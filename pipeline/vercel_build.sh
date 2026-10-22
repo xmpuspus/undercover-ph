@@ -98,4 +98,7 @@ for f in sorted(Path(sys.argv[1]).rglob("*.bin")):
     print(f"{gz}: {f.stat().st_size} -> {gz.stat().st_size} bytes")
 print(f"gzip copies: {n} files, {raw} -> {packed} bytes")
 PY
+# trees.json is a shade.py input for the next run. The map draws trees from trees.pmtiles, so the app never
+# fetches it (47 MB over 13 areas).
+find "$APP/dist/data/areas" -name trees.json -delete
 echo "vercel_build done in $((SECONDS - t_all)) s"
