@@ -93,8 +93,10 @@ async function pick(page, input, text, typed) {
 }
 
 async function chooseTime(page, day, minute, slow) {
-  // Phones have one "when" chip whose panel holds the dates and the hours.
-  if (await page.getByTestId("when-chip").isVisible().catch(() => false)) {
+  // Phones have one "when" chip whose panel holds the dates and the hours. Wait for one of the two layouts,
+  // so a check made before the chips render does not pick the wrong one.
+  await page.getByTestId("when-chip").or(page.getByTestId("date-chip")).first().waitFor({ timeout: 30000 });
+  if (await page.getByTestId("when-chip").isVisible()) {
     await page.getByTestId("when-chip").click();
     if (slow) await page.waitForTimeout(650);
     await page.locator(`[data-testid="date-option"][data-label="${day}"]`).click();

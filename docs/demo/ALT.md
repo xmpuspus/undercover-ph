@@ -4,7 +4,7 @@ Each line matches the recording made with `pnpm demo:record` on 2026-10-22, with
 
 ## hero.gif
 
-Real recording of undercover.ph: the landing card over a 3D map of Makati, Shaded picked, Greenbelt typed as the destination and Ayala MRT Station as the start, the time set to Tomorrow at 3 PM, and two routes drawn with yellow sun segments, the recommended one 88% shaded and the shortest 71% shaded, with a card that reads 22 min, 1.4 km, 2.6 min in sun, roof 7%, building shade 67%, tree shade 14% and sun 12%.
+Real recording of undercover.ph: the landing card over a 3D map of Makati, Shaded picked, Greenbelt typed as the destination and Ayala MRT Station as the start, the time set to Tomorrow at 3 PM, and two routes drawn with yellow sun segments, the recommended one 88% shaded and the shortest 72% shaded, with a card that reads 22 min, 1.4 km, 2.6 min in sun, roof 7%, building shade 68%, tree shade 13% and sun 12%.
 
 ## sun-direction.gif
 
@@ -12,7 +12,7 @@ Real recording of the same walk with ground shadows on, where the play button st
 
 ## steps-phone.gif
 
-Real recording on a phone screen: the short route card at the bottom with 88% shaded, 22 min, 2.7 min less sun than the shortest walk and 2 warnings (stairs, through a building), with most of the screen left to the map. Then Steps with 12 steps that name the sidewalk side and the walker's own side, for example "Head north on the northeast side (on your right) of Courtyard Drive", with landmarks such as Rustan's and Greenbelt 5 and flags for a crossing, an underpass with stairs and a passage through a building. Then Navigate with that first turn, step 1 of 12, and an End button.
+Real recording on a phone screen: the short route card at the bottom with 88% shaded, 22 min, 2.6 min less sun than the shortest walk and 2 warnings (stairs, through a building), with most of the screen left to the map. Then Steps with 12 steps that name the sidewalk side and the walker's own side, for example "Head north on the southwest side (on your left) of Courtyard Drive", with landmarks such as Rustan's and Greenbelt 5 and flags for a crossing, an underpass with stairs and a passage through a building. Then Navigate with that first turn, step 1 of 12, and an End button.
 
 ## rain.gif
 

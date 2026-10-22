@@ -31,7 +31,7 @@ The app covers 14 walking areas, from Caloocan to Alabang. Each area is a downto
 
 [![A walk from Ayala MRT Station to Greenbelt on undercover.ph. It shows the landing card, the Shaded choice, destination and start search, and tomorrow at 3 PM. Then three routes on the 3D map with their shaded share. Then the route card with minutes in sun and the roof, building, and tree split](docs/demo/hero.gif)](https://undercover.ph)
 
-<sub>Real recording of the app (via `app/scripts/demo-record.mjs`). Ayala MRT Station to Greenbelt, leaving at 3 PM. The recommended walk is 1,406 m, 88% shaded, with 2.6 minutes in sun. The shortest walk is 1,230 m, 71% shaded, with 5.3 minutes in sun.</sub>
+<sub>Real recording of the app (via `app/scripts/demo-record.mjs`). Ayala MRT Station to Greenbelt, leaving at 3 PM. The recommended walk is 1,406 m, 88% shaded, with 2.6 minutes in sun. The shortest walk is 1,230 m, 72% shaded, with 5.2 minutes in sun.</sub>
 
 Try it at **[undercover.ph](https://undercover.ph)**. Pick Shaded or Sheltered, choose where you start and where you go, and pick the half hour you leave.
 
@@ -45,7 +45,7 @@ The season flips which side that is at noon. From 1 May to 14 August the noon su
 
 [![The shadow layer on undercover.ph moving through one day. Building and tree shadows swing from west at 8 AM to east at 4 PM. The sun chip turns and the route updates](docs/demo/sun-direction.gif)](https://undercover.ph)
 
-<sub>Real recording of the shadow layer and the play button, made in Makati before the app covered more areas. The map draws its shadows in your browser from building heights and tree crowns. They match the shade model's ground shadows on 92% to 98% of the ground in Makati. Route scores always come from the full shade model.</sub>
+<sub>Real recording of the shadow layer and the play button in Makati. The map draws its shadows in your browser from building heights and tree crowns. They match the shade model's ground shadows on 92% to 98% of the ground in Makati. Route scores always come from the full shade model.</sub>
 
 ## Each route shows its sun minutes, cover, and sidewalk side
 

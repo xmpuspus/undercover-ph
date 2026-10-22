@@ -83,7 +83,7 @@ export function Footer({ onAbout }: { onAbout: () => void }) {
       data-testid="attribution"
     >
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer" className={`${link} font-medium text-ink`}>
-        © OpenStreetMap<span className="hidden sm:inline"> contributors</span>
+        © OpenStreetMap{" "}<span className="ml-[0.25em] hidden sm:inline">contributors</span>
       </a>
       <a href="https://openfreemap.org" target="_blank" rel="noreferrer" className={link}>
         OpenFreeMap
