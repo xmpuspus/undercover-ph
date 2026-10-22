@@ -11,6 +11,8 @@ with an hours_idx, as at a time when the malls are shut. Otherwise hours are ign
 The search follows the browser router's side-switch rule (app/src/lib/router/astar.ts, sideSwitch).
 A move between opposite side edges of one road is free at a node with flag 1 or 2 (crossing or signals).
 At a node with flag 4 (junction) it costs 60 m x (1 + K). Anywhere else it is forbidden.
+Two side edges are on opposite sidewalks when the walker has them on different hands, from each edge's
+side and the direction walked, or on the same hand after a U-turn between the same two nodes.
 So each search state is a directed edge, as in the browser, not a node. As in the browser, a walk never
 turns back along the edge it just walked, because that U-turn would dodge the side-switch rule.
 """
@@ -23,12 +25,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np  # noqa: E402
 
-from ctx import GRAPH_BBOX, OUT, WORK, haversine  # noqa: E402
+from ctx import OUT, WORK, haversine  # noqa: E402
 
-# Same values as app/src/lib/router/astar.ts and data.ts.
+# Same values as app/src/lib/router/astar.ts.
 JUNCTION_PENALTY_M = 60.0
 NODE_CROSSING, NODE_SIGNALS, NODE_JUNCTION = 1, 2, 4
-EARTH_R = 6371008.8
+OTHER_HAND = {"left": "right", "right": "left"}
 FREE, JUNCTION, FORBIDDEN, NONE = "free", "junction", "forbidden", None
 
 
@@ -44,23 +46,6 @@ def cost(e, k):
     return e["len_m"] * (1 + (0 if e["flags"] & 7 else k))
 
 
-def side_vectors(graph):
-    """Sidewalk offset per side edge in metres: from the u-v chord midpoint to the mean geom point."""
-    m_lat = EARTH_R * math.pi / 180
-    m_lon = m_lat * math.cos(math.radians((GRAPH_BBOX[1] + GRAPH_BBOX[3]) / 2))
-    nodes = graph["nodes"]
-    out = []
-    for e in graph["edges"]:
-        if e["side"] not in ("left", "right"):
-            out.append(None)
-            continue
-        g = e["geom"] if len(e["geom"]) >= 2 else [nodes[e["u"]], nodes[e["v"]]]
-        mx = sum(c[0] for c in g) / len(g) - (nodes[e["u"]][0] + nodes[e["v"]][0]) / 2
-        my = sum(c[1] for c in g) / len(g) - (nodes[e["u"]][1] + nodes[e["v"]][1]) / 2
-        out.append((mx * m_lon, my * m_lat))
-    return out
-
-
 def same_road(a, b):
     if a["name"] is not None and a["name"] == b["name"]:
         return True
@@ -69,13 +54,18 @@ def same_road(a, b):
     return {a["u"], a["v"]} == {b["u"], b["v"]}
 
 
-def side_switch(edges, side, node_flags, a, b, x):
+def side_switch(edges, node_flags, a, b, x):
     """The browser's sideSwitch: the kind of move from edge a to edge b at node x."""
-    if side[a] is None or side[b] is None:
+    ea, eb = edges[a], edges[b]
+    if ea["side"] not in OTHER_HAND or eb["side"] not in OTHER_HAND:
         return NONE
-    if not side[a][0] * side[b][0] + side[a][1] * side[b][1] < 0:
+    if not same_road(ea, eb):
         return NONE
-    if not same_road(edges[a], edges[b]):
+    # A side is relative to the edge's u-to-v direction. Walking against it puts the sidewalk on the other hand.
+    hand_a = OTHER_HAND[ea["side"]] if ea["u"] == x else ea["side"]
+    hand_b = OTHER_HAND[eb["side"]] if eb["v"] == x else eb["side"]
+    same_arm = {ea["u"], ea["v"]} == {eb["u"], eb["v"]}
+    if (hand_a != hand_b) if same_arm else (hand_a == hand_b):
         return NONE
     if node_flags is None:
         return FREE
@@ -92,7 +82,6 @@ def search(graph, src, dst, k, closed):
     edges = graph["edges"]
     nf = graph.get("node_flags")
     node_flags = nf if isinstance(nf, list) and len(nf) == len(graph["nodes"]) else None
-    side = side_vectors(graph)
     ok = [e["routable"] and not (closed and e["hours_idx"] is not None) and e["u"] != e["v"] for e in edges]
     adj = {}
     for e in edges:
@@ -105,7 +94,7 @@ def search(graph, src, dst, k, closed):
     def relax(frm, x, e, g):
         c = g + cost(edges[e], k)
         if frm is not None:
-            sw = side_switch(edges, side, node_flags, frm >> 1, e, x)
+            sw = side_switch(edges, node_flags, frm >> 1, e, x)
             if sw == FORBIDDEN:
                 return
             if sw == JUNCTION:
@@ -140,7 +129,7 @@ def search(graph, src, dst, k, closed):
     states.reverse()
     # A state's tail node is where the walker entered its edge: u for 2e, v for 2e + 1.
     tail = [edges[d >> 1]["v"] if d & 1 else edges[d >> 1]["u"] for d in states]
-    junctions = sum(side_switch(edges, side, node_flags, states[i - 1] >> 1, states[i] >> 1, tail[i]) == JUNCTION
+    junctions = sum(side_switch(edges, node_flags, states[i - 1] >> 1, states[i] >> 1, tail[i]) == JUNCTION
                     for i in range(1, len(states)))
     return [edges[d >> 1] for d in states], junctions
 

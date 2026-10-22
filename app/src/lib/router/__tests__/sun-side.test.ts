@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { sideSwitch, Switch } from "../astar";
 import { findRoutes } from "../index";
 import type { Result, Route } from "../types";
 import { DAY, edgeIdx, fan, makeData, NIGHT, query, type EdgeSpec } from "./helpers";
@@ -153,6 +154,68 @@ describe("side switches", () => {
     expect(s.steps[1].text).toBe("Cross where there is no marked crossing. Walk on the south side (on your right) of Ayala Avenue");
     expect(s.steps[1].flags).toContain("crossing");
     expect(s.warnings).toContain("Crosses a road where there is no marked crossing.");
+  });
+
+  it("reads the side from the way direction, not the bend of a curved piece", () => {
+    // B to C bulges 150 m north. Its south sidewalk line then has a mean point north of the chord, so the
+    // old offset test called the move from the north sidewalk a same-side move and hid the crossing at B.
+    const curved = (flagB: number) =>
+      makeData({
+        nodes: AVENUE,
+        edges: [north(0, 1, 0, 200), { ...south(1, 2, 200, 400), geom: [[200, -5], [300, 145], [400, -5]] }],
+        nodeFlags: [4, flagB, 4],
+      });
+    expect(sideSwitch(curved(0), 0, 1, 1)).toBe(Switch.Forbidden);
+    expect(findRoutes(curved(0), query({ from: 0, to: 2 })).state).toBe("no_route");
+    const s = byLabel(findRoutes(curved(4), query({ from: 0, to: 2 })), "shortest");
+    expect(s.steps[1].text).toMatch(/^Cross where there is no marked crossing\. /);
+    expect(s.warnings).toContain("Crosses a road where there is no marked crossing.");
+  });
+
+  it("keeps a walker on one sidewalk through a mid-block bend", () => {
+    // Both pieces carry only the north sidewalk. B to C bulges 150 m south, so its mean point falls south of
+    // the chord, and the old offset test forbade this same-side move: no route.
+    const data = makeData({
+      nodes: AVENUE,
+      edges: [north(0, 1, 0, 200), north(1, 2, 200, 400, { geom: [[200, 5], [300, -145], [400, 5]] })],
+      nodeFlags: [4, 0, 4],
+    });
+    expect(sideSwitch(data, 0, 1, 1)).toBe(Switch.None);
+    const r = findRoutes(data, query({ from: 0, to: 2 }));
+    expect(r.state).toBe("ok");
+    expect(byLabel(r, "shortest").warnings).not.toContain("Crosses a road where there is no marked crossing.");
+  });
+
+  it("counts a U-turn onto the other sidewalk of the same piece as a switch", () => {
+    // Walking the north sidewalk west from B to A, then back east on the south sidewalk, crosses at A.
+    const data = makeData({ nodes: AVENUE, edges: [north(0, 1, 0, 200), south(0, 1, 0, 200)], nodeFlags: [0, 4, 4] });
+    expect(sideSwitch(data, 0, 1, 0)).toBe(Switch.Forbidden);
+    expect(sideSwitch(data, 0, 1, 1)).toBe(Switch.Junction);
+  });
+
+  it("keeps the same sidewalk round a sharp corner between two ways", () => {
+    // A road reaches X (200, 0) from the west on one way and leaves on another way back to the southwest,
+    // a 150 degree turn. The second way runs from Y to X. The north (left) sidewalk of the first way and the
+    // southeast (right) sidewalk of the second both run round the outside of the corner. The south and the
+    // northwest sidewalks both run round the inside.
+    const data = makeData({
+      nodes: [
+        [0, 0],
+        [200, 0],
+        [27, -100],
+      ],
+      edges: [
+        { u: 0, v: 1, name: "Osmena Highway", side: "left", way: 1, geom: [[0, 5], [200, 5]] },
+        { u: 0, v: 1, name: "Osmena Highway", side: "right", way: 1, geom: [[0, -5], [200, -5]] },
+        { u: 2, v: 1, name: "Osmena Highway", side: "right", way: 2, geom: [[29.5, -104.3], [202.5, -4.3]] },
+        { u: 2, v: 1, name: "Osmena Highway", side: "left", way: 2, geom: [[24.5, -95.7], [197.5, 4.3]] },
+      ],
+      nodeFlags: [4, 0, 4],
+    });
+    expect(sideSwitch(data, 0, 2, 1)).toBe(Switch.None);
+    expect(sideSwitch(data, 1, 3, 1)).toBe(Switch.None);
+    expect(sideSwitch(data, 0, 3, 1)).toBe(Switch.Forbidden);
+    expect(sideSwitch(data, 1, 2, 1)).toBe(Switch.Forbidden);
   });
 
   it("leaves moves onto centre edges alone", () => {

@@ -9,9 +9,17 @@ Access follows pipeline/access_policy.py: the research policy plus the project d
 Writes app/public/data/graph.json and pipeline/work/{graph_log.json,edge_causes.json}.
 
 Graph method (reused from research scripts/05/extract_walk_graph.py): static public-through ways only,
-whole ways omitted when they touch an explicitly blocked node, graph nodes at way ends and at nodes
-shared by two or more kept ways, one edge per way piece between graph nodes.
+graph nodes at way ends and at nodes shared by two or more kept ways, one edge per way piece between
+graph nodes. Two changes from the research extractor (2026-10-22):
+
+- A node rule acts on the way pieces that hold the node, not on the whole way. A piece through an
+  explicitly blocked node is left out, and a piece through a node that needs an access check is unroutable.
+  The rest of the way stays, so a public road keeps its open length up to a gate.
+- A walkable way with no node inside the graph rects is kept when it lies on a run of at most CONNECT_M
+  outside the rects that joins two separate routable pieces of the kept ways. The rects cut through roads
+  where member districts meet, such as the Tinajeros Bridge between Malabon and Valenzuela.
 """
+import heapq
 import json
 import math
 import re
@@ -50,6 +58,8 @@ INSIDE_SHARE = 0.5
 # Safety item: node_flags tell the router where a walker can cross between side edges.
 NODE_BIT = {"crossing": 1, "signals": 2, "junction": 4, "grade_separated": 8}
 CROSSING_STREETS = ["Ayala Avenue", "Paseo de Roxas", "Makati Avenue", "Senator Gil J. Puyat Avenue"]
+# Longest run outside the graph rects that a connector way may add between two routable pieces.
+CONNECT_M = 300.0
 
 
 def crossing_node_tags():
@@ -270,6 +280,77 @@ def landmark_index():
     return feats, STRtree([f[1] for f in feats])
 
 
+def node_checked(nid, node_rules, blocked):
+    """True when the node blocks the public or needs an access check, so a piece through it is not routable."""
+    return nid in blocked or (nid in node_rules and (node_requires_evaluation(node_rules[nid][2]) or
+                                                     node_time_rule(node_walker_tags(node_rules[nid][2]))))
+
+
+def connector_ways(ways, outside, node_rules, blocked):
+    """Outside ways on a run of at most CONNECT_M that joins two separate routable pieces of the kept ways.
+
+    The pieces come from the kept ways split at shared nodes, without the ways or pieces that need a check.
+    From each kept node that an outside way touches, a search along outside ways stops at the first kept
+    node it reaches. When that node lies in another piece, every way on the run becomes a connector.
+    """
+    root = {}
+
+    def find(x):
+        root.setdefault(x, x)
+        while root[x] != x:
+            root[x] = root[root[x]]
+            x = root[x]
+        return x
+
+    use = Counter()
+    for wy in ways:
+        use.update(set(wy["ids"]))
+        use[wy["ids"][0]] += 1
+        use[wy["ids"][-1]] += 1
+    for wy in ways:
+        ids = wy["ids"]
+        for nid in ids:
+            find(nid)
+        if way_requires_evaluation(wy["tags"]):
+            continue
+        start = 0
+        for i in range(1, len(ids)):
+            if use[ids[i]] < 2 and i != len(ids) - 1:
+                continue
+            piece = ids[start:i + 1]
+            if not any(node_checked(n, node_rules, blocked) for n in piece):
+                for n in piece[1:]:
+                    root[find(n)] = find(piece[0])
+            start = i
+    adj = defaultdict(list)
+    for k, wy in enumerate(outside):
+        ids, lons, lats = wy["ids"], wy["lons"], wy["lats"]
+        for i in range(1, len(ids)):
+            d = haversine(lats[i - 1], lons[i - 1], lats[i], lons[i])
+            adj[ids[i - 1]].append((ids[i], d, k))
+            adj[ids[i]].append((ids[i - 1], d, k))
+    chosen = set()
+    for s in sorted(n for n in adj if n in root):
+        rs = find(s)
+        dist, prev, heap = {s: 0.0}, {}, [(0.0, s)]
+        while heap:
+            d, x = heapq.heappop(heap)
+            if d > dist[x]:
+                continue
+            if x != s and x in root:
+                if find(x) != rs:
+                    while x in prev:
+                        x, k = prev[x]
+                        chosen.add(k)
+                continue
+            for y, c, k in adj[x]:
+                if d + c <= CONNECT_M and d + c < dist.get(y, math.inf):
+                    dist[y] = d + c
+                    prev[y] = (x, k)
+                    heapq.heappush(heap, (d + c, y))
+    return [outside[k] for k in sorted(chosen)]
+
+
 def main():
     t0 = time.time()
     node_rules = read_node_rules(str(PBF))
@@ -281,8 +362,8 @@ def main():
     cross_nodes, signal_nodes, crossing_no_nodes = crossing_node_tags()
     ways_at_node, street_nodes = defaultdict(set), defaultdict(set)
 
-    ways, lanes_by_class = [], defaultdict(list)
-    blocked_ways, blocked_len, bad_loc, not_walkable = 0, 0.0, 0, 0
+    ways, outside, lanes_by_class = [], [], defaultdict(list)
+    blocked_ways, blocked_pieces, blocked_len, bad_loc, not_walkable = 0, 0, 0.0, 0, 0
     fp = (osmium.FileProcessor(str(PBF), osmium.osm.NODE | osmium.osm.WAY).with_locations()
           .with_filter(osmium.filter.EntityFilter(osmium.osm.WAY))
           .with_filter(osmium.filter.KeyFilter("highway")))
@@ -294,13 +375,21 @@ def main():
         except osmium.InvalidLocationError:
             bad_loc += 1
             continue
+        near = any(in_bbox(lo, la, BUILDING_BBOX) for lo, la in zip(lons, lats))
         # Junction counts use every highway way near the graph, walkable or not, each way once.
-        if any(in_bbox(lo, la, BUILDING_BBOX) for lo, la in zip(lons, lats)):
+        if near:
             for nid in set(ids):
                 ways_at_node[nid].add(w.id)
             if w.tags.get("name") in CROSSING_STREETS:
                 street_nodes[w.tags.get("name")].update(ids)
-        if len(ids) < 2 or not any(in_bbox(lo, la, GRAPH_BBOX) for lo, la in zip(lons, lats)):
+        if len(ids) < 2:
+            continue
+        if not any(in_bbox(lo, la, GRAPH_BBOX) for lo, la in zip(lons, lats)):
+            # A connector candidate: walkable, with no rule on the way or its nodes.
+            tags = dict(w.tags)
+            if (near and static_public_walkable(tags) and not way_requires_evaluation(tags)
+                    and not any(node_checked(n, node_rules, blocked) for n in ids)):
+                outside.append({"id": w.id, "ids": ids, "lons": lons, "lats": lats, "tags": tags})
             continue
         tags = dict(w.tags)
         lane_n = parse_lanes(tags.get("lanes"))
@@ -309,11 +398,10 @@ def main():
         if not static_public_walkable(tags):
             not_walkable += 1
             continue
-        if any(nid in blocked for nid in ids):
-            blocked_ways += 1
-            blocked_len += sum(haversine(lats[i - 1], lons[i - 1], lats[i], lons[i]) for i in range(1, len(ids)))
-            continue
+        blocked_ways += any(nid in blocked for nid in ids)
         ways.append({"id": w.id, "ids": ids, "lons": lons, "lats": lats, "tags": tags})
+    connectors = connector_ways(ways, outside, node_rules, blocked)
+    ways += connectors
 
     class_lanes = {k: float(median(v)) for k, v in lanes_by_class.items() if len(v) >= 5}
 
@@ -339,26 +427,22 @@ def main():
     for wy in ways:
         ids, lons, lats, tags = wy["ids"], wy["lons"], wy["lats"], wy["tags"]
         base = contract_flags(tags)
-        causes = way_eval_causes(tags)
+        way_causes = way_eval_causes(tags)
         ign = ignored_conditionals(tags)
         if ign:
             ignored_ways += 1
             ignored_keys.update(ign)
-        node_time = False
-        for nid in ids:
+        # Node rules by position in the way. Each applies to the pieces that hold its node.
+        node_causes, node_time = {}, set()
+        for j, nid in enumerate(ids):
             if nid in node_rules:
                 ntags = node_rules[nid][2]
                 if node_requires_evaluation(ntags):
-                    causes.append(node_cause(node_walker_tags(ntags)))  # whole way, as the research extractor flags it
+                    node_causes[j] = node_cause(node_walker_tags(ntags))
                 elif ntags.get("barrier") == "kerb":
                     kerb_ignored.add(nid)
                 if node_time_rule(node_walker_tags(ntags)):
-                    node_time = True
-        if causes:
-            base |= BIT["access_eval"]
-        if node_time:
-            base |= BIT["time"]
-        causes = sorted(set(causes))
+                    node_time.add(j)
         for lo, la in zip(lons, lats):
             if not in_bbox(lo, la, GRAPH_BBOX):
                 dx = max(GRAPH_BBOX[0] - lo, 0, lo - GRAPH_BBOX[2]) * 111320 * math.cos(math.radians(la))
@@ -389,10 +473,17 @@ def main():
             if use[ids[i]] < 2 and i != len(ids) - 1:
                 continue
             seg = range(start, i + 1)
+            if any(ids[j] in blocked for j in seg):
+                # The piece passes an explicitly blocked node, so it stays out. The way's other pieces stay in.
+                blocked_pieces += 1
+                blocked_len += sum(haversine(lats[j - 1], lons[j - 1], lats[j], lons[j]) for j in seg[1:])
+                start = i
+                continue
             u = nid_of(ids[start], lons[start], lats[start])
             v = nid_of(ids[i], lons[i], lats[i])
             centre = [[round(lons[j], 7), round(lats[j], 7)] for j in seg]
-            flags = base
+            causes = sorted(set(way_causes + [node_causes[j] for j in seg if j in node_causes]))
+            flags = base | (BIT["access_eval"] if causes else 0) | (BIT["time"] if any(j in node_time for j in seg) else 0)
             if any(ids[j] in elevators for j in seg):
                 flags |= BIT["elevator"]
             common = {"u": u, "v": v, "way_id": wy["id"], "name": tags.get("name"), "level": tags.get("level"),
@@ -571,7 +662,12 @@ def main():
     log = {
         "access_profile": LOCAL_PROFILE, "seconds": round(time.time() - t0, 1),
         "ways_kept": len(ways), "ways_not_walkable": not_walkable,
-        "ways_omitted_blocked_node": blocked_ways, "km_omitted_blocked_node": round(blocked_len / 1000, 3),
+        "ways_with_blocked_node": blocked_ways, "pieces_omitted_blocked_node": blocked_pieces,
+        "km_omitted_blocked_node": round(blocked_len / 1000, 3),
+        "connector_ways": len(connectors),
+        "connector_km": round(sum(sum(haversine(c["lats"][i - 1], c["lons"][i - 1], c["lats"][i], c["lons"][i])
+                                      for i in range(1, len(c["ids"]))) for c in connectors) / 1000, 3),
+        "connector_way_ids": [c["id"] for c in connectors],
         "ways_bad_location": bad_loc, "max_node_distance_outside_graph_bbox_m": round(max_out_m, 1),
         "nodes": n, "edges": len(edges), "km": km(edges),
         "routable_edges": len(rout), "routable_km": km(rout),

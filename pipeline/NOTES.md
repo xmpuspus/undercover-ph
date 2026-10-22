@@ -610,3 +610,52 @@ A clean `git archive` copy built in an `amazonlinux:2023` container with 4 CPUs 
 - The 104 shade files take 49.0 MB, and their gzip copies 13.6 MB. `app/dist` holds 205 MB.
 - Of that, each area's `trees.json` adds 47 MB that the app does not read, because the map reads `trees.pmtiles`.
 - The six-area run before it took 276 s.
+
+### A fixed side test and two graph rules join the split areas, and las-pinas ships
+
+Date: 2026-10-22. Missing crossings did not split the areas. Three other causes did.
+
+- **las-pinas: the side test misread sidewalks.** The router compared each sidewalk line's mean vertex with its chord midpoint. On a bent piece, or one with uneven vertices, that vector points along the road or to the wrong side. At node 2137 on Alabang-Zapote Road, a mid-block way split, all four onward moves read as side changes, so the road ended there.
+- **north-coast: the area's graph boxes leave gaps.** The Valenzuela piece, 2,738 nodes and 322 places, joined the rest only through 79 m of M. H. del Pilar Street on the Tinajeros Bridge, which lies outside all five boxes.
+- **paranaque-bf-aguirre: gates.** Its walk network fell into 148 routable pieces. Gate nodes made 11.98 km of edges unroutable, and 294 ways touching a closed gate node, 24.7 km, stayed out of the graph.
+- **Everywhere: a node rule acted on its whole way.** One gate made a whole way unroutable, and one closed node removed a whole way. So a public road lost its full length to a gate at one end.
+
+Changes:
+
+- `app/src/lib/router/astar.ts` and `pipeline/districts/route_check.py` tell sidewalks apart from each edge's `side` and the direction walked. A U-turn onto the other edge between the same two nodes is a change of sidewalk. The crossing rule stays: free at flag 1 or 2, 60 m x (1 + k) and a warning at flag 4, forbidden elsewhere.
+- `pipeline/districts/build_graph.py` applies a node rule to the way pieces that hold the node. A piece through a closed node stays out, and a piece through a node that needs a check is unroutable. The rest of the way stays in.
+- It keeps a walkable way outside the graph boxes when it joins two separate routable pieces within 300 m (`CONNECT_M`). The way may have no access rule on itself or its nodes.
+- No rebuilt edge passes a closed node, and no routable edge passes a node that needs a check. A position-aware check over all 14 graphs found 0 of each.
+
+Each area was rebuilt with `build.py`, shaded, and published by `publish.py` with no held area. The rebuild with the old scripts gave byte-identical pasay-moa files first.
+Place pairs: 600 seeded random pairs of an area's places, routed with the side rule, before on the old places and after on the new ones.
+Largest piece: the share of routable nodes in the largest piece of the router's search graph.
+
+| Area | Edges | Connector ways (km) | Place pairs with a route | Largest piece |
+| --- | --- | --- | --- | --- |
+| metro-core | 30,894 to 34,477 | 103 (8.2) | 93.5% to 94.8% | 89.1% to 93.1% |
+| pasay-moa | 5,735 to 6,292 | 22 (2.5) | 96.0% to 97.8% | 83.5% to 89.6% |
+| cubao-eastwood | 5,661 to 6,463 | 31 (2.4) | 78.3% to 92.8% | 80.6% to 93.3% |
+| qc-north | 9,343 to 10,547 | 23 (3.8) | 89.3% to 90.3% | 85.6% to 89.7% |
+| manila | 16,711 to 18,559 | 116 (12.9) | 93.8% to 97.0% | 83.5% to 88.9% |
+| alabang | 5,312 to 5,621 | 8 (0.8) | 75.3% to 76.0% | 80.0% to 82.0% |
+| north-coast | 15,449 to 16,919 | 51 (5.4) | 58.0% to 99.0% | 61.7% to 92.7% |
+| marikina | 7,022 to 7,706 | 30 (1.8) | 70.7% to 74.8% | 78.3% to 81.8% |
+| paranaque-airport | 6,223 to 6,957 | 48 (2.1) | 76.2% to 86.8% | 78.1% to 86.2% |
+| las-pinas | 4,301 to 4,855 | 39 (3.5) | 31.0% to 87.5% | 31.8% to 73.5% |
+| paranaque-bf-aguirre | 3,207 to 3,712 | 26 (2.3) | 38.8% to 50.7% | 35.7% to 42.0% |
+| taguig-pateros | 14,281 to 15,543 | 122 (8.2) | 78.0% to 80.2% | 83.0% to 85.3% |
+| qc-commonwealth-fairview | 9,331 to 10,420 | 65 (7.0) | 92.5% to 92.8% | 86.8% to 89.7% |
+| qc-banawe | 5,204 to 6,015 | 40 (3.1) | 89.8% to 99.2% | 89.1% to 96.1% |
+
+- With the fixed side test, every area's reach equals its reach with no side rule at all.
+- las-pinas passes its three checks: Robinsons Place to SM Center 2,274 m, to City Hall 2,122 m, and Vista Mall to Las Pinas Doctors Hospital 3,202 m. None needs an unmarked crossing.
+- Valenzuela City Medical Center to Valenzuela Town Center falls from 5,352 m to 1,729 m, against 930 m straight.
+- Ayala MRT Station to Greenbelt keeps the same routes, lengths and steps at 08:00, 12:00, 15:00 and 16:00, and in rain mode.
+- In the old routes for 2,843 place pairs, 2,623 moves crossed a road mid-block without a step, 1,473 of them on trunk, primary or secondary roads. The fixed test forbids them. 271 old unmarked-crossing warnings were moves along one sidewalk.
+
+Still open:
+
+- Gated villages are a project decision. In paranaque-bf-aguirre, 120 edges, 7.1 km, pass a gate and stay unroutable, and 298 pieces, 12.2 km, pass a closed gate and stay out. With every gate in its graph open, 66.8% of place pairs would route.
+- `barrier=bollard` and `barrier=height_restrictor` still need an access check, although both let walkers pass. In north-coast they hold 1.1 km of unroutable edges.
+- The step text names a sidewalk's compass side from the same mean vertex vector. On 20% to 33% of side edges that word differs from the side the line's ends show, and on 6% to 11% by 90 degrees or more.

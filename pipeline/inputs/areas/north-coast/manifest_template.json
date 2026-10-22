@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T15:48:42+08:00",
+ "generated_at": "2026-10-22T17:03:05+08:00",
  "osm_extract": "philippines-261020.osm.pbf, md5 941dd405ba4f1c028ca874cde38ea200, clipped to ncr.osm.pbf with osmium extract -b 120.90,14.35,121.20,14.80",
  "pilot_bbox": [
   120.94,
@@ -58,11 +58,11 @@
   1110
  ],
  "counts": {
-  "nodes": 10241,
-  "edges": 15449,
-  "routable_edges": 14284,
+  "nodes": 11066,
+  "edges": 16919,
+  "routable_edges": 16068,
   "buildings": 136324,
-  "places": 1462
+  "places": 1470
  },
  "sources": [
   {
@@ -79,23 +79,24 @@
   }
  ],
  "limits": [
-  "Edges with unchecked access rules are not routable by default. That removes 1165 of 15449 edges, or 54.5 km.",
-  "The largest routable network holds 61.8% of routable nodes and 68.2% of routable length.",
+  "Edges with unchecked access rules are not routable by default. That removes 851 of 16919 edges, or 38.6 km.",
+  "The largest routable network holds 92.7% of routable nodes and 95.7% of routable length.",
   "Kerbs do not trigger an access check. 0 edges that cross a raised kerb carry the steps flag, so step-free routes avoid them.",
-  "Gates alone remove 1101 edges and 51.8 km. Village and estate gates need a field check.",
+  "Gates alone remove 797 edges and 36.4 km. Village and estate gates need a field check.",
   "Only access, foot and opening-hours rules restrict walkers. Vehicle-only conditional tags, such as a Sunday car-free rule, do not.",
   "Indoor corridors and building passages without cited hours stay unroutable. They remove 0 edges and 0.0 km.",
-  "The graph leaves out 923 whole ways, 20.5 km, that touch an explicitly closed node.",
+  "The graph leaves out 925 way pieces, 15.1 km, that pass an explicitly closed node. The rest of those 923 ways stays in.",
   "0 indoor edges with cited mall hours are routable. The router opens and closes them by those hours.",
-  "The routable graph has 0.15 km of roofed, tunnel or indoor walkway in 3 edges.",
+  "The routable graph has 0.16 km of roofed, tunnel or indoor walkway in 4 edges.",
   "OSM maps 0 indoor, corridor or passage edges here. 0 of them carry mall hours.",
   "Some plain footways run through mall footprints without indoor tags. They stay routable at all hours.",
-  "69 unsheltered edges, 1.8 km, run mostly inside a building footprint with no cover tag.",
+  "71 unsheltered edges, 1.9 km, run mostly inside a building footprint with no cover tag.",
   "Those edges carry flag 1024, inside a footprint with cover unverified. They get no shelter flag, and their shade counts as low confidence.",
   "The graph keeps each whole way that has a node in the graph area. Some edges reach 1072 m past it.",
+  "51 ways outside the graph area, 5.4 km, join walk network pieces that the area edge cut apart.",
   "A road side edge starts half the carriageway width plus 1 m from the road centreline.",
   "The offset shrinks in 0.5 m steps, down to 1.5 m, until no 1 m sample sits inside a ground-level footprint.",
-  "1497 side edges moved closer to the road. 202 sides still inside a footprint at 1.5 m became 185 centre edges.",
+  "1636 side edges moved closer to the road. 206 sides still inside a footprint at 1.5 m became 189 centre edges.",
   "Carriageway width comes from the width tag, else lanes x 3.2 m, else the median lane count for that road class.",
   "The class medians are 3 lanes for primary, 2 for secondary and 2 for tertiary roads.",
   "Side offsets run from 1.5 m to 13.8 m, with a median of 4.2 m.",
@@ -104,8 +105,8 @@
   "Both side edges share the road's nodes. Node flags mark crossings, signals, junctions and grade-separated links.",
   "Side edge geometry starts and ends at the offset line, a few metres from its nodes.",
   "The offset ignores real kerb lines. A dual carriageway can get a side edge on its median.",
-  "Places snap to the largest routable network within 80 m when possible. 391 places still sit on small islands.",
-  "36 named places lie more than 80 m from a routable node, so the app omits them.",
+  "Places snap to the largest routable network within 80 m when possible. 5 places still sit on small islands.",
+  "28 named places lie more than 80 m from a routable node, so the app omits them.",
   "OSM opening hours that the simple parser cannot read are skipped. 0 values were skipped.",
   "Building heights come from OSM height, else OSM levels x 3.74 m, else the Google 2023 median, else a 7.5 m default.",
   "Google fills 125369 OSM building objects with modelled 2023 heights. Google heights stop near 100 m.",

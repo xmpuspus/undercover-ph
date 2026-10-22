@@ -201,7 +201,7 @@ def make_limits(g, p, b, h):
         f"Gates alone remove {gate_ed} edges and {gate_km:.1f} km. Village and estate gates need a field check.",
         "Only access, foot and opening-hours rules restrict walkers. Vehicle-only conditional tags, such as a Sunday car-free rule, do not.",
         f"Indoor corridors and building passages without cited hours stay unroutable. They remove {ed('way_controlled_passage')} edges and {km('way_controlled_passage'):.1f} km.",
-        f"The graph leaves out {g['ways_omitted_blocked_node']} whole ways, {g['km_omitted_blocked_node']:.1f} km, that touch an explicitly closed node.",
+        f"The graph leaves out {g['pieces_omitted_blocked_node']} way pieces, {g['km_omitted_blocked_node']:.1f} km, that pass an explicitly closed node. The rest of those {g['ways_with_blocked_node']} ways stays in.",
         f"{g['indoor_opened_by_hours_edges']} indoor edges with cited mall hours are routable. The router opens and closes them by those hours.",
         f"The routable graph has {g['sheltered_routable_km']:.2f} km of roofed, tunnel or indoor walkway in {g['sheltered_routable_edges']} edges.",
         f"OSM maps {indoor} indoor, corridor or passage edges here. {sum(g['hours_idx_edges'].values())} of them carry mall hours.",
@@ -210,6 +210,7 @@ def make_limits(g, p, b, h):
         "Those edges carry flag 1024, inside a footprint with cover unverified. They get no shelter flag, and their shade counts as low confidence.",
         "The graph keeps each whole way that has a node in the graph area. "
         f"Some edges reach {g['max_node_distance_outside_graph_bbox_m']:.0f} m past it.",
+        f"{g['connector_ways']} ways outside the graph area, {g['connector_km']:.1f} km, join walk network pieces that the area edge cut apart.",
         "A road side edge starts half the carriageway width plus 1 m from the road centreline.",
         "The offset shrinks in 0.5 m steps, down to 1.5 m, until no 1 m sample sits inside a ground-level footprint.",
         f"{g['side_edges_moved_closer']} side edges moved closer to the road. {sum(g['side_fallback_sides'].values())} sides still inside a footprint at 1.5 m became {g['side_fallback_centre_edges']} centre edges.",

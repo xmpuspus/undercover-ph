@@ -2,10 +2,10 @@
 
 Dated 2026-10-22. The project owns it. The pipeline in `pipeline/` writes every file below to `app/public/data/`. The app in `app/` reads them and nothing else.
 
-## Thirteen routing areas share one time zone and one date rule
+## Fourteen routing areas share one time zone and one date rule
 
-- `areas.json` lists 13 routing areas. Their ids are metro-core, pasay-moa, cubao-eastwood, qc-north, manila, alabang, north-coast, marikina, paranaque-airport, paranaque-bf-aguirre, taguig-pateros. The other two are qc-commonwealth-fairview and qc-banawe. metro-core has Makati CBD.
-- `pipeline/areas.json` lists las-pinas too. It stays out of the app until its route checks pass.
+- `areas.json` lists 14 routing areas. Their ids are metro-core, pasay-moa, cubao-eastwood, qc-north, manila, alabang, north-coast, marikina, paranaque-airport, las-pinas and paranaque-bf-aguirre. The other three are taguig-pateros, qc-commonwealth-fairview and qc-banawe. metro-core has Makati CBD.
+- las-pinas joined on 2026-10-22, after its three route checks passed.
 - A route runs inside one area. Each area joins one or more districts, and each district stays a named neighbourhood.
 - An area's `bbox` is the envelope of its district boxes. Its graph area is the union of its `graph_rects`, and each of those is a district box plus 500 m.
 - The building area is each graph box plus 800 m, so long low-sun shadows reach the edges.
@@ -31,6 +31,9 @@ On 2026-10-22 the contract added these rules.
 - Road side edges keep their samples outside building footprints. The offset shrinks to 1.5 m, then falls back to one centre edge.
 - `graph.node_flags` holds one integer per node. The bit values are 1 mapped crossing, 2 traffic signals, 4 junction of 3 or more ways, 8 grade-separated link.
 - A route changes to the opposite side of the same road only at a node with bit 1 or 2. At a junction without them it costs 60 m and gets a warning. Elsewhere the router forbids it.
+- Amendment, 2026-10-22. Two side edges are on opposite sidewalks when the walker has them on different hands, from each edge's `side` and the direction walked. A U-turn onto the other edge between the same two nodes counts as a change of sidewalk. The router does not use the mean offset of the sidewalk line for this.
+- Amendment, 2026-10-22. A node rule applies to the way pieces that hold the node. The build leaves out a piece through an explicitly closed node and marks a piece through a node that needs an access check as unroutable. The rest of the way stays.
+- Amendment, 2026-10-22. A walkable way with no node in the `graph_rects` stays when it joins two separate routable pieces of the area within 300 m outside them.
 - Since 2026-10-22 the area builds write no shadow overlay PNGs and no `manifest.shadow_overlay`. The app draws building and tree shadows from `buildings.pmtiles` and `trees.pmtiles`.
 
 The app builds its default adjacency only from edges with `routable == true` that are open at the chosen time. A user toggle "Include paths with unchecked access" stays off by default. When the user turns it on, the app draws those edges dashed and labels them on the route card.
@@ -43,7 +46,7 @@ These files are committed in git and built by `pipeline/districts/publish.py` fr
 
 ```text
 app/public/data/
-  areas.json             the 13 areas
+  areas.json             the 14 areas
   places_index.json      every place once, for search
   buildings.pmtiles      buildings of all areas, one file
   trees.pmtiles          tree crowns of all areas, one file
@@ -95,12 +98,12 @@ All JSON files that git keeps are compact, with no spaces or line breaks.
   "node_id": 0, "area": "metro-core", "aliases": ["Ayala MRT"], "detail": "..."}]
 ```
 
-- One row for each real place, with the fields of `places.json` plus `area`. 16,010 rows.
+- One row for each real place, with the fields of `places.json` plus `area`. 16,667 rows.
 - `node_id` is a node in that area's `graph.json`. It means nothing in another area's graph.
 - `aliases` and `detail` appear only when the place has them.
 - Areas overlap, for example taguig-pateros and metro-core, or paranaque-airport and pasay-moa. A place can be in both areas' `places.json`.
 - The index treats two places as one when the names match and the points lie within 150 m. That is the radius `build_places.py` uses to merge a name.
-- It keeps the copy whose point lies farthest inside its own area's `graph_rects`, so the route has the most graph around it. That drops 954 copies.
+- It keeps the copy whose point lies farthest inside its own area's `graph_rects`, so the route has the most graph around it. That drops 963 copies.
 - Each area's `places.json` keeps all its places, because the router needs them.
 
 ### `manifest.json`
@@ -149,7 +152,7 @@ One per area, in `areas/<id>/graph.json`. Node and edge ids count from 0 in each
 ```
 
 - `geom` runs from `u` to `v`.
-- `side` is `"left"`, `"right"`, or `"centre"`. Two-sided road sidewalks become two edges, joined by crossing links.
+- `side` is `"left"`, `"right"`, or `"centre"`. Two-sided road sidewalks become two edges, joined by crossing links. Left and right are relative to the edge's `u` to `v` direction, which is the OSM way direction.
 - `landmark` is the nearest named building or place within 25 m, or `null`.
 - `flags` is a bitmask with these bits.
 
@@ -185,7 +188,7 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 - Paths in `files` and `lowconf` start at the area folder.
 - Sheltered edges (`flags & 7`) count as 100% roof in the app. The pipeline still writes their values.
 - Each sample point casts a ray toward the sun from its own height. Footbridge samples start at deck height.
-- `<name>.bin.gz` is a gzip copy beside every `.bin`. For metro-core a date file is 1,606,488 bytes, and its copy is 432,058.
+- `<name>.bin.gz` is a gzip copy beside every `.bin`. For metro-core a date file is 1,792,804 bytes, and its copy is 563,428.
 - Vercel compresses only listed MIME types, and `application/octet-stream` is not one of them.
 - `pipeline/vercel_build.sh` writes the copies after the app build, in `app/dist/data/areas/`, so each copy matches the shipped file.
 - `app/vercel.json` serves `.bin.gz` as `application/gzip`. The app fetches the copy and inflates it with `DecompressionStream`.
@@ -194,19 +197,19 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 ### `buildings.pmtiles` (app) and `pipeline/inputs/areas/<id>/buildings.geojson.gz` (pipeline)
 
 - `buildings.geojson.gz` holds every building of one area out to the shade margin, for the shade engine. It stays in the pipeline.
-- `buildings.pmtiles` is one file for all 13 areas. Its source layer is `buildings`.
+- `buildings.pmtiles` is one file for all 14 areas. Its source layer is `buildings`.
 - Each feature is a polygon with two numbers, `height_m` and `min_height_m`. Each `building:part` is its own feature.
-- It holds every building that has a height and lies within 150 m of a walk area. That is 637,936 buildings and 24.4 MB.
-- Where two areas overlap, one copy stays when the heights match and the centres lie within 1 m. That removed 55,927 copies.
+- It holds every building that has a height and lies within 150 m of a walk area. That is 665,246 buildings and 25.5 MB.
+- Where two areas overlap, one copy stays when the heights match and the centres lie within 1 m. That removed 55,942 copies.
 - Zooms 13 to 15. Zoom 15 keeps every footprint, unsimplified, on a grid of about 0.15 m. The app overzooms past 15.
 - Zooms 13 and 14 thin out small footprints, with tippecanoe's defaults, to keep tiles light.
-- A check build drew 212,830 buildings at zoom 13 and 637,731 at zoom 14. When the count matters, draw shadows from zoom 15 data.
+- A check build of the 13-area file drew 212,830 of its 637,936 buildings at zoom 13 and 637,731 at zoom 14. When the count matters, draw shadows from zoom 15 data.
 
 ### `trees.pmtiles`
 
-- One file for all 13 areas, 17.9 MB. Its source layer is `trees`.
+- One file for all 14 areas, 18.4 MB. Its source layer is `trees`.
 - Each feature is a point at a crown centre, with three numbers in metres. They are `r_m` (crown radius), `top_m` (crown top) and `base_m` (crown base).
-- It holds 1,325,409 crowns of 3 m or taller, within 200 m of a walk area. The build removes 8,889 copies from overlapping areas.
+- It holds 1,366,459 crowns of 3 m or taller, within 200 m of a walk area. The build removes 8,917 copies from overlapping areas.
 - Zooms 14 and 15. Both zooms keep every crown, so tree shadows look the same at either zoom.
 - The crowns equal each area's deploy-time `trees.json`, which `manifest.trees` describes.
 

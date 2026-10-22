@@ -37,12 +37,25 @@ function sameRoad(data: Data, a: number, b: number): boolean {
 
 /**
  * Classify the move from edge a to edge b at node x. A side switch is a move between two side edges
- * of the same road whose sidewalk offsets point to opposite sides (dot product below 0).
+ * of the same road on opposite sidewalks.
+ *
+ * An edge's side, left or right, is relative to its u-to-v direction, which is the OSM way direction.
+ * So the side and the direction walked give the hand the walker has the sidewalk on. Between pieces on
+ * two different arms of x, the same sidewalk stays on the same hand, at any turn angle. A U-turn onto
+ * the other edge between the same two nodes reverses the walker, so there the same hand means the
+ * other sidewalk. The offset vectors (sideX, sideY) cannot decide this: on a curved piece the bend
+ * moves the mean of the line more than the sidewalk offset does.
  */
 export function sideSwitch(data: Data, a: number, b: number, x: number): Switch {
-  if (a < 0 || !data.edgeSide[a] || !data.edgeSide[b]) return Switch.None;
-  if (!(data.sideX[a] * data.sideX[b] + data.sideY[a] * data.sideY[b] < 0)) return Switch.None;
+  const side = data.edgeSide;
+  if (a < 0 || !side[a] || !side[b]) return Switch.None;
   if (!sameRoad(data, a, b)) return Switch.None;
+  const { edgeU, edgeV } = data;
+  // 1 = the walker's left, 2 = the right. Walking against the way direction swaps them.
+  const handA = edgeU[a] === x ? 3 - side[a] : side[a];
+  const handB = edgeV[b] === x ? 3 - side[b] : side[b];
+  const sameArm = (edgeU[a] === edgeU[b] && edgeV[a] === edgeV[b]) || (edgeU[a] === edgeV[b] && edgeV[a] === edgeU[b]);
+  if (sameArm ? handA !== handB : handA === handB) return Switch.None;
   const nf = data.nodeFlags;
   if (!nf) return Switch.Free;
   const f = nf[x];
