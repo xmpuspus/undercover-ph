@@ -6,7 +6,11 @@ import { AlertIcon, CloseIcon } from "./Icons";
 export function TopBanner({ onClose, onAbout }: { onClose: () => void; onAbout: () => void }) {
   return (
     <div className="flex items-center gap-1 bg-ink py-0.5 pl-4 pr-1 text-[13px] leading-snug text-white" role="note" data-testid="prototype-banner">
-      <p className="min-w-0 flex-1 py-1.5">Prototype. Routes and data can be wrong. Independent project, not affiliated with any government agency.</p>
+      {/* One line on phones, so the map keeps its height. About says the rest. */}
+      <p className="min-w-0 flex-1 py-1.5">
+        <span className="md:hidden">Independent prototype. Routes can be wrong.</span>
+        <span className="hidden md:inline">Prototype. Routes and data can be wrong. Independent project, not affiliated with any government agency.</span>
+      </p>
       <button type="button" onClick={onAbout} className="h-11 shrink-0 rounded px-2 underline underline-offset-2 hover:bg-white/10">
         About
       </button>
@@ -65,17 +69,18 @@ export function AdvisoryBar({
 }
 
 // Each link is a 44 px tall row for touch. Phones get slightly smaller text so the credits fit one row from 390 px.
-const link = "inline-flex min-h-11 items-center hover:underline";
+// Phones get one 32 px row (above the 24 px WCAG minimum) so the attribution does not take two rows of the map.
+const link = "inline-flex min-h-8 items-center hover:underline md:min-h-11";
 
 // Basemap attribution stays visible at every size and in every stage. Data credits live in About.
 export function Footer({ onAbout }: { onAbout: () => void }) {
   return (
     <footer
-      className="z-30 flex flex-wrap items-center gap-x-2 border-t border-slate-200 bg-white px-2 pb-[env(safe-area-inset-bottom)] text-[11.5px] leading-snug text-slate-600 md:gap-x-3 md:px-3 md:text-[12px]"
+      className="z-30 flex flex-wrap items-center gap-x-3 border-t border-slate-200 bg-white px-3 pb-[env(safe-area-inset-bottom)] text-[11.5px] leading-snug text-slate-600 md:text-[12px]"
       data-testid="attribution"
     >
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer" className={`${link} font-medium text-ink`}>
-        © OpenStreetMap contributors
+        © OpenStreetMap<span className="hidden sm:inline"> contributors</span>
       </a>
       <a href="https://openfreemap.org" target="_blank" rel="noreferrer" className={link}>
         OpenFreeMap

@@ -82,3 +82,10 @@ describe("trip in the fragment", () => {
     expect(hashFor(null)).toBe("");
   });
 });
+
+describe("location privacy", () => {
+  it("never writes a GPS fix into the link", () => {
+    expect(encodeEndpoint({ label: "My location", node: 5, lon: 121.0234567, lat: 14.5512345, snap_m: 12 }, [])).toBeNull();
+    expect(encodeEndpoint({ label: "Point on map", node: 5, lon: 121.0234567, lat: 14.5512345, snap_m: 12 }, [])).toBe("121.02346,14.55123");
+  });
+});

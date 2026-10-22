@@ -155,63 +155,102 @@ const HEAT_DOT: Record<1 | 2 | 3 | 4, string> = { 1: "bg-yellow-400", 2: "bg-ora
 
 export function WeatherChips({ weather, date, minute, mode, dark }: { weather: Weather | null; date: string; minute: number; mode: Mode; dark: boolean }) {
   const small = "flex h-11 items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 px-3 text-[13px] text-ink shadow-sm";
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const k = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("pointerdown", h);
+    document.addEventListener("keydown", k);
+    return () => {
+      document.removeEventListener("pointerdown", h);
+      document.removeEventListener("keydown", k);
+    };
+  }, [open]);
   if (!weather) return null;
   if (weather.status !== "ok") {
     return (
       <div className="pointer-events-auto flex gap-2" data-testid="weather">
-        <span className={small} title={`Checked ${fmtStamp(weather.fetched_at)}`}>
-          Weather unavailable
-        </span>
+        <span className={small}>Weather unavailable</span>
       </div>
     );
   }
   const w = weatherAt(weather, date, minute);
-  const hint = `${weather.source.replace(/ \(CC BY 4.0\)$/, "")} for ${fmtMinute(Math.floor(minute / 60) * 60, true)}, fetched ${fmtStamp(weather.fetched_at)}`;
+  const source = `${weather.source.replace(/ \(CC BY 4.0\)$/, "")} forecast for ${fmtMinute(Math.floor(minute / 60) * 60, true)}, fetched ${fmtStamp(weather.fetched_at)}.`;
   if (!w || w.temp == null) {
     return (
       <div className="pointer-events-auto flex gap-2" data-testid="weather">
-        <span className={small} title={hint}>
-          No forecast for this hour
-        </span>
+        <span className={small}>No forecast for this hour</span>
       </div>
     );
   }
-  const air = `Air ${Math.round(w.temp)}°C${w.condition ? `, ${w.condition.toLowerCase()}` : ""}.`;
   const band = w.feels != null ? heatBand(w.feels) : null;
-  const heatTitle =
-    w.feels == null
-      ? `${air} ${hint}.`
-      : `${band ? `${band.name}: PAGASA heat index band, ${band.range}.` : "Below the PAGASA heat index bands, which start at 27°C."} ` +
-        `This is Open-Meteo's feels-like temperature, not a PAGASA reading. ${air} ${hint}.`;
+  // Touch screens have no hover, so the band, the air temperature, and the source open on a tap.
   return (
-    <div className="pointer-events-auto flex flex-wrap gap-2" data-testid="weather">
-      <span
+    <div ref={ref} className="pointer-events-auto relative flex flex-wrap gap-2" data-testid="weather">
+      <button
+        type="button"
         className={`${small} ${band ? HEAT[band.level] : ""}`}
-        title={heatTitle}
-        aria-label={w.feels != null ? `Feels like ${Math.round(w.feels)}°C${band ? `, ${band.name}` : ""}` : undefined}
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls="weather-details"
+        aria-label={w.feels != null ? `Feels like ${Math.round(w.feels)}°C${band ? `, ${band.name}` : ""}. Weather details` : "Weather details"}
         data-testid="heat-chip"
         data-band={band?.name ?? "none"}
       >
         {w.feels != null ? (
           <>
             <span className={`h-2 w-2 shrink-0 rounded-full ${band ? HEAT_DOT[band.level] : "bg-slate-300"}`} aria-hidden="true" />
-            Feels like {Math.round(w.feels)}°C
+            <span className="md:hidden">Feels {Math.round(w.feels)}°C</span>
+            <span className="hidden md:inline">Feels like {Math.round(w.feels)}°C</span>
           </>
         ) : (
           `${Math.round(w.temp)}°C${w.condition ? `, ${w.condition}` : ""}`
         )}
-      </span>
+      </button>
       {mode === "shade" && w.uv != null && !dark && (
-        <span className={small} title={hint}>
+        // Phones show UV in the weather details only, so the chips stay in two rows.
+        <span className={`${small} hidden md:flex`}>
           <SunIcon size={14} className="text-amber-500" />
-          UV {Math.round(w.uv)}, {uvWord(w.uv)}
+          UV {Math.round(w.uv)}
+          <span className="hidden md:inline">, {uvWord(w.uv)}</span>
         </span>
       )}
       {mode === "rain" && w.rain != null && (
-        <span className={small} title={hint}>
+        <span className={small}>
           <RainIcon size={14} className="text-brand" />
-          {Math.round(w.rain)}% chance of rain
+          {Math.round(w.rain)}%<span className="md:hidden"> rain</span>
+          <span className="hidden md:inline"> chance of rain</span>
         </span>
+      )}
+      {open && (
+        <div
+          id="weather-details"
+          role="dialog"
+          aria-label="Weather details"
+          className="absolute left-0 top-12 z-40 w-[min(300px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-3 text-[13px] leading-snug text-slate-700 shadow-card"
+          data-testid="weather-details"
+        >
+          {w.feels != null && (
+            <p className="font-medium text-ink">
+              Feels like {Math.round(w.feels)}°C{band ? `: ${band.name} (${band.range})` : ""}
+            </p>
+          )}
+          <p className="mt-1">
+            Air {Math.round(w.temp)}°C{w.condition ? `, ${w.condition.toLowerCase()}` : ""}
+            {w.uv != null ? `. UV ${Math.round(w.uv)}, ${uvWord(w.uv)}` : ""}
+            {w.rain != null ? `. ${Math.round(w.rain)}% chance of rain` : ""}.
+          </p>
+          {band ? (
+            <p className="mt-1.5 text-slate-500">The bands are PAGASA heat index bands. The number is Open-Meteo&apos;s feels-like temperature, not a PAGASA reading.</p>
+          ) : (
+            w.feels != null && <p className="mt-1.5 text-slate-500">Below the PAGASA heat index bands, which start at 27°C.</p>
+          )}
+          <p className="mt-1.5 text-slate-500">{source}</p>
+        </div>
       )}
     </div>
   );

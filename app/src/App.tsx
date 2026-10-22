@@ -18,7 +18,7 @@ import { eagerMap, loadMapLibre, prefetchMapLibre } from "./lib/maplibre";
 import { useReducedMotion } from "./lib/motion";
 import { PauseIcon, PlayIcon } from "./components/Icons";
 import { nowLabel, nowSlot } from "./lib/nowSlot";
-import { decodeEndpoint, encodeEndpoint, hashFor, hhmmToMinute, minuteToHHMM, tripFromHash, type TripParams } from "./lib/tripUrl";
+import { decodeEndpoint, encodeEndpoint, hashFor, hhmmToMinute, minuteToHHMM, MY_LOCATION, tripFromHash, type TripParams } from "./lib/tripUrl";
 
 // The first screen needs only the landing card. The map, steps, navigation, About and rain load as separate chunks.
 const MapView = lazy(() => loadMapLibre().then(() => import("./components/MapView")));
@@ -155,7 +155,8 @@ export default function App() {
   }, [mapOn]);
 
   useEffect(() => {
-    loadWeather().then(setWeather);
+    // A failed fetch shows "Weather unavailable", the same as a file that reports an error. Null means still loading.
+    loadWeather().then((w) => setWeather(w ?? { status: "unavailable", fetched_at: "" }));
     loadAdvisory().then(setAdvisory);
     exists("READY.shadows").then(setShadowsReady);
   }, []);
@@ -470,7 +471,7 @@ export default function App() {
     const s = data ? snapToNode(data, lon, lat) : null;
     if (!s) return "The walking map is not loaded.";
     if (s.dist_m > MAX_SNAP_M) {
-      return `${label === "My location" ? "You are" : "That point is"} ${fmtDist(s.dist_m)} from the nearest mapped path. Routing works only inside the dashed box, the covered area.`;
+      return `${label === MY_LOCATION ? "You are" : "That point is"} ${fmtDist(s.dist_m)} from the nearest mapped path. Routing works only inside the dashed box, the covered area.`;
     }
     const [nlon, nlat] = nodeLL(s.node, [lon, lat]);
     return { label, sub: `${Math.round(s.dist_m)} m from the nearest path`, node: s.node, lon: nlon, lat: nlat, snap_m: s.dist_m };
@@ -499,7 +500,7 @@ export default function App() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocating(false);
-        const ep = pointEndpoint(pos.coords.longitude, pos.coords.latitude, "My location");
+        const ep = pointEndpoint(pos.coords.longitude, pos.coords.latitude, MY_LOCATION);
         if (typeof ep === "string") setNotice(ep);
         else assign("from", ep);
       },
@@ -854,11 +855,12 @@ export default function App() {
                       role="switch"
                       aria-checked={shadowsOn}
                       onClick={() => setShadowsOn(!shadowsOn)}
-                      className={`pointer-events-auto flex h-11 items-center gap-1.5 rounded-full border px-3 text-[13px] shadow-sm ${shadowsOn ? "border-brand bg-blue-50 text-brand" : "border-slate-200 bg-white/95 text-slate-600"}`}
+                      aria-label="Shadows on the map"
+                      className={`pointer-events-auto flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-3 text-[13px] shadow-sm ${shadowsOn ? "border-brand bg-blue-50 text-brand" : "border-slate-200 bg-white/95 text-slate-600"}`}
                       data-testid="shadows-toggle"
                     >
                       <span className={`h-2.5 w-2.5 rounded-sm ${shadowsOn ? "bg-slate-600/70" : "border border-slate-500"}`} />
-                      Shadows
+                      <span className="hidden md:inline">Shadows</span>
                     </button>
                   )}
                 </div>

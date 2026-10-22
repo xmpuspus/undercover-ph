@@ -75,10 +75,27 @@ export default function SunChip({ sun, bearing, day, accent }: { sun: SunView | 
         {day && <Dial day={day} altitude={sun.altitude} accent={accent} />}
         <span className="flex flex-col items-start leading-[15px]">
           <span className="whitespace-nowrap text-[13px]">
-            {sun.altitude <= 0 ? "Sun down" : low ? `Sun ${sun.compass} · too low for shade` : `Sun ${sun.compass} · ${Math.round(sun.altitude)}° up`}
+            {sun.altitude <= 0 ? (
+              "Sun down"
+            ) : low ? (
+              <>
+                <span className="md:hidden">Sun too low</span>
+                <span className="hidden md:inline">Sun {sun.compass} · too low for shade</span>
+              </>
+            ) : (
+              <>
+                {/* Phones keep the chips to two rows. The explainer behind the tap says where shadows fall. */}
+                <span className="md:hidden">
+                  {sun.compass} · {Math.round(sun.altitude)}°
+                </span>
+                <span className="hidden md:inline">
+                  Sun {sun.compass} · {Math.round(sun.altitude)}° up
+                </span>
+              </>
+            )}
           </span>
           {!low && (
-            <span className="flex items-center gap-1 whitespace-nowrap text-[11.5px] text-slate-600">
+            <span className="hidden items-center gap-1 whitespace-nowrap text-[11.5px] text-slate-600 md:flex">
               <ShadowArrow deg={sun.azimuth - bearing} />
               Shadows fall {shadowWord}
             </span>

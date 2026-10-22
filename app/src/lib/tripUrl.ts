@@ -22,8 +22,12 @@ const POINT = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
 const NODE = /^n(\d+)$/;
 
 const round5 = (n: number) => String(Math.round(n * 1e5) / 1e5);
+export const MY_LOCATION = "My location";
 
-export function encodeEndpoint(ep: { label: string; node: number; lon: number; lat: number; snap_m: number | null }, places: { name: string }[]): string {
+// A GPS fix never goes into the link: links get shared and kept in history, and the spot is often a home.
+// Such an end is left out, and a restored link asks for it again.
+export function encodeEndpoint(ep: { label: string; node: number; lon: number; lat: number; snap_m: number | null }, places: { name: string }[]): string | null {
+  if (ep.label === MY_LOCATION) return null;
   if (ep.snap_m != null) return `${round5(ep.lon)},${round5(ep.lat)}`;
   const same = places.filter((p) => p.name.toLowerCase() === ep.label.toLowerCase()).length;
   return same === 1 ? ep.label : `n${ep.node}`;

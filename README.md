@@ -67,7 +67,7 @@ Like Singapore's version, the app returns three walks: the shortest, the most co
 
 ## Privacy
 
-The router runs in your browser. Your start and end points never reach a server that this project controls. The app asks for your location only when you tap "Use my location", and it keeps nothing. It has no analytics and no trackers. One small server function reads the PAGASA thunderstorm advisory for the app, every 10 minutes at most. It gets no route, place, or location. Map tiles come from OpenFreeMap, which receives the map area you view.
+The router runs in your browser. Your start and end points never reach a server that this project controls. The app asks for your location only when you tap "Use my location", and it keeps nothing. The app has no analytics and no trackers. The trip lives in the page address after the # sign, which browsers never send to a server. A reload or a shared link reopens it. A position from "Use my location" never goes into that address. One small server function reads the PAGASA thunderstorm advisory for the app, every 10 minutes at most. It gets no route, place, or location. Map tiles come from OpenFreeMap, which receives the map area you view.
 
 ## Run it locally
 
@@ -100,7 +100,7 @@ The full method, with its numbers and limits, is in [docs/methodology.md](docs/m
 | File | What it holds |
 | --- | --- |
 | `app/public/data/graph.json` | Walk network: 6,274 edges, 5,586 open to routes (221.4 km), with access, crossing, and cover flags |
-| `app/public/data/places.json` | 1,140 named places for search |
+| `app/public/data/places.json` | 1,187 named places for search |
 | `app/public/data/hours.json` | 18 opening-hours rows, each with its source |
 | `app/public/data/buildings_display.geojson` | Buildings with heights for the 3D map |
 | `shade.bin` and `shadows/` | Shade per edge and ground shadow images, generated at build time |
