@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CBD_CENTER, COLORS, STYLE_DAY, STYLE_NIGHT } from "../config";
+import { CBD_CENTER, COLORS, DATA_BASE, NIGHT_ALT_DEG, STYLE_DAY, STYLE_NIGHT } from "../config";
 import type { Endpoint, Mode, ShadowOverlay } from "../types";
 import { segColor, type DisplayRoute } from "../lib/display";
 import { anchorCandidates, nearestOnRect, placeBubbles, type Rect } from "../lib/callouts";
@@ -9,6 +9,9 @@ import { mixTheme, rgba, type SkyTheme } from "../lib/skyTheme";
 import { animate, prefersReducedMotion } from "../lib/motion";
 import { lengthM, sliceAlong } from "../lib/ribbon";
 import { mapLibre } from "../lib/maplibre";
+import { addPmtilesProtocol } from "../lib/pmtiles";
+import { BUILDINGS_SOURCE, GroundShadows, TREES_SOURCE } from "../lib/groundShadows";
+import { rectsOutline, type Rect as AreaRect } from "../lib/areaOutline";
 import { MoonIcon, SunIcon, UmbrellaIcon } from "./Icons";
 
 export interface Insets {
@@ -27,8 +30,13 @@ export interface Focus {
 interface Props {
   // Sky, light and building colours for the chosen hour. theme.dark picks the night basemap.
   theme: SkyTheme;
-  // GeoJSON of 3D buildings. MapLibre's worker fetches and parses it.
-  buildingsUrl: string;
+  // Replaced by buildingTiles. Kept so older callers compile; a GeoJSON URL here is ignored.
+  buildingsUrl?: string;
+  // PMTiles of the 3D buildings (layer "buildings") and of the tree crowns (layer "trees") for every area.
+  // Defaults: data/buildings.pmtiles and data/trees.pmtiles.
+  buildingTiles?: string;
+  treeTiles?: string;
+  // Called when the building tiles for the view have loaded.
   onBuildings: () => void;
   // onLoaded: the style is in. onReady: the map is worth showing (basemap drawn, first idle, or once it has
   // loaded and the camera leaves the landing view). The landing poster fades out on onReady.
@@ -36,6 +44,8 @@ interface Props {
   onReady: () => void;
   // Routing and data cover graph_bbox (the pilot box plus 500 m). A solid blue outline shows it.
   coverBbox: [number, number, number, number] | null;
+  // Routing areas from areas.json. Each gets the solid blue outline round its graph boxes; without them, coverBbox does.
+  areas?: { graph_rects: AreaRect[] }[] | null;
   routes: DisplayRoute[];
   selected: number;
   mode: Mode;
@@ -50,7 +60,12 @@ interface Props {
   onMapClick: (lon: number, lat: number) => void;
   onSelect: (i: number) => void;
   onBearing: (deg: number) => void;
-  shadow: { url: string; coords: ShadowOverlay["coords"] } | null;
+  // The chosen hour's sun as [altitude, azimuth] in degrees, for the ground shadows. Default: the sun in theme.light.
+  sun?: [number, number] | null;
+  // The Shadows switch. Shadows also hide when the sun is at or below NIGHT_ALT_DEG.
+  shadowsOn?: boolean;
+  // Replaced by shadowsOn and sun: the pipeline's shadow PNG. Only shadow={null}, which meant off, still counts.
+  shadow?: { url: string; coords: ShadowOverlay["coords"] } | null;
   // A stretch of the selected route to light up, from the route ribbon.
   highlight: { coords: [number, number][]; color: string } | null;
 }
@@ -69,6 +84,27 @@ type Src = maplibregl.GeoJSONSource;
 
 function line(coords: [number, number][], props: Record<string, unknown>): GeoJSON.Feature {
   return { type: "Feature", properties: props, geometry: { type: "LineString", coordinates: coords } };
+}
+
+function tilesUrl(url: string | undefined, file: string): string {
+  return `pmtiles://${url ?? new URL(`${DATA_BASE}${file}`, window.location.href).href}`;
+}
+
+// The sun for the shadows: the sun prop, else the light direction of the theme, which follows the same sun.
+function sunOf(p: Props): [number, number] | null {
+  if (p.sun !== undefined) return p.sun;
+  const l = p.theme.light;
+  return l.anchor === "map" ? [90 - l.position[2], l.position[1]] : null;
+}
+
+// Older callers switch shadows off with shadow={null}.
+function shadowsOn(p: Props): boolean {
+  return p.shadowsOn ?? p.shadow !== null;
+}
+
+function shadowsShown(p: Props): boolean {
+  const sun = sunOf(p);
+  return shadowsOn(p) && !!sun && sun[0] > NIGHT_ALT_DEG;
 }
 
 // The dark basemap draws its labels in dim grey (about 2:1 on its ground) and has no place labels,
@@ -124,8 +160,8 @@ export default function MapView(p: Props) {
   const shown = useRef(p.theme);
   // How much of the selected route is drawn, 0 to 1. A newly selected route draws itself in.
   const drawn = useRef(1);
-  // Two ground-shadow images take turns, so a new hour fades in over the old one.
-  const shade = useRef<ShadeState>({ front: "a", url: null, token: 0 });
+  // Ground shadows of the buildings and trees in view, drawn for the chosen sun.
+  const groundShadows = useRef<GroundShadows | null>(null);
   const [tick, setTick] = useState(0);
   const [styleTick, setStyleTick] = useState(0);
 
@@ -155,6 +191,18 @@ export default function MapView(p: Props) {
   const routeRef = useRef(routeData);
   routeRef.current = routeData;
 
+  // Where routing works: each area's graph boxes joined into one outline, or the single cover box.
+  const outline = useMemo((): GeoJSON.Feature | null => {
+    const groups: AreaRect[][] = p.areas?.length ? p.areas.map((a) => a.graph_rects) : p.coverBbox ? [[p.coverBbox]] : [];
+    const rings = groups.flatMap((rects) => rectsOutline(rects));
+    return rings.length ? { type: "Feature", properties: {}, geometry: { type: "MultiLineString", coordinates: rings } } : null;
+  }, [p.areas, p.coverBbox]);
+  const outlineRef = useRef(outline);
+  outlineRef.current = outline;
+  const sun = sunOf(p);
+  const shadows = shadowsOn(p);
+  const shadowsVisible = shadowsShown(p);
+
   // The selected route, drawn up to the current progress.
   function syncSelected() {
     const map = mapRef.current;
@@ -174,26 +222,9 @@ export default function MapView(p: Props) {
     const q = props.current;
     (map.getSource("hb-alt") as Src | undefined)?.setData(routeRef.current.alt);
     syncSelected();
-    const b = q.coverBbox;
-    (map.getSource("hb-pilot") as Src | undefined)?.setData(
-      b && q.stage === "plan"
-        ? {
-            type: "Feature",
-            properties: {},
-            geometry: {
-              type: "LineString",
-              coordinates: [
-                [b[0], b[1]],
-                [b[2], b[1]],
-                [b[2], b[3]],
-                [b[0], b[3]],
-                [b[0], b[1]],
-              ],
-            },
-          }
-        : EMPTY,
-    );
-    syncShadow(map, q.shadow, shade.current);
+    const o = outlineRef.current;
+    (map.getSource("hb-pilot") as Src | undefined)?.setData(o && q.stage === "plan" ? o : EMPTY);
+    groundShadows.current?.set(sunOf(q), shadowsOn(q));
     paint(shown.current);
   }
 
@@ -223,7 +254,7 @@ export default function MapView(p: Props) {
     }, { validate: false });
     map.setLight({ ...th.light, "color-transition": NO_TRANSITION, "intensity-transition": NO_TRANSITION, "position-transition": NO_TRANSITION });
     if (map.getLayer("hb-buildings-3d")) {
-      const look = buildingLook(th, !!props.current.shadow);
+      const look = buildingLook(th, shadowsShown(props.current));
       map.setPaintProperty("hb-buildings-3d", "fill-extrusion-color", look["fill-extrusion-color"]);
       map.setPaintProperty("hb-buildings-3d", "fill-extrusion-opacity", look["fill-extrusion-opacity"]);
     }
@@ -236,7 +267,9 @@ export default function MapView(p: Props) {
       if ("source-layer" in l && l["source-layer"] === "building") map.setLayoutProperty(l.id, "visibility", "none");
     }
     const firstSymbol = layers.find((l) => l.type === "symbol")?.id;
-    if (!map.getSource("hb-buildings")) map.addSource("hb-buildings", { type: "geojson", data: props.current.buildingsUrl });
+    // One tile set for every area: the map fetches only the tiles in view, by range request.
+    if (!map.getSource(BUILDINGS_SOURCE)) map.addSource(BUILDINGS_SOURCE, { type: "vector", url: tilesUrl(props.current.buildingTiles, "buildings.pmtiles") });
+    if (!map.getSource(TREES_SOURCE)) map.addSource(TREES_SOURCE, { type: "vector", url: tilesUrl(props.current.treeTiles, "trees.pmtiles") });
     for (const id of ["hb-pilot", "hb-alt", "hb-sel", "hb-sel-full", "hb-hl"]) {
       if (!map.getSource(id)) map.addSource(id, { type: "geojson", data: EMPTY });
     }
@@ -244,11 +277,12 @@ export default function MapView(p: Props) {
       {
         id: "hb-buildings-3d",
         type: "fill-extrusion",
-        source: "hb-buildings",
+        source: BUILDINGS_SOURCE,
+        "source-layer": "buildings",
         // Footprints without a height are left out rather than drawn at a guessed height.
         filter: ["to-boolean", ["get", "height_m"]],
         paint: {
-          ...buildingLook(shown.current, !!props.current.shadow),
+          ...buildingLook(shown.current, shadowsShown(props.current)),
           "fill-extrusion-height": ["get", "height_m"],
           "fill-extrusion-base": ["coalesce", ["get", "min_height_m"], 0],
           "fill-extrusion-vertical-gradient": true,
@@ -257,6 +291,13 @@ export default function MapView(p: Props) {
       },
       firstSymbol,
     );
+    // MapLibre loads a source's tiles only for a layer that uses it. The crowns show only as shadows, so this
+    // layer matches no crown: no crown has a negative radius. The shadows read the crowns from the loaded tiles.
+    map.addLayer(
+      { id: "hb-trees-load", type: "circle", source: TREES_SOURCE, "source-layer": "trees", filter: ["<", ["get", "r_m"], 0], paint: { "circle-radius": 0 } },
+      "hb-buildings-3d",
+    );
+    groundShadows.current?.install("hb-buildings-3d");
     map.addLayer(
       {
         id: "hb-pilot-line",
@@ -314,6 +355,7 @@ export default function MapView(p: Props) {
     let map: maplibregl.Map;
     const url = props.current.theme.dark ? STYLE_NIGHT : STYLE_DAY;
     try {
+      addPmtilesProtocol();
       map = new (mapLibre().Map)({
         container: box.current,
         style: url,
@@ -330,16 +372,19 @@ export default function MapView(p: Props) {
     }
     styleUrl.current = url;
     mapRef.current = map;
-    if (import.meta.env.DEV) (window as unknown as { __hbMap: maplibregl.Map }).__hbMap = map;
-    // The basemap asks for sprite icons it does not ship; a transparent pixel keeps the console clean.
+    groundShadows.current = new GroundShadows(map, prefersReducedMotion() ? 0 : FADE_MS);
+    if (import.meta.env.DEV) Object.assign(window, { __hbMap: map, __hbShadows: groundShadows.current });
+    // A tile event with the source fully loaded: the buildings for the view are in. The first event after the
+    // TileJSON loads can report "loaded" before any tile is asked for, so it does not count.
     map.on("sourcedata", (e) => {
-      if (e.sourceId === "hb-buildings" && e.isSourceLoaded) props.current.onBuildings();
+      if (e.sourceId === BUILDINGS_SOURCE && e.tile && e.isSourceLoaded) props.current.onBuildings();
     });
+    // The basemap asks for sprite icons it does not ship; a transparent pixel keeps the console clean.
     map.on("styleimagemissing", (e) => {
       if (!map.hasImage(e.id)) map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) });
     });
     // The poster can go once the basemap under the landing view has drawn. The first idle also waits for
-    // buildings_display.geojson, seconds later on a phone; the "Loading 3D buildings..." note covers that wait.
+    // the building tiles, later on a phone; the "Loading 3D buildings..." note covers that wait.
     let basemap: string[] = [];
     const onRender = () => {
       if (!basemap.length || !basemap.every((id) => map.getSource(id) && map.isSourceLoaded(id))) return;
@@ -349,8 +394,6 @@ export default function MapView(p: Props) {
     map.on("render", onRender);
     map.on("style.load", () => {
       ready.current = true;
-      // A new style drops the shadow images; start the pair again.
-      shade.current = { front: "a", url: null, token: shade.current.token + 1 };
       guardNumericFilters(map);
       basemap = Object.keys(map.getStyle().sources ?? {});
       install(map, styleUrl.current === STYLE_NIGHT);
@@ -398,6 +441,8 @@ export default function MapView(p: Props) {
       map.getCanvas().style.cursor = hit || props.current.stage === "plan" ? "pointer" : "";
     });
     return () => {
+      groundShadows.current?.remove();
+      groundShadows.current = null;
       map.remove();
       mapRef.current = null;
       ready.current = false;
@@ -411,6 +456,7 @@ export default function MapView(p: Props) {
     if (!map || styleUrl.current === url) return;
     styleUrl.current = url;
     ready.current = false;
+    groundShadows.current?.uninstall();
     map.setStyle(url, { diff: false });
   }, [p.theme.dark]);
 
@@ -434,7 +480,9 @@ export default function MapView(p: Props) {
     };
   }, [routeData.key]);
 
-  useEffect(sync, [routeData, p.coverBbox, p.stage, p.shadow?.url]);
+  useEffect(sync, [routeData, outline, p.stage]);
+  // A new hour or the Shadows switch: redraw the ground shadows.
+  useEffect(() => groundShadows.current?.set(sun, shadows), [sun?.[0], sun?.[1], shadows]);
   useEffect(syncSelected, [p.highlight]);
 
   // A new hour: the sky, light and buildings ease to its theme.
@@ -451,7 +499,7 @@ export default function MapView(p: Props) {
       paint(shown.current);
     });
   }, [p.theme]);
-  useEffect(() => paint(shown.current), [!!p.shadow, styleTick]);
+  useEffect(() => paint(shown.current), [shadowsVisible, styleTick]);
 
   // Start and end pins.
   useEffect(() => {
@@ -669,60 +717,6 @@ function partRoute(sel: GeoJSON.FeatureCollection, full: GeoJSON.FeatureCollecti
     { type: "FeatureCollection", features },
     { type: "FeatureCollection", features: fullPart },
   ];
-}
-
-interface ShadeState {
-  front: "a" | "b";
-  url: string | null;
-  token: number;
-}
-
-// Ground shadows for the chosen slot: two image sources under the 3D buildings and the route lines.
-// A new slot loads into the hidden one, then the two crossfade. The PNG carries its own alpha.
-function syncShadow(map: maplibregl.Map, shadow: Props["shadow"], st: ShadeState) {
-  const id = (k: "a" | "b") => `hb-shadows-${k}`;
-  const layer = (k: "a" | "b") => `hb-shadows-${k}-layer`;
-  const opacity = (k: "a" | "b", v: number) => map.getLayer(layer(k)) && map.setPaintProperty(layer(k), "raster-opacity", v);
-  if (!shadow) {
-    st.url = null;
-    st.token++;
-    opacity("a", 0);
-    opacity("b", 0);
-    return;
-  }
-  if (shadow.url === st.url) {
-    opacity(st.front, 1);
-    return;
-  }
-  st.url = shadow.url;
-  const token = ++st.token;
-  const first = !map.getSource(id("a"));
-  const next = first ? "a" : st.front === "a" ? "b" : "a";
-  const src = map.getSource(id(next)) as maplibregl.ImageSource | undefined;
-  if (src) src.updateImage({ url: shadow.url, coordinates: shadow.coords });
-  else {
-    map.addSource(id(next), { type: "image", url: shadow.url, coordinates: shadow.coords });
-    const fade = prefersReducedMotion() ? NO_TRANSITION : { duration: FADE_MS, delay: 0 };
-    map.addLayer(
-      { id: layer(next), type: "raster", source: id(next), paint: { "raster-opacity": 0, "raster-opacity-transition": fade, "raster-fade-duration": 0 } },
-      map.getLayer("hb-buildings-3d") ? "hb-buildings-3d" : undefined,
-    );
-  }
-  // Swap once the new image has loaded, or after a second and a half if no load event comes.
-  const swap = () => {
-    map.off("sourcedata", onData);
-    clearTimeout(timer);
-    if (token !== st.token) return;
-    const old = st.front;
-    st.front = next;
-    opacity(next, 1);
-    if (old !== next) opacity(old, 0);
-  };
-  const onData = (e: maplibregl.MapSourceDataEvent) => {
-    if (e.sourceId === id(next) && e.sourceDataType === "metadata") swap();
-  };
-  map.on("sourcedata", onData);
-  const timer = setTimeout(swap, 1500);
 }
 
 function moveToFocus(map: maplibregl.Map, f: Focus, stage: Props["stage"], insets: Insets, planPitch: number) {
