@@ -330,17 +330,27 @@ An earlier run on 2026-10-22 at 00:34 replaced the shade builder's 12 limits. I 
 
 ## Deploy build
 
-Git keeps each area's graph, places and hours, the two PMTiles files, and `pipeline/inputs/areas/<id>/`. Every Vercel build makes the dated files.
+Git keeps each area's graph, places and hours, the two PMTiles files, and `pipeline/inputs/areas/<id>/`. The deploy makes the dated files.
 
-1. `pipeline/vercel_build.sh` runs from `app/`. It makes a venv from `pipeline/shade/requirements.txt` under `app/node_modules/.cache/`.
+Since 2026-10-22 a GitHub workflow casts the shade and the deploy downloads it. Vercel stops a build at 45 minutes, and shade for every area no longer fits.
+
+- `.github/workflows/shade.yml` runs at 04:30 Manila. Each area is its own job: `set_dates.py`, then `shade/shade.py`. One release, `shade-YYYY-MM-DD`, holds every area's `manifest.json`, `shade/`, `READY.shade` and `graph.sha256`. The workflow keeps the 3 newest releases and pushes an empty commit to deploy.
+- `daily-rebuild.yml` at 05:40 still pushes an empty commit if main has none from today, for a morning when the shade workflow failed.
+
+The deploy build:
+
+1. `pipeline/vercel_build.sh` runs from `app/`.
 2. It reads the area ids from `app/public/data/areas.json`, and stops if that file is missing.
-3. It fetches the PAGASA advisory once, into `app/public/data/advisory.json`.
-4. For each area it runs `pipeline/refresh_dates.sh` with today's date in Asia/Manila. The data folder is `app/public/data/areas/<id>/` and the inputs folder is `pipeline/inputs/areas/<id>/`.
-5. `set_dates.py` copies `manifest_template.json` to `manifest.json`, sets `dates` and `generated_at`, and writes `READY.graph`.
-6. `shade/shade.py` runs in area mode. It writes `shade/<date>.bin`, `shade/lowconf.bin`, `trees.json`, its manifest keys and `READY.shade`.
-7. `fetch_weather.py` writes `weather.json`, a copy of the advisory and `READY.weather`. The forecast point is the area centre.
-8. `pnpm test` runs the router tests, then `pnpm run build` builds the app. `UCPH_SKIP_TESTS=1` skips the tests, for timing runs only.
-9. The script writes a gzip copy beside each `.bin` in `app/dist/data/areas/`, because Vercel does not compress `application/octet-stream`.
+3. On Vercel it downloads the newest shade release from today or the two days before. `pipeline/stale_shade.py` lists each area whose `graph.json` hash differs from the release's `graph.sha256`. Only those areas get a venv and a shade run here. With no release, every area does. Off Vercel, every area is shaded here unless `UCPH_SHADE_SOURCE=release`.
+4. It fetches the PAGASA advisory once, into `app/public/data/advisory.json`.
+5. For each area it shaded here, it runs `pipeline/refresh_dates.sh` with today's date in Asia/Manila. The data folder is `app/public/data/areas/<id>/` and the inputs folder is `pipeline/inputs/areas/<id>/`. For the other areas it runs only `fetch_weather.py`.
+6. `set_dates.py` copies `manifest_template.json` to `manifest.json`, sets `dates` and `generated_at`, and writes `READY.graph`.
+7. `shade/shade.py` runs in area mode. It writes `shade/<date>.bin`, `shade/lowconf.bin`, `trees.json`, its manifest keys and `READY.shade`.
+8. `fetch_weather.py` writes `weather.json`, a copy of the advisory and `READY.weather`. The forecast point is the area centre.
+9. `pnpm test` runs the router tests, then `pnpm run build` builds the app. `UCPH_SKIP_TESTS=1` skips the tests, for timing runs only.
+10. The script writes a gzip copy beside each `.bin` in `app/dist/data/areas/`, because Vercel does not compress `application/octet-stream`, and drops `trees.json`.
+
+A local run of the release path (14 areas, one stale on purpose) took 63 s, against 748 s when it shaded every area.
 
 The area builds write no shadow overlays. The app draws shadows from `buildings.pmtiles` and `trees.pmtiles`.
 `refresh_dates.sh` needs `UCPH_AREA`, `UCPH_DATA` and `UCPH_INPUTS`, and `set_dates.py` needs the last two. Neither has a root Makati mode any more.

@@ -56,7 +56,7 @@ app/public/data/
   areas/<id>/hours.json
 ```
 
-`pipeline/vercel_build.sh` builds these files on every deploy, and git ignores them.
+The deploy builds these files, and git ignores them. Since 2026-10-22 the shade comes from a GitHub release that `.github/workflows/shade.yml` builds each morning at 04:30 Manila. `pipeline/vercel_build.sh` downloads it, shades only an area whose `graph.json` hash differs from the release's `graph.sha256`, and fetches the weather. With no release from the last three days, it shades every area itself.
 
 ```text
 app/public/data/

@@ -60,3 +60,6 @@ qa/
 app/spike/
 .claude/
 *.log
+
+# Written by the shade workflow and read by the deploy build
+app/public/data/**/graph.sha256
