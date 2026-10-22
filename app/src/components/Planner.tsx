@@ -23,8 +23,8 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (m: Mode)
   };
   return (
     <div role="radiogroup" aria-label="Route type" className="flex gap-1 rounded-card bg-slate-200/80 p-1">
-      {item("shade", "Shaded routes")}
-      {item("rain", "Sheltered routes")}
+      {item("shade", "Shaded")}
+      {item("rain", "Sheltered")}
     </div>
   );
 }

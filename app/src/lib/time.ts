@@ -39,6 +39,8 @@ export function addDays(date: string, n: number): string {
 export function dateLabel(date: string, today: string): string {
   if (date === today) return "Today";
   if (date === addDays(today, 1)) return "Tomorrow";
+  // A past date (the data ran out) gets its full date, so "Thursday" never reads as the coming Thursday.
+  if (date < today) return dateShort(date);
   return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
 }
 

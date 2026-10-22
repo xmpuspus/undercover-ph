@@ -87,11 +87,11 @@ export function NavSheet({ d, from, to, night, showSteps, idx, onSteps, onStep, 
       <button
         type="button"
         onClick={onClose}
-        aria-label="End navigation"
-        className="absolute -top-12 left-0 grid h-11 w-11 place-items-center rounded-full bg-white text-ink shadow-card"
+        className="absolute -top-12 left-0 flex h-11 items-center gap-1.5 rounded-full bg-white pl-3 pr-4 text-[14px] font-medium text-ink shadow-card"
         data-testid="nav-close"
       >
-        <CloseIcon size={18} />
+        <CloseIcon size={16} />
+        End
       </button>
       <div className="rounded-card bg-white p-3 shadow-card">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px]">
