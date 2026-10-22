@@ -3,6 +3,8 @@
 Usage: pipeline/.venv/bin/python -I pipeline/districts/publish.py [--no-tiles] [--hold AREA_ID ...]
 Run it after pipeline/districts/build.py has staged every area in pipeline/areas.json. It stops on an area
 whose last build.py checks failed. `--hold AREA_ID` (repeatable) leaves that area out of the app.
+Areas outside Metro Manila come from pipeline/regions/areas.json. One of them ships when it is staged, its
+checks passed and its canopy.tif exists; the report lists the others as not ready.
 It reads pipeline/stage/<id>/ and writes these files, all kept in git:
 
 - app/public/data/areas.json: the routing areas, their boxes, neighbourhoods and centre.
@@ -46,6 +48,12 @@ Z15_KEEP_ALL = ["--no-feature-limit", "--no-tile-size-limit", "--no-tiny-polygon
                 "--full-detail=13"]
 
 
+# Region names for areas.json. Metro Manila areas have no region row and get "ncr".
+REGIONS = {"ncr": {"id": "ncr", "name": "Metro Manila"}}
+if (PIPE / "regions/regions.json").exists():
+    REGIONS |= {r["id"]: r for r in json.load(open(PIPE / "regions/regions.json"))["regions"]}
+
+
 def dump(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
@@ -61,9 +69,11 @@ def area_entry(a, m):
     if m["area"]["id"] != a["id"]:
         sys.exit(f"{a['id']}: the staged manifest belongs to {m['area']['id']}")
     w, s, e, n = a["bbox"]
+    region = REGIONS.get(a.get("region") or "ncr", {"id": "ncr", "name": "Metro Manila"})
     return {
         "id": a["id"],
         "name": a["name"],
+        "region": {"id": region["id"], "name": region["name"]},
         "cities": a["cities"],
         "bbox": a["bbox"],
         "graph_bbox": a["graph_bbox"],
@@ -224,14 +234,29 @@ def build_tiles(ids):
             "trees_pmtiles_bytes": (DATA / "trees.pmtiles").stat().st_size}
 
 
+def regional_ready(a):
+    """Why a regional area cannot ship yet, or None when it can."""
+    i = a["id"]
+    summary = PIPE / "work/districts" / i / "summary.json"
+    if not (STAGE / i / "graph.json").exists():
+        return "not built"
+    if not summary.exists() or not json.load(open(summary))["checks_passed"]:
+        return "checks not passed"
+    if not (INPUTS / i / "canopy.tif").exists():
+        return "no canopy.tif"
+    return None
+
+
 def main(tiles=True, hold=()):
     areas = json.load(open(PIPE / "areas.json"))["areas"]
-    unknown = set(hold) - {a["id"] for a in areas}
+    regional = json.load(open(PIPE / "regions/areas.json"))["areas"] if (PIPE / "regions/areas.json").exists() else []
+    unknown = set(hold) - {a["id"] for a in areas + regional}
     if unknown:
         sys.exit(f"--hold names unknown areas: {sorted(unknown)}")
-    areas = [a for a in areas if a["id"] not in hold]
+    not_ready = {a["id"]: why for a in regional if a["id"] not in hold and (why := regional_ready(a))}
+    areas = [a for a in areas + regional if a["id"] not in hold and a["id"] not in not_ready]
     ids = [a["id"] for a in areas]
-    rows, index, report = [], [], {"held_back": list(hold)}
+    rows, index, report = [], [], {"held_back": list(hold), "regional_not_ready": not_ready}
     for a in areas:
         i = a["id"]
         stage = STAGE / i

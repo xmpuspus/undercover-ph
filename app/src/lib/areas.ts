@@ -41,6 +41,20 @@ export function placeWhere(p: Place, areas: AreaInfo[] | null): string | null {
   return a.neighbourhoods.find((n) => inBox(n.bbox, p.lon, p.lat))?.name ?? areaLabel(a.id, areas);
 }
 
+export const NCR = "ncr";
+export const regionOf = (a: AreaInfo | undefined) => a?.region?.id ?? NCR;
+
+/** Metro Manila first, then the other regions by name, each with its areas. */
+export function areaGroups(areas: AreaInfo[] | null): { region: string; name: string; areas: AreaInfo[] }[] {
+  const groups = new Map<string, { region: string; name: string; areas: AreaInfo[] }>();
+  for (const a of areas ?? []) {
+    const id = regionOf(a);
+    if (!groups.has(id)) groups.set(id, { region: id, name: a.region?.name ?? "Metro Manila", areas: [] });
+    groups.get(id)!.areas.push(a);
+  }
+  return [...groups.values()].sort((x, y) => (x.region === NCR ? -1 : y.region === NCR ? 1 : x.name.localeCompare(y.name)));
+}
+
 /** The covered areas as one sentence part, in the landing card's order. */
 export function areaList(areas: AreaInfo[] | null): string {
   const order = (id: string) => {

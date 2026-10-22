@@ -64,6 +64,8 @@ export interface Endpoint {
 export interface AreaInfo {
   id: string;
   name: string;
+  // Absent in data published before the regional areas: those areas are all in Metro Manila.
+  region?: { id: string; name: string };
   cities: string[];
   bbox: [number, number, number, number];
   graph_bbox: [number, number, number, number];

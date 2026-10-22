@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { APP_NAME, AREA_LABELS, NIGHT_ALT_DEG } from "../config";
-import type { Manifest } from "../types";
+import type { AreaInfo, Manifest } from "../types";
+import { areaGroups, areaLabel, NCR } from "../lib/areas";
 import { REC_MAX_DETOUR, REC_MIN_CUT } from "../lib/routerClient";
 import { fmtStamp } from "../lib/time";
 import { CloseIcon } from "./Icons";
@@ -57,7 +58,10 @@ function longDate(d: string, withYear: boolean): string {
 
 const linkCls = "inline-flex min-h-11 items-center font-medium text-brand hover:underline";
 
-export default function About({ manifest, onClose }: { manifest: Manifest | null; onClose: () => void }) {
+export default function About({ manifest, areas, onClose }: { manifest: Manifest | null; areas: AreaInfo[] | null; onClose: () => void }) {
+  // Metro Manila keeps its hand-written labels. Other regions list their areas from areas.json, grouped by region.
+  const groups = areaGroups(areas).filter((g) => g.region !== NCR);
+  const total = AREA_LABELS.length + groups.reduce((n, g) => n + g.areas.length, 0);
   const box = useRef<HTMLElement>(null);
   // Escape closes. Tab stays inside the dialog while it is open.
   useEffect(() => {
@@ -119,12 +123,25 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
           {APP_NAME} finds walking routes that stay in shade or under a roof. It is a prototype by an independent developer. It is not affiliated with any
           government agency.
         </p>
-        <p className="mt-2">It covers {AREA_LABELS.length} walking areas around Metro Manila's busiest centres. A trip that starts or ends outside them gets no route:</p>
+        <p className="mt-2">
+          It covers {total} walking areas{groups.length ? ", in Metro Manila and other cities" : " around Metro Manila's busiest centres"}. A trip that
+          starts or ends outside them gets no route:
+        </p>
         <ul className="mt-1 list-disc space-y-0.5 pl-5" data-testid="about-areas">
           {AREA_LABELS.map((a) => (
             <li key={a.id}>{a.label}</li>
           ))}
         </ul>
+        {groups.map((g) => (
+          <div key={g.region} className="mt-2" data-testid="about-region">
+            <p className="font-medium text-ink">{g.name}</p>
+            <ul className="mt-0.5 list-disc space-y-0.5 pl-5">
+              {g.areas.map((a) => (
+                <li key={a.id}>{areaLabel(a.id, areas)}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
         <p className="mt-2">A route starts and ends in the same area.</p>
 
         <h3 className="mt-4 font-semibold text-ink">How it works</h3>

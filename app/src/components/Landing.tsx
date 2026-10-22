@@ -1,10 +1,13 @@
 import { AREA_LABELS } from "../config";
-import type { Mode } from "../types";
+import { NCR, regionOf } from "../lib/areas";
+import type { AreaInfo, Mode } from "../types";
 import { phaseLabel, rgba, type SkyTheme } from "../lib/skyTheme";
 import { fmtMinute } from "../lib/time";
 import { BrandMark, RainIcon, SunIcon } from "./Icons";
 
 interface Props {
+  // The routing areas, once areas.json has loaded. The area line counts them.
+  areas: AreaInfo[] | null;
   onPick: (m: Mode) => void;
   // Hover, focus or touch on the card starts loading route data before the tap lands.
   onIntent: () => void;
@@ -17,7 +20,10 @@ interface Props {
   picking: Mode | null;
 }
 
-export default function Landing({ onPick, onIntent, status, error, theme, minute, picking }: Props) {
+export default function Landing({ areas, onPick, onIntent, status, error, theme, minute, picking }: Props) {
+  const ncr = areas ? areas.filter((a) => regionOf(a) === NCR).length : AREA_LABELS.length;
+  const others = areas ? areas.length - ncr : 0;
+  const cities = areas ? new Set(areas.filter((a) => regionOf(a) !== NCR).flatMap((a) => a.cities)).size : 0;
   return (
     <div className="pointer-events-none absolute inset-0 grid place-items-center p-4">
       <section
@@ -40,7 +46,9 @@ export default function Landing({ onPick, onIntent, status, error, theme, minute
         <p className="mt-2 text-[16px] font-light leading-relaxed text-slate-700">Walk in the shade on sunny days, or under cover when it rains.</p>
         {/* One line, so the buttons stay in view on a phone. About lists every area. index.html repeats this line. */}
         <p className="mt-3 text-[13px] text-slate-700" data-testid="landing-areas">
-          {AREA_LABELS.length} walking areas in Metro Manila's busiest centres, from Caloocan to Alabang.
+          {others > 0
+            ? `${ncr} walking areas in Metro Manila and ${others} in ${cities} more cities across the Philippines.`
+            : `${ncr} walking areas in Metro Manila's busiest centres, from Caloocan to Alabang.`}
         </p>
         <div className="mt-5 grid grid-cols-2 gap-3">
           <ModeButton mode="shade" onPick={onPick} busy={picking === "shade"} />

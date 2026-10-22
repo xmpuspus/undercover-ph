@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { AreaInfo } from "../types";
-import { areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea } from "./areas";
+import { areaAt, areaCities, areaGroups, areaLabel, areaList, placeWhere, regionOf, sharedArea } from "./areas";
 
 // Two areas whose graph boxes overlap, as Greenhills (metro-core) and Cubao do.
 const core: AreaInfo = {
@@ -88,3 +88,21 @@ describe("sharedArea", () => {
     expect(sharedArea([core, taguig, moa], { area: "pasay-moa", lon: 120.982, lat: 14.535 }, { area: "metro-core", lon: 121.052, lat: 14.551 })).toBeNull();
   });
 });
+
+describe("regions", () => {
+  const cebu: AreaInfo = { ...core, id: "cebu-city-centre", name: "Cebu City", region: { id: "cebu", name: "Metro Cebu" }, cities: ["Cebu City"] };
+  const baguio: AreaInfo = { ...core, id: "baguio-centre", name: "Baguio", region: { id: "baguio", name: "Baguio" }, cities: ["Baguio"] };
+
+  it("treats an area with no region as Metro Manila", () => {
+    expect(regionOf(core)).toBe("ncr");
+    expect(regionOf(cebu)).toBe("cebu");
+    expect(regionOf(undefined)).toBe("ncr");
+  });
+
+  it("groups areas with Metro Manila first, then the other regions by name", () => {
+    const g = areaGroups([cebu, core, baguio, cubao]);
+    expect(g.map((x) => x.name)).toEqual(["Metro Manila", "Baguio", "Metro Cebu"]);
+    expect(g[0].areas.map((a) => a.id)).toEqual(["metro-core", "cubao-eastwood"]);
+  });
+});
+
