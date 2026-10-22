@@ -124,7 +124,7 @@ function WhenChip(p: Props) {
         <ChevronDown size={13} className="text-slate-500" />
       </button>
       {open && (
-        <div className="absolute left-0 top-12 z-40 w-[min(340px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-2 shadow-card" role="dialog" aria-label="When you leave" data-testid="when-panel">
+        <div className="absolute left-0 top-12 z-40 w-[min(340px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-2 shadow-card max-h-[calc(100dvh-9rem)] overflow-y-auto" role="dialog" aria-label="When you leave" data-testid="when-panel">
           <div className="flex gap-1.5">
             <button
               type="button"
@@ -210,7 +210,7 @@ function TimeChipRow(p: Props) {
         </button>
       </div>
       {menu === "date" && (
-        <div className="absolute left-0 top-12 z-40 w-56 rounded-card border border-slate-200 bg-white p-1 shadow-card" role="listbox" aria-label="Date">
+        <div className="absolute left-0 top-12 z-40 w-56 rounded-card border border-slate-200 bg-white p-1 shadow-card max-h-[calc(100dvh-9rem)] overflow-y-auto" role="listbox" aria-label="Date">
           {p.dates.map((d) => (
             <button
               key={d.date}
@@ -232,7 +232,7 @@ function TimeChipRow(p: Props) {
         </div>
       )}
       {menu === "hour" && (
-        <div className="absolute left-0 top-12 z-40 w-[min(332px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-2 shadow-card" role="dialog" aria-label="Departure time">
+        <div className="absolute left-0 top-12 z-40 w-[min(332px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-2 shadow-card max-h-[calc(100dvh-9rem)] overflow-y-auto" role="dialog" aria-label="Departure time">
           <HourGrid p={p} onPicked={() => close(true)} />
           <SlotNote p={p} />
         </div>
@@ -248,7 +248,7 @@ function NowChip({ minute, active, onClick }: Props["now"]) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      aria-label={`Leave now. Manila time ${hm} ${ap}`}
+      aria-label={`Now ${hm} ${ap}, Manila time. Leave now`}
       title="Manila time now. Tap to leave now."
       className={`${chip} ${active ? "border-brand bg-blue-50 text-brand" : ""}`}
       data-testid="now-chip"
@@ -362,7 +362,7 @@ export function WeatherChips({
           id="weather-details"
           role="dialog"
           aria-label="Weather details"
-          className={`absolute top-12 z-40 w-[min(300px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-3 text-[13px] leading-snug text-slate-700 shadow-card ${compact ? "left-1/2 -translate-x-1/2" : "left-0"}`}
+          className={`absolute top-12 z-40 w-[min(300px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-3 text-[13px] leading-snug text-slate-700 shadow-card max-h-[calc(100dvh-9rem)] overflow-y-auto ${compact ? "left-1/2 -translate-x-1/2" : "left-0"}`}
           data-testid="weather-details"
         >
           {w.feels != null && (

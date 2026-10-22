@@ -4,7 +4,10 @@ import { useReducedMotion } from "../lib/motion";
 // Light rain over the map in rain mode. A timer redraws a half-resolution canvas 10 times a second; there is
 // no requestAnimationFrame loop, so the page wakes only for those frames. Long, faint streaks hide the low frame
 // rate. The rain stops while the tab is hidden. With reduced motion it draws one still frame.
+// It falls for 4.5 s after rain mode starts, then holds a still frame: motion that runs longer than
+// 5 s needs a pause control (WCAG 2.2.2), and the still streaks still mark rain mode.
 const FRAME_MS = 100;
+const RUN_MS = 4500;
 const SCALE = 0.5;
 
 interface Drop {
@@ -71,14 +74,16 @@ export default function RainLayer() {
 
     let timer = 0;
     let last = performance.now();
+    const until = performance.now() + RUN_MS;
     const tick = () => {
       const now = performance.now();
+      if (now >= until) return stop();
       draw(Math.min(0.1, (now - last) / 1000));
       last = now;
       timer = window.setTimeout(tick, FRAME_MS);
     };
     const start = () => {
-      if (timer || document.hidden) return;
+      if (timer || document.hidden || performance.now() >= until) return;
       last = performance.now();
       timer = window.setTimeout(tick, FRAME_MS);
       canvas.dataset.running = "1";

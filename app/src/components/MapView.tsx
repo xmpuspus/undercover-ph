@@ -465,6 +465,8 @@ export default function MapView(p: Props) {
       markers.current[key] = new (mapLibre().Marker)({ element: el, anchor: key === "from" ? "center" : "bottom" })
         .setLngLat([ep.lon, ep.lat])
         .addTo(map);
+      // MapLibre marks markers as buttons, but these pins do nothing on a tap and take no focus.
+      el.setAttribute("role", "img");
     }
   }, [p.from, p.to]);
 
@@ -595,6 +597,7 @@ export default function MapView(p: Props) {
               key={d.key}
               type="button"
               data-testid="route-callout"
+              aria-pressed={i === p.selected}
               onClick={() => p.onSelect(i)}
               className={`absolute flex flex-col justify-center rounded-xl px-3 text-left shadow-card transition-colors ${
                 i === p.selected ? "bg-brand text-white" : "bg-white text-ink hover:bg-slate-50"

@@ -459,6 +459,8 @@ export default function App() {
     if (field === "from") setFrom(ep);
     else setTo(ep);
     setActive(other ? null : field === "from" ? "to" : "from");
+    // Keyboard and screen reader users land on the next thing to do, not on the page body.
+    refocus(other ? "panel" : `${field === "from" ? "to" : "from"}-input`);
   };
 
   const placeEndpoint = (pl: Place): Endpoint => {
@@ -627,6 +629,15 @@ export default function App() {
   };
   // Focus moves after React has drawn the view that holds the target.
   const focusNext = useRef<string | null>(null);
+  // Each screen gets its own title, so tabs, history, and screen readers say where the user is (WCAG 2.4.2).
+  useEffect(() => {
+    const base = "undercover.ph";
+    if (stage === "navigate" && to) document.title = `Walking to ${to.label} | ${base}`;
+    else if (stage === "plan" && from && to) document.title = `${from.label} to ${to.label} | ${base}`;
+    else if (stage === "plan") document.title = `Plan a walk | ${base}`;
+    else document.title = `${base} | Shaded and sheltered walks in Makati`;
+  }, [stage, from, to]);
+
   const refocus = (testid: string) => {
     focusNext.current = testid;
   };
@@ -655,6 +666,7 @@ export default function App() {
   });
 
   const startNavigate = () => {
+    refocus("turn-card");
     setStage("navigate");
     setNavIdx(0);
     setShowSteps(false);
@@ -903,7 +915,9 @@ export default function App() {
             )}
             <div
               ref={setPanelEl}
-              className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 p-3 md:bottom-4 md:left-4 md:right-auto md:w-[368px] md:p-0"
+              tabIndex={-1}
+              aria-label="Trip"
+              className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 p-3 outline-none md:bottom-4 md:left-4 md:right-auto md:w-[368px] md:p-0"
               style={{ maxHeight: short ? "calc(100% - 32px)" : desktop ? `calc(100% - ${(view === "dest" ? 0 : topH) + 40}px)` : view === "steps" ? "72%" : "70%" }}
               data-testid="panel"
             >
@@ -932,7 +946,11 @@ export default function App() {
                       onPick={onPick}
                       onBack={goBack}
                     />
-                    {notice && <p className="mt-2 rounded-card bg-amber-50 px-3 py-2 text-[13px] text-amber-900">{notice}</p>}
+                    {notice && (
+                      <p className="mt-2 rounded-card bg-amber-50 px-3 py-2 text-[13px] text-amber-900" role="status">
+                        {notice}
+                      </p>
+                    )}
                   </div>
                 </>
               )}

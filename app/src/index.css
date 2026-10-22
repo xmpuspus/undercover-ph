@@ -18,10 +18,18 @@ body {
   overflow: hidden;
 }
 
-/* One visible focus ring for keyboard users on every control. */
+/* One visible focus ring for keyboard users on every control. A white halo under the blue ring keeps
+   it above 3:1 on any map colour, day or night (WCAG 1.4.11). */
 :focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px #ffffff;
+}
+
+/* The map clips anything outside its box, so its ring sits inside the canvas. */
+.maplibregl-canvas:focus-visible {
+  outline-offset: -4px;
+  box-shadow: inset 0 0 0 6px #ffffff;
 }
 
 .maplibregl-map {

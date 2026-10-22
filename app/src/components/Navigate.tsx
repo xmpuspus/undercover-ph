@@ -15,7 +15,8 @@ export function TurnCard({ d, idx, night, onPrev, onNext }: { d: DisplayRoute; i
     );
   }
   return (
-    <div className="pointer-events-auto rounded-card bg-white p-3 shadow-card" data-testid="turn-card">
+    // tabIndex -1: focus lands here when navigation starts. aria-live reads each new step aloud.
+    <div className="pointer-events-auto rounded-card bg-white p-3 shadow-card outline-none" tabIndex={-1} aria-live="polite" data-testid="turn-card">
       <div className="flex items-start gap-3">
         <div className="flex flex-col items-center gap-1">
           <CoverDot cover={s.cover} night={night} size={36} />
@@ -25,7 +26,11 @@ export function TurnCard({ d, idx, night, onPrev, onNext }: { d: DisplayRoute; i
           <p className="text-[16px] font-medium leading-snug text-ink" data-testid="turn-text">
             {s.text}
           </p>
-          {s.textTl && <p className="text-[13px] leading-snug text-slate-500">{s.textTl}</p>}
+          {s.textTl && (
+            <p className="text-[13px] leading-snug text-slate-500" lang="fil">
+              {s.textTl}
+            </p>
+          )}
           <FlagChips step={s} night={night} />
         </div>
         <span className="shrink-0 text-[13px] text-slate-500">{s.minutes} min</span>

@@ -76,7 +76,7 @@ function ModeButton({ mode, onPick, busy }: { mode: Mode; onPick: (m: Mode) => v
       </span>
       <span className="flex items-center gap-1.5 text-[12px] font-light text-slate-600">
         {busy && <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-brand motion-reduce:animate-none" aria-hidden="true" />}
-        {busy ? "Loading map" : shade ? "Malilim" : "May bubong"}
+        {busy ? "Loading map" : <span lang="fil">{shade ? "Malilim" : "May bubong"}</span>}
       </span>
     </button>
   );

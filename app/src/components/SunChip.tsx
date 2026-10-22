@@ -125,7 +125,7 @@ export default function SunChip({
         )}
       </button>
       {open && (
-        <div className={`absolute top-12 z-40 w-[min(300px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-3 text-[13px] leading-snug text-slate-700 shadow-card ${compact ? "right-0" : "left-0"}`} role="dialog" aria-label="Sun and shade" id="sun-explainer" data-testid="sun-explainer">
+        <div className={`absolute top-12 z-40 w-[min(300px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-3 text-[13px] leading-snug text-slate-700 shadow-card max-h-[calc(100dvh-9rem)] overflow-y-auto ${compact ? "right-0" : "left-0"}`} role="dialog" aria-label="Sun and shade" id="sun-explainer" data-testid="sun-explainer">
           {compact && (
             <p className="mb-1.5 font-medium text-ink">
               {sun.altitude <= 0 ? "Sun down." : low ? `Sun ${sun.compass}, too low for shade.` : `Sun ${sun.compass}, ${Math.round(sun.altitude)}° up. Shadows fall ${shadowWord}.`}

@@ -173,7 +173,7 @@ export function DestinationSearch({ data, mode, query, onQuery, results, suggest
           )}
         </label>
       </div>
-      <p className="px-3 pt-2 text-[12px] text-slate-600">{query.trim() ? "Places" : "Saan ka papunta? Suggested places"}</p>
+      <p className="px-3 pt-2 text-[12px] text-slate-600">{query.trim() ? "Places" : <><span lang="fil">Saan ka papunta?</span> Suggested places</>}</p>
       {data.status !== "ready" ? (
         <DataNote data={data} />
       ) : list.length ? (
@@ -246,7 +246,7 @@ export function TripFields(p: TripProps) {
         </div>
       </div>
       <div className="border-t border-slate-100 px-3 py-2">
-        <p className="text-[12px] text-slate-500">{p.active === "from" ? "Nasaan ka ngayon? Pick a place or tap the map." : "Saan ka papunta? Pick a place or tap the map."}</p>
+        <p className="text-[12px] text-slate-500"><span lang="fil">{p.active === "from" ? "Nasaan ka ngayon?" : "Saan ka papunta?"}</span> Pick a place or tap the map.</p>
         {p.active === "from" && (
           <button
             type="button"
