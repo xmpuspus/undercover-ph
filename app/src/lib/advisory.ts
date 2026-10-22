@@ -29,7 +29,7 @@ export function advisoryCovers(issuedAt: string | null | undefined, date: string
 
 export function advisoryLine(issuedAt: string, cities: string[]): { text: string; makati: boolean } {
   const time = /(\d{1,2}:\d{2}\s*[AP]M)/i.exec(issuedAt)?.[1] ?? issuedAt;
-  const makati = cities.includes("Makati");
+  const makati = cities.includes("Makati") || cities.includes("Metro Manila");
   const list = cities.length ? cities.join(", ") : "no Metro Manila city named";
   return {
     makati,

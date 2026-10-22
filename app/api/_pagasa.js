@@ -18,6 +18,11 @@ function unescape(s) {
   });
 }
 
+// Whole words only, and "Manila" never inside "Metro Manila", which names the region, not the city.
+function cityPattern(c) {
+  return new RegExp(`${c === "Manila" ? "(?<!Metro )" : ""}\\b${c}\\b`);
+}
+
 export function parseAdvisory(page, fetchedAt) {
   const text = unescape(page.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ");
   const m = /(Thunderstorm Advisory No\.\s*\d+.*?)(?:Thunderstorm Watch|Heavy Rainfall|Rainfall Advisory|Regional Forecast|$)/.exec(text);
@@ -26,7 +31,9 @@ export function parseAdvisory(page, fetchedAt) {
   if (!m) return { ...base, issued_at: null, text: null, cities: [], note: "No thunderstorm advisory text found on the page at fetch time." };
   const block = m[1].slice(0, 1200).trim();
   const issued = /Issued at:?\s*([0-9]{1,2}:[0-9]{2}\s*[AP]M,?\s*[0-9]{1,2}\s+\w+\s+[0-9]{4})/.exec(block);
-  const cities = [...new Set(NCR_CITIES.filter((c) => block.includes(c)))].sort();
+  // An advisory can name the whole region ("Metro Manila", "NCR") instead of its cities. That covers Makati too.
+  const region = /\bMetro Manila\b|\bNCR\b|National Capital Region/.test(block.replace(/#NCR_PRSD/g, ""));
+  const cities = [...new Set([...NCR_CITIES.filter((c) => cityPattern(c).test(block)), ...(region ? ["Metro Manila"] : [])])].sort();
   return { ...base, issued_at: issued ? issued[1] : null, text: block, cities };
 }
 

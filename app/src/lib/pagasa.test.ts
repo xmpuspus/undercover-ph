@@ -27,6 +27,13 @@ describe("PAGASA page parser", () => {
     expect(a).toMatchObject({ status: "ok", issued_at: null, text: null, cities: [] });
   });
 
+  it("counts an advisory for all of Metro Manila as covering Makati", () => {
+    const a = parseAdvisory("<p>Thunderstorm Advisory No. 3 Issued at: 2:10 PM, 22 October 2026. Rainshowers over Metro Manila within the next 2 hours.</p>", "");
+    expect(a.cities).toEqual(["Metro Manila"]);
+    // The #NCR_PRSD tag on every advisory is the issuing office, not the area.
+    expect(parseAdvisory(PAGE, "").cities).not.toContain("Metro Manila");
+  });
+
   it("decodes entities in city names", () => {
     const a = parseAdvisory("<p>Thunderstorm Advisory No. 2 Issued at: 3:05 PM, 22 October 2026. Las Pi&ntilde;as and Para&#241;aque.</p>", "");
     expect(a.cities).toEqual(["Las Piñas", "Parañaque"]);

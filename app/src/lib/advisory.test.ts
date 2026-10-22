@@ -33,5 +33,6 @@ describe("PAGASA advisory window", () => {
       text: "PAGASA thunderstorm advisory, issued 10:10 PM: Marikina, Quezon City. Makati is not listed.",
     });
     expect(advisoryLine(ISSUED, ["Makati", "Pasig"]).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Makati, Pasig. Makati is listed.");
+    expect(advisoryLine(ISSUED, ["Metro Manila"]).makati).toBe(true);
   });
 });

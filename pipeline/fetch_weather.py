@@ -96,7 +96,11 @@ def advisory():
             }
         block = m.group(1)[:1200].strip()
         issued = re.search(r"Issued at:?\s*([0-9]{1,2}:[0-9]{2}\s*[AP]M,?\s*[0-9]{1,2}\s+\w+\s+[0-9]{4})", block)
-        cities = sorted({c for c in NCR_CITIES if c in block})
+        # An advisory can name the whole region ("Metro Manila", "NCR") instead of its cities. That covers Makati too.
+        region = re.search(r"\bMetro Manila\b|\bNCR\b|National Capital Region", block.replace("#NCR_PRSD", ""))
+        # Whole words only, and "Manila" never inside "Metro Manila", which names the region, not the city.
+        named = {c for c in NCR_CITIES if re.search(("(?<!Metro )" if c == "Manila" else "") + r"\b" + re.escape(c) + r"\b", block)}
+        cities = sorted(named | ({"Metro Manila"} if region else set()))
         return {
             "status": "ok", "source_url": ADVISORY_URL, "fetched_at": now(),
             "issued_at": issued.group(1) if issued else None, "text": block, "cities": cities,
