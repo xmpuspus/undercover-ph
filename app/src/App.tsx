@@ -41,6 +41,8 @@ interface Snapshot {
   showSteps: boolean;
   from: Endpoint | null;
   to: Endpoint | null;
+  // The trip settings of this entry, so Back and Forward restore its time and profile, not the latest ones.
+  settings?: { dateIdx: number; bucketIdx: number; mode: Mode; stepFree: boolean; nowAt: { minute: number; dateIdx: number; bucketIdx: number } | null };
   // Position in the app's own history, 0 for the first entry. In-app Back uses it to know when to go back a step.
   i: number;
 }
@@ -588,7 +590,7 @@ export default function App() {
     const { pathname, search } = window.location;
     const url = `${pathname}${search}${tripHash}`;
     const prior = window.history.state as Snapshot | null;
-    const snap: Snapshot = { screen, stage, active, showSteps, from, to, i: prior?.i ?? 0 };
+    const snap: Snapshot = { screen, stage, active, showSteps, from, to, settings: { dateIdx, bucketIdx, mode, stepFree, nowAt }, i: prior?.i ?? 0 };
     if (lastScreen.current === null) {
       lastScreen.current = screen;
       if (prior || screen === "landing") return window.history.replaceState(snap, "", url);
@@ -602,7 +604,7 @@ export default function App() {
     } else {
       window.history.replaceState(snap, "", url);
     }
-  }, [restoring, screen, stage, active, showSteps, from, to, tripHash]);
+  }, [restoring, screen, stage, active, showSteps, from, to, tripHash, dateIdx, bucketIdx, mode, stepFree, nowAt]);
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
       const s = e.state as Snapshot | null;
@@ -616,6 +618,13 @@ export default function App() {
       setStage(s.stage);
       setActive(s.active);
       setShowSteps(s.showSteps);
+      if (s.settings) {
+        setDateIdx(s.settings.dateIdx);
+        setBucketIdx(s.settings.bucketIdx);
+        setMode(s.settings.mode);
+        setStepFree(s.settings.stepFree);
+        setNowAt(s.settings.nowAt);
+      }
       if (s.screen === "dest") {
         setFrom(null);
         setTo(null);
@@ -625,8 +634,17 @@ export default function App() {
         setTo((t) => s.to ?? t);
       }
     };
+    // A link pasted into the same tab changes only the fragment and carries no app entry. Reload so the
+    // trip in the new link loads the same way as a fresh visit. Back and Forward carry an entry and go to onPop.
+    const onHash = () => {
+      if (!(window.history.state as Snapshot | null)?.screen) window.location.reload();
+    };
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("hashchange", onHash);
+    };
   }, [restoring]);
 
   // Dialogs and sheets hand focus back to the control that opened them.

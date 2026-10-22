@@ -129,6 +129,15 @@ describe("access filters", () => {
     expect(none.notes).toContain("No walking route connects these points at any hour.");
   });
 
+  it("names the pair of limits when only another hour and unchecked paths together open a route", () => {
+    const hours = [{ name: "Glorietta", rules: { thu: ["10:00", "21:00"] }, source_url: "https://example.org/hours", checked: "2026-10-20" }];
+    const { data } = fan([{ y: 0, flags: 4, hours: 0, routable: false, name: "Glorietta" }], { hours });
+    const r = findRoutes(data, query({ departMin: 21 * 60 + 5 }));
+    expect(r.state).toBe("no_route");
+    expect(r.notes.some((n) => n.startsWith("A route exists only at other hours or on paths with unchecked access"))).toBe(true);
+    expect(r.notes).not.toContain("No walking route connects these points at any hour.");
+  });
+
   it("says why when only unchecked paths connect the points", () => {
     const { data } = fan([{ y: 0, routable: false }]);
     const r = findRoutes(data, query());

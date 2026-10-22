@@ -152,8 +152,36 @@ test("editing the start hides the old route and routes only after a new pick", a
   await expect(page.getByTestId("from-input")).toHaveAttribute("placeholder", "Ayala MRT Station");
   await expect(card).toHaveCount(0);
   await pickPlace(page, "from-input", "Glorietta");
-  await expect(page.getByTestId("route-card").or(page.getByTestId("route-state"))).toBeVisible();
+  // A new route, not an error card: the router must succeed after the replacement pick.
+  await expect(page.getByTestId("route-card")).toBeVisible();
+  await expect(page.getByTestId("route-state")).toHaveCount(0);
+  await expect(page.getByTestId("edit-from")).toHaveText("Glorietta");
   expect(tripOf(page.url()).get("start")).toBe("Glorietta");
+});
+
+test("a link pasted into the same tab opens its own trip", async ({ page }) => {
+  await planTrip(page);
+  test.skip(!(await page.getByTestId("route-card").isVisible()), "the router found no route for this pair");
+  const hash = new URL(page.url()).hash.replace("end=Greenbelt", "end=Glorietta");
+  await page.evaluate((h) => (window.location.hash = h), hash);
+  await expect(page.getByTestId("edit-to")).toHaveText("Glorietta", { timeout: 60_000 });
+});
+
+test("Back restores the time of the earlier entry, not the latest one", async ({ page }) => {
+  await planTrip(page);
+  test.skip(!(await page.getByTestId("route-card").isVisible()), "the router found no route for this pair");
+  const before = tripOf(page.url()).get("time");
+  await page.getByTestId("show-steps").click();
+  await expect(page.getByTestId("steps")).toBeVisible();
+  await page.goBack();
+  await expect(page.getByTestId("route-card")).toBeVisible();
+  // A later hour on the results entry must not leak into the steps entry ahead of it.
+  await page.getByTestId("hour-chip").click();
+  await page.getByTestId("hour-option-960").click();
+  expect(tripOf(page.url()).get("time")).toBe("1600");
+  await page.goForward();
+  await expect(page.getByTestId("steps")).toBeVisible();
+  expect(tripOf(page.url()).get("time")).toBe(before);
 });
 
 test("Now names the real time and the shade slot it uses", async ({ page }) => {
