@@ -330,28 +330,27 @@ An earlier run on 2026-10-22 at 00:34 replaced the shade builder's 12 limits. I 
 
 ## Deploy build
 
-Git keeps the graph files, `buildings_display.geojson` and `pipeline/inputs/`. Every Vercel build makes the dated files.
+Git keeps each area's graph, places and hours, the two PMTiles files, and `pipeline/inputs/areas/<id>/`. Every Vercel build makes the dated files.
 
 1. `pipeline/vercel_build.sh` runs from `app/`. It makes a venv from `pipeline/shade/requirements.txt` under `app/node_modules/.cache/`.
-2. For each area it runs `pipeline/refresh_dates.sh` with today's date in Asia/Manila.
-3. `set_dates.py` copies `manifest_template.json` to `manifest.json`, sets `dates` and `generated_at`, and writes `READY.graph`.
-4. `shade/shade.py` writes `shade.bin`, the overlays, its manifest keys and `READY.shadows`. The script writes `READY.shade`.
-5. `fetch_weather.py` writes `weather.json`, `advisory.json` and `READY.weather`.
-6. `pnpm test` runs the router tests on the new files, then `pnpm run build` builds the app.
-7. The script writes `shade.bin.gz` beside each `shade.bin` in `app/dist/data/`, because Vercel does not compress `application/octet-stream`.
+2. It reads the area ids from `app/public/data/areas.json`, and stops if that file is missing.
+3. It fetches the PAGASA advisory once, into `app/public/data/advisory.json`.
+4. For each area it runs `pipeline/refresh_dates.sh` with today's date in Asia/Manila. The data folder is `app/public/data/areas/<id>/` and the inputs folder is `pipeline/inputs/areas/<id>/`.
+5. `set_dates.py` copies `manifest_template.json` to `manifest.json`, sets `dates` and `generated_at`, and writes `READY.graph`.
+6. `shade/shade.py` runs in area mode. It writes `shade/<date>.bin`, `shade/lowconf.bin`, `trees.json`, its manifest keys and `READY.shade`.
+7. `fetch_weather.py` writes `weather.json`, a copy of the advisory and `READY.weather`. The forecast point is the area centre.
+8. `pnpm test` runs the router tests, then `pnpm run build` builds the app. `UCPH_SKIP_TESTS=1` skips the tests, for timing runs only.
+9. The script writes a gzip copy beside each `.bin` in `app/dist/data/areas/`, because Vercel does not compress `application/octet-stream`.
 
-With `app/public/data/areas.json`, the build loops over `areas/<id>/`, with inputs in `pipeline/inputs/areas/<id>/`.
-Listed areas use shade.py's area mode by default: per-date files in `shade/`, `trees.json`, and no overlays.
-`UCPH_AREA_OVERLAYS=1` gives them `shade.bin` and overlays instead, like the root area.
-The PAGASA advisory is fetched once and copied to each area. Weather is one Open-Meteo call per area centre.
-`UCPH_OVERLAY_DATES` sets how many dates get overlays. The default is 7.
+The area builds write no shadow overlays. The app draws shadows from `buildings.pmtiles` and `trees.pmtiles`.
+`refresh_dates.sh` needs `UCPH_AREA`, `UCPH_DATA` and `UCPH_INPUTS`, and `set_dates.py` needs the last two. Neither has a root Makati mode any more.
 
 ## Districts: six routing areas are staged and pass every check
 
 Sixteen districts in `pipeline/districts.json` group into six routing areas, listed in `pipeline/areas.json`.
 A route can run anywhere inside one area. Each district stays a named neighbourhood inside its area.
 The areas follow option B of the project decisions of 2026-10-22.
-The staged bundles sit in `pipeline/stage/<area>/`. Nothing under `app/public/data/` changed.
+The staged bundles sit in `pipeline/stage/<area>/`. `publish.py` copies them into the app (see the last section).
 
 ### How the areas were chosen
 
@@ -370,10 +369,15 @@ pipeline/.venv/bin/python -I pipeline/districts/fetch_gob.py <district> [...]   
 pipeline/.venv/bin/python -I pipeline/districts/build.py <area> [...]          # about 2 to 5 minutes per area
 pipeline/.venv/bin/python -I pipeline/districts/build.py --checks <area>       # routes, display, checks only
 pipeline/.venv/bin/python -I pipeline/districts/report.py                      # tables and the Makati diff
+pipeline/.venv/bin/python -I pipeline/districts/publish.py                     # app data, inputs and PMTiles
 ```
 
 - `pipeline/districts/` holds copies of the single-area scripts. Only their import line changed, to `ctx.py`.
 - `ctx.py` reads `UC_AREA` and gives the copies the area's boxes and staging paths. A district id builds a one-district area.
+- `build.py` accepts only ids from `pipeline/areas.json` and `pipeline/districts.json`. It stops on any other id before it builds a path.
+- `build_places.py` carries the search fixes of the root script: named `landuse=commercial` sites, named `building:part` towers such as RCBC Plaza, One Ayala as a mall, `detail` for repeated names, and compact JSON.
+- `route_check.py` follows the browser router's side-switch rule. A walker changes to the other side of a road only at a node with flag 1 or 2. A junction (flag 4) costs 60 m x (1 + k). Anywhere else the change is forbidden.
+- `publish.py` needs tippecanoe and tile-join. It writes no file outside `app/public/data/`, `pipeline/inputs/areas/` and `pipeline/work/tiles/`.
 - An area's graph area is the union of its member graph boxes, not their envelope. `in_bbox()` tests the union.
 - `build_hours.py`, `build_manifest.py` and `build_display.py` are new versions for areas.
 - `hours_sources.json` lists cited web hours. `routes.json` lists the route checks. `indoor_report.py` lists indoor edges by footprint.
@@ -421,22 +425,22 @@ pipeline/.venv/bin/python -I pipeline/districts/report.py                      #
 
 | Area | Districts | Graph area km2 | Edges | Routable km | Largest piece, nodes / km | Sheltered routable km | Bit 10 edges / km | Places (dropped) |
 | --- | --- | ---: | ---: | ---: | --- | ---: | --- | --- |
-| metro-core | makati-cbd, rockwell-poblacion, bgc, mandaluyong-shaw, ortigas, pasig-center, greenhills | 52.1 | 30,894 | 1,256.9 | 89.1% / 92.3% | 6.90 | 341 / 10.4 | 4,211 (136) |
-| pasay-moa | pasay-moa | 12.5 | 5,735 | 236.0 | 84.3% / 89.5% | 2.01 | 101 / 3.0 | 539 (19) |
-| cubao-eastwood | cubao, eastwood | 13.3 | 5,661 | 306.7 | 81.5% / 87.5% | 1.51 | 46 / 1.8 | 827 (55) |
-| qc-north | qc-triangle, up-diliman | 21.2 | 9,343 | 479.7 | 85.6% / 93.1% | 3.73 | 117 / 3.6 | 1,437 (80) |
-| manila | manila-ermita, manila-ubelt, binondo | 29.1 | 16,711 | 739.5 | 83.8% / 93.4% | 6.00 | 277 / 6.7 | 3,182 (37) |
-| alabang | alabang | 14.6 | 5,312 | 252.7 | 80.2% / 80.1% | 1.72 | 225 / 6.0 | 473 (11) |
+| metro-core | makati-cbd, rockwell-poblacion, bgc, mandaluyong-shaw, ortigas, pasig-center, greenhills | 52.1 | 30,894 | 1,256.9 | 89.1% / 92.3% | 6.90 | 341 / 10.4 | 4,356 (137) |
+| pasay-moa | pasay-moa | 12.5 | 5,735 | 236.0 | 84.3% / 89.5% | 2.01 | 101 / 3.0 | 578 (19) |
+| cubao-eastwood | cubao, eastwood | 13.3 | 5,661 | 306.7 | 81.5% / 87.5% | 1.51 | 46 / 1.8 | 847 (55) |
+| qc-north | qc-triangle, up-diliman | 21.2 | 9,343 | 479.7 | 85.6% / 93.1% | 3.73 | 117 / 3.6 | 1,501 (81) |
+| manila | manila-ermita, manila-ubelt, binondo | 29.1 | 16,711 | 739.5 | 83.8% / 93.4% | 6.00 | 277 / 6.7 | 3,250 (38) |
+| alabang | alabang | 14.6 | 5,312 | 252.7 | 80.2% / 80.1% | 1.72 | 225 / 6.0 | 482 (12) |
 
 | Area | graph.json raw / gzip | places.json raw / gzip | buildings_display raw / gzip | buildings.geojson.gz |
 | --- | --- | --- | --- | ---: |
-| metro-core | 8.80 MB / 1.51 MB | 0.62 MB / 0.10 MB | 31.12 MB / 3.54 MB | 6.82 MB |
-| pasay-moa | 1.59 MB / 0.26 MB | 0.08 MB / 0.01 MB | 3.47 MB / 0.39 MB | 0.92 MB |
-| cubao-eastwood | 1.61 MB / 0.28 MB | 0.12 MB / 0.02 MB | 8.86 MB / 1.03 MB | 2.41 MB |
-| qc-north | 2.77 MB / 0.47 MB | 0.21 MB / 0.04 MB | 11.85 MB / 1.34 MB | 3.42 MB |
-| manila | 4.65 MB / 0.79 MB | 0.47 MB / 0.08 MB | 14.44 MB / 1.64 MB | 3.55 MB |
-| alabang | 1.50 MB / 0.25 MB | 0.07 MB / 0.01 MB | 3.26 MB / 0.37 MB | 0.81 MB |
-| all six | 20.92 MB / 3.57 MB | 1.58 MB / 0.26 MB | 73.01 MB / 8.31 MB | 17.93 MB |
+| metro-core | 8.80 MB / 1.51 MB | 0.53 MB / 0.10 MB | 31.12 MB / 3.54 MB | 6.82 MB |
+| pasay-moa | 1.59 MB / 0.26 MB | 0.07 MB / 0.01 MB | 3.47 MB / 0.39 MB | 0.92 MB |
+| cubao-eastwood | 1.61 MB / 0.28 MB | 0.10 MB / 0.02 MB | 8.86 MB / 1.03 MB | 2.41 MB |
+| qc-north | 2.77 MB / 0.47 MB | 0.18 MB / 0.04 MB | 11.85 MB / 1.34 MB | 3.42 MB |
+| manila | 4.65 MB / 0.79 MB | 0.40 MB / 0.08 MB | 14.44 MB / 1.64 MB | 3.55 MB |
+| alabang | 1.50 MB / 0.25 MB | 0.06 MB / 0.01 MB | 3.26 MB / 0.37 MB | 0.81 MB |
+| all six | 20.92 MB / 3.57 MB | 1.34 MB / 0.27 MB | 73.01 MB / 8.31 MB | 17.93 MB |
 
 | Area | Walkable km by neighbourhood (edge midpoint in the district box; margin = outside every district box) |
 | --- | --- |
@@ -451,35 +455,84 @@ pipeline/.venv/bin/python -I pipeline/districts/report.py                      #
 
 Each pair runs three times: shortest, sheltered-first with k = 8 on unsheltered length, and k = 8 with hours-bound edges removed.
 
+The checks follow the browser's side-switch rule since 2026-10-22. Seven of the 18 pairs grew in at least one run, by 0.1 m to 35.1 m, because a side change now needs a mapped crossing or signals. Cubao LRT to Eastwood Mall grew most, from 4,510 m to 4,545 m. No route got shorter, and none of the 54 runs switches sides at an unmarked junction.
+
 | Area | From | To | Shortest | Straight line | Ratio | Sheltered | Sheltered-first, k = 8 | k = 8, malls closed |
 | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
 | metro-core | Ayala MRT Station | Greenbelt | 1,230 m | 818 m | 1.5 | 79 m | 1,238 m, 318 m sheltered | 1,232 m, 135 m sheltered |
-| metro-core | Guadalupe MRT Station | Power Plant Mall | 1,389 m | 1,012 m | 1.37 | 0 m | 1,389 m, 0 m sheltered | 1,389 m, 0 m sheltered |
+| metro-core | Guadalupe MRT Station | Power Plant Mall | 1,391 m | 1,012 m | 1.37 | 0 m | 1,391 m, 0 m sheltered | 1,391 m, 0 m sheltered |
 | metro-core | Ortigas MRT Station | SM Megamall | 1,644 m | 352 m | 4.66 | 345 m | 1,767 m, 658 m sheltered | 1,644 m, 345 m sheltered |
 | metro-core | Shaw Boulevard | Shangri-La Plaza | 326 m | 184 m | 1.77 | 56 m | 326 m, 56 m sheltered | 326 m, 56 m sheltered |
 | metro-core | Ayala MRT Station | Market! Market! | 4,234 m | 3,024 m | 1.4 | 48 m | 4,387 m, 457 m sheltered | 4,386 m, 274 m sheltered |
 | metro-core | Shaw Boulevard | SM Megamall | 595 m | 548 m | 1.09 | 56 m | 595 m, 56 m sheltered | 595 m, 56 m sheltered |
 | metro-core | Ortigas MRT Station | Greenhills Mall | 2,381 m | 1,822 m | 1.31 | 193 m | 2,385 m, 388 m sheltered | 2,385 m, 388 m sheltered |
-| metro-core | Santolan-Annapolis MRT Station | Greenhills Mall | 1,603 m | 1,065 m | 1.5 | 0 m | 1,603 m, 0 m sheltered | 1,603 m, 0 m sheltered |
+| metro-core | Santolan-Annapolis MRT Station | Greenhills Mall | 1,604 m | 1,065 m | 1.51 | 0 m | 1,604 m, 0 m sheltered | 1,604 m, 0 m sheltered |
 | metro-core | UV Expresss Terminal | Bahay na Tisa | 897 m | 691 m | 1.3 | 0 m | 897 m, 0 m sheltered | 897 m, 0 m sheltered |
 | pasay-moa | EDSA LRT Station | SM Mall of Asia | 2,989 m | 2,088 m | 1.43 | 220 m | 3,036 m, 273 m sheltered | 3,015 m, 170 m sheltered |
 | cubao-eastwood | Araneta Center - Cubao LRT Station | Gateway Mall 1 | 1,552 m | 129 m | 12.04 | 118 m | 1,552 m, 118 m sheltered | 2,010 m, 0 m sheltered |
-| cubao-eastwood | Araneta Center - Cubao LRT Station | Eastwood Mall | 4,510 m | 3,212 m | 1.4 | 55 m | 4,551 m, 155 m sheltered | 4,551 m, 155 m sheltered |
+| cubao-eastwood | Araneta Center - Cubao LRT Station | Eastwood Mall | 4,545 m | 3,212 m | 1.42 | 55 m | 4,586 m, 155 m sheltered | 4,586 m, 155 m sheltered |
 | qc-north | North Avenue MRT Station | SM City North Edsa | 2,494 m | 556 m | 4.48 | 232 m | 2,494 m, 232 m sheltered | 2,494 m, 232 m sheltered |
-| qc-north | Quezon Avenue MRT Station | U.P. Town Center | 5,650 m | 4,049 m | 1.4 | 0 m | 5,650 m, 0 m sheltered | 5,650 m, 0 m sheltered |
+| qc-north | Quezon Avenue MRT Station | U.P. Town Center | 5,663 m | 4,049 m | 1.4 | 0 m | 5,663 m, 0 m sheltered | 5,663 m, 0 m sheltered |
 | manila | Carriedo LRT Station | Lucky Chinatown | 1,244 m | 954 m | 1.3 | 0 m | 1,258 m, 24 m sheltered | 1,258 m, 24 m sheltered |
-| manila | Legarda LRT Station | University of Santo Tomas | 1,478 m | 1,051 m | 1.41 | 0 m | 1,503 m, 36 m sheltered | 1,503 m, 36 m sheltered |
+| manila | Legarda LRT Station | University of Santo Tomas | 1,480 m | 1,051 m | 1.41 | 0 m | 1,505 m, 36 m sheltered | 1,505 m, 36 m sheltered |
 | manila | United Nations LRT Station | Robinsons Manila | 1,039 m | 684 m | 1.52 | 0 m | 1,039 m, 0 m sheltered | 1,039 m, 0 m sheltered |
 | alabang | Alabang PNR Station | Alabang Town Center | 2,853 m | 2,059 m | 1.39 | 0 m | 2,853 m, 0 m sheltered | 2,853 m, 0 m sheltered |
-
 
 - North Avenue MRT to SM North EDSA runs 4.5 times the straight line. Unroutable edges on the EDSA side force a loop along Misamis Street.
 - Cubao LRT to Gateway Mall 1 runs 12 times the straight line. The Gateway corridor also touches an entrance node, which stays blocked.
 - Pasig Center has no rail station in OSM, so its check starts at a UV Express terminal.
 
-### Phase B waits for the release decision
+### Phase B moved the six areas into the app on 2026-10-22
 
-Phase B moves the bundles to `app/public/data/areas/<id>/` and the inputs to `pipeline/inputs/areas/<id>/`.
-It also writes `areas.json` and `places_index.json`, and points `run_all.sh` at the area build. None of this has run.
+`publish.py` reads `pipeline/areas.json` and the staged areas, and writes these files to git:
 
-- 2026-10-22: removed `Buendia PNR Station` from the root `places.json`. OSM tags it disused. The area build skips disused stations, so the next build drops it by rule.
+- `app/public/data/areas.json`: id, name, cities, `bbox`, `graph_bbox`, `graph_rects`, neighbourhoods and `center` for each area.
+- `app/public/data/places_index.json`: all 11,014 places, each with its area id and its node in that area. 1.42 MB, 0.27 MB as gzip.
+- `app/public/data/areas/<id>/graph.json`, `places.json` and `hours.json`, compact.
+- `pipeline/inputs/areas/<id>/manifest_template.json` and `buildings.geojson.gz`, beside the `canopy.tif` that was already there.
+- `app/public/data/buildings.pmtiles`: 272,948 buildings, layer `buildings`, zooms 13 to 15, 11.1 MB.
+- `app/public/data/trees.pmtiles`: 589,760 crowns, layer `trees`, zooms 14 and 15, 8.1 MB.
+
+- Zoom 15 keeps every building. An indexed check build found all 272,948 there.
+- The default tile grid (detail 12, about 0.29 m) lost 14 pillar parts under 0.1 m2 in Manila. Detail 13 keeps them and adds 0.59 MB.
+- Zooms 13 and 14 thin small footprints, with tippecanoe's defaults. The check build drew 148,817 at zoom 13 and 272,745 at zoom 14.
+- Trees use drop rate 1, so both zooms keep every crown. The largest tree tile is 271 KB at zoom 14 and 97 KB at zoom 15.
+- Areas overlap near Greenhills and Cubao. The tiles keep one copy of a building or crown with the same heights and a centre within 1 m.
+- That removed 5,218 building copies and 1,955 crown copies. 73 places sit in both metro-core and cubao-eastwood, and the index keeps both.
+- The root Makati files left git: `graph.json`, `places.json`, `hours.json`, `buildings_display.geojson` and `pipeline/inputs/manifest_template.json` and `buildings.geojson`.
+- metro-core covers Makati CBD. `pipeline/inputs/canopy_height_makati.tif` stays, because `test_night_bucket_writes_255` in `shade/test_shade.py` reads it.
+- `pipeline/inputs/areas/makati-cbd/` stays out of git. The makati-cbd stage is only a regression build.
+- The root scripts (`run_all.sh` and `pipeline/build_*.py`) still build the single Makati area into `app/public/data/`. The app no longer reads those files.
+
+| Area | Places (with detail) | canopy.tif | buildings.geojson.gz | manifest_template.json |
+| --- | --- | ---: | ---: | ---: |
+| metro-core | 4,356 (400) | 6.61 MB | 6.82 MB | 8.4 KB |
+| pasay-moa | 578 (56) | 0.82 MB | 0.92 MB | 5.8 KB |
+| cubao-eastwood | 847 (50) | 2.47 MB | 2.41 MB | 7.0 KB |
+| qc-north | 1,501 (98) | 3.30 MB | 3.42 MB | 6.1 KB |
+| manila | 3,250 (218) | 1.74 MB | 3.55 MB | 6.5 KB |
+| alabang | 482 (23) | 1.64 MB | 0.81 MB | 5.8 KB |
+
+RCBC Plaza is in metro-core as an office, and One Ayala as a mall. Buendia PNR Station is gone.
+
+### The deploy build takes under 5 minutes
+
+A clean `git archive` copy built in an `amazonlinux:2023` container with 4 CPUs and 8 GB, as on Vercel, but on arm64. Vercel runs x86_64.
+
+| Step | Seconds |
+| --- | ---: |
+| dnf, Node 22, Python 3.12, pnpm | 21 |
+| `pnpm install --frozen-lockfile` | 12 |
+| shade venv from scratch | 52 |
+| metro-core | 90 |
+| pasay-moa | 12 |
+| cubao-eastwood | 21 |
+| qc-north | 29 |
+| manila | 35 |
+| alabang | 14 |
+| app build and 48 gzip copies | 21 |
+| `vercel_build.sh` in total | 276 |
+
+- The run used `UCPH_SKIP_TESTS=1`, because the app tests wait on the app side of the area change. Vercel stops a build at 45 minutes.
+- The build cache keeps the venv, so later builds skip the 52 s step.
+- The 48 shade files take 26.9 MB, and their gzip copies 7.4 MB. `app/dist` holds 109 MB.

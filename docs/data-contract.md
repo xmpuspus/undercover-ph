@@ -1,12 +1,13 @@
-# The pipeline writes eight files that the browser app reads
+# The app reads four shared files and one folder per routing area
 
-Date: 2026-10-21. Owner: the project. The pipeline in `pipeline/` writes every file below to `app/public/data/`. The app in `app/` reads them and nothing else.
+Date: 2026-10-22. Owner: the project. The pipeline in `pipeline/` writes every file below to `app/public/data/`. The app in `app/` reads them and nothing else.
 
-## Area, time zone, and dates are fixed for the prototype
+## Six routing areas share one time zone and one date rule
 
-- Pilot box (Makati CBD): lat 14.548 to 14.562, lon 121.012 to 121.032.
-- Graph area: the pilot box plus 500 m on each side. Use lat 14.5435 to 14.5665, lon 121.0074 to 121.0366.
-- Building area: the graph area plus 800 m on each side, so long low-sun shadows reach the edges.
+- `areas.json` lists six routing areas: metro-core, pasay-moa, cubao-eastwood, qc-north, manila and alabang. metro-core contains Makati CBD.
+- A route runs inside one area. Each area joins one or more districts, and each district stays a named neighbourhood.
+- An area's `bbox` is the envelope of its district boxes. Its graph area is the union of its `graph_rects`: each district box plus 500 m.
+- The building area is each graph box plus 800 m, so long low-sun shadows reach the edges.
 - Time zone: `Asia/Manila` (UTC+8, no daylight saving).
 - Dates: 7 calendar days, 2026-10-21 to 2026-10-27. The app offers only dates in `manifest.dates`. It never interpolates a date.
 - Buckets: every 30 minutes from 06:00 to 18:30, so 26 buckets. `manifest.buckets_min` holds minutes after midnight.
@@ -29,32 +30,106 @@ Amendment, 2026-10-22:
 - Road side edges keep their samples outside building footprints. The offset shrinks to 1.5 m, then falls back to one centre edge.
 - `graph.node_flags` holds one integer per node: 1 mapped crossing, 2 traffic signals, 4 junction of 3 or more ways, 8 grade-separated link.
 - A route changes to the opposite side of the same road only at a node with bit 1 or 2. At a junction without them it costs 60 m and gets a warning. Elsewhere the router forbids it.
-- `manifest.shadow_overlay` points to one ground-shadow PNG per date and daytime bucket, at 2 m per pixel.
+- Amendment, 2026-10-22: the area builds write no shadow overlay PNGs and no `manifest.shadow_overlay`. The app draws building and tree shadows from `buildings.pmtiles` and `trees.pmtiles`.
 
 The app builds its default adjacency only from edges with `routable == true` that are open at the chosen time. A user toggle "Include paths with unchecked access" stays off by default. When the user turns it on, the app draws those edges dashed and labels them on the route card.
 
 ## Files
 
+### Git keeps the slow-changing files, and every deploy builds the dated ones
+
+Committed in git, built by `pipeline/districts/publish.py` from the staged areas:
+
+```text
+app/public/data/
+  areas.json             the six areas
+  places_index.json      every place of every area, for search
+  buildings.pmtiles      buildings of all six areas, one file
+  trees.pmtiles          tree crowns of all six areas, one file
+  areas/<id>/graph.json
+  areas/<id>/places.json
+  areas/<id>/hours.json
+```
+
+Built by `pipeline/vercel_build.sh` on every deploy, and ignored by git:
+
+```text
+app/public/data/
+  advisory.json          one PAGASA fetch, copied into each area
+  areas/<id>/manifest.json
+  areas/<id>/shade/<date>.bin      one file per date, 7 dates
+  areas/<id>/shade/lowconf.bin
+  areas/<id>/trees.json            the shade engine's crowns; the app reads trees.pmtiles
+  areas/<id>/weather.json
+  areas/<id>/advisory.json
+  areas/<id>/READY.graph, READY.shade, READY.weather
+```
+
+After the app build, the script writes a gzip copy beside each `.bin` in `app/dist/data/areas/`.
+All JSON files that git keeps are compact, with no spaces or line breaks.
+
+### `areas.json`
+
+```json
+{"areas": [{"id": "metro-core", "name": "Makati, BGC, Ortigas and Shaw",
+  "cities": ["Makati", "..."],
+  "bbox": [121.012, 14.533, 121.09, 14.608],
+  "graph_bbox": [121.0074, 14.5285, 121.0946, 14.6125],
+  "graph_rects": [[121.0074, 14.5435, 121.0366, 14.5665], "..."],
+  "neighbourhoods": [{"id": "makati-cbd", "name": "Makati CBD", "bbox": [121.012, 14.548, 121.032, 14.562]}],
+  "center": [121.051, 14.5705]}]}
+```
+
+- `bbox` is the envelope of the district boxes. `graph_bbox` is the envelope of `graph_rects`.
+- `graph_rects` are the boxes the graph really covers. A point between them is outside the area.
+- `center` is the middle of `bbox`. The weather forecast and the sun position use this point.
+- The values come from `pipeline/areas.json` and each area's manifest, and the publish step checks that they agree.
+
+### `places_index.json`
+
+```json
+[{"name": "RCBC Plaza", "category": "office", "lon": 121.0163798, "lat": 14.5607614,
+  "node_id": 11927, "area": "metro-core"},
+ {"name": "Ayala MRT Station", "category": "station", "lon": 0, "lat": 0,
+  "node_id": 0, "area": "metro-core", "aliases": ["Ayala MRT"], "detail": "..."}]
+```
+
+- One row for every place in every area's `places.json`, with the same fields plus `area`.
+- `node_id` is a node in that area's `graph.json`. It means nothing in another area's graph.
+- `aliases` and `detail` appear only when the place has them.
+- 73 places sit in both metro-core and cubao-eastwood, where the two areas overlap near Greenhills and Cubao. Each copy keeps its own area and node.
+
 ### `manifest.json`
+
+One per area, in `areas/<id>/manifest.json`.
 
 ```json
 {
   "generated_at": "ISO-8601 with +08:00",
   "osm_extract": "philippines-261020.osm.pbf, md5 941dd405...",
-  "pilot_bbox": [121.012, 14.548, 121.032, 14.562],
-  "graph_bbox": [121.0074, 14.5435, 121.0366, 14.5665],
+  "pilot_bbox": [121.012, 14.533, 121.09, 14.608],
+  "graph_bbox": [121.0074, 14.5285, 121.0946, 14.6125],
+  "building_bbox": [120.9999, 14.5212, 121.1021, 14.6198],
   "timezone": "Asia/Manila",
-  "dates": ["2026-10-21", "..."],
+  "dates": ["2026-10-22", "..."],
   "buckets_min": [360, 390, "...", 1110],
-  "sun": {"2026-10-21": [[altitude_deg, azimuth_deg], "... one per bucket"]},
-  "sunrise_sunset": {"2026-10-21": ["05:51", "17:33"]},
+  "sun": {"2026-10-22": [[altitude_deg, azimuth_deg], "... one per bucket"]},
+  "sunrise_sunset": {"2026-10-22": ["05:49", "17:32"]},
   "counts": {"nodes": 0, "edges": 0, "routable_edges": 0, "buildings": 0, "places": 0},
   "sources": [{"name": "", "licence": "", "url": "", "used_for": ""}],
-  "limits": ["plain sentences the method page shows"]
+  "limits": ["plain sentences the method page shows"],
+  "area": {"id": "metro-core", "name": "", "neighbourhoods": [{"id": "", "name": "", "cities": [], "bbox": [], "graph_bbox": []}]},
+  "graph_rects": [[0, 0, 0, 0]],
+  "trees": {"path": "trees.json", "count": 0, "fields": ["lon", "lat", "r_m", "top_m", "base_m"], "source": ""},
+  "shade": {"...": "see below"}
 }
 ```
 
+`pilot_bbox` equals the area's `bbox` in `areas.json`. `counts.buildings` counts the full building set, out to the shade margin.
+
 ### `graph.json`
+
+One per area, in `areas/<id>/graph.json`. Node and edge ids count from 0 in each area.
 
 ```json
 {
@@ -89,23 +164,47 @@ The app builds its default adjacency only from edges with `routable == true` tha
 
 Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways and vehicle tunnels never do.
 
-### `shade.bin` and its header in `manifest.shade`
+### `shade/<date>.bin`, `shade/lowconf.bin` and their header in `manifest.shade`
 
 ```json
 "shade": {"n_dates": 7, "n_buckets": 26, "n_edges": 0,
-          "layout": "uint8 building[d][b][e], then uint8 tree[d][b][e], then uint8 lowconf[e]"}
+          "layout": "shade/<date>.bin: uint8 building[b][e], then uint8 tree[b][e]; shade/lowconf.bin: uint8 lowconf[e]",
+          "per_date": true,
+          "files": ["shade/2026-10-22.bin", "... one per date in manifest.dates"],
+          "lowconf": "shade/lowconf.bin"}
 ```
 
-- `building[d][b][e]`: percent of edge length in building shadow, 0 to 100.
-- `tree[d][b][e]`: percent of edge length in tree shadow and not in building shadow, 0 to 100.
-- `lowconf[e]`: percent of the edge's building-shaded samples cast by a building with a default height, 0 to 100.
+- Each date file holds `2 x n_buckets x n_edges` bytes, so a phone loads one day at a time.
+- `building[b][e]`: percent of edge length in building shadow, 0 to 100. 255 marks a night bucket.
+- `tree[b][e]`: percent of edge length in tree shadow and not in building shadow, 0 to 100.
+- `lowconf[e]`: percent of the edge's building-shaded samples cast by a building with a default height, 0 to 100. It holds `n_edges` bytes and serves every date.
+- Paths in `files` and `lowconf` are relative to the area folder.
 - Sheltered edges (`flags & 7`) count as 100% roof in the app. The pipeline still writes their values.
 - Each sample point casts a ray toward the sun from its own height. Footbridge samples start at deck height.
-- `shade.bin.gz`: a gzip copy of `shade.bin`, 536,987 bytes for 2,290,010. Vercel compresses only listed MIME types. `application/octet-stream` is not one of them. `pipeline/vercel_build.sh` writes the copy after the app build, beside each `shade.bin` in `app/dist/data/`. So the copy always matches the shipped `shade.bin`. `app/vercel.json` serves it as `application/gzip`. The app fetches `shade.bin.gz` and inflates it with `DecompressionStream`. If the copy is missing, broken, or the wrong size, the app reads `shade.bin`. The dev server and local builds have no copy.
+- `<name>.bin.gz`: a gzip copy beside every `.bin`. For metro-core a date file is 1,606,488 bytes, and its copy is 432,058.
+- Vercel compresses only listed MIME types, and `application/octet-stream` is not one of them.
+- `pipeline/vercel_build.sh` writes the copies after the app build, in `app/dist/data/areas/`, so each copy matches the shipped file.
+- `app/vercel.json` serves `.bin.gz` as `application/gzip`. The app fetches the copy and inflates it with `DecompressionStream`.
+- If the copy is missing, broken, or the wrong size, the app reads the `.bin`. The dev server and local builds have no copies.
 
-### `buildings_display.geojson` (app) and `pipeline/inputs/buildings.geojson` (pipeline)
+### `buildings.pmtiles` (app) and `pipeline/inputs/areas/<id>/buildings.geojson.gz` (pipeline)
 
-`pipeline/inputs/buildings.geojson` holds every building out to the shade margin, for the shade engine. The app loads `buildings_display.geojson`, the subset within 150 m of the walk area, with no null heights. Both are polygon features. Each `building:part` is its own feature. Properties: `height_m`, `min_height_m`, `source` (`osm`, `osm_levels`, `google_2023`, `default`), `name`.
+- `buildings.geojson.gz` holds every building of one area out to the shade margin, for the shade engine. It stays in the pipeline.
+- `buildings.pmtiles` is one file for all six areas. Its source layer is `buildings`.
+- Each feature is a polygon with two numbers: `height_m` and `min_height_m`. Each `building:part` is its own feature.
+- It holds every building within 150 m of a walk area that has a height: 272,948 buildings, 11.1 MB.
+- Where two areas overlap, one copy stays: same heights and a centre within 1 m. That removed 5,218 copies.
+- Zooms 13 to 15. Zoom 15 keeps every footprint, unsimplified, on a grid of about 0.15 m. The app overzooms past 15.
+- Zooms 13 and 14 thin out small footprints, with tippecanoe's defaults, to keep tiles light.
+- A check build drew 148,817 buildings at zoom 13 and 272,745 at zoom 14. Draw shadows from zoom 15 data when the count matters.
+
+### `trees.pmtiles`
+
+- One file for all six areas, 8.1 MB. Its source layer is `trees`.
+- Each feature is a point at a crown centre, with three numbers: `r_m` (crown radius), `top_m` (crown top) and `base_m` (crown base), in metres.
+- It holds 589,760 crowns of 3 m or taller, within 200 m of a walk area. Copies from overlapping areas are removed, 1,955 of them.
+- Zooms 14 and 15. Both zooms keep every crown, so tree shadows look the same at either zoom.
+- The crowns equal each area's deploy-time `trees.json`, which `manifest.trees` describes.
 
 ### `places.json`
 
@@ -116,7 +215,9 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
   "node_id": 0, "aliases": [], "detail": "in Greenbelt 3"}]
 ```
 
-Every place has a snapped `node_id` on a routable edge. Places come from named OSM features in the graph area.
+One per area, in `areas/<id>/places.json`. Every place has a snapped `node_id` on a routable edge of that area's graph. Places come from named OSM features in the graph area.
+
+Named commercial sites (`landuse=commercial`), named tower parts (`building:part`) and tenant office areas are places too, so towers such as RCBC Plaza are found. Stations tagged disused, abandoned, proposed or under construction are left out.
 
 `detail` is optional. The pipeline adds it only to places whose name appears more than once. It tells them apart in a few words. It comes from OSM: the named building or mall around the place, the address house name, the address street, or the nearest named street. The app shows it next to the name and never searches it.
 
@@ -127,10 +228,11 @@ Every place has a snapped `node_id` on a routable edge. Places come from named O
   "source_url": "https://...", "checked": "2026-02-24"}]
 ```
 
-Only rows with a cited source. No guessed hours.
+One per area, in `areas/<id>/hours.json`. Only rows with a cited source. No guessed hours.
 
 ### `weather.json` and `advisory.json`
 
+- Each area has both files. The forecast point is the area's `center`. Every area's advisory is a copy of the one fetch in `app/public/data/advisory.json`.
 - `weather.json`: `{"status": "ok", "source": "Open-Meteo", "fetched_at": "", "lat": 0, "lon": 0, "hourly": {"time": [], "temperature_2m": [], "apparent_temperature": [], "precipitation_probability": [], "uv_index": [], "weather_code": []}}`.
 - `advisory.json`: `{"status": "ok", "source_url": "", "fetched_at": "", "issued_at": "", "text": "", "cities": []}`.
 - If a fetch fails, the file holds `{"status": "unavailable", "fetched_at": "", "reason": ""}`. The app shows "Weather unavailable" and no number.
@@ -138,8 +240,10 @@ Only rows with a cited source. No guessed hours.
 
 ## Markers tell the app which files are ready
 
-- `READY.graph`: `manifest.json`, `graph.json`, `places.json`, `hours.json`, and `buildings_display.geojson` exist. `pipeline/set_dates.py` writes it during the build.
-- `READY.shade`: `shade.bin` exists and `manifest.shade` matches it.
+Each area folder has its own three markers.
+
+- `READY.graph`: `manifest.json`, `graph.json`, `places.json` and `hours.json` exist. `pipeline/set_dates.py` writes it during the build.
+- `READY.shade`: every file in `manifest.shade.files` and `shade/lowconf.bin` exist and match `manifest.shade`. `shade.py` writes it last.
 - `READY.weather`: `weather.json` and `advisory.json` exist.
 
 The app never fabricates a payload. Unit tests can use small hand-built graphs inside the test files only.

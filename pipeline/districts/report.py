@@ -2,7 +2,7 @@
 
 Usage: pipeline/.venv/bin/python -I pipeline/districts/report.py
 Reads pipeline/work/districts/<area>/summary.json for every area in pipeline/areas.json, and compares
-pipeline/stage/makati-cbd/ with the current root app data. Writes pipeline/work/districts/report.json.
+pipeline/stage/makati-cbd/ with the root app data when both exist. Writes pipeline/work/districts/report.json.
 """
 import gzip
 import json
@@ -16,6 +16,10 @@ ROOT = PIPE.parent
 
 def makati_diff():
     stage, app = PIPE / "stage/makati-cbd", ROOT / "app/public/data"
+    # The root Makati files left git on 2026-10-22, when metro-core replaced them. The diff runs only on a
+    # checkout that still has them and a staged makati-cbd build.
+    if not (app / "graph.json").exists() or not (stage / "graph.json").exists():
+        return {"skipped": "no root Makati files or no staged makati-cbd build"}
     out = {}
     for f in ("graph.json", "hours.json", "buildings_display.geojson", "places.json"):
         a, s = (app / f).read_bytes(), (stage / f).read_bytes()
