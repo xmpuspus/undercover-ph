@@ -19,7 +19,7 @@ function Dial({ day, altitude, accent }: { day: SunDay; altitude: number; accent
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className="shrink-0" data-testid="sun-dial">
       <path d={`${d} Z`} fill={accent} fillOpacity={0.14} stroke="none" />
-      <path d={d} fill="none" stroke="#94A3B8" strokeWidth={1.2} strokeDasharray="2 2" />
+      <path d={d} fill="none" stroke="#64748B" strokeWidth={1.2} strokeDasharray="2 2" />
       <line x1={1} x2={W - 1} y1={BASE} y2={BASE} stroke="#64748B" strokeWidth={1.2} />
       {up ? (
         <circle cx={sx} cy={y(altitude)} r={4} fill={accent} stroke="#A16207" strokeWidth={1.2} />

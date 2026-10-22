@@ -267,7 +267,8 @@ export function TripFields(p: TripProps) {
       </div>
       {p.data.status !== "ready" && <DataNote data={p.data} />}
       {p.data.status === "ready" && list.length > 0 && (
-        <div className="max-h-[38vh] overflow-y-auto border-t border-slate-100">
+        // Focusable, so keyboard users can scroll the list too (WCAG 2.1.1).
+        <div className="max-h-[38vh] overflow-y-auto border-t border-slate-100" tabIndex={0} aria-label="Places">
           <PlaceList id="trip-places" places={list} onPick={p.onPick} testid={`${p.active}-results`} active={combo.active} />
         </div>
       )}
