@@ -45,12 +45,16 @@ UPSTREAM DATA (cited, not re-licensed by us):
 
 - OpenStreetMap: © OpenStreetMap contributors, ODbL 1.0. Geofabrik extract
   philippines-261020.
-- Google Open Buildings 2.5D Temporal (2023 heights): CC BY 4.0.
+- Google Open Buildings 2.5D Temporal (2023 heights): CC BY 4.0
+  (https://creativecommons.org/licenses/by/4.0/). Modified: clipped to the
+  Makati area and merged with OpenStreetMap footprints.
   https://sites.research.google/gr/open-buildings/temporal/
 - Tree canopy height (pipeline/inputs/canopy_height_makati.tif, a clip):
   Meta and World Resources Institute (WRI), 2024. High Resolution Canopy
-  Height Maps (CHM). CC BY 4.0. Source imagery for CHM © 2016 Maxar.
-- Weather (app/public/data/weather.json): Open-Meteo, CC BY 4.0.
+  Height Maps (CHM). CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+  Modified: clipped to the Makati area. Source imagery for CHM © 2016 Maxar.
+- Weather (app/public/data/weather.json): Open-Meteo, CC BY 4.0
+  (https://creativecommons.org/licenses/by/4.0/).
 - Thunderstorm advisory text (app/public/data/advisory.json): PAGASA, a
   Philippine government work, shown with credit and a link to the source.
 - Basemap tiles at runtime: OpenFreeMap, © OpenMapTiles, © OpenStreetMap

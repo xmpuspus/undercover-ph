@@ -5,10 +5,14 @@ import { REC_MAX_DETOUR, REC_MIN_CUT } from "../lib/routerClient";
 import { fmtStamp } from "../lib/time";
 import { CloseIcon } from "./Icons";
 
-const SOURCES: { name: string; licence: string; text: string; url: string }[] = [
+// CC BY 4.0 asks for a link to the licence and a note when the data was changed (section 3(a)(1)).
+const CC_BY = "https://creativecommons.org/licenses/by/4.0/";
+
+const SOURCES: { name: string; licence: string; text: string; url: string; licenceUrl?: string }[] = [
   {
     name: "OpenStreetMap",
     licence: "ODbL 1.0, © OpenStreetMap contributors",
+    licenceUrl: "https://opendatacommons.org/licenses/odbl/1-0/",
     text: "Walk paths, buildings, places, and opening-hours tags.",
     url: "https://www.openstreetmap.org/copyright",
   },
@@ -21,20 +25,23 @@ const SOURCES: { name: string; licence: string; text: string; url: string }[] = 
   {
     name: "Meta and WRI canopy height",
     licence: "CC BY 4.0. Source imagery for CHM © 2016 Maxar",
-    text: "Meta and World Resources Institute (WRI), 2024. High Resolution Canopy Height Maps (CHM). Tree shade.",
+    text: "Meta and World Resources Institute (WRI), 2024. High Resolution Canopy Height Maps (CHM). Clipped to Makati for tree shade.",
     url: "https://registry.opendata.aws/dataforgood-fb-forests/",
+    licenceUrl: CC_BY,
   },
   {
     name: "Google Open Buildings 2.5D",
     licence: "CC BY 4.0 or ODbL",
-    text: "Modelled building heights from 2023 imagery, where OpenStreetMap has none.",
+    text: "Modelled building heights from 2023 imagery, where OpenStreetMap has none. Clipped and merged with OpenStreetMap footprints.",
     url: "https://sites.research.google/gr/open-buildings/",
+    licenceUrl: CC_BY,
   },
   {
     name: "Open-Meteo",
     licence: "CC BY 4.0",
     text: "Hourly forecast for Makati.",
     url: "https://open-meteo.com/",
+    licenceUrl: CC_BY,
   },
   {
     name: "PAGASA",
@@ -147,7 +154,16 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
                 <a href={c.url} target="_blank" rel="noreferrer" className={linkCls}>
                   {c.name}
                 </a>
-                <span className="block text-[13px] text-slate-500">{c.licence.replace(/\.+$/, "")}.</span>
+                <span className="block text-[13px] text-slate-600">
+                  {"licenceUrl" in c && c.licenceUrl ? (
+                    <a href={c.licenceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                      {c.licence.replace(/\.+$/, "")}
+                    </a>
+                  ) : (
+                    c.licence.replace(/\.+$/, "")
+                  )}
+                  .
+                </span>
                 <span className="block">{c.text}</span>
               </li>
             ),

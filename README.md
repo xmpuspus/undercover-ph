@@ -50,7 +50,7 @@ Like Singapore's version, the app returns three walks: the shortest, the most co
 
 ## What is in this repo
 
-- **`app/`**: the web app (Vite, React, TypeScript, MapLibre GL). The router lives in `app/src/lib/router/`: a custom A* search with access, opening-hours, side-of-street, and night rules, covered by 55 unit tests.
+- **`app/`**: the web app (Vite, React, TypeScript, MapLibre GL). The router lives in `app/src/lib/router/`: a custom A* search with access, opening-hours, side-of-street, and night rules, covered by unit tests.
 - **`pipeline/`**: the data build. It reads OpenStreetMap, assigns building heights, builds the walk graph, and fetches weather and the PAGASA advisory.
 - **`pipeline/shade/`**: the shade engine. It casts rays toward the sun from every 5 m of every sidewalk, each half hour. It also renders the ground shadow images.
 - **`docs/`**: the [method](docs/methodology.md), the [sun-direction analysis](docs/sun-direction.md), the [data contract](docs/data-contract.md), the [design](docs/design.md), and the [research corrections](docs/research-corrections.md).
@@ -67,7 +67,7 @@ Like Singapore's version, the app returns three walks: the shortest, the most co
 
 ## Privacy
 
-The router runs in your browser. Your start and end points never reach a server that this project controls. The app asks for your location only when you tap "Use my location", and it keeps nothing. The app has no analytics and no trackers. The trip lives in the page address after the # sign, which browsers never send to a server. A reload or a shared link reopens it. A position from "Use my location" never goes into that address. One small server function reads the PAGASA thunderstorm advisory for the app, every 10 minutes at most. It gets no route, place, or location. Map tiles come from OpenFreeMap, which receives the map area you view.
+The router runs in your browser. Your start and end points never reach a server that this project controls. The app asks for your location only when you tap "Use my location", and it keeps nothing. The app has no analytics and no trackers. The trip lives in the page address after the # sign, which browsers never send to a server. A reload or a shared link reopens it. A position from "Use my location" never goes into that address. One small server function reads the PAGASA thunderstorm advisory for the app, and the CDN keeps each answer for 10 minutes. It gets no route, place, or location. Map tiles come from OpenFreeMap, which receives the map area you view.
 
 ## Run it locally
 
@@ -76,9 +76,9 @@ git clone https://github.com/xmpuspus/undercover-ph
 cd undercover-ph/app
 pnpm install
 pnpm dev            # http://localhost:5173
-pnpm test           # 120 unit tests: router, search, route card text, sky theme, trip links, advisory
+pnpm test           # unit tests: router, search, route card text, sky theme, trip links, advisory
 pnpm build          # type check and production build
-pnpm e2e            # 9 browser tests on desktop and phone: trip flow, Back, links, Now, phone layout
+pnpm e2e            # browser tests on desktop and phone: trip flow, Back, links, Now, phone layout
 pnpm demo:record    # re-record the GIFs in docs/demo/ from a production build
 ```
 

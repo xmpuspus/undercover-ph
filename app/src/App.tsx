@@ -780,7 +780,7 @@ export default function App() {
 
   const when =
     isNow && nowAt
-      ? nowLabel(nowAt.minute, { bucketIdx, min: minute, night: dark }, mode)
+      ? nowLabel(nowAt.minute, { bucketIdx, min: minute, night: dark }, mode, sun?.[0])
       : date
         ? `${dateLabel(date, clock.date)}, ${fmtMinute(minute, true)}`
         : "";
@@ -790,7 +790,7 @@ export default function App() {
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-slate-200 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] font-sans text-ink">
       {banner && <TopBanner onClose={() => setBanner(false)} onAbout={openAbout} />}
-      <AdvisoryBar advisory={advisory} date={date} minute={minute} mode={mode} onRain={() => setMode("rain")} />
+      <AdvisoryBar advisory={advisory} date={date} minute={departMin} mode={mode} onRain={() => setMode("rain")} />
       <main className="relative min-h-0 flex-1 overflow-hidden">
         {mapOn && buildingsLoading && (
           <p className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1 text-[12px] text-slate-600 shadow-sm" role="status">
@@ -862,7 +862,7 @@ export default function App() {
                   <>
                     <div className="flex items-start gap-2">
                       <TimeChips
-                        now={{ minute: clock.minute, active: isNow, onClick: goNow }}
+                        now={{ minute: isNow && nowAt ? nowAt.minute : clock.minute, active: isNow, onClick: goNow }}
                         today={clock.date}
                         dates={dateOpts}
                         dateIdx={dateIdx}
@@ -918,7 +918,7 @@ export default function App() {
                     <TimeChips
                       compact
                       play={daySlots.length > 1 ? { playing, onToggle: togglePlay } : null}
-                      now={{ minute: clock.minute, active: isNow, onClick: goNow }}
+                      now={{ minute: isNow && nowAt ? nowAt.minute : clock.minute, active: isNow, onClick: goNow }}
                       today={clock.date}
                       dates={dateOpts}
                       dateIdx={dateIdx}

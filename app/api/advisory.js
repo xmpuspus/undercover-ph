@@ -14,7 +14,8 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=600, stale-while-revalidate=600");
     res.status(200).json(parseAdvisory(await r.text(), manilaNow()));
   } catch (e) {
-    res.setHeader("Cache-Control", "no-store");
+    // Cache the failure for a minute too, so a PAGASA outage does not turn every page load into a fetch.
+    res.setHeader("Cache-Control", "public, max-age=0, s-maxage=60");
     res.status(502).json({ status: "unavailable", fetched_at: manilaNow(), reason: String(e).slice(0, 300) });
   }
 }

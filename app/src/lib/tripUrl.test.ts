@@ -71,6 +71,16 @@ describe("Now slot", () => {
   it("uses the first slot, a night one, before dawn", () => {
     expect(nowSlot(buckets, alt, 300, 3)).toMatchObject({ bucketIdx: 0, night: true });
   });
+  it("keeps the daylight slot at sunset while the sun is still above the night line", () => {
+    // 2026-10-22: 5:00 PM at 6.9 degrees, 5:30 PM at 0.2. At 5:01 PM the sun is about 6.7 degrees up.
+    const dusk = [960, 990, 1020, 1050];
+    const alts = [21, 14, 6.9, 0.2];
+    expect(nowSlot(dusk, alts, 1021, 3)).toEqual({ bucketIdx: 2, min: 1020, night: false });
+    // At 5:25 PM the line between the slots reads 1.3 degrees, under the night line, so night it is.
+    const late = nowSlot(dusk, alts, 1045, 3);
+    expect(late).toEqual({ bucketIdx: 3, min: 1050, night: true });
+    expect(nowLabel(1045, late!, "shade", 0.2)).toBe("now, 5:25 PM, sun too low for shade");
+  });
   it("returns null when the last slot is daylight and the clock is past it", () => {
     expect(nowSlot([360, 720], [9, 60], 800, 3)).toBeNull();
   });

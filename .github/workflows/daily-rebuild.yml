@@ -1,7 +1,7 @@
 # Vercel generates the dated data (7 shade dates, overlays, weather, PAGASA advisory)
 # in every build (pipeline/vercel_build.sh), so the site goes stale unless main gets
-# a commit each day. This job pushes an empty commit when main has had none in the
-# last 20 hours. Vercel's Git integration then rebuilds and deploys.
+# a commit each day. This job pushes an empty commit unless main already has a commit
+# from today (Manila date). Vercel's Git integration then rebuilds and deploys.
 # No secrets and no Vercel token. A failed Vercel build keeps the last good deployment.
 
 name: daily-rebuild
@@ -30,11 +30,13 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
-      - name: Push an empty commit unless main changed in the last 20 hours
+      - name: Push an empty commit unless main has a commit from today in Manila
         run: |
-          age=$(( $(date +%s) - $(git log -1 --format=%ct) ))
-          if [ "$age" -lt 72000 ]; then
-            echo "main has a commit from $((age / 3600)) h ago, so Vercel built current data then."
+          # A push at 9 PM yesterday built yesterday's dates. Only a commit made today builds today's.
+          last=$(TZ=Asia/Manila date -d "@$(git log -1 --format=%ct)" +%F)
+          today=$(TZ=Asia/Manila date +%F)
+          if [ "$last" = "$today" ]; then
+            echo "main has a commit from today ($today), so Vercel built today's data then."
             exit 0
           fi
           git config user.name "github-actions[bot]"
