@@ -326,9 +326,11 @@ export function findRoutes(data: Data, q: Query): Result {
       notes.push("Every route between these points uses steps.");
     } else if (reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, q.includeUnchecked, q.stepFree)) {
       notes.push("Every route between these points passes through a place that is closed at this time.");
-    } else if (reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, true, false)) {
+    } else if (reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, true, q.stepFree)) {
       // Each limit alone still blocks, but together they open a route: say so, not "no route at any hour".
       notes.push("A route exists only at other hours or on paths with unchecked access. Try another time, or include those paths.");
+    } else if (q.stepFree && reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, true, false)) {
+      notes.push("A route exists only with steps, and only at other hours or on paths with unchecked access.");
     } else {
       notes.push("No walking route connects these points at any hour.");
     }

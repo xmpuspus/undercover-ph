@@ -145,7 +145,7 @@ test("a shared link opens on the route and Back goes to the landing page", async
 test("editing the start hides the old route and routes only after a new pick", async ({ page }) => {
   await planTrip(page);
   const card = page.getByTestId("route-card");
-  test.skip(!(await card.isVisible()), "the router found no route for this pair");
+  await expect(card).toBeVisible();
   await page.getByTestId("edit-from").click();
   await expect(page.getByTestId("from-input")).toBeVisible();
   // The kept start shows as the box's value, the old route is gone, and nothing re-routes by itself.
@@ -161,7 +161,8 @@ test("editing the start hides the old route and routes only after a new pick", a
 
 test("a link pasted into the same tab opens its own trip", async ({ page }) => {
   await planTrip(page);
-  test.skip(!(await page.getByTestId("route-card").isVisible()), "the router found no route for this pair");
+  // Ayala MRT Station to Greenbelt always has a route. A router error must fail the test, not skip it.
+  await expect(page.getByTestId("route-card")).toBeVisible();
   const hash = new URL(page.url()).hash.replace("end=Greenbelt", "end=Glorietta");
   await page.evaluate((h) => (window.location.hash = h), hash);
   await expect(page.getByTestId("edit-to")).toHaveText("Glorietta", { timeout: 60_000 });
@@ -169,7 +170,8 @@ test("a link pasted into the same tab opens its own trip", async ({ page }) => {
 
 test("Back restores the time of the earlier entry, not the latest one", async ({ page }) => {
   await planTrip(page);
-  test.skip(!(await page.getByTestId("route-card").isVisible()), "the router found no route for this pair");
+  // Ayala MRT Station to Greenbelt always has a route. A router error must fail the test, not skip it.
+  await expect(page.getByTestId("route-card")).toBeVisible();
   const before = tripOf(page.url()).get("time");
   await page.getByTestId("show-steps").click();
   await expect(page.getByTestId("steps")).toBeVisible();

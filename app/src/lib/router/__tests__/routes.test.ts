@@ -138,6 +138,14 @@ describe("access filters", () => {
     expect(r.notes).not.toContain("No walking route connects these points at any hour.");
   });
 
+  it("keeps Step-free in the combined check and names steps when they are part of the block", () => {
+    const { data } = fan([{ y: 0, flags: 16, routable: false }]);
+    const r = findRoutes(data, query({ stepFree: true }));
+    expect(r.state).toBe("no_route");
+    expect(r.notes.some((n) => n.startsWith("A route exists only at other hours or on paths with unchecked access"))).toBe(false);
+    expect(r.notes.some((n) => n.startsWith("A route exists only with steps"))).toBe(true);
+  });
+
   it("says why when only unchecked paths connect the points", () => {
     const { data } = fan([{ y: 0, routable: false }]);
     const r = findRoutes(data, query());

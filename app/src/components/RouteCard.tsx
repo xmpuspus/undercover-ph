@@ -532,7 +532,9 @@ const ONLY_STEPS = "Every route between these points uses steps.";
 const CLOSED = "Every route between these points passes through a place that is closed at this time.";
 const NO_PATH = "No walking route connects these points at any hour.";
 const COMBINED = /^A route exists only at other hours or on paths with unchecked access/;
-const isCause = (n: string) => n === SAME_PLACE || n === ONLY_STEPS || n === CLOSED || n === NO_PATH || ONLY_UNCHECKED.test(n) || COMBINED.test(n);
+const COMBINED_STEPS = /^A route exists only with steps, and only at other hours/;
+const isCause = (n: string) =>
+  n === SAME_PLACE || n === ONLY_STEPS || n === CLOSED || n === NO_PATH || ONLY_UNCHECKED.test(n) || COMBINED.test(n) || COMBINED_STEPS.test(n);
 
 const andList = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}` : (xs[0] ?? ""));
 
@@ -550,6 +552,9 @@ export function noRouteText(notes: string[], from: string, to: string, gatedEnds
   }
   if (notes.includes(CLOSED)) return { title, fix: "Every route between them passes through a place that is closed at this time. Try another time." };
   if (notes.some((n) => COMBINED.test(n))) return { title, fix: "A route exists only at other hours and on paths with unchecked access. Try another time, and include those paths." };
+  if (notes.some((n) => COMBINED_STEPS.test(n))) {
+    return { title, fix: "A route exists only with steps, at other hours or on paths with unchecked access. Turn off Step-free, then try another time or include those paths." };
+  }
   return { title, fix: gate ? `${gate} Pick a nearby street.` : "No walking route connects them at any hour. Pick a nearby start or end." };
 }
 
