@@ -367,7 +367,8 @@ export function RouteCard(p: CardProps) {
           </button>
         </div>
 
-        <div className="mt-3 grid grid-cols-[auto_1fr] gap-2">
+        {/* Sticky, so Steps and Navigate stay in reach when the card scrolls inside a short panel. */}
+        <div className="sticky bottom-0 -mx-4 mt-3 grid grid-cols-[auto_1fr] gap-2 bg-white px-4 pb-1 pt-2">
           <button
             type="button"
             onClick={p.onSteps}
