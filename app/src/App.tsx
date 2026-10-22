@@ -3,7 +3,7 @@ import { AREA_LABELS, CBD_CENTER, DEFAULT_AREA, NIGHT_ALT_DEG, SUGGESTED } from 
 import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, Weather } from "./types";
 import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, placeKeys, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
 import { areaBase, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
-import { NCR, areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea, wellKnown } from "./lib/areas";
+import { areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea, wellKnown } from "./lib/areas";
 import { areaAdvisory } from "./lib/advisory";
 import { clockPinned, dateLabel, dateShort, fmtDist, fmtMinute, manilaNow, type Clock } from "./lib/time";
 import { toDisplay } from "./lib/display";
