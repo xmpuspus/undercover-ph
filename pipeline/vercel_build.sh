@@ -82,4 +82,17 @@ fi
 cd "$APP"
 pnpm test
 pnpm run build
+# Vercel compresses only listed MIME types and application/octet-stream is not one, so shade.bin would ship
+# raw (2.29 MB, 0.54 MB as gzip). Put a gzip copy beside each shade.bin in the output; the app inflates it.
+# Written from the built output after the build, so it can never be older than the shade.bin it copies.
+"$PY" -I - "$APP/dist/data" <<'PY'
+import gzip
+import sys
+from pathlib import Path
+
+for f in sorted(Path(sys.argv[1]).rglob("shade.bin")):
+    gz = f.with_name("shade.bin.gz")
+    gz.write_bytes(gzip.compress(f.read_bytes(), compresslevel=9, mtime=0))
+    print(f"{gz}: {f.stat().st_size} -> {gz.stat().st_size} bytes")
+PY
 echo "vercel_build done in $((SECONDS - t_all)) s"

@@ -30,8 +30,34 @@ async function getBytes(fetchImpl: FetchLike, base: string, file: string): Promi
   }
 }
 
+// Vercel compresses only listed MIME types, and shade.bin (application/octet-stream) is not one, so the deploy
+// build writes shade.bin.gz beside it: 0.54 MB instead of 2.29 MB. Inflate that here. Use shade.bin when the
+// copy is missing (dev server, local builds), broken, or the browser has no DecompressionStream.
+async function getShade(fetchImpl: FetchLike, base: string): Promise<ArrayBuffer | null> {
+  if (typeof DecompressionStream === "function") {
+    const gz = await getBytes(fetchImpl, base, "shade.bin.gz");
+    if (gz) {
+      try {
+        return await gunzip(gz);
+      } catch {
+        // Fall through to shade.bin.
+      }
+    }
+  }
+  return getBytes(fetchImpl, base, "shade.bin");
+}
+
+async function gunzip(buf: ArrayBuffer): Promise<ArrayBuffer> {
+  // A host that adds Content-Encoding: gzip hands the bytes over inflated already. Shade bytes are 0 to 100
+  // or 255 (night), so plain shade.bin never starts with the gzip magic bytes 1f 8b.
+  const head = new Uint8Array(buf, 0, Math.min(2, buf.byteLength));
+  if (head[0] !== 0x1f || head[1] !== 0x8b) return buf;
+  const stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return new Response(stream).arrayBuffer();
+}
+
 /**
- * Fetch manifest.json, graph.json, places.json, hours.json, and shade.bin (when manifest.shade exists).
+ * Fetch manifest.json, graph.json, places.json, hours.json, and shade.bin.gz or shade.bin (when manifest.shade exists).
  * Pass the UI's data URL as base, for example `${import.meta.env.BASE_URL}data/`.
  * A missing or mismatched shade.bin does not throw. data.shade is then null and data.loadNotes says why.
  */
@@ -44,7 +70,7 @@ export async function loadData(base = "data", fetchImpl?: FetchLike): Promise<Da
     getJson(f, base, "hours.json"),
   ]);
   const m = manifest as Manifest;
-  const shade = m.shade ? await getBytes(f, base, "shade.bin") : null;
+  const shade = m.shade ? await getShade(f, base) : null;
   return buildData({
     manifest: m,
     graph: graph as RawGraph,

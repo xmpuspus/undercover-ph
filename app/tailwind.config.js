@@ -3,7 +3,7 @@ export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
-      fontFamily: { sans: ["Jost", "system-ui", "sans-serif"] },
+      fontFamily: { sans: ["Jost", '"Jost Fallback"', '"Jost Fallback Roboto"', "system-ui", "sans-serif"] },
       colors: { ink: "#0F172A", brand: "#2563EB", sun: "#FACC15" },
       borderRadius: { card: "16px" },
       // Phones held sideways and other short screens.

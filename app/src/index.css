@@ -2,6 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Local fonts sized to Jost's width and line metrics, so text keeps its line breaks when Jost swaps in.
+   Values from the real font files (fontTools): size-adjust is Jost's average advance over the fallback's,
+   the overrides are Jost's hhea ascent 1070, descent 375 and line gap 0 (per 1000) over size-adjust.
+   Arial covers Apple and Windows devices, Roboto covers Android. Weight 600 uses the bold faces. */
+@font-face {
+  font-family: "Jost Fallback";
+  font-weight: 300;
+  src: local("Arial"), local("ArialMT");
+  size-adjust: 93.47%;
+  ascent-override: 114.47%;
+  descent-override: 40.12%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jost Fallback";
+  font-weight: 400;
+  src: local("Arial"), local("ArialMT");
+  size-adjust: 95.87%;
+  ascent-override: 111.61%;
+  descent-override: 39.11%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jost Fallback";
+  font-weight: 500;
+  src: local("Arial"), local("ArialMT");
+  size-adjust: 99.81%;
+  ascent-override: 107.2%;
+  descent-override: 37.57%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jost Fallback";
+  font-weight: 600;
+  src: local("Arial Bold"), local("Arial-BoldMT");
+  size-adjust: 95.2%;
+  ascent-override: 112.39%;
+  descent-override: 39.39%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jost Fallback Roboto";
+  font-weight: 300;
+  src: local("Roboto"), local("Roboto-Regular");
+  size-adjust: 93.74%;
+  ascent-override: 114.14%;
+  descent-override: 40%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jost Fallback Roboto";
+  font-weight: 400;
+  src: local("Roboto"), local("Roboto-Regular");
+  size-adjust: 96.15%;
+  ascent-override: 111.28%;
+  descent-override: 39%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jost Fallback Roboto";
+  font-weight: 500;
+  src: local("Roboto"), local("Roboto-Regular");
+  size-adjust: 100.1%;
+  ascent-override: 106.89%;
+  descent-override: 37.46%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jost Fallback Roboto";
+  font-weight: 600;
+  src: local("Roboto Bold"), local("Roboto-Bold");
+  size-adjust: 101.45%;
+  ascent-override: 105.47%;
+  descent-override: 36.96%;
+  line-gap-override: 0%;
+}
+
 html,
 body,
 #root {
@@ -9,8 +86,26 @@ body,
   margin: 0;
 }
 
+/* The static landing shell in index.html. Its colours live here, not in style attributes,
+   because the CSP in vercel.json (style-src 'self') blocks inline styles. */
+#shell-sky {
+  background: linear-gradient(#3e9bea, #ddf0ff 14%, #eef2f6 40%);
+}
+[data-sky="night"] #shell-sky {
+  background: linear-gradient(#0b1630, #23365e 14%, #1e293b 40%);
+}
+#shell-wash {
+  background: linear-gradient(rgba(230, 243, 255, 0.3) 0%, rgba(230, 243, 255, 0.133) 22%, rgba(230, 243, 255, 0) 50%);
+}
+#shell-card {
+  background-color: rgba(255, 255, 255, 0.78);
+}
+[data-sky="night"] #shell-card {
+  background-color: rgba(239, 246, 255, 0.86);
+}
+
 body {
-  font-family: Jost, system-ui, sans-serif;
+  font-family: Jost, "Jost Fallback", "Jost Fallback Roboto", system-ui, sans-serif;
   color: #0f172a;
   /* Shows only in the iPhone safe areas around the app, above the dark banner and at the sides. */
   background: #0f172a;
@@ -33,7 +128,7 @@ body {
 }
 
 .maplibregl-map {
-  font-family: Jost, system-ui, sans-serif;
+  font-family: Jost, "Jost Fallback", "Jost Fallback Roboto", system-ui, sans-serif;
 }
 
 .hb-pin-start {

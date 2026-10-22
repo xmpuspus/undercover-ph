@@ -101,6 +101,7 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 - `lowconf[e]`: percent of the edge's building-shaded samples cast by a building with a default height, 0 to 100.
 - Sheltered edges (`flags & 7`) count as 100% roof in the app. The pipeline still writes their values.
 - Each sample point casts a ray toward the sun from its own height. Footbridge samples start at deck height.
+- `shade.bin.gz`: a gzip copy of `shade.bin` (about 0.54 MB for 2.29 MB). Vercel compresses only listed MIME types, and `application/octet-stream` is not one. `pipeline/vercel_build.sh` writes the copy beside each `shade.bin` in `app/dist/data/` after the app build, so it always matches the shipped `shade.bin`. `app/vercel.json` serves it as `application/gzip`. The app fetches `shade.bin.gz` and inflates it with `DecompressionStream`. It reads `shade.bin` when the copy is missing (the dev server and local builds), broken, or the browser cannot inflate it.
 
 ### `buildings_display.geojson` (app) and `pipeline/inputs/buildings.geojson` (pipeline)
 

@@ -30,8 +30,8 @@ interface Props {
   // GeoJSON of 3D buildings. MapLibre's worker fetches and parses it.
   buildingsUrl: string;
   onBuildings: () => void;
-  // onLoaded: the style is in. onReady: the map is worth showing (first idle, or once it has loaded and the
-  // camera leaves the landing view). The landing poster fades out on onReady.
+  // onLoaded: the style is in. onReady: the map is worth showing (basemap drawn, first idle, or once it has
+  // loaded and the camera leaves the landing view). The landing poster fades out on onReady.
   onLoaded: () => void;
   onReady: () => void;
   // Routing and data cover graph_bbox (the pilot box plus 500 m). A solid blue outline shows it.
@@ -338,11 +338,21 @@ export default function MapView(p: Props) {
     map.on("styleimagemissing", (e) => {
       if (!map.hasImage(e.id)) map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) });
     });
+    // The poster can go once the basemap under the landing view has drawn. The first idle also waits for
+    // buildings_display.geojson, seconds later on a phone; the "Loading 3D buildings..." note covers that wait.
+    let basemap: string[] = [];
+    const onRender = () => {
+      if (!basemap.length || !basemap.every((id) => map.getSource(id) && map.isSourceLoaded(id))) return;
+      map.off("render", onRender);
+      announceReady();
+    };
+    map.on("render", onRender);
     map.on("style.load", () => {
       ready.current = true;
       // A new style drops the shadow images; start the pair again.
       shade.current = { front: "a", url: null, token: shade.current.token + 1 };
       guardNumericFilters(map);
+      basemap = Object.keys(map.getStyle().sources ?? {});
       install(map, styleUrl.current === STYLE_NIGHT);
       sync();
       setStyleTick((t) => t + 1);

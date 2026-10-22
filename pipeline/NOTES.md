@@ -338,6 +338,7 @@ Git keeps the graph files, `buildings_display.geojson` and `pipeline/inputs/`. E
 4. `shade/shade.py` writes `shade.bin`, the overlays, its manifest keys and `READY.shadows`. The script writes `READY.shade`.
 5. `fetch_weather.py` writes `weather.json`, `advisory.json` and `READY.weather`.
 6. `pnpm test` runs the router tests on the new files, then `pnpm run build` builds the app.
+7. The script writes `shade.bin.gz` beside each `shade.bin` in `app/dist/data/`, because Vercel does not compress `application/octet-stream`.
 
 With `app/public/data/areas.json`, the build loops over `areas/<id>/`, with inputs in `pipeline/inputs/areas/<id>/`.
 Listed areas use shade.py's area mode by default: per-date files in `shade/`, `trees.json`, and no overlays.
