@@ -9,7 +9,7 @@ const TRIPS: [string, string, string][] = [
   ["metro-core", "Ayala MRT Station", "Greenbelt"],
   ["pasay-moa", "SM Mall of Asia", "SMX Convention Center"],
   ["cubao-eastwood", "Gateway Mall 1", "Smart Araneta Coliseum"],
-  ["qc-north", "TriNoma", "SM City North EDSA"],
+  ["qc-north", "TriNoma", "SM City North Edsa"],
   ["manila", "Intramuros", "Manila City Hall"],
   ["alabang", "Alabang Town Center", "Festival Alabang"],
   ["north-coast", "Yamaha Monumento LRT Station", "Malabon City Hall"],
@@ -32,7 +32,12 @@ async function pickPlace(page: Page, inputId: string, text: string) {
 for (const [area, from, to] of TRIPS) {
   test(`${area}: ${from} to ${to}`, async ({ page }) => {
     const errors: string[] = [];
-    page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+    // A bare "Error" text says nothing, so keep each Error's message and stack top.
+    page.on("console", async (m) => {
+      if (m.type() !== "error") return;
+      const args = await Promise.all(m.args().map((x) => x.evaluate((v) => (v instanceof Error ? `${v.name}: ${v.message} ${String(v.stack).split("\n")[1] ?? ""}` : String(v))).catch(() => m.text())));
+      errors.push(`${args.join(" ")} @ ${m.location().url}`);
+    });
     page.on("pageerror", (e) => errors.push(String(e)));
     await page.goto("/");
     await expect(page.getByTestId("pick-shade")).toBeEnabled({ timeout: 90_000 });

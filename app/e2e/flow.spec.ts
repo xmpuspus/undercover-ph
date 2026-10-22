@@ -203,7 +203,7 @@ test("Now after the last slot is a night walk today, not tomorrow morning", asyn
 
 test("plan a walk in BGC, tomorrow at 3 PM", async ({ page }) => {
   await page.goto(`/?now=${NOW}`);
-  await expect(page.getByTestId("landing-areas")).toContainText("13 walking areas in Metro Manila");
+  await expect(page.getByTestId("landing-areas")).toContainText("14 walking areas in Metro Manila");
   await expect(page.getByTestId("pick-shade")).toBeEnabled({ timeout: 60_000 });
   await page.getByTestId("pick-shade").click();
   await pickPlace(page, "destination-input", "Market! Market!");

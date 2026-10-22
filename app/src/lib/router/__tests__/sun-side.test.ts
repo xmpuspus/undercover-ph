@@ -172,6 +172,20 @@ describe("side switches", () => {
     expect(s.warnings).toContain("Crosses a road where there is no marked crossing.");
   });
 
+  it("names the sidewalk on a curved piece from the way direction, not the bend", () => {
+    // B to C bulges 150 m north, so the mean point of its south sidewalk line lies north of the chord.
+    // The step must still say south side, the side the router walks.
+    const data = makeData({
+      nodes: AVENUE,
+      edges: [south(0, 1, 0, 200), { ...south(1, 2, 200, 400), geom: [[200, -5], [300, 145], [400, -5]] }],
+      nodeFlags: [4, 4, 4],
+    });
+    const s = byLabel(findRoutes(data, query({ from: 0, to: 2 })), "shortest");
+    expect(s.steps.length).toBeGreaterThan(0);
+    for (const step of s.steps) expect(step.side).toBe("south");
+    expect(s.steps[0].text).toBe("Head east on the south side (on your right) of Ayala Avenue");
+  });
+
   it("keeps a walker on one sidewalk through a mid-block bend", () => {
     // Both pieces carry only the north sidewalk. B to C bulges 150 m south, so its mean point falls south of
     // the chord, and the old offset test forbade this same-side move: no route.

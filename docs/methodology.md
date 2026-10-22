@@ -5,13 +5,13 @@ The data file formats are in [data-contract.md](data-contract.md). The build ste
 ## 1. The walk network comes from OpenStreetMap with strict access rules
 
 - The source is the Geofabrik Philippines extract of 2026-10-20, clipped to Metro Manila.
-- `app/public/data/areas.json` lists the 13 walking areas across Metro Manila. Each area joins one or more district boxes around a busy centre. Its walk network covers each box plus 500 m on each side.
+- `app/public/data/areas.json` lists the 14 walking areas across Metro Manila. Each area joins one or more district boxes around a busy centre. Its walk network covers each box plus 500 m on each side.
 - Each area routes on its own network. Where two areas overlap, a trip across the seam routes in the area whose network holds both ends.
 - Every `footway`, `path`, `steps`, `corridor`, and walkable road becomes an edge between two nodes.
 - Roads of tertiary class and above get a separate edge for each sidewalk. The pipeline offsets each sidewalk line from the road centre and keeps it outside building footprints.
 - An edge with an unchecked access rule (a gate, an entrance, a private passage) stays out of routes by default. The user can turn such paths on, and the app then draws them dashed.
 - A gate or other node rule closes only the stretch of way between the two junctions around it. The rest of that way stays walkable, so a public road stays open up to a village gate. A stretch through a closed node, such as a gate tagged `access=private`, is left out of the graph.
-- Each area keeps every way with a node inside its graph boxes. A walkable way outside the boxes also stays when it joins two separate parts of the area's walk network within 300 m, such as a bridge in the gap between two member districts.
+- Each area keeps every way with a node inside its graph boxes. If a walkable way outside the boxes joins two separate parts of the area's walk network within 300 m, it stays. A bridge in the gap between two districts is one case.
 - Mall and building passages with published opening hours enter routes only while they are open.
 
 ## 2. Building heights come from OpenStreetMap first, then Google's 2023 estimates
@@ -20,7 +20,7 @@ The pipeline gives each building one height from the first of these sources that
 
 1. The OpenStreetMap `height` tag.
 2. The OpenStreetMap `building:levels` tag times 3.74 m, the median measured on Makati buildings that carry both tags.
-3. The median of the Google Open Buildings 2.5D Temporal raster (2023) inside the footprint. Google caps heights at 100 m, so OSM supplies the tower heights.
+3. The median of the Google Open Buildings 2.5D Temporal raster (2023) inside the footprint. Google caps heights at 100 m, so a tower over 100 m gets its full height only from an OpenStreetMap tag.
 4. A default of 7.5 m (two levels). A default that is too tall invents shade, so it errs low.
 
 Each `building:part` keeps its own height and base. A tower part does not raise its podium.
@@ -40,21 +40,21 @@ Each `building:part` keeps its own height and base. A tower part does not raise 
 
 Roofed walkways, underpasses, and indoor passages count as fully covered.
 
-## 5. The router finds three routes and keeps the recommended one only when it helps
+## 5. The router finds three routes and keeps the recommended one only when it is at most 20% longer and cuts sun by at least 15%
 
-The search runs in the browser, so no server sees a start or end point.
+The search runs in the browser, so no server of this project sees a start or end point. The map tile server sees the map area on screen.
 
 - Cost of an edge = length x (1 + k x sun exposure). Exposure is 0 under a roof and the sunlit share elsewhere.
 - The shortest route uses k = 0.
 - The most covered route uses k = 8, lowered while the detour exceeds 50%.
 - The recommended route starts at k = 2 and lowers k until the detour is 20% or less. The app shows it only if it cuts sun exposure by at least 15%. If it does not, the most covered route takes its place when it meets both limits.
 - The reported numbers use the shade at the time the walker reaches each edge. The time comes from the departure time and a walking speed of 1.1 m/s.
-- A route moves to the other side of a road only at a mapped crossing or a traffic signal. At an unmarked junction the move costs 60 m and shows a warning. Mid-block the router forbids it.
+- A route moves to the other side of a road free at a mapped crossing or a traffic signal. At a junction with no mapped crossing the move adds 60 x (1 + k) m of cost, 60 m on the shortest route and 540 m at k = 8, and the step shows a warning. Mid-block the router forbids it.
 - The router tells the two sidewalks apart from each sidewalk's side of its OpenStreetMap way and the direction walked. Each sidewalk stays on the same hand of the walker along the road, round bends and corners.
 - When the sun is 3 degrees or less above the horizon, the app says that shade does not apply.
 - Rain mode counts only roofed, underground, and indoor edges as covered.
 
-## 6. Weather and advisories are context, never a claim about a street
+## 6. Weather and the PAGASA advisory cover the whole metro, and the app makes no flood claim
 
 - Open-Meteo gives the hourly temperature, feels-like temperature, rain chance, and UV index.
 - The PAGASA thunderstorm advisory shows only during the 2 hours it covers.
@@ -63,7 +63,7 @@ The search runs in the browser, so no server sees a start or end point.
 ## 7. Five known limits
 
 - Nobody checked the modelled shade on the street yet.
-- OpenStreetMap maps few covered walkways in Makati, so sheltered routes undercount real cover.
+- OpenStreetMap maps few covered walkways, so sheltered routes undercount real cover. The README gives the sheltered length across all areas.
 - Where OpenStreetMap has no sidewalk data, the pipeline assumes a sidewalk on both sides of larger roads. A step such as "walk on the south side" can point to a sidewalk that does not exist.
 - Awnings and arcades that OpenStreetMap does not map add shade that the model cannot see.
 - The data covers 7 days. A scheduled job moves the window each day.

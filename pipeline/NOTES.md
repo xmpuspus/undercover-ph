@@ -613,23 +613,23 @@ A clean `git archive` copy built in an `amazonlinux:2023` container with 4 CPUs 
 
 ### A fixed side test and two graph rules join the split areas, and las-pinas ships
 
-Date: 2026-10-22. Missing crossings did not split the areas. Three other causes did.
+Missing crossings did not split the areas on 2026-10-22. Three other causes did.
 
-- **las-pinas: the side test misread sidewalks.** The router compared each sidewalk line's mean vertex with its chord midpoint. On a bent piece, or one with uneven vertices, that vector points along the road or to the wrong side. At node 2137 on Alabang-Zapote Road, a mid-block way split, all four onward moves read as side changes, so the road ended there.
-- **north-coast: the area's graph boxes leave gaps.** The Valenzuela piece, 2,738 nodes and 322 places, joined the rest only through 79 m of M. H. del Pilar Street on the Tinajeros Bridge, which lies outside all five boxes.
-- **paranaque-bf-aguirre: gates.** Its walk network fell into 148 routable pieces. Gate nodes made 11.98 km of edges unroutable, and 294 ways touching a closed gate node, 24.7 km, stayed out of the graph.
-- **Everywhere: a node rule acted on its whole way.** One gate made a whole way unroutable, and one closed node removed a whole way. So a public road lost its full length to a gate at one end.
+- **The side test misread sidewalks in las-pinas.** The router compared each sidewalk line's mean vertex with its chord midpoint. On a bent piece, or one with uneven vertices, that vector points along the road or to the wrong side. At node 2137 on Alabang-Zapote Road, a mid-block way split, all four onward moves read as side changes, so the road ended there.
+- **The graph boxes of north-coast leave gaps.** The Valenzuela piece, 2,738 nodes and 322 places, joined the rest only through 79 m of M. H. del Pilar Street on the Tinajeros Bridge, which lies outside all five boxes.
+- **Gates split paranaque-bf-aguirre.** Its walk network fell into 148 routable pieces. Gate nodes made 11.98 km of edges unroutable, and 294 ways touching a closed gate node, 24.7 km, stayed out of the graph.
+- **A node rule acted on its whole way, in every area.** One gate made a whole way unroutable, and one closed node removed a whole way. So a public road lost its full length to a gate at one end.
 
-Changes:
+The fix changed three things.
 
-- `app/src/lib/router/astar.ts` and `pipeline/districts/route_check.py` tell sidewalks apart from each edge's `side` and the direction walked. A U-turn onto the other edge between the same two nodes is a change of sidewalk. The crossing rule stays: free at flag 1 or 2, 60 m x (1 + k) and a warning at flag 4, forbidden elsewhere.
+- `app/src/lib/router/astar.ts` and `pipeline/districts/route_check.py` tell sidewalks apart from each edge's `side` and the direction walked. A U-turn onto the other edge between the same two nodes is a change of sidewalk. The crossing rule stays. A change is free at flag 1 or 2, costs 60 m x (1 + k) with a warning at flag 4, and is forbidden elsewhere.
 - `pipeline/districts/build_graph.py` applies a node rule to the way pieces that hold the node. A piece through a closed node stays out, and a piece through a node that needs a check is unroutable. The rest of the way stays in.
 - It keeps a walkable way outside the graph boxes when it joins two separate routable pieces within 300 m (`CONNECT_M`). The way may have no access rule on itself or its nodes.
 - No rebuilt edge passes a closed node, and no routable edge passes a node that needs a check. A position-aware check over all 14 graphs found 0 of each.
 
 Each area was rebuilt with `build.py`, shaded, and published by `publish.py` with no held area. The rebuild with the old scripts gave byte-identical pasay-moa files first.
-Place pairs: 600 seeded random pairs of an area's places, routed with the side rule, before on the old places and after on the new ones.
-Largest piece: the share of routable nodes in the largest piece of the router's search graph.
+Place pairs are 600 seeded random pairs of an area's places, routed with the side rule, before on the old places and after on the new ones.
+Largest piece is the share of routable nodes in the largest piece of the router's search graph.
 
 | Area | Edges | Connector ways (km) | Place pairs with a route | Largest piece |
 | --- | --- | --- | --- | --- |
@@ -649,13 +649,13 @@ Largest piece: the share of routable nodes in the largest piece of the router's 
 | qc-banawe | 5,204 to 6,015 | 40 (3.1) | 89.8% to 99.2% | 89.1% to 96.1% |
 
 - With the fixed side test, every area's reach equals its reach with no side rule at all.
-- las-pinas passes its three checks: Robinsons Place to SM Center 2,274 m, to City Hall 2,122 m, and Vista Mall to Las Pinas Doctors Hospital 3,202 m. None needs an unmarked crossing.
+- las-pinas passes its three checks. Robinsons Place to SM Center is 2,274 m, to City Hall 2,122 m, and Vista Mall to Las Pinas Doctors Hospital 3,202 m. None needs an unmarked crossing.
 - Valenzuela City Medical Center to Valenzuela Town Center falls from 5,352 m to 1,729 m, against 930 m straight.
 - Ayala MRT Station to Greenbelt keeps the same routes, lengths and steps at 08:00, 12:00, 15:00 and 16:00, and in rain mode.
 - In the old routes for 2,843 place pairs, 2,623 moves crossed a road mid-block without a step, 1,473 of them on trunk, primary or secondary roads. The fixed test forbids them. 271 old unmarked-crossing warnings were moves along one sidewalk.
 
-Still open:
+Three items stay open.
 
 - Gated villages are a project decision. In paranaque-bf-aguirre, 120 edges, 7.1 km, pass a gate and stay unroutable, and 298 pieces, 12.2 km, pass a closed gate and stay out. With every gate in its graph open, 66.8% of place pairs would route.
 - `barrier=bollard` and `barrier=height_restrictor` still need an access check, although both let walkers pass. In north-coast they hold 1.1 km of unroutable edges.
-- The step text names a sidewalk's compass side from the same mean vertex vector. On 20% to 33% of side edges that word differs from the side the line's ends show, and on 6% to 11% by 90 degrees or more.
+- Fixed later on 2026-10-22. The step text named a sidewalk's compass side from the same mean vertex vector. On 20% to 33% of side edges that word differed from the side the line's ends show, and on 6% to 11% by 90 degrees or more. `steps.ts` now takes the word from the edge's `side` and its u-to-v chord.

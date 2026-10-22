@@ -400,20 +400,28 @@ function prepend(a: Leg, b: Leg, withLeadIn: boolean): void {
 
 const COMPASS8 = ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"];
 
-/** 8-wind side of a sidewalk edge, from its offset vector. */
+/**
+ * 8-wind side of a sidewalk edge. Its side, left or right, is relative to the u-to-v direction (the OSM way
+ * direction), so the side lies 90 degrees from the u-to-v chord. The mean offset of the line (sideX, sideY)
+ * points the wrong way on bent pieces, the same fault the router's side test had.
+ */
 function sideWord(data: Data, e: number): string {
-  const b = ((Math.atan2(data.sideX[e], data.sideY[e]) * 180) / Math.PI + 360) % 360;
+  const u = data.edgeU[e];
+  const v = data.edgeV[e];
+  const chord = (Math.atan2(data.nodeX[v] - data.nodeX[u], data.nodeY[v] - data.nodeY[u]) * 180) / Math.PI;
+  const b = (chord + (data.edgeSide[e] === 1 ? -90 : 90) + 720) % 360;
   return COMPASS8[Math.round(b / 45) % 8];
 }
 
-/**
- * Signed length of sidewalk edge e as walked: positive when its side is on the walker's left.
- * The cross product of the walking direction and the sidewalk's offset from the road gives the hand.
- */
+/** Signed length of sidewalk edge e as walked: positive when its side is on the walker's left. */
 function handOf(data: Data, e: number, c: [number, number][]): number {
-  const dx = (c[c.length - 1][0] - c[0][0]) * data.mPerLon;
-  const dy = (c[c.length - 1][1] - c[0][1]) * data.mPerLat;
-  return Math.sign(dx * data.sideY[e] - dy * data.sideX[e]) * data.edgeLen[e];
+  const u = data.edgeU[e];
+  const v = data.edgeV[e];
+  const walk = (c[c.length - 1][0] - c[0][0]) * (data.nodeLon[v] - data.nodeLon[u]) * data.mPerLon ** 2 +
+    (c[c.length - 1][1] - c[0][1]) * (data.nodeLat[v] - data.nodeLat[u]) * data.mPerLat ** 2;
+  // Walking u to v keeps the edge's own side. Walking v to u swaps left and right.
+  const left = (data.edgeSide[e] === 1) === walk >= 0;
+  return (left ? 1 : -1) * data.edgeLen[e];
 }
 
 /** "left" or "right" for the walker on the leg's side, or null when the leg's edges disagree evenly. */

@@ -20,7 +20,9 @@ def write_limits(s, areas):
     """The cover, access and sidewalk limits, summed over every area's graph."""
     sheltered = gated = side = assumed = 0.0
     for a in areas:
-        for e in json.loads((DATA / "areas" / a["id"] / "graph.json").read_text())["edges"]:
+        for e in json.loads((DATA / "areas" / a["id"] / "graph.json").read_text())[
+            "edges"
+        ]:
             km = e["len_m"] / 1000
             if e["routable"] and e["flags"] & 7:
                 sheltered += km
@@ -33,7 +35,7 @@ def write_limits(s, areas):
     text = "\n".join(
         [
             f"- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds {sheltered:,.1f} km "
-            "of sheltered path, far less than exists on the street.",
+            "of sheltered path. Nobody has measured how much exists on the street.",
             f"- **Access.** Gates and entrances that need a field check remove {gated:,.0f} km of paths from routes.",
             "- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. "
             f"That covers {assumed:,.0f} km of the {side:,.0f} km of side-of-street paths. "
@@ -58,7 +60,9 @@ def main():
         tpl = ROOT / "pipeline/inputs/areas" / a["id"] / "manifest_template.json"
         b = json.loads(tpl.read_text())["counts"]["buildings"] if tpl.exists() else 0
         n = places.get(a["id"], 0)
-        rows.append(f"| {a['name']} | {', '.join(a['cities'])} | {rkm:,.0f} | {n:,} | {b:,} |")
+        rows.append(
+            f"| {a['name']} | {', '.join(a['cities'])} | {rkm:,.0f} | {n:,} | {b:,} |"
+        )
         tot["km"] += km
         tot["rkm"] += rkm
         tot["places"] += n
