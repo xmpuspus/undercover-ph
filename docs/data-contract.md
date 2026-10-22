@@ -101,7 +101,7 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 - `lowconf[e]`: percent of the edge's building-shaded samples cast by a building with a default height, 0 to 100.
 - Sheltered edges (`flags & 7`) count as 100% roof in the app. The pipeline still writes their values.
 - Each sample point casts a ray toward the sun from its own height. Footbridge samples start at deck height.
-- `shade.bin.gz`: a gzip copy of `shade.bin` (about 0.54 MB for 2.29 MB). Vercel compresses only listed MIME types, and `application/octet-stream` is not one. `pipeline/vercel_build.sh` writes the copy beside each `shade.bin` in `app/dist/data/` after the app build, so it always matches the shipped `shade.bin`. `app/vercel.json` serves it as `application/gzip`. The app fetches `shade.bin.gz` and inflates it with `DecompressionStream`. It reads `shade.bin` when the copy is missing (the dev server and local builds), broken, or the browser cannot inflate it.
+- `shade.bin.gz`: a gzip copy of `shade.bin`, 536,987 bytes for 2,290,010. Vercel compresses only listed MIME types. `application/octet-stream` is not one of them. `pipeline/vercel_build.sh` writes the copy after the app build, beside each `shade.bin` in `app/dist/data/`. So the copy always matches the shipped `shade.bin`. `app/vercel.json` serves it as `application/gzip`. The app fetches `shade.bin.gz` and inflates it with `DecompressionStream`. If the copy is missing, broken, or the wrong size, the app reads `shade.bin`. The dev server and local builds have no copy.
 
 ### `buildings_display.geojson` (app) and `pipeline/inputs/buildings.geojson` (pipeline)
 
@@ -118,7 +118,7 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 
 Every place has a snapped `node_id` on a routable edge. Places come from named OSM features in the graph area.
 
-`detail` is optional. It is set only on places whose name appears more than once, and it tells them apart in a few words. It comes from OSM: the named building or mall that contains the place, the address house name, the address street, or the nearest named street. The app shows it next to the name and never searches it.
+`detail` is optional. The pipeline adds it only to places whose name appears more than once. It tells them apart in a few words. It comes from OSM: the named building or mall around the place, the address house name, the address street, or the nearest named street. The app shows it next to the name and never searches it.
 
 ### `hours.json`
 

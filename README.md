@@ -35,7 +35,7 @@ Like Singapore's version, the app returns three walks: the shortest, the most co
 - **Steps that say which sidewalk to use**, with landmarks, stairs, footbridges, underpasses, and closing times.
 - **A night state.** After sunset the app says that shade does not apply.
 - **Rain mode**, which counts only roofed, underground, and indoor paths as covered.
-- **A step-free option**, English with Taglish helper text, and the data date on every route card.
+- **A step-free choice**, English with Taglish helper text, and the data date on every route card.
 
 <table>
 <tr>
@@ -52,7 +52,7 @@ Like Singapore's version, the app returns three walks: the shortest, the most co
 
 - **`app/`**: the web app (Vite, React, TypeScript, MapLibre GL). The router lives in `app/src/lib/router/`: a custom A* search with access, opening-hours, side-of-street, and night rules, covered by unit tests.
 - **`pipeline/`**: the data build. It reads OpenStreetMap, assigns building heights, builds the walk graph, and fetches weather and the PAGASA advisory.
-- **`pipeline/shade/`**: the shade engine. It casts rays toward the sun from every 5 m of every sidewalk, each half hour. It also renders the ground shadow images.
+- **`pipeline/shade/`**: the shade engine. It casts rays toward the sun from every 5 m of every sidewalk, each half hour. It also draws the ground shadow images.
 - **`docs/`**: the [method](docs/methodology.md), the [sun-direction analysis](docs/sun-direction.md), the [data contract](docs/data-contract.md), the [design](docs/design.md), and the [research corrections](docs/research-corrections.md).
 - **`research/`**: the research reports behind the design, and a teardown of Singapore's interface.
 - **`tests/`**: access-policy tests for the walk graph.
@@ -62,12 +62,14 @@ Like Singapore's version, the app returns three walks: the shortest, the most co
 - **Not a heat or safety guarantee.** Shade lowers sun exposure. It does not make a walk safe in extreme heat.
 - **Not measured shade.** The app models shade from building heights and tree data. Nobody checked it on the street yet.
 - **Not live street conditions.** No public source gives live street flooding or closures for Metro Manila. The app makes no such claim.
-- **Not wheelchair routing advice.** The step-free option avoids mapped steps only. Ramps and lifts are not yet mapped well.
+- **Not wheelchair routing advice.** The step-free choice avoids mapped steps only. Ramps and lifts are not yet mapped well.
 - **Not a government service.** It is an independent project. No government agency in the Philippines or Singapore runs it.
 
 ## Privacy
 
-The router runs in your browser. Your start and end points never reach a server that this project controls. The app asks for your location only when you tap "Use my location", and it keeps nothing. The app has no analytics and no trackers. The trip lives in the page address after the # sign, which browsers never send to a server. A reload or a shared link reopens it. A position from "Use my location" never goes into that address. One small server function reads the PAGASA thunderstorm advisory for the app, and the CDN keeps each answer for 10 minutes. It gets no route, place, or location. Map tiles come from OpenFreeMap, which receives the map area you view.
+The router runs in your browser. Your start and end points never reach a server that this project controls. The app asks for your location only when you tap "Use my location", and it keeps nothing. The app has no analytics and no trackers.
+
+The trip lives in the page address after the # sign, which browsers never send to a server. A reload or a shared link reopens it. A position from "Use my location" never goes into that address. One small server function reads the PAGASA thunderstorm advisory for the app, and the CDN keeps each answer for 10 minutes. It gets no route, place, or location. Map tiles come from OpenFreeMap, which receives the map area you view.
 
 ## Run it locally
 
