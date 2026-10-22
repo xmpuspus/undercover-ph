@@ -1,7 +1,8 @@
 import type { Mode } from "../types";
 
-// The trip lives in the URL query, so a reload or a shared link restores it.
-// ?start=Ayala+MRT+Station&end=Greenbelt&date=2026-10-23&time=1500&mode=shade&step-free=1
+// The trip lives in the URL fragment, so a reload or a shared link restores it. Browsers never send the
+// fragment to a server, so no start or end reaches a request log.
+// #start=Ayala%20MRT%20Station&end=Greenbelt&date=2026-10-23&time=1500&mode=shade&step-free=1
 // A place travels by name, or as n<node id> when its name is not unique. A map point travels as lon,lat.
 // time=now means "leave when the link is opened". Other query params (now, map) pass through untouched.
 
@@ -73,3 +74,6 @@ export function buildSearch(search: string, trip: TripParams | null): string {
   }
   return keep.length ? `?${keep.join("&")}` : "";
 }
+
+export const tripFromHash = (hash: string): TripParams => parseTrip(hash.replace(/^#/, "?"));
+export const hashFor = (trip: TripParams | null): string => buildSearch("", trip).replace(/^\?/, "#");

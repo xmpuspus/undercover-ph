@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildSearch, decodeEndpoint, encodeEndpoint, hhmmToMinute, minuteToHHMM, parseTrip } from "./tripUrl";
+import { buildSearch, decodeEndpoint, encodeEndpoint, hashFor, hhmmToMinute, minuteToHHMM, parseTrip, tripFromHash } from "./tripUrl";
 import { nowLabel, nowSlot } from "./nowSlot";
 
 const places = [{ name: "Greenbelt" }, { name: "Ayala MRT Station" }, { name: "Twin" }, { name: "twin" }];
@@ -70,5 +70,15 @@ describe("Now slot", () => {
   });
   it("returns null when the last slot is daylight and the clock is past it", () => {
     expect(nowSlot([360, 720], [9, 60], 800, 3)).toBeNull();
+  });
+});
+
+describe("trip in the fragment", () => {
+  it("round-trips through the hash and keeps the query empty", () => {
+    const trip = { start: "Ayala MRT Station", end: "121.02346,14.55123", date: "2026-10-23", time: "1500", mode: "shade" as const, stepFree: false };
+    const hash = hashFor(trip);
+    expect(hash).toBe("#start=Ayala%20MRT%20Station&end=121.02346,14.55123&date=2026-10-23&time=1500&mode=shade");
+    expect(tripFromHash(hash)).toEqual(trip);
+    expect(hashFor(null)).toBe("");
   });
 });

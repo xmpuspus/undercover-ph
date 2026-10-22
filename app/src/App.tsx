@@ -18,7 +18,7 @@ import { eagerMap, loadMapLibre, prefetchMapLibre } from "./lib/maplibre";
 import { useReducedMotion } from "./lib/motion";
 import { PauseIcon, PlayIcon } from "./components/Icons";
 import { nowLabel, nowSlot } from "./lib/nowSlot";
-import { buildSearch, decodeEndpoint, encodeEndpoint, hhmmToMinute, minuteToHHMM, parseTrip, type TripParams } from "./lib/tripUrl";
+import { decodeEndpoint, encodeEndpoint, hashFor, hhmmToMinute, minuteToHHMM, tripFromHash, type TripParams } from "./lib/tripUrl";
 
 // The first screen needs only the landing card. The map, steps, navigation, About and rain load as separate chunks.
 const MapView = lazy(() => loadMapLibre().then(() => import("./components/MapView")));
@@ -99,9 +99,9 @@ export default function App() {
   const [advisory, setAdvisory] = useState<Advisory | null>(null);
   const [buildingsLoading, setBuildingsLoading] = useState(true);
 
-  // A link with a start or end in its query opens straight on that trip, once the places have loaded.
+  // A link with a start or end in its fragment opens straight on that trip, once the places have loaded.
   const [initialTrip] = useState<TripParams | null>(() => {
-    const t = parseTrip(window.location.search);
+    const t = tripFromHash(window.location.hash);
     return t.start || t.end ? t : null;
   });
   const [restoring, setRestoring] = useState(!!initialTrip);
@@ -551,7 +551,7 @@ export default function App() {
     if (status === "error") setRestoring(false);
   }, [status]);
 
-  // Every screen is a browser history entry, and the trip is kept in the query with replaceState.
+  // Every screen is a browser history entry, and the trip is kept in the fragment with replaceState.
   const tripParams = useMemo<TripParams | null>(() => {
     if (stage === "landing") return null;
     const places = data?.places ?? [];
@@ -566,12 +566,12 @@ export default function App() {
       stepFree,
     };
   }, [stage, data, manifest, from, to, isNow, nowAt, dateIdx, minute, mode, stepFree]);
-  const search = buildSearch(window.location.search, tripParams);
+  const tripHash = hashFor(tripParams);
   const lastScreen = useRef<Screen | null>(null);
   useEffect(() => {
     if (restoring) return;
-    const { pathname, hash } = window.location;
-    const url = `${pathname}${search}${hash}`;
+    const { pathname, search } = window.location;
+    const url = `${pathname}${search}${tripHash}`;
     const prior = window.history.state as Snapshot | null;
     const snap: Snapshot = { screen, stage, active, showSteps, from, to, i: prior?.i ?? 0 };
     if (lastScreen.current === null) {
@@ -579,7 +579,7 @@ export default function App() {
       if (prior || screen === "landing") return window.history.replaceState(snap, "", url);
       // A shared link has nothing behind it. Seed a landing entry so Back has somewhere to go.
       const landing: Snapshot = { screen: "landing", stage: "landing", active: null, showSteps: false, from: null, to: null, i: 0 };
-      window.history.replaceState(landing, "", `${pathname}${buildSearch(search, null)}${hash}`);
+      window.history.replaceState(landing, "", `${pathname}${search}`);
       window.history.pushState({ ...snap, i: 1 }, "", url);
     } else if (screen !== lastScreen.current) {
       lastScreen.current = screen;
@@ -587,7 +587,7 @@ export default function App() {
     } else {
       window.history.replaceState(snap, "", url);
     }
-  }, [restoring, screen, stage, active, showSteps, from, to, search]);
+  }, [restoring, screen, stage, active, showSteps, from, to, tripHash]);
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
       const s = e.state as Snapshot | null;

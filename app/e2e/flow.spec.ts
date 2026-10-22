@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 
+const tripOf = (href: string) => new URLSearchParams(new URL(href).hash.replace(/^#/, ""));
+
 // Pin "now" to 09:00 on the first manifest date, so "Tomorrow" always exists in the data.
 const manifest = JSON.parse(readFileSync(new URL("../public/data/manifest.json", import.meta.url), "utf8")) as { dates: string[] };
 const NOW = `${manifest.dates[0]}T09:00`;
@@ -100,16 +102,19 @@ async function planTrip(page: Page, now = NOW) {
 
 test("Back steps to the previous stage and a reload keeps the trip", async ({ page }) => {
   await planTrip(page);
+  // The trip rides in the fragment, which the browser never sends to the server. ?now= stays in the query.
   const url = new URL(page.url());
-  expect(url.searchParams.get("start")).toBe("Ayala MRT Station");
-  expect(url.searchParams.get("end")).toBe("Greenbelt");
-  expect(url.searchParams.get("time")).toBe("now");
+  const trip = tripOf(page.url());
+  expect(trip.get("start")).toBe("Ayala MRT Station");
+  expect(trip.get("end")).toBe("Greenbelt");
+  expect(trip.get("time")).toBe("now");
+  expect(url.searchParams.get("start")).toBeNull();
   expect(url.searchParams.get("now")).toBe(NOW);
 
   // Reload: the same trip comes back with its route.
   await page.reload();
   await expect(page.getByTestId("route-card").or(page.getByTestId("route-state"))).toBeVisible({ timeout: 60_000 });
-  expect(new URL(page.url()).searchParams.get("end")).toBe("Greenbelt");
+  expect(tripOf(page.url()).get("end")).toBe("Greenbelt");
 
   // Back from the results shows the trip fields, with the start and end kept.
   await page.goBack();
@@ -121,7 +126,7 @@ test("Back steps to the previous stage and a reload keeps the trip", async ({ pa
   await expect(page.getByTestId("destination-panel")).toBeVisible();
   await page.goBack();
   await expect(page.getByTestId("landing")).toBeVisible();
-  expect(new URL(page.url()).searchParams.get("start")).toBeNull();
+  expect(tripOf(page.url()).get("start")).toBeNull();
   // Forward puts the trip screens back.
   await page.goForward();
   await expect(page.getByTestId("destination-panel")).toBeVisible();
@@ -148,7 +153,7 @@ test("editing the start hides the old route and routes only after a new pick", a
   await expect(card).toHaveCount(0);
   await pickPlace(page, "from-input", "Glorietta");
   await expect(page.getByTestId("route-card").or(page.getByTestId("route-state"))).toBeVisible();
-  expect(new URL(page.url()).searchParams.get("start")).toBe("Glorietta");
+  expect(tripOf(page.url()).get("start")).toBe("Glorietta");
 });
 
 test("Now names the real time and the shade slot it uses", async ({ page }) => {
