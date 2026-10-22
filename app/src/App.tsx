@@ -17,6 +17,8 @@ import { rgba, skyTheme, type SkyTheme } from "./lib/skyTheme";
 import { eagerMap, loadMapLibre, prefetchMapLibre } from "./lib/maplibre";
 import { useReducedMotion } from "./lib/motion";
 import { PauseIcon, PlayIcon } from "./components/Icons";
+import { nowLabel, nowSlot } from "./lib/nowSlot";
+import { buildSearch, decodeEndpoint, encodeEndpoint, hhmmToMinute, minuteToHHMM, parseTrip, type TripParams } from "./lib/tripUrl";
 
 // The first screen needs only the landing card. The map, steps, navigation, About and rain load as separate chunks.
 const MapView = lazy(() => loadMapLibre().then(() => import("./components/MapView")));
@@ -28,6 +30,20 @@ const RainLayer = lazy(() => import("./components/RainLayer"));
 
 type Stage = "landing" | "plan" | "navigate";
 type Field = "from" | "to";
+type Screen = "landing" | "dest" | "trip" | "results" | "steps" | "navigate";
+
+// What each browser history entry remembers, so Back and Forward put the screen back as it was.
+interface Snapshot {
+  screen: Screen;
+  stage: Stage;
+  active: Field | null;
+  showSteps: boolean;
+  from: Endpoint | null;
+  to: Endpoint | null;
+  // Position in the app's own history, 0 for the first entry. In-app Back uses it to know when to go back a step.
+  i: number;
+}
+const historyIndex = () => (window.history.state as Snapshot | null)?.i ?? 0;
 
 function useHeight(el: HTMLElement | null): number {
   const [h, setH] = useState(0);
@@ -83,15 +99,21 @@ export default function App() {
   const [advisory, setAdvisory] = useState<Advisory | null>(null);
   const [buildingsLoading, setBuildingsLoading] = useState(true);
 
-  const [stage, setStage] = useState<Stage>("landing");
-  const [mode, setMode] = useState<Mode>("shade");
+  // A link with a start or end in its query opens straight on that trip, once the places have loaded.
+  const [initialTrip] = useState<TripParams | null>(() => {
+    const t = parseTrip(window.location.search);
+    return t.start || t.end ? t : null;
+  });
+  const [restoring, setRestoring] = useState(!!initialTrip);
+  const [stage, setStage] = useState<Stage>(initialTrip ? "plan" : "landing");
+  const [mode, setMode] = useState<Mode>(initialTrip?.mode ?? "shade");
   const [from, setFrom] = useState<Endpoint | null>(null);
   const [to, setTo] = useState<Endpoint | null>(null);
   const [active, setActive] = useState<Field | null>(null);
   const [query, setQuery] = useState("");
   const [dateIdx, setDateIdx] = useState(0);
   const [bucketIdx, setBucketIdx] = useState(0);
-  const [stepFree, setStepFree] = useState(false);
+  const [stepFree, setStepFree] = useState(initialTrip?.stepFree ?? false);
   const [includeUnchecked, setIncludeUnchecked] = useState(false);
   const [pickedLabel, setPickedLabel] = useState<Route["label"] | null>(null);
   const [showSteps, setShowSteps] = useState(false);
@@ -109,11 +131,14 @@ export default function App() {
   const [highlight, setHighlight] = useState<Highlight>(null);
   // The 3D map starts on the first input (or at once with ?now= or ?map=eager). Until it is ready, a poster
   // of the same view stands in, so the first screen costs no map work.
-  const [mapOn, setMapOn] = useState(eagerMap);
+  const [mapOn, setMapOn] = useState(eagerMap || !!initialTrip);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const [mapTry, setMapTry] = useState(0);
   const [picking, setPicking] = useState<Mode | null>(null);
+  // Set while "Now" is the chosen time: the real clock minute is the departure, and the slot holds the shade data.
+  const [nowAt, setNowAt] = useState<{ minute: number; dateIdx: number; bucketIdx: number } | null>(null);
+  const [nowNote, setNowNote] = useState<{ text: string; dateIdx: number; bucketIdx: number } | null>(null);
 
   useEffect(() => {
     const prefetch = () => prefetchMapLibre();
@@ -241,33 +266,38 @@ export default function App() {
     setPlaying(true);
   };
 
-  // "Now" is the next half hour in Manila. After today's last slot it rolls to the next date's first daytime slot.
-  const liveSlot = useMemo(() => {
-    if (!dateOpts.length) return null;
-    const first = dateOpts[0];
-    const next = first.date === clock.date ? bucketsFor(first.date)[0] : undefined;
-    if (next) return { dateIdx: first.idx, bucketIdx: next.idx };
+  // "Now" departs at the real clock minute and uses the first shade slot at or after it. After the last slot of
+  // the day it uses that slot when it is night, so an evening walk is never shown as tomorrow morning. When today
+  // has no fitting slot, Now stays unpressed and a note says which later slot the route uses.
+  const applyNow = useCallback(() => {
+    if (!manifest || !dateOpts.length) return;
+    setPlaying(false);
+    const todayIdx = manifest.dates.indexOf(clock.date);
+    const slot = todayIdx >= 0 ? nowSlot(manifest.buckets_min, manifest.sun?.[clock.date]?.map((r) => r?.[0]), clock.minute, NIGHT_ALT_DEG) : null;
+    if (slot) {
+      setDateIdx(todayIdx);
+      setBucketIdx(slot.bucketIdx);
+      setNowAt({ minute: clock.minute, dateIdx: todayIdx, bucketIdx: slot.bucketIdx });
+      return;
+    }
+    setNowAt(null);
+    const last = manifest.buckets_min[manifest.buckets_min.length - 1];
+    const lead = todayIdx >= 0 ? `Shade data ends at ${fmtMinute(last, true)} and has no night slot.` : "There is no shade data for today.";
     for (const d of dateOpts) {
       const day = bucketsFor(d.date).find((b) => !b.night);
-      if (day) return { dateIdx: d.idx, bucketIdx: day.idx };
+      if (!day) continue;
+      setDateIdx(d.idx);
+      setBucketIdx(day.idx);
+      setNowNote({ text: `${lead} The route uses the first daylight slot, ${dateLabel(d.date, clock.date)} ${fmtMinute(day.min, true)}.`, dateIdx: d.idx, bucketIdx: day.idx });
+      return;
     }
-    return { dateIdx: first.idx, bucketIdx: bucketsFor(first.date)[0]?.idx ?? 0 };
-  }, [dateOpts, bucketsFor, clock]);
-  // Pick the live slot once, when the data arrives. The ticking clock must not move a time the user chose.
-  const defaulted = useRef(false);
-  useEffect(() => {
-    if (!liveSlot || defaulted.current) return;
-    defaulted.current = true;
-    setDateIdx(liveSlot.dateIdx);
-    setBucketIdx(liveSlot.bucketIdx);
-  }, [liveSlot]);
-  const goNow = () => {
-    if (!liveSlot) return;
-    setPlaying(false);
-    setDateIdx(liveSlot.dateIdx);
-    setBucketIdx(liveSlot.bucketIdx);
-  };
-  const isNow = !!liveSlot && liveSlot.dateIdx === dateIdx && liveSlot.bucketIdx === bucketIdx;
+    const first = dateOpts[0];
+    setDateIdx(first.idx);
+    setBucketIdx(bucketsFor(first.date)[0]?.idx ?? 0);
+  }, [manifest, dateOpts, bucketsFor, clock]);
+  const goNow = applyNow;
+  const isNow = !!nowAt && nowAt.dateIdx === dateIdx && nowAt.bucketIdx === bucketIdx;
+  const shownNote = nowNote && nowNote.dateIdx === dateIdx && nowNote.bucketIdx === bucketIdx ? nowNote.text : null;
 
   const pickDate = (idx: number) => {
     setDateIdx(idx);
@@ -276,6 +306,8 @@ export default function App() {
   };
 
   const minute = manifest?.buckets_min[bucketIdx] ?? 0;
+  // Opening hours and walking time use the real departure minute; shade uses the slot.
+  const departMin = isNow && nowAt ? nowAt.minute : minute;
   const sun = (manifest?.sun?.[date]?.[bucketIdx] ?? null) as [number, number] | null;
   // The router's night: at 3 degrees or lower, shade does not apply. Shadows and UV hide.
   const dark = sun ? sun[0] <= NIGHT_ALT_DEG : false;
@@ -313,8 +345,8 @@ export default function App() {
   // The search runs on a deferred copy of its inputs, so a tap on a place or an hour paints at once and the
   // routes follow; meanwhile the card says it is updating.
   const routeInput = useMemo(
-    () => ({ from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute, stage }),
-    [from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute, stage],
+    () => ({ from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute: departMin, stage }),
+    [from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, departMin, stage],
   );
   const deferred = useDeferredValue(routeInput);
   const routing = deferred !== routeInput;
@@ -390,10 +422,15 @@ export default function App() {
   const pickedIdx = pickedLabel ? display.findIndex((d) => d.labels.includes(pickedLabel)) : -1;
   const selected = pickedIdx >= 0 ? pickedIdx : preselect;
   const current = display[selected] ?? null;
-  const mapRoutes = useMemo(() => (stage === "landing" ? [] : stage === "navigate" && current ? [current] : display), [stage, current, display]);
-
   const view: "dest" | "trip" | "results" | "steps" =
     !to && active !== "from" ? "dest" : active || !from || !to ? "trip" : showSteps ? "steps" : "results";
+  const screen: Screen = stage === "landing" ? "landing" : stage === "navigate" ? "navigate" : view;
+  // While a start or end is being edited the old route is hidden; the kept end stays as a marker.
+  const editing = stage === "plan" && (view === "dest" || view === "trip");
+  const mapRoutes = useMemo(
+    () => (stage === "landing" || editing ? [] : stage === "navigate" && current ? [current] : display),
+    [stage, editing, current, display],
+  );
 
   // Search and suggestions.
   const results = useMemo(() => (data && query.trim() ? searchPlaces(data, query, 8) : []), [data, query]);
@@ -474,6 +511,109 @@ export default function App() {
     );
   };
 
+  // Once the places load: restore the trip from the link, or pick Now. The time chosen then stays put as the clock ticks.
+  const started = useRef(false);
+  useEffect(() => {
+    if (initialTrip) ensureData();
+  }, []);
+  useEffect(() => {
+    if (!data || !manifest || started.current) return;
+    started.current = true;
+    const trip = initialTrip;
+    if (!trip) return applyNow();
+    const resolve = (token: string | null): Endpoint | null => {
+      const ref = decodeEndpoint(token);
+      if (!ref) return null;
+      if (ref.kind === "point") {
+        const ep = pointEndpoint(ref.lon, ref.lat, "Point on map");
+        return typeof ep === "string" ? null : ep;
+      }
+      const pl =
+        ref.kind === "node" ? data.places.find((x) => x.node_id === ref.node) : data.places.find((x) => x.name.toLowerCase() === ref.name.toLowerCase());
+      return pl ? placeEndpoint(pl) : null;
+    };
+    const f = resolve(trip.start);
+    const t = resolve(trip.end);
+    if ((trip.start && !f) || (trip.end && !t)) setNotice("Part of this link did not match a place. Pick it again.");
+    setFrom(f);
+    setTo(t);
+    setActive(f && t ? null : t ? "from" : f ? "to" : null);
+    const di = trip.date ? manifest.dates.indexOf(trip.date) : -1;
+    const bi = trip.time && trip.time !== "now" ? manifest.buckets_min.indexOf(hhmmToMinute(trip.time)) : -1;
+    if (di >= 0 && bi >= 0 && trip.date! >= clock.date) {
+      setDateIdx(di);
+      setBucketIdx(bi);
+    } else applyNow();
+    setRestoring(false);
+  }, [data, manifest]);
+  // If the places never load, drop the restoring card so the retry button shows.
+  useEffect(() => {
+    if (status === "error") setRestoring(false);
+  }, [status]);
+
+  // Every screen is a browser history entry, and the trip is kept in the query with replaceState.
+  const tripParams = useMemo<TripParams | null>(() => {
+    if (stage === "landing") return null;
+    const places = data?.places ?? [];
+    const timed = !!manifest && !!(from || to);
+    const live = isNow && !!nowAt;
+    return {
+      start: from ? encodeEndpoint(from, places) : null,
+      end: to ? encodeEndpoint(to, places) : null,
+      date: timed && !live ? (manifest?.dates[dateIdx] ?? null) : null,
+      time: timed ? (live ? "now" : minuteToHHMM(minute)) : null,
+      mode,
+      stepFree,
+    };
+  }, [stage, data, manifest, from, to, isNow, nowAt, dateIdx, minute, mode, stepFree]);
+  const search = buildSearch(window.location.search, tripParams);
+  const lastScreen = useRef<Screen | null>(null);
+  useEffect(() => {
+    if (restoring) return;
+    const { pathname, hash } = window.location;
+    const url = `${pathname}${search}${hash}`;
+    const prior = window.history.state as Snapshot | null;
+    const snap: Snapshot = { screen, stage, active, showSteps, from, to, i: prior?.i ?? 0 };
+    if (lastScreen.current === null) {
+      lastScreen.current = screen;
+      if (prior || screen === "landing") return window.history.replaceState(snap, "", url);
+      // A shared link has nothing behind it. Seed a landing entry so Back has somewhere to go.
+      const landing: Snapshot = { screen: "landing", stage: "landing", active: null, showSteps: false, from: null, to: null, i: 0 };
+      window.history.replaceState(landing, "", `${pathname}${buildSearch(search, null)}${hash}`);
+      window.history.pushState({ ...snap, i: 1 }, "", url);
+    } else if (screen !== lastScreen.current) {
+      lastScreen.current = screen;
+      window.history.pushState({ ...snap, i: snap.i + 1 }, "", url);
+    } else {
+      window.history.replaceState(snap, "", url);
+    }
+  }, [restoring, screen, stage, active, showSteps, from, to, search]);
+  useEffect(() => {
+    const onPop = (e: PopStateEvent) => {
+      const s = e.state as Snapshot | null;
+      if (!s?.screen || restoring) return;
+      lastScreen.current = s.screen;
+      setPlaying(false);
+      setPicking(null);
+      setNotice(null);
+      setQuery("");
+      setFocus(null);
+      setStage(s.stage);
+      setActive(s.active);
+      setShowSteps(s.showSteps);
+      if (s.screen === "dest") {
+        setFrom(null);
+        setTo(null);
+      } else if (s.screen !== "landing") {
+        // A step back to the trip fields keeps the start and end already picked.
+        setFrom((f) => s.from ?? f);
+        setTo((t) => s.to ?? t);
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [restoring]);
+
   // Dialogs and sheets hand focus back to the control that opened them.
   const aboutOpener = useRef<HTMLElement | null>(null);
   const openAbout = () => {
@@ -497,10 +637,12 @@ export default function App() {
     el.focus();
   });
   const endNavigate = () => {
+    refocus("navigate");
+    // Each stage is a history entry, so leaving navigation steps back one entry, as the browser Back button does.
+    if (historyIndex() > 0) return window.history.back();
     setStage("plan");
     setShowSteps(false);
     setFocus(null);
-    refocus("navigate");
   };
   useEffect(() => {
     if (stage !== "navigate") return;
@@ -533,7 +675,7 @@ export default function App() {
 
   // Read out new route results to screen readers, once each search lands.
   const announce = useMemo(() => {
-    if (stage !== "plan" || !from || !to || routing) return "";
+    if (stage !== "plan" || editing || !from || !to || routing) return "";
     if (routed.error) return routed.error;
     if (!result) return "";
     if (result.state === "no_route") return "No open walking route connects these points at this time.";
@@ -542,7 +684,7 @@ export default function App() {
     const n = display.length;
     const sunLine = result.state === "night" ? "Shade does not apply after dark." : `${Math.round(current.route.sun_minutes * 10) / 10} min ${routeMode === "shade" ? "in sun" : "without a roof"}.`;
     return `${n} ${n === 1 ? "route" : "routes"} found. ${current.title}: ${current.pct}% ${current.pctWord}, ${current.route.minutes} min walk. ${sunLine}`;
-  }, [stage, from, to, routing, routed.error, result, current, display.length, routeMode]);
+  }, [stage, editing, from, to, routing, routed.error, result, current, display.length, routeMode]);
 
   const vp = useViewport();
   const desktop = vp.w >= 768;
@@ -566,6 +708,7 @@ export default function App() {
   const fitKey = display.length ? `${stage}|${from?.node}|${to?.node}|${mode}|${stepFree}|${includeUnchecked}` : "";
 
   const goBack = () => {
+    if (historyIndex() > 0) return window.history.back();
     setNotice(null);
     setQuery("");
     if (view === "dest") {
@@ -587,7 +730,12 @@ export default function App() {
     setShowSteps(false);
   };
 
-  const when = date ? `${dateLabel(date, clock.date)}, ${fmtMinute(minute, true)}` : "";
+  const when =
+    isNow && nowAt
+      ? nowLabel(nowAt.minute, { bucketIdx, min: minute, night: dark }, mode)
+      : date
+        ? `${dateLabel(date, clock.date)}, ${fmtMinute(minute, true)}`
+        : "";
   const toggles = <ProfileToggles stepFree={stepFree} onStepFree={setStepFree} mode={mode} onMode={setMode} />;
   const dataDate = manifest ? dateShort(manifest.generated_at.slice(0, 10)) : "";
 
@@ -727,7 +875,13 @@ export default function App() {
                   The shade data covers {dateShort(manifest!.dates[0])} to {dateShort(manifest!.dates[manifest!.dates.length - 1])}. Those dates have passed.
                 </p>
               )}
-              {view === "dest" && (
+              {shownNote && (
+                <p className="rounded-card bg-amber-50 px-3 py-2 text-[13px] text-amber-900 shadow-card" role="status" data-testid="now-note">
+                  {shownNote}
+                </p>
+              )}
+              {restoring && <Pending text="Restoring your trip..." />}
+              {view === "dest" && !restoring && (
                 <>
                   <ModeSwitch mode={mode} onChange={setMode} />
                   <div className="min-h-0 overflow-y-auto rounded-card">
@@ -824,9 +978,10 @@ export default function App() {
                         minutes={current.route.minutes}
                         night={night}
                         onBack={() => {
+                          refocus("show-steps");
+                          if (historyIndex() > 0) return window.history.back();
                           setShowSteps(false);
                           setFocus(null);
-                          refocus("show-steps");
                         }}
                         onFocus={(i) => {
                           const s = current.route.steps[i];

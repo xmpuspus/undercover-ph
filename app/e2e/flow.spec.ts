@@ -88,3 +88,78 @@ test("plan a shaded walk from Ayala MRT Station to Greenbelt, tomorrow at 3 PM",
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+async function planTrip(page: Page, now = NOW) {
+  await page.goto(`/?now=${now}`);
+  await expect(page.getByTestId("pick-shade")).toBeEnabled({ timeout: 60_000 });
+  await page.getByTestId("pick-shade").click();
+  await pickPlace(page, "destination-input", "Greenbelt");
+  await pickPlace(page, "from-input", "Ayala MRT Station");
+  await expect(page.getByTestId("route-card").or(page.getByTestId("route-state"))).toBeVisible();
+}
+
+test("Back steps to the previous stage and a reload keeps the trip", async ({ page }) => {
+  await planTrip(page);
+  const url = new URL(page.url());
+  expect(url.searchParams.get("start")).toBe("Ayala MRT Station");
+  expect(url.searchParams.get("end")).toBe("Greenbelt");
+  expect(url.searchParams.get("time")).toBe("now");
+  expect(url.searchParams.get("now")).toBe(NOW);
+
+  // Reload: the same trip comes back with its route.
+  await page.reload();
+  await expect(page.getByTestId("route-card").or(page.getByTestId("route-state"))).toBeVisible({ timeout: 60_000 });
+  expect(new URL(page.url()).searchParams.get("end")).toBe("Greenbelt");
+
+  // Back from the results shows the trip fields, with the start and end kept.
+  await page.goBack();
+  await expect(page.getByTestId("trip-panel")).toBeVisible();
+  await expect(page.getByTestId("to-field")).toHaveText("Greenbelt");
+  await expect(page.getByTestId("route-card")).toHaveCount(0);
+  // Back again shows the destination search, and once more the landing page, still inside the app.
+  await page.goBack();
+  await expect(page.getByTestId("destination-panel")).toBeVisible();
+  await page.goBack();
+  await expect(page.getByTestId("landing")).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("start")).toBeNull();
+  // Forward puts the trip screens back.
+  await page.goForward();
+  await expect(page.getByTestId("destination-panel")).toBeVisible();
+});
+
+test("a shared link opens on the route and Back goes to the landing page", async ({ page }) => {
+  await planTrip(page);
+  const link = page.url();
+  await page.goto("about:blank");
+  await page.goto(link);
+  await expect(page.getByTestId("route-card").or(page.getByTestId("route-state"))).toBeVisible({ timeout: 60_000 });
+  await page.goBack();
+  await expect(page.getByTestId("landing")).toBeVisible();
+});
+
+test("editing the start hides the old route and routes only after a new pick", async ({ page }) => {
+  await planTrip(page);
+  const card = page.getByTestId("route-card");
+  test.skip(!(await card.isVisible()), "the router found no route for this pair");
+  await page.getByTestId("edit-from").click();
+  await expect(page.getByTestId("from-input")).toBeVisible();
+  // The kept start shows as the box's value, the old route is gone, and nothing re-routes by itself.
+  await expect(page.getByTestId("from-input")).toHaveAttribute("placeholder", "Ayala MRT Station");
+  await expect(card).toHaveCount(0);
+  await pickPlace(page, "from-input", "Glorietta");
+  await expect(page.getByTestId("route-card").or(page.getByTestId("route-state"))).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("start")).toBe("Glorietta");
+});
+
+test("Now names the real time and the shade slot it uses", async ({ page }) => {
+  await planTrip(page, `${manifest.dates[0]}T12:40`);
+  await expect(page.getByTestId("now-chip")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("Leaving now, 12:40 PM, shade for 1 PM")).toBeVisible();
+});
+
+test("Now after the last slot is a night walk today, not tomorrow morning", async ({ page }) => {
+  await planTrip(page, `${manifest.dates[0]}T19:10`);
+  await expect(page.getByTestId("now-chip")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("date-chip")).toContainText("Today");
+  await expect(page.getByText("Leaving now, 7:10 PM, after dark")).toBeVisible();
+});

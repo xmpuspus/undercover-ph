@@ -50,6 +50,11 @@ function useCombobox(id: string, places: Place[], onPick: (p: Place) => void, qu
       return;
     }
     if (!places.length) return;
+    // Enter on an empty box must not pick a suggestion by accident, least of all over a kept start or end.
+    if (e.key === "Enter" && active < 0 && !query.trim()) {
+      e.preventDefault();
+      return;
+    }
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setActive((a) => (a + 1) % places.length);
@@ -207,8 +212,8 @@ export function TripFields(p: TripProps) {
             autoFocus
             value={p.query}
             onChange={(e) => p.onQuery(e.target.value)}
-            placeholder={key === "from" ? "Where are you now?" : "Where to?"}
-            className="h-11 min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-slate-500"
+            placeholder={ep ? ep.label : key === "from" ? "Where are you now?" : "Where to?"}
+            className={`h-11 min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none ${ep ? "placeholder:text-ink" : "placeholder:text-slate-500"}`}
             aria-label={key === "from" ? "Start" : "Destination"}
             data-testid={`${key}-input`}
             {...combo.input}
