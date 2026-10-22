@@ -32,8 +32,18 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (m: Mode)
 // One message for every search with no match: the list cannot tell a missing place from a place outside the areas.
 const NO_MATCH = "No place by that name in the areas this app covers. Try another name, or tap the map.";
 
+// Map tags as a walker would say them. "residential" alone is an adjective, and the tags use British spelling.
+const CATEGORY_LABELS: Record<string, string> = {
+  residential: "Residential building",
+  neighbourhood: "Neighborhood",
+  place_of_worship: "Place of worship",
+  shopping_area: "Shopping area",
+  bus_station: "Bus station",
+  station: "Train station",
+};
+
 function categoryLabel(c: string): string {
-  const s = c.replace(/_/g, " ");
+  const s = CATEGORY_LABELS[c] ?? c.replace(/_/g, " ");
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 

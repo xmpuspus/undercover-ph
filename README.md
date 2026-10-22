@@ -12,21 +12,21 @@ The app covers 14 walking areas, from Caloocan to Alabang. Each area is a downto
 <!-- coverage:start -->
 | Area | Cities | Walkable km in routes | Places | Buildings |
 | --- | --- | ---: | ---: | ---: |
-| Makati, BGC, Ortigas and Shaw | Makati, Mandaluyong, Pasig, Quezon City, San Juan, Taguig | 1,333 | 4,130 | 189,704 |
-| Bay Area and Mall of Asia | Pasay | 250 | 524 | 25,183 |
+| Makati, BGC, Ortigas and Shaw | Makati, Mandaluyong, Pasig, Quezon City, San Juan, Taguig | 1,342 | 4,130 | 189,704 |
+| Bay Area and Mall of Asia | Pasay | 251 | 524 | 25,183 |
 | Cubao and Eastwood | Quezon City | 321 | 813 | 65,167 |
 | North Avenue, Quezon Memorial Circle and UP Diliman | Quezon City | 507 | 1,474 | 96,652 |
-| Intramuros, Ermita, Binondo and University Belt | Manila | 809 | 3,241 | 100,359 |
+| Intramuros, Ermita, Binondo and University Belt | Manila | 810 | 3,241 | 100,359 |
 | Alabang and Filinvest City | Muntinlupa | 261 | 481 | 21,701 |
-| Caloocan, Malabon, Navotas and Valenzuela | Caloocan, Malabon, Navotas, Valenzuela | 853 | 1,470 | 136,324 |
-| Marikina Centre and Riverbanks | Marikina | 389 | 819 | 82,926 |
+| Caloocan, Malabon, Navotas and Valenzuela | Caloocan, Malabon, Navotas, Valenzuela | 854 | 1,470 | 136,324 |
+| Marikina Centre and Riverbanks | Marikina | 391 | 819 | 82,926 |
 | Aseana, PITX and NAIA | Paranaque, Pasay | 317 | 405 | 31,350 |
 | Las Pinas and Alabang-Zapote Road | Las Pinas | 274 | 515 | 47,566 |
 | BF Homes and Aguirre Avenue | Paranaque | 222 | 321 | 29,438 |
-| McKinley Hill, Taguig Centre, Arca South and Pateros | Pateros, Taguig | 740 | 997 | 136,126 |
-| Commonwealth, Fairview and SM Fairview | Quezon City | 498 | 969 | 193,787 |
+| McKinley Hill, Taguig Centre, Arca South and Pateros | Pateros, Taguig | 744 | 997 | 136,126 |
+| Commonwealth, Fairview and SM Fairview | Quezon City | 499 | 969 | 193,787 |
 | Banawe and Quezon Avenue | Quezon City | 404 | 508 | 64,510 |
-| **14 areas** | | **7,177** | **16,667** | **1,220,793** |
+| **14 areas** | | **7,196** | **16,667** | **1,220,793** |
 <!-- coverage:end -->
 
 [![A walk from Ayala MRT Station to Greenbelt on undercover.ph. It shows the landing card, the Shaded choice, destination and start search, and tomorrow at 3 PM. Then three routes on the 3D map with their shaded share. Then the route card with minutes in sun and the roof, building, and tree split](docs/demo/hero.gif)](https://undercover.ph)
@@ -137,9 +137,9 @@ Each area keeps its files in `app/public/data/areas/<id>/`. Two files cover ever
 ## Known limits and the work still to do
 
 <!-- limits:start -->
-- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds 28.6 km of sheltered path. Nobody has measured how much exists on the street.
-- **Access.** Gates and entrances that need a field check remove 341 km of paths from routes.
-- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. That covers 1,020 km of the 3,305 km of side-of-street paths. A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.
+- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds 28.7 km of sheltered path. Nobody has measured how much exists on the street.
+- **Access.** Gates and entrances that need a field check remove 321 km of paths from routes.
+- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. That covers 1,021 km of the 3,306 km of side-of-street paths. A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.
 <!-- limits:end -->
 - **Heights.** Google's heights stop at 100 m and date from 2023. OpenStreetMap supplies most tower heights.
 - **Taglish copy.** A native speaker has not reviewed it yet.

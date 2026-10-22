@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T17:03:05+08:00",
+ "generated_at": "2026-10-22T19:17:12+08:00",
  "osm_extract": "philippines-261020.osm.pbf, md5 941dd405ba4f1c028ca874cde38ea200, clipped to ncr.osm.pbf with osmium extract -b 120.90,14.35,121.20,14.80",
  "pilot_bbox": [
   120.94,
@@ -60,7 +60,7 @@
  "counts": {
   "nodes": 11066,
   "edges": 16919,
-  "routable_edges": 16068,
+  "routable_edges": 16089,
   "buildings": 136324,
   "places": 1470
  },
@@ -79,10 +79,10 @@
   }
  ],
  "limits": [
-  "Edges with unchecked access rules are not routable by default. That removes 851 of 16919 edges, or 38.6 km.",
+  "Edges with unchecked access rules are not routable by default. That removes 830 of 16919 edges, or 37.5 km.",
   "The largest routable network holds 92.7% of routable nodes and 95.7% of routable length.",
   "Kerbs do not trigger an access check. 0 edges that cross a raised kerb carry the steps flag, so step-free routes avoid them.",
-  "Gates alone remove 797 edges and 36.4 km. Village and estate gates need a field check.",
+  "Gates alone remove 798 edges and 36.6 km. Village and estate gates need a field check.",
   "Only access, foot and opening-hours rules restrict walkers. Vehicle-only conditional tags, such as a Sunday car-free rule, do not.",
   "Indoor corridors and building passages without cited hours stay unroutable. They remove 0 edges and 0.0 km.",
   "The graph leaves out 925 way pieces, 15.1 km, that pass an explicitly closed node. The rest of those 923 ways stays in.",
