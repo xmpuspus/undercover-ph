@@ -5,6 +5,9 @@ Anonymous HTTP range reads of the public COGs, as for Makati. No account. A buil
 several tiles is pasted together on the shared 0.5 m pixel grid. Where tiles overlap, the first tile
 with a valid pixel wins, and the log counts overlapping valid pixels that disagree.
 Writes pipeline/raw/districts/<id>/gob_2023/building_area_height_presence.tif and window_log.json.
+Tiles come from every 2023 manifest the pipeline has: the two research manifests first, then any in
+pipeline/raw/regions/gob_manifests/ (pipeline/regions/fetch_gob_manifests.py). A district reads only tiles
+in its region's UTM zone, from the EPSG code in the manifest name. Metro Manila districts use zone 51.
 """
 import json
 import sys
@@ -19,12 +22,17 @@ from rasterio.windows import Window  # noqa: E402
 
 import dcommon  # noqa: E402
 from common import RESEARCH, TO_UTM  # noqa: E402
+from pyproj import Transformer  # noqa: E402
+from regions import region  # noqa: E402
 
 MARGIN_M = 60.0
 RES = 0.5
 NODATA = -99.0
 MANIFESTS = [RESEARCH / "raw/02/gob_temporal_manifest" / m
              for m in ("33_EPSG_32651_2023_06_30.json", "35_EPSG_32651_2023_06_30.json")]
+MANIFESTS += [p for p in sorted(region.GOB_MANIFESTS.glob("*_2023_06_30.json"))
+              if p.name not in {m.name for m in MANIFESTS}]
+NCR_EPSG = 32651
 ENV = dict(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", GDAL_HTTP_MAX_RETRY="5", GDAL_HTTP_RETRY_DELAY="2",
            CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif")
 
@@ -32,6 +40,7 @@ ENV = dict(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", GDAL_HTTP_MAX_RETRY="5", GD
 def tile_sources():
     out = []
     for mf in MANIFESTS:
+        epsg = region.manifest_epsg(mf)
         m = json.load(open(mf))
         for ts in m["tilesets"]:
             for s in ts["sources"]:
@@ -39,14 +48,20 @@ def tile_sources():
                 x0, y1 = a["translateX"], a["translateY"]
                 x1, y0 = x0 + a["scaleX"] * d["width"], y1 + a["scaleY"] * d["height"]
                 url = (m["uriPrefix"] + s["uris"][0]).replace("gs://", "https://storage.googleapis.com/")
-                out.append({"url": url, "extent": (x0, y0, x1, y1), "props": m["properties"]})
+                out.append({"url": url, "extent": (x0, y0, x1, y1), "props": m["properties"], "epsg": epsg})
     return out
 
 
 def fetch(d, sources):
     w, s, e, n = d.building_bbox
-    xs, ys = zip(*[TO_UTM.transform(x, y) for x, y in ((w, s), (e, s), (w, n), (e, n))])
-    hits = [t for t in sources if t["extent"][0] < max(xs) + MARGIN_M and t["extent"][2] > min(xs) - MARGIN_M
+    epsg, to_utm = NCR_EPSG, TO_UTM
+    if d.region != "ncr":
+        epsg = region.utm_epsg(region.get(d.region))
+        to_utm = Transformer.from_crs("EPSG:4326", f"EPSG:{epsg}", always_xy=True)
+    xs, ys = zip(*[to_utm.transform(x, y) for x, y in ((w, s), (e, s), (w, n), (e, n))])
+    # Extents are UTM metres, so only tiles in the district's zone can be compared with its box.
+    hits = [t for t in sources if t["epsg"] == epsg
+            and t["extent"][0] < max(xs) + MARGIN_M and t["extent"][2] > min(xs) - MARGIN_M
             and t["extent"][1] < max(ys) + MARGIN_M and t["extent"][3] > min(ys) - MARGIN_M]
     if not hits:
         sys.exit(f"{d.id}: no Google tile covers the building area")
@@ -93,14 +108,15 @@ def fetch(d, sources):
     out_dir = d.raw / "gob_2023"
     out_dir.mkdir(parents=True, exist_ok=True)
     transform = Affine(RES, 0.0, x0, 0.0, -RES, y1)
-    prof = dict(driver="GTiff", dtype="float32", count=2, width=width, height=height, crs="EPSG:32651",
+    prof = dict(driver="GTiff", dtype="float32", count=2, width=width, height=height, crs=f"EPSG:{epsg}",
                 transform=transform, nodata=NODATA, compress="deflate", tiled=True, blockxsize=512,
                 blockysize=512, BIGTIFF="IF_SAFER")
     with rasterio.open(out_dir / "building_area_height_presence.tif", "w", **prof) as dst:
         dst.write(np.stack([hgt, pres]))
         dst.set_band_description(1, "building_height")
         dst.set_band_description(2, "building_presence")
-    log = {"district": d.id, "building_bbox": d.building_bbox, "box_utm51n": [x0, y1 - height * RES, x0 + width * RES, y1],
+    log = {"district": d.id, "building_bbox": d.building_bbox,
+           f"box_utm{epsg - 32600}n": [x0, y1 - height * RES, x0 + width * RES, y1],
            "size_px": [width, height], "tiles": log_tiles, "overlap_conflict_px": conflicts,
            "nodata_px": int((hgt == NODATA).sum()), "height_max": float(hgt.max()),
            "tile_props": hits[0]["props"], "seconds": round(time.time() - t0, 1),

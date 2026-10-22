@@ -1,0 +1,562 @@
+{
+ "makati-cbd": {
+  "bbox": [
+   121.012,
+   14.548,
+   121.032,
+   14.562
+  ],
+  "walk_km": 90.12,
+  "covered_km": 1.745,
+  "places": 730,
+  "buildings": 1595,
+  "height_tag_share": 0.271,
+  "n_univ": 10,
+  "n_mall": 17,
+  "n_transit": 6
+ },
+ "bgc": {
+  "bbox": [
+   121.04,
+   14.533,
+   121.062,
+   14.563
+  ],
+  "walk_km": 248.87,
+  "covered_km": 1.208,
+  "places": 616,
+  "buildings": 16899,
+  "height_tag_share": 0.024,
+  "n_univ": 4,
+  "n_mall": 8,
+  "n_transit": 7
+ },
+ "ortigas": {
+  "bbox": [
+   121.05,
+   14.562,
+   121.068,
+   14.594
+  ],
+  "walk_km": 138.36,
+  "covered_km": 3.23,
+  "places": 648,
+  "buildings": 7788,
+  "height_tag_share": 0.043,
+  "n_univ": 4,
+  "n_mall": 11,
+  "n_transit": 11
+ },
+ "mandaluyong-shaw": {
+  "bbox": [
+   121.03,
+   14.568,
+   121.052,
+   14.585
+  ],
+  "walk_km": 92.43,
+  "covered_km": 0.193,
+  "places": 543,
+  "buildings": 13873,
+  "height_tag_share": 0.021,
+  "n_univ": 2,
+  "n_mall": 2,
+  "n_transit": 2
+ },
+ "pasig-center": {
+  "bbox": [
+   121.07,
+   14.553,
+   121.09,
+   14.57
+  ],
+  "walk_km": 78.62,
+  "covered_km": 0.928,
+  "places": 282,
+  "buildings": 19055,
+  "height_tag_share": 0.002,
+  "n_univ": 4,
+  "n_mall": 2,
+  "n_transit": 4
+ },
+ "rockwell-poblacion": {
+  "bbox": [
+   121.024,
+   14.56,
+   121.042,
+   14.572
+  ],
+  "walk_km": 62.0,
+  "covered_km": 0.084,
+  "places": 335,
+  "buildings": 5696,
+  "height_tag_share": 0.027,
+  "n_univ": 4,
+  "n_mall": 3,
+  "n_transit": 1
+ },
+ "greenhills": {
+  "bbox": [
+   121.04,
+   14.594,
+   121.058,
+   14.608
+  ],
+  "walk_km": 36.43,
+  "covered_km": 1.193,
+  "places": 165,
+  "buildings": 2744,
+  "height_tag_share": 0.024,
+  "n_univ": 1,
+  "n_mall": 5,
+  "n_transit": 2
+ },
+ "cubao": {
+  "bbox": [
+   121.046,
+   14.612,
+   121.062,
+   14.627
+  ],
+  "walk_km": 64.96,
+  "covered_km": 0.777,
+  "places": 274,
+  "buildings": 6888,
+  "height_tag_share": 0.017,
+  "n_univ": 3,
+  "n_mall": 6,
+  "n_transit": 21
+ },
+ "eastwood": {
+  "bbox": [
+   121.072,
+   14.602,
+   121.086,
+   14.615
+  ],
+  "walk_km": 26.98,
+  "covered_km": 0.681,
+  "places": 152,
+  "buildings": 5745,
+  "height_tag_share": 0.009,
+  "n_univ": 1,
+  "n_mall": 4,
+  "n_transit": 3
+ },
+ "qc-triangle": {
+  "bbox": [
+   121.024,
+   14.64,
+   121.055,
+   14.662
+  ],
+  "walk_km": 149.22,
+  "covered_km": 3.258,
+  "places": 558,
+  "buildings": 14721,
+  "height_tag_share": 0.013,
+  "n_univ": 4,
+  "n_mall": 5,
+  "n_transit": 14
+ },
+ "up-diliman": {
+  "bbox": [
+   121.055,
+   14.647,
+   121.075,
+   14.664
+  ],
+  "walk_km": 85.77,
+  "covered_km": 1.215,
+  "places": 399,
+  "buildings": 4487,
+  "height_tag_share": 0.042,
+  "n_univ": 17,
+  "n_mall": 2,
+  "n_transit": 2
+ },
+ "manila-ubelt": {
+  "bbox": [
+   120.978,
+   14.596,
+   121.0,
+   14.614
+  ],
+  "walk_km": 126.77,
+  "covered_km": 3.635,
+  "places": 1019,
+  "buildings": 9592,
+  "height_tag_share": 0.355,
+  "n_univ": 50,
+  "n_mall": 14,
+  "n_transit": 31
+ },
+ "binondo": {
+  "bbox": [
+   120.968,
+   14.594,
+   120.988,
+   14.606
+  ],
+  "walk_km": 82.09,
+  "covered_km": 3.623,
+  "places": 847,
+  "buildings": 3077,
+  "height_tag_share": 0.648,
+  "n_univ": 12,
+  "n_mall": 24,
+  "n_transit": 13
+ },
+ "manila-ermita": {
+  "bbox": [
+   120.968,
+   14.56,
+   120.998,
+   14.596
+  ],
+  "walk_km": 223.26,
+  "covered_km": 2.226,
+  "places": 1380,
+  "buildings": 10558,
+  "height_tag_share": 0.203,
+  "n_univ": 29,
+  "n_mall": 6,
+  "n_transit": 11
+ },
+ "pasay-moa": {
+  "bbox": [
+   120.976,
+   14.525,
+   121.003,
+   14.545
+  ],
+  "walk_km": 141.62,
+  "covered_km": 3.846,
+  "places": 389,
+  "buildings": 5441,
+  "height_tag_share": 0.051,
+  "n_univ": 5,
+  "n_mall": 12,
+  "n_transit": 17
+ },
+ "alabang": {
+  "bbox": [
+   121.022,
+   14.408,
+   121.05,
+   14.432
+  ],
+  "walk_km": 145.66,
+  "covered_km": 2.406,
+  "places": 346,
+  "buildings": 5109,
+  "height_tag_share": 0.041,
+  "n_univ": 4,
+  "n_mall": 7,
+  "n_transit": 16
+ },
+ "caloocan-monumento": {
+  "bbox": [
+   120.972,
+   14.64,
+   120.994,
+   14.662
+  ],
+  "walk_km": 126.66,
+  "covered_km": 0.028,
+  "places": 413,
+  "buildings": 14455,
+  "height_tag_share": 0.008,
+  "n_univ": 13,
+  "n_mall": 11,
+  "n_transit": 19
+ },
+ "malabon-navotas-center": {
+  "bbox": [
+   120.94,
+   14.65,
+   120.966,
+   14.668
+  ],
+  "walk_km": 100.17,
+  "covered_km": 0.0,
+  "places": 219,
+  "buildings": 19604,
+  "height_tag_share": 0.026,
+  "n_univ": 3,
+  "n_mall": 4,
+  "n_transit": 0
+ },
+ "navotas-fishport": {
+  "bbox": [
+   120.94,
+   14.637,
+   120.962,
+   14.652
+  ],
+  "walk_km": 57.99,
+  "covered_km": 0.0,
+  "places": 65,
+  "buildings": 7119,
+  "height_tag_share": 0.002,
+  "n_univ": 1,
+  "n_mall": 0,
+  "n_transit": 0
+ },
+ "valenzuela-center": {
+  "bbox": [
+   120.968,
+   14.676,
+   120.986,
+   14.696
+  ],
+  "walk_km": 67.46,
+  "covered_km": 0.124,
+  "places": 152,
+  "buildings": 9171,
+  "height_tag_share": 0.009,
+  "n_univ": 9,
+  "n_mall": 2,
+  "n_transit": 2
+ },
+ "valenzuela-malinta": {
+  "bbox": [
+   120.952,
+   14.68,
+   120.968,
+   14.697
+  ],
+  "walk_km": 45.16,
+  "covered_km": 0.0,
+  "places": 95,
+  "buildings": 4858,
+  "height_tag_share": 0.095,
+  "n_univ": 4,
+  "n_mall": 0,
+  "n_transit": 0
+ },
+ "marikina-center": {
+  "bbox": [
+   121.088,
+   14.622,
+   121.11,
+   14.645
+  ],
+  "walk_km": 109.28,
+  "covered_km": 0.219,
+  "places": 314,
+  "buildings": 15210,
+  "height_tag_share": 0.016,
+  "n_univ": 3,
+  "n_mall": 1,
+  "n_transit": 1
+ },
+ "marikina-riverbanks": {
+  "bbox": [
+   121.074,
+   14.624,
+   121.094,
+   14.64
+  ],
+  "walk_km": 68.84,
+  "covered_km": 1.533,
+  "places": 195,
+  "buildings": 6490,
+  "height_tag_share": 0.006,
+  "n_univ": 6,
+  "n_mall": 0,
+  "n_transit": 2
+ },
+ "paranaque-aseana-pitx": {
+  "bbox": [
+   120.98,
+   14.503,
+   121.002,
+   14.526
+  ],
+  "walk_km": 95.36,
+  "covered_km": 2.122,
+  "places": 217,
+  "buildings": 5721,
+  "height_tag_share": 0.019,
+  "n_univ": 1,
+  "n_mall": 4,
+  "n_transit": 5
+ },
+ "paranaque-naia": {
+  "bbox": [
+   121.0,
+   14.502,
+   121.022,
+   14.524
+  ],
+  "walk_km": 62.96,
+  "covered_km": 2.747,
+  "places": 151,
+  "buildings": 2644,
+  "height_tag_share": 0.021,
+  "n_univ": 1,
+  "n_mall": 4,
+  "n_transit": 3
+ },
+ "paranaque-bf-aguirre": {
+  "bbox": [
+   121.018,
+   14.438,
+   121.042,
+   14.462
+  ],
+  "walk_km": 102.37,
+  "covered_km": 0.003,
+  "places": 197,
+  "buildings": 7478,
+  "height_tag_share": 0.006,
+  "n_univ": 1,
+  "n_mall": 3,
+  "n_transit": 0
+ },
+ "las-pinas-center": {
+  "bbox": [
+   120.972,
+   14.438,
+   121.002,
+   14.458
+  ],
+  "walk_km": 110.04,
+  "covered_km": 0.085,
+  "places": 350,
+  "buildings": 10444,
+  "height_tag_share": 0.044,
+  "n_univ": 6,
+  "n_mall": 2,
+  "n_transit": 1
+ },
+ "pateros-center": {
+  "bbox": [
+   121.056,
+   14.538,
+   121.078,
+   14.554
+  ],
+  "walk_km": 99.51,
+  "covered_km": 0.038,
+  "places": 277,
+  "buildings": 19942,
+  "height_tag_share": 0.003,
+  "n_univ": 5,
+  "n_mall": 1,
+  "n_transit": 3
+ },
+ "qc-commonwealth": {
+  "bbox": [
+   121.076,
+   14.672,
+   121.096,
+   14.7
+  ],
+  "walk_km": 126.34,
+  "covered_km": 0.216,
+  "places": 317,
+  "buildings": 38570,
+  "height_tag_share": 0.003,
+  "n_univ": 3,
+  "n_mall": 4,
+  "n_transit": 9
+ },
+ "qc-fairview": {
+  "bbox": [
+   121.058,
+   14.696,
+   121.082,
+   14.72
+  ],
+  "walk_km": 55.99,
+  "covered_km": 0.116,
+  "places": 273,
+  "buildings": 15460,
+  "height_tag_share": 0.005,
+  "n_univ": 5,
+  "n_mall": 1,
+  "n_transit": 4
+ },
+ "qc-sm-fairview": {
+  "bbox": [
+   121.048,
+   14.722,
+   121.068,
+   14.742
+  ],
+  "walk_km": 70.76,
+  "covered_km": 0.771,
+  "places": 241,
+  "buildings": 10966,
+  "height_tag_share": 0.006,
+  "n_univ": 5,
+  "n_mall": 2,
+  "n_transit": 12
+ },
+ "qc-banawe": {
+  "bbox": [
+   121.004,
+   14.614,
+   121.026,
+   14.638
+  ],
+  "walk_km": 105.37,
+  "covered_km": 0.009,
+  "places": 269,
+  "buildings": 15472,
+  "height_tag_share": 0.008,
+  "n_univ": 8,
+  "n_mall": 1,
+  "n_transit": 0
+ },
+ "taguig-mckinley-hill": {
+  "bbox": [
+   121.042,
+   14.518,
+   121.064,
+   14.534
+  ],
+  "walk_km": 103.67,
+  "covered_km": 0.0,
+  "places": 220,
+  "buildings": 11637,
+  "height_tag_share": 0.013,
+  "n_univ": 1,
+  "n_mall": 2,
+  "n_transit": 2
+ },
+ "taguig-center": {
+  "bbox": [
+   121.062,
+   14.514,
+   121.082,
+   14.534
+  ],
+  "walk_km": 61.55,
+  "covered_km": 0.0,
+  "places": 169,
+  "buildings": 10035,
+  "height_tag_share": 0.006,
+  "n_univ": 3,
+  "n_mall": 1,
+  "n_transit": 0
+ },
+ "arca-south": {
+  "bbox": [
+   121.034,
+   14.496,
+   121.056,
+   14.514
+  ],
+  "walk_km": 84.04,
+  "covered_km": 0.071,
+  "places": 181,
+  "buildings": 11523,
+  "height_tag_share": 0.007,
+  "n_univ": 3,
+  "n_mall": 2,
+  "n_transit": 3
+ }
+}

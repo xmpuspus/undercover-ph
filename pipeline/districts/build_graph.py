@@ -1,6 +1,7 @@
 """District copy of pipeline/build_graph.py. Run through pipeline/districts/build.py, which sets UC_DISTRICT.
 
-Build graph.json for the graph area from the NCR PBF with the corrected pedestrian access policy.
+Build graph.json for the graph area from the region's PBF (ctx.PBF; the NCR PBF for Metro Manila) with the
+corrected pedestrian access policy.
 
 Usage: pipeline/.venv/bin/python -I pipeline/build_graph.py
 Reads the PBF, pipeline/work/{features.jsonl,elevators.json,kerbs.json,hours_match.json},
@@ -37,8 +38,8 @@ from scipy.sparse import coo_matrix  # noqa: E402
 from scipy.sparse.csgraph import connected_components  # noqa: E402
 from shapely.strtree import STRtree  # noqa: E402
 
-from ctx import (BUILDING_BBOX, BUILDINGS, GRAPH_BBOX, OUT, PBF, TO_LL, TO_UTM, WORK, haversine, in_bbox,  # noqa: E402
-                    write_json)
+from ctx import (BUILDING_BBOX, BUILDINGS, CROSSING_STREETS, GRAPH_BBOX, OUT, PBF, TO_LL, TO_UTM, WORK,  # noqa: E402
+                 haversine, in_bbox, write_json)
 from extract_walk_graph import classify  # noqa: E402  research corrected classifier, imported unchanged
 from pedestrian_access import (PEDESTRIAN, node_blocks_public, read_node_rules,  # noqa: E402
                                static_public_walkable)
@@ -57,7 +58,6 @@ FOOTPRINT_MARGIN_M = 0.05
 INSIDE_SHARE = 0.5
 # Safety item: node_flags tell the router where a walker can cross between side edges.
 NODE_BIT = {"crossing": 1, "signals": 2, "junction": 4, "grade_separated": 8}
-CROSSING_STREETS = ["Ayala Avenue", "Paseo de Roxas", "Makati Avenue", "Senator Gil J. Puyat Avenue"]
 # Longest run outside the graph rects that a connector way may add between two routable pieces.
 CONNECT_M = 300.0
 

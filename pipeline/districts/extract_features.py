@@ -1,6 +1,7 @@
 """District copy of pipeline/extract_features.py. Run through pipeline/districts/build.py, which sets UC_DISTRICT.
 
-One pass over the NCR PBF: building outlines and parts, named features, and elevator nodes.
+One pass over the region's PBF (ctx.PBF; the NCR PBF for Metro Manila): building outlines and parts, named
+features, and elevator nodes.
 
 Usage: pipeline/.venv/bin/python -I pipeline/extract_features.py
 Writes pipeline/work/buildings_osm.jsonl, features.jsonl, elevators.json and kerbs.json.

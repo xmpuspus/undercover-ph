@@ -36,6 +36,8 @@ class District:
         self.cities = row["cities"]
         self.wave = row["wave"]
         self.bbox = row["bbox"]
+        # Districts outside Metro Manila name a region in pipeline/regions/districts.json.
+        self.region = row.get("region", "ncr")
         self.graph_bbox = grow_nearest(self.bbox, GRAPH_MARGIN_M)
         self.building_bbox = grow_bbox(self.graph_bbox, BUILDING_MARGIN_M)
         self.raw = RAW / self.id
@@ -57,8 +59,20 @@ def load_all():
     return [District(r) for r in sorted(rows, key=lambda r: r["wave"])]
 
 
+def load_region_districts():
+    """Districts outside Metro Manila, from pipeline/regions/districts.json. load_all() leaves them out."""
+    path = PIPE / "regions/districts.json"
+    if not path.exists():
+        return []
+    rows = json.load(open(path))["districts"]
+    return [District(r) for r in sorted(rows, key=lambda r: r["wave"])]
+
+
 def get(district_id):
     for d in load_all():
+        if d.id == district_id:
+            return d
+    for d in load_region_districts():
         if d.id == district_id:
             return d
     sys.exit(f"unknown district {district_id}")

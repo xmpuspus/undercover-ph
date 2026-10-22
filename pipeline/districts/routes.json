@@ -89,6 +89,48 @@
    "Alabang Town Center"
   ]
  ],
+ "paranaque-airport": [
+  [
+   "PITX LRT Station",
+   "Ayala Malls Manila Bay"
+  ],
+  [
+   "MIA Road LRT Station",
+   "Aseana Powerstation"
+  ],
+  [
+   "Nichols PNR Station",
+   "Newport Mall"
+  ]
+ ],
+ "paranaque-bf-aguirre": [
+  [
+   "SM City BF Parañaque",
+   "Aguirre Central Park"
+  ],
+  [
+   "SM City BF Parañaque",
+   "Vista Mall Lakefront"
+  ],
+  [
+   "Aguirre Central Park",
+   "W.Mall"
+  ]
+ ],
+ "las-pinas": [
+  [
+   "Robinsons Place Las Piñas",
+   "SM Center Las Piñas"
+  ],
+  [
+   "Robinsons Place Las Piñas",
+   "Las Piñas City Hall"
+  ],
+  [
+   "Vista Mall Las Piñas",
+   "Las Piñas Doctors Hospital"
+  ]
+ ],
  "north-coast": [
   [
    "Yamaha Monumento LRT Station",
@@ -121,46 +163,36 @@
    "Marikina City Hall"
   ]
  ],
- "paranaque-airport": [
+ "qc-banawe": [
   [
-   "PITX LRT Station",
-   "Ayala Malls Manila Bay"
+   "Fe Del Mundo Medical Center",
+   "St. Luke's Medical Center"
   ],
   [
-   "MIA Road LRT Station",
-   "Aseana Powerstation"
+   "Z Square",
+   "Fisher Mall Quezon Avenue"
   ],
   [
-   "Nichols PNR Station",
-   "Newport Mall"
+   "Fisher Mall Quezon Avenue",
+   "Capitol Medical Center"
   ]
  ],
- "las-pinas": [
+ "cebu-city-centre": [
   [
-   "Robinsons Place Las Pi\u00f1as",
-   "SM Center Las Pi\u00f1as"
+   "Ayala Center Cebu",
+   "Ayala Malls Central Bloc"
   ],
   [
-   "Robinsons Place Las Pi\u00f1as",
-   "Las Pi\u00f1as City Hall"
+   "Robinsons Fuente",
+   "Ayala Center Cebu"
   ],
   [
-   "Vista Mall Las Pi\u00f1as",
-   "Las Pi\u00f1as Doctors Hospital"
-  ]
- ],
- "paranaque-bf-aguirre": [
-  [
-   "SM City BF Para\u00f1aque",
-   "Aguirre Central Park"
+   "Colonnade Mall",
+   "Robinsons Fuente"
   ],
   [
-   "SM City BF Para\u00f1aque",
-   "Vista Mall Lakefront"
-  ],
-  [
-   "Aguirre Central Park",
-   "W.Mall"
+   "Gaisano Capital Tisa",
+   "Robinsons Fuente"
   ]
  ],
  "taguig-pateros": [
@@ -191,18 +223,284 @@
    "SM City Fairview"
   ]
  ],
- "qc-banawe": [
+ "dagupan-centre": [
   [
-   "Fe Del Mundo Medical Center",
-   "St. Luke's Medical Center"
+   "CSI Market Square",
+   "City Mall"
   ],
   [
-   "Z Square",
-   "Fisher Mall Quezon Avenue"
+   "Coen Fashion House and General Merchandise",
+   "Magic Centerpoint"
   ],
   [
-   "Fisher Mall Quezon Avenue",
-   "Capitol Medical Center"
+   "Marimar",
+   "Dagupan Doctors Villaflor Memorial Hospital"
+  ]
+ ],
+ "mandaue": [
+  [
+   "SM City Cebu",
+   "Gaisano Grand Mall Mandaue"
+  ],
+  [
+   "Cebu North Bus Terminal",
+   "Parkmall"
+  ],
+  [
+   "Mandaue City Hospital",
+   "GMall of Cebu"
+  ]
+ ],
+ "calapan": [
+  [
+   "CityMall",
+   "Van Terminal (to Puerto Galera)"
+  ],
+  [
+   "Unitop",
+   "PVANS Transport"
+  ],
+  [
+   "XentroMall Calapan",
+   "Nuciti Central Calapan"
+  ]
+ ],
+ "vigan-centre": [
+  [
+   "Foxton Trading",
+   "Adora Clinic and Hospital"
+  ],
+  [
+   "Novo",
+   "Metro Vigan Cooperative Hospital"
+  ],
+  [
+   "Plaza Maestro Commercial Complex",
+   "Vigan Landmark Commercial Center"
+  ]
+ ],
+ "laoag-centre": [
+  [
+   "Me Shopping Center",
+   "F. taylan Dental Care clinic"
+  ],
+  [
+   "Red Dot Collective",
+   "GOV. ROQUE B. ABLAN SR. MEMORIAL HOSPITAL"
+  ],
+  [
+   "SM Hypermarket",
+   "Gov. Roque Ablan Sr. Memorial Hospital"
+  ]
+ ],
+ "puerto-princesa": [
+  [
+   "SM City Puerto Princesa",
+   "Ospital ng Palawan"
+  ],
+  [
+   "China Town Center",
+   "MMG Cooperative Hospital"
+  ],
+  [
+   "NCCC Palawan",
+   "Ospital ng Palawan"
+  ]
+ ],
+ "tagaytay": [
+  [
+   "Fora Mall Tagaytay",
+   "Tagaytay Public Transport Terminal"
+  ],
+  [
+   "Ayala Malls Serin",
+   "Tagaytay Public Transport Terminal"
+  ],
+  [
+   "Fora Mall Tagaytay",
+   "Ospital ng Lunsod ng Tagaytay"
+  ]
+ ],
+ "lucena": [
+  [
+   "Joy City",
+   "SM City Lucena Transport Terminal"
+  ],
+  [
+   "SM City Lucena",
+   "St. Anne General Hospital"
+  ],
+  [
+   "Joy City",
+   "Quezon Medical Center"
+  ]
+ ],
+ "naga": [
+  [
+   "LCC Mall Naga",
+   "Eaglestar - Naga Terminal"
+  ],
+  [
+   "Robinsons Place Naga",
+   "Bicol Central Station"
+  ],
+  [
+   "SM City Naga",
+   "Eaglestar - Naga Terminal"
+  ]
+ ],
+ "baguio-centre": [
+  [
+   "456 Department Store",
+   "Baguio General Hospital & Medical Center"
+  ],
+  [
+   "Abanao Square",
+   "Cooyeesan Hotel Plaza"
+  ],
+  [
+   "Baguio Center Mall",
+   "SM City Baguio"
+  ]
+ ],
+ "iloilo-city": [
+  [
+   "SM City Iloilo",
+   "City Square"
+  ],
+  [
+   "Festive Walk Iloilo",
+   "Gaisano Capital Guanco"
+  ],
+  [
+   "Iloilo Fastcraft Terminal",
+   "Robinsons Jaro"
+  ]
+ ],
+ "angeles-centre": [
+  [
+   "167 Shopping Center",
+   "Central Town Mall"
+  ],
+  [
+   "CityMall Dau",
+   "Clark Cityfront Mall"
+  ],
+  [
+   "Happy Go Shopping Center",
+   "Accumed Diagnostic Center"
+  ]
+ ],
+ "san-fernando-pampanga-centre": [
+  [
+   "Jumbo Jenra",
+   "Dra. Gina Marie Ponio"
+  ],
+  [
+   "North Walk 1",
+   "Robinsons Starmills"
+  ],
+  [
+   "SM City San Fernando Downtown",
+   "Jose B. Lingad Memorial Regional Hospital"
+  ]
+ ],
+ "legazpi": [
+  [
+   "101 Shopping Mall",
+   "Legazpi Grand Central Terminal"
+  ],
+  [
+   "Ayala Malls Legazpi",
+   "Legazpi UV Express Terminal"
+  ],
+  [
+   "LCC Mall Legazpi",
+   "Legazpi Grand Central Terminal"
+  ]
+ ],
+ "olongapo-centre": [
+  [
+   "Harbor Point Mall",
+   "SM City Olongapo Central"
+  ],
+  [
+   "SM City Olongapo Downtown",
+   "SBMA Dispensary"
+  ],
+  [
+   "James Gordon Memorial Hospital",
+   "Mother and Child Hospital"
+  ]
+ ],
+ "malolos-centre": [
+  [
+   "Graceland Mall",
+   "Robinsons Place Malolos"
+  ],
+  [
+   "Star Bright",
+   "Xentro Mall Malolos"
+  ],
+  [
+   "Bulacan Medical Center",
+   "EENT Hospital"
+  ]
+ ],
+ "santa-rosa": [
+  [
+   "Central Mall Biñan",
+   "JAC Liner - Biñan Terminal"
+  ],
+  [
+   "Robinsons Santa Rosa Market",
+   "Santa Rosa Integrated Transport Terminal"
+  ],
+  [
+   "SM City Santa Rosa",
+   "Alabang Jeepney Terminal"
+  ]
+ ],
+ "bacolod": [
+  [
+   "Bacolod South Bus Terminal",
+   "Ayala Malls Capitol Central"
+  ],
+  [
+   "Riverside Medical Center",
+   "Gaisano Grand Bacolod"
+  ],
+  [
+   "Riverside Medical Center",
+   "Hi Strip Park"
+  ]
+ ],
+ "talisay-negros": [
+  [
+   "Concepcion Jeepney Terminal",
+   "Talisay City Hall"
+  ],
+  [
+   "Talisay Plaza",
+   "Technological University of the Philippines Visayas"
+  ],
+  [
+   "Talisay City Hall",
+   "Colegio San Nicolas de Tolentino - Recoletos"
+  ]
+ ],
+ "baliwag-centre": [
+  [
+   "A. Square",
+   "SM City Baliwag"
+  ],
+  [
+   "SM City Baliwag North Expansion",
+   "WalterMart"
+  ],
+  [
+   "Alied Care Experts Medical Center Baliuag",
+   "Baliwag Malasakit Center"
   ]
  ]
 }

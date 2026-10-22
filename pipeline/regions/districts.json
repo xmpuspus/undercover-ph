@@ -1,0 +1,1700 @@
+{
+ "note": "Walking areas outside Metro Manila, in the shape of pipeline/districts.json plus a region from pipeline/regions/regions.json. bbox is [west, south, east, north] in WGS84. The graph area adds 500 m on each side, the building area 800 m more. The Cebu box holds Ayala Center Cebu, Cebu IT Park, Fuente Osmena and Colon Street, read from cebu.osm.pbf on 2026-10-22.",
+ "districts": [
+  {
+   "id": "cebu-city-centre",
+   "name": "Cebu City centre",
+   "cities": [
+    "Cebu City"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.889,
+    10.291,
+    123.912,
+    10.334
+   ],
+   "wave": 0
+  },
+  {
+   "id": "baguio-mall-transit-hub",
+   "name": "Baguio mall and transit hub",
+   "cities": [
+    "Baguio"
+   ],
+   "region": "baguio",
+   "bbox": [
+    120.594,
+    16.412,
+    120.614,
+    16.428
+   ],
+   "wave": 0
+  },
+  {
+   "id": "baguio-university-belt",
+   "name": "Baguio university belt",
+   "cities": [
+    "Baguio"
+   ],
+   "region": "baguio",
+   "bbox": [
+    120.578,
+    16.412,
+    120.598,
+    16.428
+   ],
+   "wave": 0
+  },
+  {
+   "id": "baguio-downtown",
+   "name": "Baguio downtown",
+   "cities": [
+    "Baguio"
+   ],
+   "region": "baguio",
+   "bbox": [
+    120.586,
+    16.402,
+    120.606,
+    16.418
+   ],
+   "wave": 0
+  },
+  {
+   "id": "angeles-mall-transit-hub",
+   "name": "Angeles mall and transit hub",
+   "cities": [
+    "Angeles and Clark"
+   ],
+   "region": "angeles",
+   "bbox": [
+    120.574,
+    15.154,
+    120.594,
+    15.17
+   ],
+   "wave": 0
+  },
+  {
+   "id": "angeles-downtown",
+   "name": "Angeles downtown",
+   "cities": [
+    "Angeles and Clark"
+   ],
+   "region": "angeles",
+   "bbox": [
+    120.582,
+    15.164,
+    120.602,
+    15.18
+   ],
+   "wave": 0
+  },
+  {
+   "id": "angeles-university-belt",
+   "name": "Angeles university belt",
+   "cities": [
+    "Angeles and Clark"
+   ],
+   "region": "angeles",
+   "bbox": [
+    120.578,
+    15.132,
+    120.598,
+    15.148
+   ],
+   "wave": 0
+  },
+  {
+   "id": "san-fernando-pampanga-mall-transit-hub",
+   "name": "San Fernando Pampanga mall and transit hub",
+   "cities": [
+    "San Fernando (Pampanga)"
+   ],
+   "region": "san-fernando-pampanga",
+   "bbox": [
+    120.686,
+    15.026,
+    120.706,
+    15.042
+   ],
+   "wave": 0
+  },
+  {
+   "id": "san-fernando-pampanga-university-belt",
+   "name": "San Fernando Pampanga university belt",
+   "cities": [
+    "San Fernando (Pampanga)"
+   ],
+   "region": "san-fernando-pampanga",
+   "bbox": [
+    120.674,
+    15.032,
+    120.694,
+    15.048
+   ],
+   "wave": 0
+  },
+  {
+   "id": "san-fernando-pampanga-downtown",
+   "name": "San Fernando Pampanga downtown",
+   "cities": [
+    "San Fernando (Pampanga)"
+   ],
+   "region": "san-fernando-pampanga",
+   "bbox": [
+    120.674,
+    15.02,
+    120.694,
+    15.036
+   ],
+   "wave": 0
+  },
+  {
+   "id": "olongapo-university-belt",
+   "name": "Olongapo university belt",
+   "cities": [
+    "Olongapo and Subic"
+   ],
+   "region": "olongapo",
+   "bbox": [
+    120.272,
+    14.83,
+    120.292,
+    14.846
+   ],
+   "wave": 0
+  },
+  {
+   "id": "olongapo-downtown",
+   "name": "Olongapo downtown",
+   "cities": [
+    "Olongapo and Subic"
+   ],
+   "region": "olongapo",
+   "bbox": [
+    120.272,
+    14.818,
+    120.292,
+    14.834
+   ],
+   "wave": 0
+  },
+  {
+   "id": "malolos-mall-transit-hub",
+   "name": "Malolos mall and transit hub",
+   "cities": [
+    "Malolos"
+   ],
+   "region": "malolos",
+   "bbox": [
+    120.804,
+    14.834,
+    120.824,
+    14.85
+   ],
+   "wave": 0
+  },
+  {
+   "id": "malolos-downtown",
+   "name": "Malolos downtown",
+   "cities": [
+    "Malolos"
+   ],
+   "region": "malolos",
+   "bbox": [
+    120.804,
+    14.846,
+    120.824,
+    14.862
+   ],
+   "wave": 0
+  },
+  {
+   "id": "baliwag-university-belt",
+   "name": "Baliwag university belt",
+   "cities": [
+    "Baliwag"
+   ],
+   "region": "baliwag",
+   "bbox": [
+    120.876,
+    14.944,
+    120.896,
+    14.96
+   ],
+   "wave": 0
+  },
+  {
+   "id": "baliwag-downtown",
+   "name": "Baliwag downtown",
+   "cities": [
+    "Baliwag"
+   ],
+   "region": "baliwag",
+   "bbox": [
+    120.888,
+    14.95,
+    120.908,
+    14.966
+   ],
+   "wave": 0
+  },
+  {
+   "id": "tarlac-city-mall-transit-hub",
+   "name": "Tarlac City mall and transit hub",
+   "cities": [
+    "Tarlac City"
+   ],
+   "region": "tarlac",
+   "bbox": [
+    120.586,
+    15.486,
+    120.606,
+    15.502
+   ],
+   "wave": 0
+  },
+  {
+   "id": "tarlac-city-downtown",
+   "name": "Tarlac City downtown",
+   "cities": [
+    "Tarlac City"
+   ],
+   "region": "tarlac",
+   "bbox": [
+    120.582,
+    15.474,
+    120.602,
+    15.49
+   ],
+   "wave": 0
+  },
+  {
+   "id": "balanga-university-belt",
+   "name": "Balanga university belt",
+   "cities": [
+    "Balanga"
+   ],
+   "region": "balanga",
+   "bbox": [
+    120.518,
+    14.664,
+    120.538,
+    14.68
+   ],
+   "wave": 0
+  },
+  {
+   "id": "balanga-downtown",
+   "name": "Balanga downtown",
+   "cities": [
+    "Balanga"
+   ],
+   "region": "balanga",
+   "bbox": [
+    120.53,
+    14.67,
+    120.55,
+    14.686
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cabanatuan-mall-transit-hub",
+   "name": "Cabanatuan mall and transit hub",
+   "cities": [
+    "Cabanatuan"
+   ],
+   "region": "cabanatuan",
+   "bbox": [
+    120.964,
+    15.49,
+    120.984,
+    15.506
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cabanatuan-university-belt",
+   "name": "Cabanatuan university belt",
+   "cities": [
+    "Cabanatuan"
+   ],
+   "region": "cabanatuan",
+   "bbox": [
+    120.948,
+    15.47,
+    120.968,
+    15.486
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cabanatuan-downtown",
+   "name": "Cabanatuan downtown",
+   "cities": [
+    "Cabanatuan"
+   ],
+   "region": "cabanatuan",
+   "bbox": [
+    120.96,
+    15.478,
+    120.98,
+    15.494
+   ],
+   "wave": 0
+  },
+  {
+   "id": "dagupan-downtown",
+   "name": "Dagupan downtown",
+   "cities": [
+    "Dagupan"
+   ],
+   "region": "dagupan",
+   "bbox": [
+    120.328,
+    16.032,
+    120.348,
+    16.048
+   ],
+   "wave": 0
+  },
+  {
+   "id": "vigan-downtown",
+   "name": "Vigan downtown",
+   "cities": [
+    "Vigan"
+   ],
+   "region": "vigan",
+   "bbox": [
+    120.378,
+    17.568,
+    120.398,
+    17.584
+   ],
+   "wave": 0
+  },
+  {
+   "id": "laoag-downtown",
+   "name": "Laoag downtown",
+   "cities": [
+    "Laoag"
+   ],
+   "region": "laoag",
+   "bbox": [
+    120.584,
+    18.192,
+    120.604,
+    18.208
+   ],
+   "wave": 0
+  },
+  {
+   "id": "tuguegarao-university-belt",
+   "name": "Tuguegarao university belt",
+   "cities": [
+    "Tuguegarao"
+   ],
+   "region": "tuguegarao",
+   "bbox": [
+    121.72,
+    17.62,
+    121.74,
+    17.636
+   ],
+   "wave": 0
+  },
+  {
+   "id": "tuguegarao-downtown",
+   "name": "Tuguegarao downtown",
+   "cities": [
+    "Tuguegarao"
+   ],
+   "region": "tuguegarao",
+   "bbox": [
+    121.712,
+    17.61,
+    121.732,
+    17.626
+   ],
+   "wave": 0
+  },
+  {
+   "id": "davao-city-mall-transit-hub",
+   "name": "Davao City mall and transit hub",
+   "cities": [
+    "Davao City"
+   ],
+   "region": "davao-city",
+   "bbox": [
+    125.602,
+    7.076,
+    125.622,
+    7.092
+   ],
+   "wave": 0
+  },
+  {
+   "id": "davao-city-university-belt",
+   "name": "Davao City university belt",
+   "cities": [
+    "Davao City"
+   ],
+   "region": "davao-city",
+   "bbox": [
+    125.594,
+    7.056,
+    125.614,
+    7.072
+   ],
+   "wave": 0
+  },
+  {
+   "id": "davao-city-downtown",
+   "name": "Davao City downtown",
+   "cities": [
+    "Davao City"
+   ],
+   "region": "davao-city",
+   "bbox": [
+    125.604,
+    7.064,
+    125.624,
+    7.08
+   ],
+   "wave": 0
+  },
+  {
+   "id": "digos-mall-transit-hub",
+   "name": "Digos mall and transit hub",
+   "cities": [
+    "Digos"
+   ],
+   "region": "digos",
+   "bbox": [
+    125.336,
+    6.752,
+    125.356,
+    6.768
+   ],
+   "wave": 0
+  },
+  {
+   "id": "digos-downtown",
+   "name": "Digos downtown",
+   "cities": [
+    "Digos"
+   ],
+   "region": "digos",
+   "bbox": [
+    125.344,
+    6.742,
+    125.364,
+    6.758
+   ],
+   "wave": 0
+  },
+  {
+   "id": "tagum-university-belt",
+   "name": "Tagum university belt",
+   "cities": [
+    "Tagum"
+   ],
+   "region": "tagum",
+   "bbox": [
+    125.796,
+    7.432,
+    125.816,
+    7.448
+   ],
+   "wave": 0
+  },
+  {
+   "id": "tagum-mall-transit-hub",
+   "name": "Tagum mall and transit hub",
+   "cities": [
+    "Tagum"
+   ],
+   "region": "tagum",
+   "bbox": [
+    125.784,
+    7.448,
+    125.804,
+    7.464
+   ],
+   "wave": 0
+  },
+  {
+   "id": "tagum-downtown",
+   "name": "Tagum downtown",
+   "cities": [
+    "Tagum"
+   ],
+   "region": "tagum",
+   "bbox": [
+    125.798,
+    7.444,
+    125.818,
+    7.46
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cagayan-de-oro-mall-transit-hub",
+   "name": "Cagayan De Oro mall and transit hub",
+   "cities": [
+    "Cagayan de Oro"
+   ],
+   "region": "cagayan-de-oro",
+   "bbox": [
+    124.642,
+    8.462,
+    124.662,
+    8.478
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cagayan-de-oro-university-belt",
+   "name": "Cagayan De Oro university belt",
+   "cities": [
+    "Cagayan de Oro"
+   ],
+   "region": "cagayan-de-oro",
+   "bbox": [
+    124.628,
+    8.466,
+    124.648,
+    8.482
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cagayan-de-oro-downtown",
+   "name": "Cagayan De Oro downtown",
+   "cities": [
+    "Cagayan de Oro"
+   ],
+   "region": "cagayan-de-oro",
+   "bbox": [
+    124.638,
+    8.474,
+    124.658,
+    8.49
+   ],
+   "wave": 0
+  },
+  {
+   "id": "iligan-mall-transit-hub",
+   "name": "Iligan mall and transit hub",
+   "cities": [
+    "Iligan"
+   ],
+   "region": "iligan",
+   "bbox": [
+    124.228,
+    8.214,
+    124.248,
+    8.23
+   ],
+   "wave": 0
+  },
+  {
+   "id": "iligan-university-belt",
+   "name": "Iligan university belt",
+   "cities": [
+    "Iligan"
+   ],
+   "region": "iligan",
+   "bbox": [
+    124.236,
+    8.224,
+    124.256,
+    8.24
+   ],
+   "wave": 0
+  },
+  {
+   "id": "iligan-downtown",
+   "name": "Iligan downtown",
+   "cities": [
+    "Iligan"
+   ],
+   "region": "iligan",
+   "bbox": [
+    124.242,
+    8.236,
+    124.262,
+    8.252
+   ],
+   "wave": 0
+  },
+  {
+   "id": "zamboanga-city-mall-transit-hub",
+   "name": "Zamboanga City mall and transit hub",
+   "cities": [
+    "Zamboanga City"
+   ],
+   "region": "zamboanga-city",
+   "bbox": [
+    122.056,
+    6.906,
+    122.076,
+    6.922
+   ],
+   "wave": 0
+  },
+  {
+   "id": "zamboanga-city-university-belt",
+   "name": "Zamboanga City university belt",
+   "cities": [
+    "Zamboanga City"
+   ],
+   "region": "zamboanga-city",
+   "bbox": [
+    122.068,
+    6.914,
+    122.088,
+    6.93
+   ],
+   "wave": 0
+  },
+  {
+   "id": "zamboanga-city-downtown",
+   "name": "Zamboanga City downtown",
+   "cities": [
+    "Zamboanga City"
+   ],
+   "region": "zamboanga-city",
+   "bbox": [
+    122.07,
+    6.902,
+    122.09,
+    6.918
+   ],
+   "wave": 0
+  },
+  {
+   "id": "pagadian-downtown",
+   "name": "Pagadian downtown",
+   "cities": [
+    "Pagadian"
+   ],
+   "region": "pagadian",
+   "bbox": [
+    123.426,
+    7.818,
+    123.446,
+    7.834
+   ],
+   "wave": 0
+  },
+  {
+   "id": "dipolog-downtown",
+   "name": "Dipolog downtown",
+   "cities": [
+    "Dipolog"
+   ],
+   "region": "dipolog",
+   "bbox": [
+    123.334,
+    8.574,
+    123.354,
+    8.59
+   ],
+   "wave": 0
+  },
+  {
+   "id": "general-santos-university-belt",
+   "name": "General Santos university belt",
+   "cities": [
+    "General Santos"
+   ],
+   "region": "general-santos",
+   "bbox": [
+    125.156,
+    6.112,
+    125.176,
+    6.128
+   ],
+   "wave": 0
+  },
+  {
+   "id": "general-santos-downtown",
+   "name": "General Santos downtown",
+   "cities": [
+    "General Santos"
+   ],
+   "region": "general-santos",
+   "bbox": [
+    125.168,
+    6.106,
+    125.188,
+    6.122
+   ],
+   "wave": 0
+  },
+  {
+   "id": "koronadal-university-belt",
+   "name": "Koronadal university belt",
+   "cities": [
+    "Koronadal"
+   ],
+   "region": "koronadal",
+   "bbox": [
+    124.846,
+    6.484,
+    124.866,
+    6.5
+   ],
+   "wave": 0
+  },
+  {
+   "id": "koronadal-mall-transit-hub",
+   "name": "Koronadal mall and transit hub",
+   "cities": [
+    "Koronadal"
+   ],
+   "region": "koronadal",
+   "bbox": [
+    124.826,
+    6.5,
+    124.846,
+    6.516
+   ],
+   "wave": 0
+  },
+  {
+   "id": "koronadal-downtown",
+   "name": "Koronadal downtown",
+   "cities": [
+    "Koronadal"
+   ],
+   "region": "koronadal",
+   "bbox": [
+    124.834,
+    6.49,
+    124.854,
+    6.506
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cotabato-city-downtown",
+   "name": "Cotabato City downtown",
+   "cities": [
+    "Cotabato City"
+   ],
+   "region": "cotabato-city",
+   "bbox": [
+    124.236,
+    7.21,
+    124.256,
+    7.226
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cotabato-city-university-belt",
+   "name": "Cotabato City university belt",
+   "cities": [
+    "Cotabato City"
+   ],
+   "region": "cotabato-city",
+   "bbox": [
+    124.23,
+    7.196,
+    124.25,
+    7.212
+   ],
+   "wave": 0
+  },
+  {
+   "id": "butuan-university-belt",
+   "name": "Butuan university belt",
+   "cities": [
+    "Butuan"
+   ],
+   "region": "butuan",
+   "bbox": [
+    125.534,
+    8.946,
+    125.554,
+    8.962
+   ],
+   "wave": 0
+  },
+  {
+   "id": "butuan-downtown",
+   "name": "Butuan downtown",
+   "cities": [
+    "Butuan"
+   ],
+   "region": "butuan",
+   "bbox": [
+    125.524,
+    8.938,
+    125.544,
+    8.954
+   ],
+   "wave": 0
+  },
+  {
+   "id": "surigao-downtown",
+   "name": "Surigao downtown",
+   "cities": [
+    "Surigao"
+   ],
+   "region": "surigao",
+   "bbox": [
+    125.482,
+    9.776,
+    125.502,
+    9.792
+   ],
+   "wave": 0
+  },
+  {
+   "id": "cebu-city-mall-transit-hub",
+   "name": "Cebu City mall and transit hub",
+   "cities": [
+    "Cebu City"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.864,
+    10.296,
+    123.884,
+    10.312
+   ],
+   "wave": 3
+  },
+  {
+   "id": "mandaue-downtown",
+   "name": "Mandaue downtown",
+   "cities": [
+    "Mandaue"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.9,
+    10.314,
+    123.92,
+    10.33
+   ],
+   "wave": 3
+  },
+  {
+   "id": "mandaue-university-belt",
+   "name": "Mandaue university belt",
+   "cities": [
+    "Mandaue"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.928,
+    10.32,
+    123.948,
+    10.336
+   ],
+   "wave": 3
+  },
+  {
+   "id": "mandaue-mall-transit-hub",
+   "name": "Mandaue mall and transit hub",
+   "cities": [
+    "Mandaue"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.906,
+    10.302,
+    123.926,
+    10.318
+   ],
+   "wave": 3
+  },
+  {
+   "id": "lapu-lapu-downtown",
+   "name": "Lapu Lapu downtown",
+   "cities": [
+    "Lapu-Lapu"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.916,
+    10.312,
+    123.936,
+    10.328
+   ],
+   "wave": 3
+  },
+  {
+   "id": "lapu-lapu-university-belt",
+   "name": "Lapu Lapu university belt",
+   "cities": [
+    "Lapu-Lapu"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.93,
+    10.332,
+    123.95,
+    10.348
+   ],
+   "wave": 3
+  },
+  {
+   "id": "lapu-lapu-mall-transit-hub",
+   "name": "Lapu Lapu mall and transit hub",
+   "cities": [
+    "Lapu-Lapu"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.944,
+    10.298,
+    123.964,
+    10.314
+   ],
+   "wave": 3
+  },
+  {
+   "id": "iloilo-city-downtown",
+   "name": "Iloilo City downtown",
+   "cities": [
+    "Iloilo City"
+   ],
+   "region": "iloilo",
+   "bbox": [
+    122.554,
+    10.692,
+    122.574,
+    10.708
+   ],
+   "wave": 3
+  },
+  {
+   "id": "iloilo-city-university-belt",
+   "name": "Iloilo City university belt",
+   "cities": [
+    "Iloilo City"
+   ],
+   "region": "iloilo",
+   "bbox": [
+    122.542,
+    10.706,
+    122.562,
+    10.722
+   ],
+   "wave": 3
+  },
+  {
+   "id": "iloilo-city-mall-transit-hub",
+   "name": "Iloilo City mall and transit hub",
+   "cities": [
+    "Iloilo City"
+   ],
+   "region": "iloilo",
+   "bbox": [
+    122.546,
+    10.718,
+    122.566,
+    10.734
+   ],
+   "wave": 3
+  },
+  {
+   "id": "bacolod-downtown",
+   "name": "Bacolod downtown",
+   "cities": [
+    "Bacolod"
+   ],
+   "region": "bacolod",
+   "bbox": [
+    122.942,
+    10.662,
+    122.962,
+    10.678
+   ],
+   "wave": 3
+  },
+  {
+   "id": "bacolod-university-belt",
+   "name": "Bacolod university belt",
+   "cities": [
+    "Bacolod"
+   ],
+   "region": "bacolod",
+   "bbox": [
+    122.95,
+    10.672,
+    122.97,
+    10.688
+   ],
+   "wave": 3
+  },
+  {
+   "id": "bacolod-mall-transit-hub",
+   "name": "Bacolod mall and transit hub",
+   "cities": [
+    "Bacolod"
+   ],
+   "region": "bacolod",
+   "bbox": [
+    122.954,
+    10.654,
+    122.974,
+    10.67
+   ],
+   "wave": 3
+  },
+  {
+   "id": "talisay-negros-downtown",
+   "name": "Talisay Negros downtown",
+   "cities": [
+    "Talisay (Negros Occidental)"
+   ],
+   "region": "bacolod",
+   "bbox": [
+    122.964,
+    10.734,
+    122.984,
+    10.75
+   ],
+   "wave": 3
+  },
+  {
+   "id": "dumaguete-downtown",
+   "name": "Dumaguete downtown",
+   "cities": [
+    "Dumaguete"
+   ],
+   "region": "dumaguete",
+   "bbox": [
+    123.29,
+    9.304,
+    123.31,
+    9.32
+   ],
+   "wave": 3
+  },
+  {
+   "id": "dumaguete-university-belt",
+   "name": "Dumaguete university belt",
+   "cities": [
+    "Dumaguete"
+   ],
+   "region": "dumaguete",
+   "bbox": [
+    123.288,
+    9.316,
+    123.308,
+    9.332
+   ],
+   "wave": 3
+  },
+  {
+   "id": "dumaguete-mall-transit-hub",
+   "name": "Dumaguete mall and transit hub",
+   "cities": [
+    "Dumaguete"
+   ],
+   "region": "dumaguete",
+   "bbox": [
+    123.292,
+    9.292,
+    123.312,
+    9.308
+   ],
+   "wave": 3
+  },
+  {
+   "id": "tagbilaran-downtown",
+   "name": "Tagbilaran downtown",
+   "cities": [
+    "Tagbilaran"
+   ],
+   "region": "tagbilaran",
+   "bbox": [
+    123.852,
+    9.64,
+    123.872,
+    9.656
+   ],
+   "wave": 3
+  },
+  {
+   "id": "tacloban-downtown",
+   "name": "Tacloban downtown",
+   "cities": [
+    "Tacloban"
+   ],
+   "region": "tacloban",
+   "bbox": [
+    124.988,
+    11.234,
+    125.008,
+    11.25
+   ],
+   "wave": 3
+  },
+  {
+   "id": "tacloban-university-belt",
+   "name": "Tacloban university belt",
+   "cities": [
+    "Tacloban"
+   ],
+   "region": "tacloban",
+   "bbox": [
+    124.994,
+    11.206,
+    125.014,
+    11.222
+   ],
+   "wave": 3
+  },
+  {
+   "id": "ormoc-downtown",
+   "name": "Ormoc downtown",
+   "cities": [
+    "Ormoc"
+   ],
+   "region": "ormoc",
+   "bbox": [
+    124.598,
+    11.004,
+    124.618,
+    11.02
+   ],
+   "wave": 3
+  },
+  {
+   "id": "roxas-city-downtown",
+   "name": "Roxas City downtown",
+   "cities": [
+    "Roxas City"
+   ],
+   "region": "roxas",
+   "bbox": [
+    122.744,
+    11.574,
+    122.764,
+    11.59
+   ],
+   "wave": 3
+  },
+  {
+   "id": "kalibo-downtown",
+   "name": "Kalibo downtown",
+   "cities": [
+    "Kalibo"
+   ],
+   "region": "kalibo",
+   "bbox": [
+    122.362,
+    11.698,
+    122.382,
+    11.714
+   ],
+   "wave": 3
+  },
+  {
+   "id": "kalibo-university-belt",
+   "name": "Kalibo university belt",
+   "cities": [
+    "Kalibo"
+   ],
+   "region": "kalibo",
+   "bbox": [
+    122.348,
+    11.704,
+    122.368,
+    11.72
+   ],
+   "wave": 3
+  },
+  {
+   "id": "dasmarinas-mall-transit-hub",
+   "name": "Dasmarinas mall and transit hub",
+   "cities": [
+    "Dasmarinas"
+   ],
+   "region": "cavite",
+   "bbox": [
+    120.93,
+    14.316,
+    120.95,
+    14.332
+   ],
+   "wave": 0
+  },
+  {
+   "id": "dasmarinas-university-belt",
+   "name": "Dasmarinas university belt",
+   "cities": [
+    "Dasmarinas"
+   ],
+   "region": "cavite",
+   "bbox": [
+    120.944,
+    14.32,
+    120.964,
+    14.336
+   ],
+   "wave": 0
+  },
+  {
+   "id": "dasmarinas-downtown",
+   "name": "Dasmarinas downtown",
+   "cities": [
+    "Dasmarinas"
+   ],
+   "region": "cavite",
+   "bbox": [
+    120.956,
+    14.31,
+    120.976,
+    14.326
+   ],
+   "wave": 0
+  },
+  {
+   "id": "tagaytay-downtown",
+   "name": "Tagaytay downtown",
+   "cities": [
+    "Tagaytay"
+   ],
+   "region": "cavite",
+   "bbox": [
+    120.95,
+    14.112,
+    120.97,
+    14.128
+   ],
+   "wave": 0
+  },
+  {
+   "id": "santa-rosa-mall-transit-hub",
+   "name": "Santa Rosa mall and transit hub",
+   "cities": [
+    "Santa Rosa"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.094,
+    14.31,
+    121.114,
+    14.326
+   ],
+   "wave": 0
+  },
+  {
+   "id": "santa-rosa-downtown",
+   "name": "Santa Rosa downtown",
+   "cities": [
+    "Santa Rosa"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.076,
+    14.324,
+    121.096,
+    14.34
+   ],
+   "wave": 0
+  },
+  {
+   "id": "calamba-university-belt",
+   "name": "Calamba university belt",
+   "cities": [
+    "Calamba"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.148,
+    14.19,
+    121.168,
+    14.206
+   ],
+   "wave": 0
+  },
+  {
+   "id": "calamba-downtown",
+   "name": "Calamba downtown",
+   "cities": [
+    "Calamba"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.15,
+    14.202,
+    121.17,
+    14.218
+   ],
+   "wave": 0
+  },
+  {
+   "id": "los-banos-mall-transit-hub",
+   "name": "Los Banos mall and transit hub",
+   "cities": [
+    "Los Banos"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.224,
+    14.152,
+    121.244,
+    14.168
+   ],
+   "wave": 0
+  },
+  {
+   "id": "los-banos-university-belt",
+   "name": "Los Banos university belt",
+   "cities": [
+    "Los Banos"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.226,
+    14.166,
+    121.246,
+    14.182
+   ],
+   "wave": 0
+  },
+  {
+   "id": "los-banos-downtown",
+   "name": "Los Banos downtown",
+   "cities": [
+    "Los Banos"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.236,
+    14.158,
+    121.256,
+    14.174
+   ],
+   "wave": 0
+  },
+  {
+   "id": "san-pablo-university-belt",
+   "name": "San Pablo university belt",
+   "cities": [
+    "San Pablo"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.324,
+    14.056,
+    121.344,
+    14.072
+   ],
+   "wave": 0
+  },
+  {
+   "id": "san-pablo-downtown",
+   "name": "San Pablo downtown",
+   "cities": [
+    "San Pablo"
+   ],
+   "region": "laguna",
+   "bbox": [
+    121.312,
+    14.062,
+    121.332,
+    14.078
+   ],
+   "wave": 0
+  },
+  {
+   "id": "lipa-mall-transit-hub",
+   "name": "Lipa mall and transit hub",
+   "cities": [
+    "Lipa"
+   ],
+   "region": "batangas",
+   "bbox": [
+    121.16,
+    13.926,
+    121.18,
+    13.942
+   ],
+   "wave": 0
+  },
+  {
+   "id": "lipa-university-belt",
+   "name": "Lipa university belt",
+   "cities": [
+    "Lipa"
+   ],
+   "region": "batangas",
+   "bbox": [
+    121.162,
+    13.938,
+    121.182,
+    13.954
+   ],
+   "wave": 0
+  },
+  {
+   "id": "lipa-downtown",
+   "name": "Lipa downtown",
+   "cities": [
+    "Lipa"
+   ],
+   "region": "batangas",
+   "bbox": [
+    121.148,
+    13.934,
+    121.168,
+    13.95
+   ],
+   "wave": 0
+  },
+  {
+   "id": "batangas-city-mall-transit-hub",
+   "name": "Batangas City mall and transit hub",
+   "cities": [
+    "Batangas City"
+   ],
+   "region": "batangas",
+   "bbox": [
+    121.04,
+    13.756,
+    121.06,
+    13.772
+   ],
+   "wave": 0
+  },
+  {
+   "id": "batangas-city-university-belt",
+   "name": "Batangas City university belt",
+   "cities": [
+    "Batangas City"
+   ],
+   "region": "batangas",
+   "bbox": [
+    121.04,
+    13.744,
+    121.06,
+    13.76
+   ],
+   "wave": 0
+  },
+  {
+   "id": "batangas-city-downtown",
+   "name": "Batangas City downtown",
+   "cities": [
+    "Batangas City"
+   ],
+   "region": "batangas",
+   "bbox": [
+    121.052,
+    13.75,
+    121.072,
+    13.766
+   ],
+   "wave": 0
+  },
+  {
+   "id": "antipolo-mall-transit-hub",
+   "name": "Antipolo mall and transit hub",
+   "cities": [
+    "Antipolo"
+   ],
+   "region": "antipolo",
+   "bbox": [
+    121.166,
+    14.588,
+    121.186,
+    14.604
+   ],
+   "wave": 0
+  },
+  {
+   "id": "antipolo-university-belt",
+   "name": "Antipolo university belt",
+   "cities": [
+    "Antipolo"
+   ],
+   "region": "antipolo",
+   "bbox": [
+    121.176,
+    14.566,
+    121.196,
+    14.582
+   ],
+   "wave": 0
+  },
+  {
+   "id": "antipolo-downtown",
+   "name": "Antipolo downtown",
+   "cities": [
+    "Antipolo"
+   ],
+   "region": "antipolo",
+   "bbox": [
+    121.168,
+    14.576,
+    121.188,
+    14.592
+   ],
+   "wave": 0
+  },
+  {
+   "id": "lucena-university-belt",
+   "name": "Lucena university belt",
+   "cities": [
+    "Lucena"
+   ],
+   "region": "lucena",
+   "bbox": [
+    121.598,
+    13.932,
+    121.618,
+    13.948
+   ],
+   "wave": 0
+  },
+  {
+   "id": "lucena-downtown",
+   "name": "Lucena downtown",
+   "cities": [
+    "Lucena"
+   ],
+   "region": "lucena",
+   "bbox": [
+    121.61,
+    13.926,
+    121.63,
+    13.942
+   ],
+   "wave": 0
+  },
+  {
+   "id": "naga-mall-transit-hub",
+   "name": "Naga mall and transit hub",
+   "cities": [
+    "Naga"
+   ],
+   "region": "naga",
+   "bbox": [
+    123.196,
+    13.616,
+    123.216,
+    13.632
+   ],
+   "wave": 0
+  },
+  {
+   "id": "naga-university-belt",
+   "name": "Naga university belt",
+   "cities": [
+    "Naga"
+   ],
+   "region": "naga",
+   "bbox": [
+    123.184,
+    13.63,
+    123.204,
+    13.646
+   ],
+   "wave": 0
+  },
+  {
+   "id": "naga-downtown",
+   "name": "Naga downtown",
+   "cities": [
+    "Naga"
+   ],
+   "region": "naga",
+   "bbox": [
+    123.18,
+    13.618,
+    123.2,
+    13.634
+   ],
+   "wave": 0
+  },
+  {
+   "id": "legazpi-mall-transit-hub",
+   "name": "Legazpi mall and transit hub",
+   "cities": [
+    "Legazpi"
+   ],
+   "region": "legazpi",
+   "bbox": [
+    123.72,
+    13.132,
+    123.74,
+    13.148
+   ],
+   "wave": 0
+  },
+  {
+   "id": "legazpi-university-belt",
+   "name": "Legazpi university belt",
+   "cities": [
+    "Legazpi"
+   ],
+   "region": "legazpi",
+   "bbox": [
+    123.71,
+    13.142,
+    123.73,
+    13.158
+   ],
+   "wave": 0
+  },
+  {
+   "id": "legazpi-downtown",
+   "name": "Legazpi downtown",
+   "cities": [
+    "Legazpi"
+   ],
+   "region": "legazpi",
+   "bbox": [
+    123.734,
+    13.138,
+    123.754,
+    13.154
+   ],
+   "wave": 0
+  },
+  {
+   "id": "calapan-downtown",
+   "name": "Calapan downtown",
+   "cities": [
+    "Calapan"
+   ],
+   "region": "calapan",
+   "bbox": [
+    121.168,
+    13.4,
+    121.188,
+    13.416
+   ],
+   "wave": 0
+  },
+  {
+   "id": "puerto-princesa-downtown",
+   "name": "Puerto Princesa downtown",
+   "cities": [
+    "Puerto Princesa"
+   ],
+   "region": "puerto-princesa",
+   "bbox": [
+    118.728,
+    9.732,
+    118.748,
+    9.748
+   ],
+   "wave": 0
+  }
+ ]
+}

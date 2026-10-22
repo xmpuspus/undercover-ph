@@ -204,6 +204,8 @@ def _root_run():
     if (
         not (ROOT_DATA / "READY.shade").exists()
         or not (ROOT_DATA / "shade.bin").exists()
+        # The root Makati files left git on 2026-10-22; a checkout can keep stale shade files without them.
+        or not (ROOT_DATA / "graph.json").exists()
     ):
         pytest.skip("no finished root Makati run")
     dates = json.loads((ROOT_DATA / "manifest.json").read_text())["dates"]

@@ -17,8 +17,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import shapely  # noqa: E402
 
-from ctx import (AREA, BUILDING_BBOX, BUILDINGS, GRAPH_BBOX, OSM_EXTRACT, OUT, PILOT_BBOX, TEMPLATE,  # noqa: E402
-                 WORK, write_json)
+from ctx import (AREA, BUILDING_BBOX, BUILDINGS, GRAPH_BBOX, OSM_EXTRACT, OUT, PILOT_BBOX, REGION_TEMPLATE,  # noqa: E402
+                 TEMPLATE, WORK, write_json)
 from pedestrian_access import PEDESTRIAN  # noqa: E402
 
 MANILA = timezone(timedelta(hours=8))
@@ -152,6 +152,8 @@ def main():
                                      "graph_bbox": d.graph_bbox} for d in AREA.members]},
         "graph_rects": GRAPH_BBOX.rects,
     }
+    if REGION_TEMPLATE:  # areas outside Metro Manila only: fetch_weather.py picks the PAGASA page from it
+        template["region"] = REGION_TEMPLATE
     write_json(TEMPLATE, template, indent=1)
 
     union = shapely.union_all([shapely.box(*r) for r in GRAPH_BBOX.rects])

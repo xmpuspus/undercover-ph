@@ -60,3 +60,6 @@ qa/
 app/spike/
 .claude/
 *.log
+
+# Scout intermediates (rebuilt by pipeline/regions/scout/extract.py)
+pipeline/regions/scout/cache/

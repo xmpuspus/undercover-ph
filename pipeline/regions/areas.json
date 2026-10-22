@@ -1,0 +1,2122 @@
+{
+ "note": "Routing areas outside Metro Manila, in the shape of pipeline/areas.json plus a region. Each area routes across the union of its member districts' graph areas (district bbox + 500 m). A district id alone also builds a one-district area.",
+ "areas": [
+  {
+   "id": "cebu-city-centre",
+   "name": "Cebu City",
+   "region": "cebu",
+   "districts": [
+    "cebu-city-centre",
+    "cebu-city-mall-transit-hub"
+   ],
+   "cities": [
+    "Cebu City"
+   ],
+   "wave": 3,
+   "bbox": [
+    123.864,
+    10.291,
+    123.912,
+    10.334
+   ],
+   "graph_bbox": [
+    123.8594,
+    10.2865,
+    123.9166,
+    10.3385
+   ],
+   "graph_rects": [
+    [
+     123.8844,
+     10.2865,
+     123.9166,
+     10.3385
+    ],
+    [
+     123.8594,
+     10.2915,
+     123.8886,
+     10.3165
+    ]
+   ]
+  },
+  {
+   "id": "baguio-centre",
+   "name": "Baguio centre",
+   "region": "baguio",
+   "districts": [
+    "baguio-mall-transit-hub",
+    "baguio-university-belt",
+    "baguio-downtown"
+   ],
+   "cities": [
+    "Baguio"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.578,
+    16.402,
+    120.614,
+    16.428
+   ],
+   "graph_bbox": [
+    120.5733,
+    16.3975,
+    120.6187,
+    16.4325
+   ],
+   "graph_rects": [
+    [
+     120.5893,
+     16.4075,
+     120.6187,
+     16.4325
+    ],
+    [
+     120.5733,
+     16.4075,
+     120.6027,
+     16.4325
+    ],
+    [
+     120.5813,
+     16.3975,
+     120.6107,
+     16.4225
+    ]
+   ]
+  },
+  {
+   "id": "angeles-centre",
+   "name": "Angeles and Clark centre",
+   "region": "angeles",
+   "districts": [
+    "angeles-mall-transit-hub",
+    "angeles-downtown",
+    "angeles-university-belt"
+   ],
+   "cities": [
+    "Angeles and Clark"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.574,
+    15.132,
+    120.602,
+    15.18
+   ],
+   "graph_bbox": [
+    120.5693,
+    15.1275,
+    120.6067,
+    15.1845
+   ],
+   "graph_rects": [
+    [
+     120.5693,
+     15.1495,
+     120.5987,
+     15.1745
+    ],
+    [
+     120.5773,
+     15.1595,
+     120.6067,
+     15.1845
+    ],
+    [
+     120.5733,
+     15.1275,
+     120.6027,
+     15.1525
+    ]
+   ]
+  },
+  {
+   "id": "san-fernando-pampanga-centre",
+   "name": "San Fernando (Pampanga) centre",
+   "region": "san-fernando-pampanga",
+   "districts": [
+    "san-fernando-pampanga-mall-transit-hub",
+    "san-fernando-pampanga-university-belt",
+    "san-fernando-pampanga-downtown"
+   ],
+   "cities": [
+    "San Fernando (Pampanga)"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.674,
+    15.02,
+    120.706,
+    15.048
+   ],
+   "graph_bbox": [
+    120.6693,
+    15.0155,
+    120.7107,
+    15.0525
+   ],
+   "graph_rects": [
+    [
+     120.6813,
+     15.0215,
+     120.7107,
+     15.0465
+    ],
+    [
+     120.6693,
+     15.0275,
+     120.6987,
+     15.0525
+    ],
+    [
+     120.6693,
+     15.0155,
+     120.6987,
+     15.0405
+    ]
+   ]
+  },
+  {
+   "id": "olongapo-centre",
+   "name": "Olongapo and Subic centre",
+   "region": "olongapo",
+   "districts": [
+    "olongapo-university-belt",
+    "olongapo-downtown"
+   ],
+   "cities": [
+    "Olongapo and Subic"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.272,
+    14.818,
+    120.292,
+    14.846
+   ],
+   "graph_bbox": [
+    120.2674,
+    14.8135,
+    120.2966,
+    14.8505
+   ],
+   "graph_rects": [
+    [
+     120.2674,
+     14.8255,
+     120.2966,
+     14.8505
+    ],
+    [
+     120.2674,
+     14.8135,
+     120.2966,
+     14.8385
+    ]
+   ]
+  },
+  {
+   "id": "malolos-centre",
+   "name": "Malolos centre",
+   "region": "malolos",
+   "districts": [
+    "malolos-mall-transit-hub",
+    "malolos-downtown"
+   ],
+   "cities": [
+    "Malolos"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.804,
+    14.834,
+    120.824,
+    14.862
+   ],
+   "graph_bbox": [
+    120.7994,
+    14.8295,
+    120.8286,
+    14.8665
+   ],
+   "graph_rects": [
+    [
+     120.7994,
+     14.8295,
+     120.8286,
+     14.8545
+    ],
+    [
+     120.7994,
+     14.8415,
+     120.8286,
+     14.8665
+    ]
+   ]
+  },
+  {
+   "id": "baliwag-centre",
+   "name": "Baliwag centre",
+   "region": "baliwag",
+   "districts": [
+    "baliwag-university-belt",
+    "baliwag-downtown"
+   ],
+   "cities": [
+    "Baliwag"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.876,
+    14.944,
+    120.908,
+    14.966
+   ],
+   "graph_bbox": [
+    120.8714,
+    14.9395,
+    120.9126,
+    14.9705
+   ],
+   "graph_rects": [
+    [
+     120.8714,
+     14.9395,
+     120.9006,
+     14.9645
+    ],
+    [
+     120.8834,
+     14.9455,
+     120.9126,
+     14.9705
+    ]
+   ]
+  },
+  {
+   "id": "tarlac-centre",
+   "name": "Tarlac City centre",
+   "region": "tarlac",
+   "districts": [
+    "tarlac-city-mall-transit-hub",
+    "tarlac-city-downtown"
+   ],
+   "cities": [
+    "Tarlac City"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.582,
+    15.474,
+    120.606,
+    15.502
+   ],
+   "graph_bbox": [
+    120.5773,
+    15.4695,
+    120.6107,
+    15.5065
+   ],
+   "graph_rects": [
+    [
+     120.5813,
+     15.4815,
+     120.6107,
+     15.5065
+    ],
+    [
+     120.5773,
+     15.4695,
+     120.6067,
+     15.4945
+    ]
+   ]
+  },
+  {
+   "id": "balanga-centre",
+   "name": "Balanga centre",
+   "region": "balanga",
+   "districts": [
+    "balanga-university-belt",
+    "balanga-downtown"
+   ],
+   "cities": [
+    "Balanga"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.518,
+    14.664,
+    120.55,
+    14.686
+   ],
+   "graph_bbox": [
+    120.5134,
+    14.6595,
+    120.5546,
+    14.6905
+   ],
+   "graph_rects": [
+    [
+     120.5134,
+     14.6595,
+     120.5426,
+     14.6845
+    ],
+    [
+     120.5254,
+     14.6655,
+     120.5546,
+     14.6905
+    ]
+   ]
+  },
+  {
+   "id": "cabanatuan-centre",
+   "name": "Cabanatuan centre",
+   "region": "cabanatuan",
+   "districts": [
+    "cabanatuan-mall-transit-hub",
+    "cabanatuan-university-belt",
+    "cabanatuan-downtown"
+   ],
+   "cities": [
+    "Cabanatuan"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.948,
+    15.47,
+    120.984,
+    15.506
+   ],
+   "graph_bbox": [
+    120.9433,
+    15.4655,
+    120.9887,
+    15.5105
+   ],
+   "graph_rects": [
+    [
+     120.9593,
+     15.4855,
+     120.9887,
+     15.5105
+    ],
+    [
+     120.9433,
+     15.4655,
+     120.9727,
+     15.4905
+    ],
+    [
+     120.9553,
+     15.4735,
+     120.9847,
+     15.4985
+    ]
+   ]
+  },
+  {
+   "id": "dagupan-centre",
+   "name": "Dagupan centre",
+   "region": "dagupan",
+   "districts": [
+    "dagupan-downtown"
+   ],
+   "cities": [
+    "Dagupan"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.328,
+    16.032,
+    120.348,
+    16.048
+   ],
+   "graph_bbox": [
+    120.3233,
+    16.0275,
+    120.3527,
+    16.0525
+   ],
+   "graph_rects": [
+    [
+     120.3233,
+     16.0275,
+     120.3527,
+     16.0525
+    ]
+   ]
+  },
+  {
+   "id": "vigan-centre",
+   "name": "Vigan centre",
+   "region": "vigan",
+   "districts": [
+    "vigan-downtown"
+   ],
+   "cities": [
+    "Vigan"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.378,
+    17.568,
+    120.398,
+    17.584
+   ],
+   "graph_bbox": [
+    120.3733,
+    17.5635,
+    120.4027,
+    17.5885
+   ],
+   "graph_rects": [
+    [
+     120.3733,
+     17.5635,
+     120.4027,
+     17.5885
+    ]
+   ]
+  },
+  {
+   "id": "laoag-centre",
+   "name": "Laoag centre",
+   "region": "laoag",
+   "districts": [
+    "laoag-downtown"
+   ],
+   "cities": [
+    "Laoag"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.584,
+    18.192,
+    120.604,
+    18.208
+   ],
+   "graph_bbox": [
+    120.5793,
+    18.1875,
+    120.6087,
+    18.2125
+   ],
+   "graph_rects": [
+    [
+     120.5793,
+     18.1875,
+     120.6087,
+     18.2125
+    ]
+   ]
+  },
+  {
+   "id": "tuguegarao-centre",
+   "name": "Tuguegarao centre",
+   "region": "tuguegarao",
+   "districts": [
+    "tuguegarao-university-belt",
+    "tuguegarao-downtown"
+   ],
+   "cities": [
+    "Tuguegarao"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.712,
+    17.61,
+    121.74,
+    17.636
+   ],
+   "graph_bbox": [
+    121.7073,
+    17.6055,
+    121.7447,
+    17.6405
+   ],
+   "graph_rects": [
+    [
+     121.7153,
+     17.6155,
+     121.7447,
+     17.6405
+    ],
+    [
+     121.7073,
+     17.6055,
+     121.7367,
+     17.6305
+    ]
+   ]
+  },
+  {
+   "id": "davao-city-centre",
+   "name": "Davao City centre",
+   "region": "davao-city",
+   "districts": [
+    "davao-city-downtown",
+    "davao-city-university-belt",
+    "davao-city-mall-transit-hub"
+   ],
+   "cities": [
+    "Davao City"
+   ],
+   "wave": 0,
+   "bbox": [
+    125.594,
+    7.056,
+    125.624,
+    7.092
+   ],
+   "graph_bbox": [
+    125.5895,
+    7.0515,
+    125.6285,
+    7.0965
+   ],
+   "graph_rects": [
+    [
+     125.5995,
+     7.0595,
+     125.6285,
+     7.0845
+    ],
+    [
+     125.5895,
+     7.0515,
+     125.6185,
+     7.0765
+    ],
+    [
+     125.5975,
+     7.0715,
+     125.6265,
+     7.0965
+    ]
+   ]
+  },
+  {
+   "id": "digos-centre",
+   "name": "Digos centre",
+   "region": "digos",
+   "districts": [
+    "digos-downtown",
+    "digos-mall-transit-hub"
+   ],
+   "cities": [
+    "Digos"
+   ],
+   "wave": 0,
+   "bbox": [
+    125.336,
+    6.742,
+    125.364,
+    6.768
+   ],
+   "graph_bbox": [
+    125.3315,
+    6.7375,
+    125.3685,
+    6.7725
+   ],
+   "graph_rects": [
+    [
+     125.3395,
+     6.7375,
+     125.3685,
+     6.7625
+    ],
+    [
+     125.3315,
+     6.7475,
+     125.3605,
+     6.7725
+    ]
+   ]
+  },
+  {
+   "id": "tagum-centre",
+   "name": "Tagum centre",
+   "region": "tagum",
+   "districts": [
+    "tagum-downtown",
+    "tagum-mall-transit-hub",
+    "tagum-university-belt"
+   ],
+   "cities": [
+    "Tagum"
+   ],
+   "wave": 0,
+   "bbox": [
+    125.784,
+    7.432,
+    125.818,
+    7.464
+   ],
+   "graph_bbox": [
+    125.7795,
+    7.4275,
+    125.8225,
+    7.4685
+   ],
+   "graph_rects": [
+    [
+     125.7935,
+     7.4395,
+     125.8225,
+     7.4645
+    ],
+    [
+     125.7795,
+     7.4435,
+     125.8085,
+     7.4685
+    ],
+    [
+     125.7915,
+     7.4275,
+     125.8205,
+     7.4525
+    ]
+   ]
+  },
+  {
+   "id": "cagayan-de-oro-centre",
+   "name": "Cagayan de Oro centre",
+   "region": "cagayan-de-oro",
+   "districts": [
+    "cagayan-de-oro-downtown",
+    "cagayan-de-oro-university-belt",
+    "cagayan-de-oro-mall-transit-hub"
+   ],
+   "cities": [
+    "Cagayan de Oro"
+   ],
+   "wave": 0,
+   "bbox": [
+    124.628,
+    8.462,
+    124.662,
+    8.49
+   ],
+   "graph_bbox": [
+    124.6235,
+    8.4575,
+    124.6665,
+    8.4945
+   ],
+   "graph_rects": [
+    [
+     124.6335,
+     8.4695,
+     124.6625,
+     8.4945
+    ],
+    [
+     124.6235,
+     8.4615,
+     124.6525,
+     8.4865
+    ],
+    [
+     124.6375,
+     8.4575,
+     124.6665,
+     8.4825
+    ]
+   ]
+  },
+  {
+   "id": "iligan-centre",
+   "name": "Iligan centre",
+   "region": "iligan",
+   "districts": [
+    "iligan-downtown",
+    "iligan-university-belt",
+    "iligan-mall-transit-hub"
+   ],
+   "cities": [
+    "Iligan"
+   ],
+   "wave": 0,
+   "bbox": [
+    124.228,
+    8.214,
+    124.262,
+    8.252
+   ],
+   "graph_bbox": [
+    124.2235,
+    8.2095,
+    124.2665,
+    8.2565
+   ],
+   "graph_rects": [
+    [
+     124.2375,
+     8.2315,
+     124.2665,
+     8.2565
+    ],
+    [
+     124.2315,
+     8.2195,
+     124.2605,
+     8.2445
+    ],
+    [
+     124.2235,
+     8.2095,
+     124.2525,
+     8.2345
+    ]
+   ]
+  },
+  {
+   "id": "zamboanga-city-centre",
+   "name": "Zamboanga City centre",
+   "region": "zamboanga-city",
+   "districts": [
+    "zamboanga-city-downtown",
+    "zamboanga-city-university-belt",
+    "zamboanga-city-mall-transit-hub"
+   ],
+   "cities": [
+    "Zamboanga City"
+   ],
+   "wave": 0,
+   "bbox": [
+    122.056,
+    6.902,
+    122.09,
+    6.93
+   ],
+   "graph_bbox": [
+    122.0515,
+    6.8975,
+    122.0945,
+    6.9345
+   ],
+   "graph_rects": [
+    [
+     122.0655,
+     6.8975,
+     122.0945,
+     6.9225
+    ],
+    [
+     122.0635,
+     6.9095,
+     122.0925,
+     6.9345
+    ],
+    [
+     122.0515,
+     6.9015,
+     122.0805,
+     6.9265
+    ]
+   ]
+  },
+  {
+   "id": "pagadian-downtown",
+   "name": "Pagadian downtown",
+   "region": "pagadian",
+   "districts": [
+    "pagadian-downtown"
+   ],
+   "cities": [
+    "Pagadian"
+   ],
+   "wave": 0,
+   "bbox": [
+    123.426,
+    7.818,
+    123.446,
+    7.834
+   ],
+   "graph_bbox": [
+    123.4215,
+    7.8135,
+    123.4505,
+    7.8385
+   ],
+   "graph_rects": [
+    [
+     123.4215,
+     7.8135,
+     123.4505,
+     7.8385
+    ]
+   ]
+  },
+  {
+   "id": "dipolog-downtown",
+   "name": "Dipolog downtown",
+   "region": "dipolog",
+   "districts": [
+    "dipolog-downtown"
+   ],
+   "cities": [
+    "Dipolog"
+   ],
+   "wave": 0,
+   "bbox": [
+    123.334,
+    8.574,
+    123.354,
+    8.59
+   ],
+   "graph_bbox": [
+    123.3295,
+    8.5695,
+    123.3585,
+    8.5945
+   ],
+   "graph_rects": [
+    [
+     123.3295,
+     8.5695,
+     123.3585,
+     8.5945
+    ]
+   ]
+  },
+  {
+   "id": "general-santos-centre",
+   "name": "General Santos centre",
+   "region": "general-santos",
+   "districts": [
+    "general-santos-downtown",
+    "general-santos-university-belt"
+   ],
+   "cities": [
+    "General Santos"
+   ],
+   "wave": 0,
+   "bbox": [
+    125.156,
+    6.106,
+    125.188,
+    6.128
+   ],
+   "graph_bbox": [
+    125.1515,
+    6.1015,
+    125.1925,
+    6.1325
+   ],
+   "graph_rects": [
+    [
+     125.1635,
+     6.1015,
+     125.1925,
+     6.1265
+    ],
+    [
+     125.1515,
+     6.1075,
+     125.1805,
+     6.1325
+    ]
+   ]
+  },
+  {
+   "id": "koronadal-centre",
+   "name": "Koronadal centre",
+   "region": "koronadal",
+   "districts": [
+    "koronadal-downtown",
+    "koronadal-mall-transit-hub",
+    "koronadal-university-belt"
+   ],
+   "cities": [
+    "Koronadal"
+   ],
+   "wave": 0,
+   "bbox": [
+    124.826,
+    6.484,
+    124.866,
+    6.516
+   ],
+   "graph_bbox": [
+    124.8215,
+    6.4795,
+    124.8705,
+    6.5205
+   ],
+   "graph_rects": [
+    [
+     124.8295,
+     6.4855,
+     124.8585,
+     6.5105
+    ],
+    [
+     124.8215,
+     6.4955,
+     124.8505,
+     6.5205
+    ],
+    [
+     124.8415,
+     6.4795,
+     124.8705,
+     6.5045
+    ]
+   ]
+  },
+  {
+   "id": "cotabato-city-centre",
+   "name": "Cotabato City centre",
+   "region": "cotabato-city",
+   "districts": [
+    "cotabato-city-university-belt",
+    "cotabato-city-downtown"
+   ],
+   "cities": [
+    "Cotabato City"
+   ],
+   "wave": 0,
+   "bbox": [
+    124.23,
+    7.196,
+    124.256,
+    7.226
+   ],
+   "graph_bbox": [
+    124.2255,
+    7.1915,
+    124.2605,
+    7.2305
+   ],
+   "graph_rects": [
+    [
+     124.2255,
+     7.1915,
+     124.2545,
+     7.2165
+    ],
+    [
+     124.2315,
+     7.2055,
+     124.2605,
+     7.2305
+    ]
+   ]
+  },
+  {
+   "id": "butuan-centre",
+   "name": "Butuan centre",
+   "region": "butuan",
+   "districts": [
+    "butuan-downtown",
+    "butuan-university-belt"
+   ],
+   "cities": [
+    "Butuan"
+   ],
+   "wave": 0,
+   "bbox": [
+    125.524,
+    8.938,
+    125.554,
+    8.962
+   ],
+   "graph_bbox": [
+    125.5195,
+    8.9335,
+    125.5585,
+    8.9665
+   ],
+   "graph_rects": [
+    [
+     125.5195,
+     8.9335,
+     125.5485,
+     8.9585
+    ],
+    [
+     125.5295,
+     8.9415,
+     125.5585,
+     8.9665
+    ]
+   ]
+  },
+  {
+   "id": "surigao-downtown",
+   "name": "Surigao downtown",
+   "region": "surigao",
+   "districts": [
+    "surigao-downtown"
+   ],
+   "cities": [
+    "Surigao"
+   ],
+   "wave": 0,
+   "bbox": [
+    125.482,
+    9.776,
+    125.502,
+    9.792
+   ],
+   "graph_bbox": [
+    125.4774,
+    9.7715,
+    125.5066,
+    9.7965
+   ],
+   "graph_rects": [
+    [
+     125.4774,
+     9.7715,
+     125.5066,
+     9.7965
+    ]
+   ]
+  },
+  {
+   "id": "mandaue",
+   "name": "Mandaue",
+   "region": "cebu",
+   "districts": [
+    "mandaue-downtown",
+    "mandaue-university-belt",
+    "mandaue-mall-transit-hub"
+   ],
+   "cities": [
+    "Mandaue"
+   ],
+   "wave": 3,
+   "bbox": [
+    123.9,
+    10.302,
+    123.948,
+    10.336
+   ],
+   "graph_bbox": [
+    123.8954,
+    10.2975,
+    123.9526,
+    10.3405
+   ],
+   "graph_rects": [
+    [
+     123.8954,
+     10.3095,
+     123.9246,
+     10.3345
+    ],
+    [
+     123.9234,
+     10.3155,
+     123.9526,
+     10.3405
+    ],
+    [
+     123.9014,
+     10.2975,
+     123.9306,
+     10.3225
+    ]
+   ]
+  },
+  {
+   "id": "lapu-lapu",
+   "name": "Lapu-Lapu",
+   "region": "cebu",
+   "districts": [
+    "lapu-lapu-downtown",
+    "lapu-lapu-university-belt",
+    "lapu-lapu-mall-transit-hub"
+   ],
+   "cities": [
+    "Lapu-Lapu"
+   ],
+   "wave": 3,
+   "bbox": [
+    123.916,
+    10.298,
+    123.964,
+    10.348
+   ],
+   "graph_bbox": [
+    123.9114,
+    10.2935,
+    123.9686,
+    10.3525
+   ],
+   "graph_rects": [
+    [
+     123.9114,
+     10.3075,
+     123.9406,
+     10.3325
+    ],
+    [
+     123.9254,
+     10.3275,
+     123.9546,
+     10.3525
+    ],
+    [
+     123.9394,
+     10.2935,
+     123.9686,
+     10.3185
+    ]
+   ]
+  },
+  {
+   "id": "iloilo-city",
+   "name": "Iloilo City",
+   "region": "iloilo",
+   "districts": [
+    "iloilo-city-downtown",
+    "iloilo-city-university-belt",
+    "iloilo-city-mall-transit-hub"
+   ],
+   "cities": [
+    "Iloilo City"
+   ],
+   "wave": 3,
+   "bbox": [
+    122.542,
+    10.692,
+    122.574,
+    10.734
+   ],
+   "graph_bbox": [
+    122.5374,
+    10.6875,
+    122.5786,
+    10.7385
+   ],
+   "graph_rects": [
+    [
+     122.5494,
+     10.6875,
+     122.5786,
+     10.7125
+    ],
+    [
+     122.5374,
+     10.7015,
+     122.5666,
+     10.7265
+    ],
+    [
+     122.5414,
+     10.7135,
+     122.5706,
+     10.7385
+    ]
+   ]
+  },
+  {
+   "id": "bacolod",
+   "name": "Bacolod",
+   "region": "bacolod",
+   "districts": [
+    "bacolod-downtown",
+    "bacolod-university-belt",
+    "bacolod-mall-transit-hub"
+   ],
+   "cities": [
+    "Bacolod"
+   ],
+   "wave": 3,
+   "bbox": [
+    122.942,
+    10.654,
+    122.974,
+    10.688
+   ],
+   "graph_bbox": [
+    122.9374,
+    10.6495,
+    122.9786,
+    10.6925
+   ],
+   "graph_rects": [
+    [
+     122.9374,
+     10.6575,
+     122.9666,
+     10.6825
+    ],
+    [
+     122.9454,
+     10.6675,
+     122.9746,
+     10.6925
+    ],
+    [
+     122.9494,
+     10.6495,
+     122.9786,
+     10.6745
+    ]
+   ]
+  },
+  {
+   "id": "talisay-negros",
+   "name": "Talisay (Negros Occidental)",
+   "region": "bacolod",
+   "districts": [
+    "talisay-negros-downtown"
+   ],
+   "cities": [
+    "Talisay (Negros Occidental)"
+   ],
+   "wave": 3,
+   "bbox": [
+    122.964,
+    10.734,
+    122.984,
+    10.75
+   ],
+   "graph_bbox": [
+    122.9594,
+    10.7295,
+    122.9886,
+    10.7545
+   ],
+   "graph_rects": [
+    [
+     122.9594,
+     10.7295,
+     122.9886,
+     10.7545
+    ]
+   ]
+  },
+  {
+   "id": "dumaguete",
+   "name": "Dumaguete",
+   "region": "dumaguete",
+   "districts": [
+    "dumaguete-downtown",
+    "dumaguete-university-belt",
+    "dumaguete-mall-transit-hub"
+   ],
+   "cities": [
+    "Dumaguete"
+   ],
+   "wave": 3,
+   "bbox": [
+    123.288,
+    9.292,
+    123.312,
+    9.332
+   ],
+   "graph_bbox": [
+    123.2834,
+    9.2875,
+    123.3166,
+    9.3365
+   ],
+   "graph_rects": [
+    [
+     123.2854,
+     9.2995,
+     123.3146,
+     9.3245
+    ],
+    [
+     123.2834,
+     9.3115,
+     123.3126,
+     9.3365
+    ],
+    [
+     123.2874,
+     9.2875,
+     123.3166,
+     9.3125
+    ]
+   ]
+  },
+  {
+   "id": "tagbilaran",
+   "name": "Tagbilaran",
+   "region": "tagbilaran",
+   "districts": [
+    "tagbilaran-downtown"
+   ],
+   "cities": [
+    "Tagbilaran"
+   ],
+   "wave": 3,
+   "bbox": [
+    123.852,
+    9.64,
+    123.872,
+    9.656
+   ],
+   "graph_bbox": [
+    123.8474,
+    9.6355,
+    123.8766,
+    9.6605
+   ],
+   "graph_rects": [
+    [
+     123.8474,
+     9.6355,
+     123.8766,
+     9.6605
+    ]
+   ]
+  },
+  {
+   "id": "tacloban-downtown",
+   "name": "Tacloban downtown",
+   "region": "tacloban",
+   "districts": [
+    "tacloban-downtown"
+   ],
+   "cities": [
+    "Tacloban"
+   ],
+   "wave": 3,
+   "bbox": [
+    124.988,
+    11.234,
+    125.008,
+    11.25
+   ],
+   "graph_bbox": [
+    124.9834,
+    11.2295,
+    125.0126,
+    11.2545
+   ],
+   "graph_rects": [
+    [
+     124.9834,
+     11.2295,
+     125.0126,
+     11.2545
+    ]
+   ]
+  },
+  {
+   "id": "tacloban-university-belt",
+   "name": "Tacloban university belt",
+   "region": "tacloban",
+   "districts": [
+    "tacloban-university-belt"
+   ],
+   "cities": [
+    "Tacloban"
+   ],
+   "wave": 3,
+   "bbox": [
+    124.994,
+    11.206,
+    125.014,
+    11.222
+   ],
+   "graph_bbox": [
+    124.9894,
+    11.2015,
+    125.0186,
+    11.2265
+   ],
+   "graph_rects": [
+    [
+     124.9894,
+     11.2015,
+     125.0186,
+     11.2265
+    ]
+   ]
+  },
+  {
+   "id": "ormoc",
+   "name": "Ormoc",
+   "region": "ormoc",
+   "districts": [
+    "ormoc-downtown"
+   ],
+   "cities": [
+    "Ormoc"
+   ],
+   "wave": 3,
+   "bbox": [
+    124.598,
+    11.004,
+    124.618,
+    11.02
+   ],
+   "graph_bbox": [
+    124.5934,
+    10.9995,
+    124.6226,
+    11.0245
+   ],
+   "graph_rects": [
+    [
+     124.5934,
+     10.9995,
+     124.6226,
+     11.0245
+    ]
+   ]
+  },
+  {
+   "id": "roxas-city",
+   "name": "Roxas City",
+   "region": "roxas",
+   "districts": [
+    "roxas-city-downtown"
+   ],
+   "cities": [
+    "Roxas City"
+   ],
+   "wave": 3,
+   "bbox": [
+    122.744,
+    11.574,
+    122.764,
+    11.59
+   ],
+   "graph_bbox": [
+    122.7394,
+    11.5695,
+    122.7686,
+    11.5945
+   ],
+   "graph_rects": [
+    [
+     122.7394,
+     11.5695,
+     122.7686,
+     11.5945
+    ]
+   ]
+  },
+  {
+   "id": "kalibo",
+   "name": "Kalibo",
+   "region": "kalibo",
+   "districts": [
+    "kalibo-downtown",
+    "kalibo-university-belt"
+   ],
+   "cities": [
+    "Kalibo"
+   ],
+   "wave": 3,
+   "bbox": [
+    122.348,
+    11.698,
+    122.382,
+    11.72
+   ],
+   "graph_bbox": [
+    122.3434,
+    11.6935,
+    122.3866,
+    11.7245
+   ],
+   "graph_rects": [
+    [
+     122.3574,
+     11.6935,
+     122.3866,
+     11.7185
+    ],
+    [
+     122.3434,
+     11.6995,
+     122.3726,
+     11.7245
+    ]
+   ]
+  },
+  {
+   "id": "dasmarinas",
+   "name": "Dasmarinas centre",
+   "region": "cavite",
+   "districts": [
+    "dasmarinas-downtown",
+    "dasmarinas-university-belt",
+    "dasmarinas-mall-transit-hub"
+   ],
+   "cities": [
+    "Dasmarinas"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.93,
+    14.31,
+    120.976,
+    14.336
+   ],
+   "graph_bbox": [
+    120.9254,
+    14.3055,
+    120.9806,
+    14.3405
+   ],
+   "graph_rects": [
+    [
+     120.9514,
+     14.3055,
+     120.9806,
+     14.3305
+    ],
+    [
+     120.9394,
+     14.3155,
+     120.9686,
+     14.3405
+    ],
+    [
+     120.9254,
+     14.3115,
+     120.9546,
+     14.3365
+    ]
+   ]
+  },
+  {
+   "id": "tagaytay",
+   "name": "Tagaytay downtown",
+   "region": "cavite",
+   "districts": [
+    "tagaytay-downtown"
+   ],
+   "cities": [
+    "Tagaytay"
+   ],
+   "wave": 0,
+   "bbox": [
+    120.95,
+    14.112,
+    120.97,
+    14.128
+   ],
+   "graph_bbox": [
+    120.9454,
+    14.1075,
+    120.9746,
+    14.1325
+   ],
+   "graph_rects": [
+    [
+     120.9454,
+     14.1075,
+     120.9746,
+     14.1325
+    ]
+   ]
+  },
+  {
+   "id": "santa-rosa",
+   "name": "Santa Rosa and Biñan centre",
+   "region": "laguna",
+   "districts": [
+    "santa-rosa-downtown",
+    "santa-rosa-mall-transit-hub"
+   ],
+   "cities": [
+    "Santa Rosa",
+    "Biñan"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.076,
+    14.31,
+    121.114,
+    14.34
+   ],
+   "graph_bbox": [
+    121.0714,
+    14.3055,
+    121.1186,
+    14.3445
+   ],
+   "graph_rects": [
+    [
+     121.0714,
+     14.3195,
+     121.1006,
+     14.3445
+    ],
+    [
+     121.0894,
+     14.3055,
+     121.1186,
+     14.3305
+    ]
+   ]
+  },
+  {
+   "id": "calamba",
+   "name": "Calamba centre",
+   "region": "laguna",
+   "districts": [
+    "calamba-downtown",
+    "calamba-university-belt"
+   ],
+   "cities": [
+    "Calamba"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.148,
+    14.19,
+    121.17,
+    14.218
+   ],
+   "graph_bbox": [
+    121.1434,
+    14.1855,
+    121.1746,
+    14.2225
+   ],
+   "graph_rects": [
+    [
+     121.1454,
+     14.1975,
+     121.1746,
+     14.2225
+    ],
+    [
+     121.1434,
+     14.1855,
+     121.1726,
+     14.2105
+    ]
+   ]
+  },
+  {
+   "id": "los-banos",
+   "name": "Los Banos centre",
+   "region": "laguna",
+   "districts": [
+    "los-banos-downtown",
+    "los-banos-university-belt",
+    "los-banos-mall-transit-hub"
+   ],
+   "cities": [
+    "Los Banos"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.224,
+    14.152,
+    121.256,
+    14.182
+   ],
+   "graph_bbox": [
+    121.2194,
+    14.1475,
+    121.2606,
+    14.1865
+   ],
+   "graph_rects": [
+    [
+     121.2314,
+     14.1535,
+     121.2606,
+     14.1785
+    ],
+    [
+     121.2214,
+     14.1615,
+     121.2506,
+     14.1865
+    ],
+    [
+     121.2194,
+     14.1475,
+     121.2486,
+     14.1725
+    ]
+   ]
+  },
+  {
+   "id": "san-pablo",
+   "name": "San Pablo centre",
+   "region": "laguna",
+   "districts": [
+    "san-pablo-downtown",
+    "san-pablo-university-belt"
+   ],
+   "cities": [
+    "San Pablo"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.312,
+    14.056,
+    121.344,
+    14.078
+   ],
+   "graph_bbox": [
+    121.3074,
+    14.0515,
+    121.3486,
+    14.0825
+   ],
+   "graph_rects": [
+    [
+     121.3074,
+     14.0575,
+     121.3366,
+     14.0825
+    ],
+    [
+     121.3194,
+     14.0515,
+     121.3486,
+     14.0765
+    ]
+   ]
+  },
+  {
+   "id": "lipa",
+   "name": "Lipa centre",
+   "region": "batangas",
+   "districts": [
+    "lipa-downtown",
+    "lipa-university-belt",
+    "lipa-mall-transit-hub"
+   ],
+   "cities": [
+    "Lipa"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.148,
+    13.926,
+    121.182,
+    13.954
+   ],
+   "graph_bbox": [
+    121.1434,
+    13.9215,
+    121.1866,
+    13.9585
+   ],
+   "graph_rects": [
+    [
+     121.1434,
+     13.9295,
+     121.1726,
+     13.9545
+    ],
+    [
+     121.1574,
+     13.9335,
+     121.1866,
+     13.9585
+    ],
+    [
+     121.1554,
+     13.9215,
+     121.1846,
+     13.9465
+    ]
+   ]
+  },
+  {
+   "id": "batangas-city",
+   "name": "Batangas City centre",
+   "region": "batangas",
+   "districts": [
+    "batangas-city-downtown",
+    "batangas-city-university-belt",
+    "batangas-city-mall-transit-hub"
+   ],
+   "cities": [
+    "Batangas City"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.04,
+    13.744,
+    121.072,
+    13.772
+   ],
+   "graph_bbox": [
+    121.0354,
+    13.7395,
+    121.0766,
+    13.7765
+   ],
+   "graph_rects": [
+    [
+     121.0474,
+     13.7455,
+     121.0766,
+     13.7705
+    ],
+    [
+     121.0354,
+     13.7395,
+     121.0646,
+     13.7645
+    ],
+    [
+     121.0354,
+     13.7515,
+     121.0646,
+     13.7765
+    ]
+   ]
+  },
+  {
+   "id": "antipolo",
+   "name": "Antipolo centre",
+   "region": "antipolo",
+   "districts": [
+    "antipolo-downtown",
+    "antipolo-university-belt",
+    "antipolo-mall-transit-hub"
+   ],
+   "cities": [
+    "Antipolo"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.166,
+    14.566,
+    121.196,
+    14.604
+   ],
+   "graph_bbox": [
+    121.1614,
+    14.5615,
+    121.2006,
+    14.6085
+   ],
+   "graph_rects": [
+    [
+     121.1634,
+     14.5715,
+     121.1926,
+     14.5965
+    ],
+    [
+     121.1714,
+     14.5615,
+     121.2006,
+     14.5865
+    ],
+    [
+     121.1614,
+     14.5835,
+     121.1906,
+     14.6085
+    ]
+   ]
+  },
+  {
+   "id": "lucena",
+   "name": "Lucena centre",
+   "region": "lucena",
+   "districts": [
+    "lucena-downtown",
+    "lucena-university-belt"
+   ],
+   "cities": [
+    "Lucena"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.598,
+    13.926,
+    121.63,
+    13.948
+   ],
+   "graph_bbox": [
+    121.5934,
+    13.9215,
+    121.6346,
+    13.9525
+   ],
+   "graph_rects": [
+    [
+     121.6054,
+     13.9215,
+     121.6346,
+     13.9465
+    ],
+    [
+     121.5934,
+     13.9275,
+     121.6226,
+     13.9525
+    ]
+   ]
+  },
+  {
+   "id": "naga",
+   "name": "Naga centre",
+   "region": "naga",
+   "districts": [
+    "naga-downtown",
+    "naga-university-belt",
+    "naga-mall-transit-hub"
+   ],
+   "cities": [
+    "Naga"
+   ],
+   "wave": 0,
+   "bbox": [
+    123.18,
+    13.616,
+    123.216,
+    13.646
+   ],
+   "graph_bbox": [
+    123.1754,
+    13.6115,
+    123.2206,
+    13.6505
+   ],
+   "graph_rects": [
+    [
+     123.1754,
+     13.6135,
+     123.2046,
+     13.6385
+    ],
+    [
+     123.1794,
+     13.6255,
+     123.2086,
+     13.6505
+    ],
+    [
+     123.1914,
+     13.6115,
+     123.2206,
+     13.6365
+    ]
+   ]
+  },
+  {
+   "id": "legazpi",
+   "name": "Legazpi centre",
+   "region": "legazpi",
+   "districts": [
+    "legazpi-downtown",
+    "legazpi-university-belt",
+    "legazpi-mall-transit-hub"
+   ],
+   "cities": [
+    "Legazpi"
+   ],
+   "wave": 0,
+   "bbox": [
+    123.71,
+    13.132,
+    123.754,
+    13.158
+   ],
+   "graph_bbox": [
+    123.7054,
+    13.1275,
+    123.7586,
+    13.1625
+   ],
+   "graph_rects": [
+    [
+     123.7294,
+     13.1335,
+     123.7586,
+     13.1585
+    ],
+    [
+     123.7054,
+     13.1375,
+     123.7346,
+     13.1625
+    ],
+    [
+     123.7154,
+     13.1275,
+     123.7446,
+     13.1525
+    ]
+   ]
+  },
+  {
+   "id": "calapan",
+   "name": "Calapan downtown",
+   "region": "calapan",
+   "districts": [
+    "calapan-downtown"
+   ],
+   "cities": [
+    "Calapan"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.168,
+    13.4,
+    121.188,
+    13.416
+   ],
+   "graph_bbox": [
+    121.1634,
+    13.3955,
+    121.1926,
+    13.4205
+   ],
+   "graph_rects": [
+    [
+     121.1634,
+     13.3955,
+     121.1926,
+     13.4205
+    ]
+   ]
+  },
+  {
+   "id": "puerto-princesa",
+   "name": "Puerto Princesa downtown",
+   "region": "puerto-princesa",
+   "districts": [
+    "puerto-princesa-downtown"
+   ],
+   "cities": [
+    "Puerto Princesa"
+   ],
+   "wave": 0,
+   "bbox": [
+    118.728,
+    9.732,
+    118.748,
+    9.748
+   ],
+   "graph_bbox": [
+    118.7234,
+    9.7275,
+    118.7526,
+    9.7525
+   ],
+   "graph_rects": [
+    [
+     118.7234,
+     9.7275,
+     118.7526,
+     9.7525
+    ]
+   ]
+  }
+ ]
+}

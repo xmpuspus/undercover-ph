@@ -1,7 +1,7 @@
 """Build one or more routing areas into pipeline/stage/<area>/.
 
 Usage: pipeline/.venv/bin/python -I pipeline/districts/build.py [--checks] AREA_ID [AREA_ID ...]
-An AREA_ID is an id from pipeline/areas.json, or a district id from pipeline/districts.json for a
+An AREA_ID is an id from pipeline/areas.json or pipeline/regions/areas.json, or a district id for a
 one-district area. Any other id stops the build before it touches a path.
 Each step runs as its own process with UC_AREA set, so the copied scripts read that area's context.
 Every member district needs its Google window first (fetch_gob.py).
@@ -21,10 +21,14 @@ STEPS = ["extract_features.py", "build_hours.py", "build_buildings.py", "build_g
 
 
 def known_ids():
-    """Area ids from pipeline/areas.json and district ids from pipeline/districts.json."""
-    areas = [a["id"] for a in json.load(open(HERE.parent / "areas.json"))["areas"]]
-    districts = [d["id"] for d in json.load(open(HERE.parent / "districts.json"))["districts"]]
-    return set(areas) | set(districts)
+    """Area and district ids from pipeline/areas.json, districts.json and the region files beside them."""
+    ids = set()
+    for name, key in (("areas.json", "areas"), ("districts.json", "districts"), ("regions/areas.json", "areas"),
+                      ("regions/districts.json", "districts")):
+        path = HERE.parent / name
+        if path.exists():
+            ids |= {x["id"] for x in json.load(open(path))[key]}
+    return ids
 
 
 def run(area, script, *args):
