@@ -402,6 +402,13 @@ export default function MapView(p: Props) {
     });
     // Tests and the screenshot script wait for data-idle="1" before capturing.
     const el = box.current;
+    // MapLibre logs every failed tile fetch with console.error. A dropped basemap or 3D tile on a weak phone
+    // signal is routine: the map retries on the next move, and routing does not use these tiles.
+    map.on("error", (e) => {
+      const msg = e.error?.message ?? "";
+      if (/Failed to fetch|NetworkError|Load failed|AbortError/i.test(msg)) console.warn("map tile:", msg);
+      else console.error(e.error ?? e);
+    });
     map.on("load", () => {
       shownOnce.current.loaded = true;
       props.current.onLoaded();

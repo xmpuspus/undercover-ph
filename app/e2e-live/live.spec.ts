@@ -40,6 +40,11 @@ for (const [area, from, to] of TRIPS) {
       errors.push(`${args.join(" ")} @ ${m.location().url}`);
     });
     page.on("pageerror", (e) => errors.push(String(e)));
+    // The map logs a dropped tile only as a warning, so check the app's own data files by status instead.
+    const data: string[] = [];
+    page.on("response", (r) => {
+      if (/\/data\/(buildings|trees)\.pmtiles|\/shade\/.*\.bin\.gz|\/graph\.json/.test(r.url())) data.push(`${r.status()} ${r.url().split("/data/")[1]}`);
+    });
     await page.goto("/");
     await expect(page.getByTestId("pick-shade")).toBeEnabled({ timeout: 90_000 });
     await page.getByTestId("pick-shade").click();
@@ -60,10 +65,12 @@ for (const [area, from, to] of TRIPS) {
       await expect(page.getByTestId("map")).toHaveAttribute("data-idle", "1", { timeout: 90_000 }).catch(() => {});
     }
     await page.screenshot({ path: `${OUT}/${area}.png` });
-    const line = JSON.stringify({ area, from, to, result, url: page.url().split("#")[1] ?? "", errors });
+    const line = JSON.stringify({ area, from, to, result, url: page.url().split("#")[1] ?? "", errors, data: data.length });
     appendFileSync(`${OUT}/results.jsonl`, line + "\n");
     console.log(line);
     expect(result.startsWith("route:"), result).toBe(true);
     expect(errors, errors.join("\n")).toEqual([]);
+    expect(data.length, "no app data requests seen").toBeGreaterThan(0);
+    expect(data.filter((d) => !/^2\d\d /.test(d)), data.join("\n")).toEqual([]);
   });
 }
