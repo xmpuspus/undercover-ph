@@ -2,7 +2,7 @@ import { useRef } from "react";
 import type { DisplayRoute } from "../lib/display";
 import { fmtKm } from "../lib/time";
 import type { Mode } from "../types";
-import { ArrowRight, ListIcon, RainIcon, SunIcon } from "./Icons";
+import { AlertIcon, ArrowRight, ListIcon, RainIcon, SunIcon } from "./Icons";
 
 interface Props {
   d: DisplayRoute;
@@ -14,6 +14,21 @@ interface Props {
   onExpand: () => void;
   onSteps: () => void;
   onNavigate: () => void;
+}
+
+// A warning in a few words for the summary line. The full card keeps the whole sentence.
+function shortWarning(w: string): string {
+  const closes = /^(.*) closes at (\S+ [AP]M)/.exec(w);
+  if (closes) return `${closes[1]} closes ${closes[2]}`;
+  if (/no marked crossing/i.test(w)) return "unmarked crossing";
+  if (/unchecked access/i.test(w)) return "unchecked paths";
+  if (/^Uses stairs/i.test(w)) return "stairs";
+  if (/raised kerb/i.test(w)) return "raised kerb";
+  if (/Footbridge entrances/i.test(w)) return "footbridge stairs";
+  if (/underpass/i.test(w)) return "dim underpass";
+  if (/through a building/i.test(w)) return "through a building";
+  if (/estimated heights/i.test(w)) return "estimated heights";
+  return w.replace(/\.$/, "");
 }
 
 // The phone sheet at rest, as in map apps: which route, how covered, how long, and Navigate. The map keeps
@@ -65,6 +80,15 @@ export default function RoutePeek({ d, count, mode, night, head, onExpand, onSte
             )
           )}
         </button>
+        {/* Safety warnings (stairs, closing times, crossings) show before Navigate, not only in the full card. */}
+        {r.warnings.length > 0 && (
+          <button type="button" onClick={onExpand} className="mt-1.5 flex w-full items-start gap-1.5 text-left text-[13px] text-amber-900" data-testid="peek-warnings">
+            <AlertIcon size={14} className="mt-0.5 shrink-0" />
+            <span className="line-clamp-2">
+              {r.warnings.length === 1 ? "1 warning" : `${r.warnings.length} warnings`}: {r.warnings.map(shortWarning).join(" · ")}
+            </span>
+          </button>
+        )}
         <div className="mt-2.5 grid grid-cols-[auto_1fr] gap-2">
           <button type="button" onClick={onSteps} className="flex h-11 items-center gap-1.5 rounded-card border border-slate-200 px-3 text-[14px] text-ink hover:border-slate-300" data-testid="peek-steps">
             <ListIcon size={16} />

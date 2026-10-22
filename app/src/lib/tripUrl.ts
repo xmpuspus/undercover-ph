@@ -15,11 +15,17 @@ export interface TripParams {
   stepFree: boolean;
 }
 
-export type EndpointRef = { kind: "name"; name: string } | { kind: "node"; node: number } | { kind: "point"; lon: number; lat: number };
+export type EndpointRef =
+  | { kind: "name"; name: string; node?: number }
+  | { kind: "node"; node: number }
+  | { kind: "point"; lon: number; lat: number };
 
 const TRIP_KEYS = new Set(["start", "end", "date", "time", "mode", "step-free"]);
 const POINT = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
 const NODE = /^n(\d+)$/;
+// "Muji~n3557": a repeated name with the node that tells its copies apart. Several places can share one node,
+// so the name travels too.
+const NAMED_NODE = /^(.+)~n(\d+)$/;
 
 const round5 = (n: number) => String(Math.round(n * 1e5) / 1e5);
 export const MY_LOCATION = "My location";
@@ -30,13 +36,15 @@ export function encodeEndpoint(ep: { label: string; node: number; lon: number; l
   if (ep.label === MY_LOCATION) return null;
   if (ep.snap_m != null) return `${round5(ep.lon)},${round5(ep.lat)}`;
   const same = places.filter((p) => p.name.toLowerCase() === ep.label.toLowerCase()).length;
-  return same === 1 ? ep.label : `n${ep.node}`;
+  return same === 1 ? ep.label : `${ep.label}~n${ep.node}`;
 }
 
 export function decodeEndpoint(token: string | null): EndpointRef | null {
   if (!token) return null;
   const pt = POINT.exec(token);
   if (pt) return { kind: "point", lon: Number(pt[1]), lat: Number(pt[2]) };
+  const nn = NAMED_NODE.exec(token);
+  if (nn) return { kind: "name", name: nn[1], node: Number(nn[2]) };
   const nd = NODE.exec(token);
   if (nd) return { kind: "node", node: Number(nd[1]) };
   return { kind: "name", name: token };

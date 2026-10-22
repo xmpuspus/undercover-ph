@@ -104,7 +104,7 @@ function sides(data: Data, route: Route) {
 const routeSides = (data: Data, r: Result) => ({ state: r.state, sun: r.sun, notes: r.notes, routes: r.routes.map((x) => sides(data, x)) });
 
 describe.skipIf(!READY)("real Makati data", () => {
-  it("routes Ayala MRT Station to Greenbelt at 2026-10-22 15:00 and times 100 pairs", async () => {
+  it("routes Ayala MRT Station to Greenbelt at 15:00 on the second data date and times 100 pairs", async () => {
     const t0 = performance.now();
     const data = await loadData(DIR, diskFetch);
     const loadMs = performance.now() - t0;
@@ -114,7 +114,7 @@ describe.skipIf(!READY)("real Makati data", () => {
     const ratio = minLenChordRatio(data);
     expect(data.hScale).toBeLessThanOrEqual(ratio);
 
-    const dateIdx = data.manifest.dates.indexOf("2026-10-22");
+    const dateIdx = Math.min(1, data.manifest.dates.length - 1); // the build rolls dates daily, so never pin one
     const bucketIdx = data.manifest.buckets_min.indexOf(900);
     expect(dateIdx).toBeGreaterThanOrEqual(0);
     expect(bucketIdx).toBeGreaterThanOrEqual(0);

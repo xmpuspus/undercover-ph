@@ -33,12 +33,14 @@ async function getBytes(fetchImpl: FetchLike, base: string, file: string): Promi
 // Vercel compresses only listed MIME types, and shade.bin (application/octet-stream) is not one, so the deploy
 // build writes shade.bin.gz beside it: 0.54 MB instead of 2.29 MB. Inflate that here. Use shade.bin when the
 // copy is missing (dev server, local builds), broken, or the browser has no DecompressionStream.
-async function getShade(fetchImpl: FetchLike, base: string): Promise<ArrayBuffer | null> {
+// expected is the size the manifest promises. A gzip copy that inflates to any other size counts as broken.
+async function getShade(fetchImpl: FetchLike, base: string, expected: number): Promise<ArrayBuffer | null> {
   if (typeof DecompressionStream === "function") {
     const gz = await getBytes(fetchImpl, base, "shade.bin.gz");
     if (gz) {
       try {
-        return await gunzip(gz);
+        const out = await gunzip(gz);
+        if (out.byteLength === expected) return out;
       } catch {
         // Fall through to shade.bin.
       }
@@ -70,7 +72,7 @@ export async function loadData(base = "data", fetchImpl?: FetchLike): Promise<Da
     getJson(f, base, "hours.json"),
   ]);
   const m = manifest as Manifest;
-  const shade = m.shade ? await getShade(f, base) : null;
+  const shade = m.shade ? await getShade(f, base, 2 * m.shade.n_dates * m.shade.n_buckets * m.shade.n_edges + m.shade.n_edges) : null;
   return buildData({
     manifest: m,
     graph: graph as RawGraph,

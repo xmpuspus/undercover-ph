@@ -199,7 +199,7 @@ const diskFetch: FetchLike = async (url) => {
 describe.skipIf(!READY)("route card headline on real Makati data", () => {
   it("never calls the shortest the shadiest while a shown route has less sun", async () => {
     const data = await loadData(DIR, diskFetch);
-    const dateIdx = data.manifest.dates.indexOf("2026-10-22");
+    const dateIdx = Math.min(1, data.manifest.dates.length - 1); // the build rolls dates daily, so never pin one
     const bucketIdx = data.manifest.buckets_min.indexOf(13 * 60);
     expect(dateIdx).toBeGreaterThanOrEqual(0);
     expect(bucketIdx).toBeGreaterThanOrEqual(0);
@@ -226,7 +226,7 @@ describe.skipIf(!READY)("route card headline on real Makati data", () => {
 
   it("keeps the rule line true over 300 random walks", async () => {
     const data = await loadData(DIR, diskFetch);
-    const dateIdx = data.manifest.dates.indexOf("2026-10-22");
+    const dateIdx = Math.min(1, data.manifest.dates.length - 1); // the build rolls dates daily, so never pin one
     const nodes: number[] = [];
     for (let i = 0; i < data.nodeCount; i++) if (data.routableNode[i]) nodes.push(i);
     let seed = 20261022;

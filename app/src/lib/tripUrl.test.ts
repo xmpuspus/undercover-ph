@@ -11,10 +11,13 @@ describe("endpoint tokens", () => {
     expect(t).toBe("Ayala MRT Station");
     expect(decodeEndpoint(t)).toEqual({ kind: "name", name: "Ayala MRT Station" });
   });
-  it("falls back to the node id when a name repeats", () => {
+  it("adds the node id when a name repeats, and keeps the name, since places can share a node", () => {
     const t = encodeEndpoint(place("Twin", 42), places);
-    expect(t).toBe("n42");
-    expect(decodeEndpoint(t)).toEqual({ kind: "node", node: 42 });
+    expect(t).toBe("Twin~n42");
+    expect(decodeEndpoint(t)).toEqual({ kind: "name", name: "Twin", node: 42 });
+  });
+  it("still reads an older link that holds only a node id", () => {
+    expect(decodeEndpoint("n42")).toEqual({ kind: "node", node: 42 });
   });
   it("rounds a map point to 5 decimals and decodes it", () => {
     const t = encodeEndpoint({ label: "Point on map", node: 1, lon: 121.0234567, lat: 14.5512345, snap_m: 12 }, places);

@@ -265,6 +265,7 @@ export default function App() {
     }
     const i = daySlots.findIndex((b) => b.idx === bucketIdx);
     if (i < 0 || i >= daySlots.length - 1) setBucketIdx(daySlots[0].idx);
+    setNowAt(null);
     setPlaying(true);
   };
 
@@ -301,7 +302,14 @@ export default function App() {
   const isNow = !!nowAt && nowAt.dateIdx === dateIdx && nowAt.bucketIdx === bucketIdx;
   const shownNote = nowNote && nowNote.dateIdx === dateIdx && nowNote.bucketIdx === bucketIdx ? nowNote.text : null;
 
+  // A time the user picks by hand is never Now, even if it lands on Now's slot again.
+  const pickBucket = (i: number) => {
+    setPlaying(false);
+    setNowAt(null);
+    setBucketIdx(i);
+  };
   const pickDate = (idx: number) => {
+    setNowAt(null);
     setDateIdx(idx);
     const opts = bucketsFor(manifest?.dates[idx] ?? "");
     if (!opts.some((b) => b.idx === bucketIdx)) setBucketIdx((opts.find((b) => !b.night) ?? opts[0])?.idx ?? 0);
@@ -532,8 +540,11 @@ export default function App() {
         const ep = pointEndpoint(ref.lon, ref.lat, "Point on map");
         return typeof ep === "string" ? null : ep;
       }
+      const named = (x: Place) => ref.kind === "name" && x.name.toLowerCase() === ref.name.toLowerCase();
       const pl =
-        ref.kind === "node" ? data.places.find((x) => x.node_id === ref.node) : data.places.find((x) => x.name.toLowerCase() === ref.name.toLowerCase());
+        ref.kind === "node"
+          ? data.places.find((x) => x.node_id === ref.node)
+          : (data.places.find((x) => named(x) && x.node_id === ref.node) ?? data.places.find(named));
       return pl ? placeEndpoint(pl) : null;
     };
     const f = resolve(trip.start);
@@ -842,10 +853,7 @@ export default function App() {
                         allDates={manifest.dates}
                         bucketsMin={manifest.buckets_min}
                         onDate={pickDate}
-                        onBucket={(i) => {
-                          setPlaying(false);
-                          setBucketIdx(i);
-                        }}
+                        onBucket={pickBucket}
                       />
                       {daySlots.length > 1 && (
                         <button
@@ -901,10 +909,7 @@ export default function App() {
                       allDates={manifest.dates}
                       bucketsMin={manifest.buckets_min}
                       onDate={pickDate}
-                      onBucket={(i) => {
-                        setPlaying(false);
-                        setBucketIdx(i);
-                      }}
+                      onBucket={pickBucket}
                     />
                     <WeatherChips compact weather={weather} date={date} minute={minute} mode={mode} dark={dark} />
                     <SunChip

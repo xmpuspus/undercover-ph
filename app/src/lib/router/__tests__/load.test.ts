@@ -83,6 +83,14 @@ describe("loadData shade file", () => {
     expect([...data.shade!.lowconf]).toEqual([5]);
   });
 
+  it("falls back to shade.bin when the gzip copy has no gzip header and the wrong size", async () => {
+    const s = server({ ...base, "shade.bin.gz": { body: new Uint8Array([0]), type: "application/gzip" }, "shade.bin": raw });
+    const data = await loadData("data", s.fetchImpl);
+    expect(data.loadNotes).toEqual([]);
+    expect(s.asked).toContain("shade.bin");
+    expect([...data.shade!.lowconf]).toEqual([5]);
+  });
+
   it("takes bytes that a host already inflated", async () => {
     const s = server({ ...base, "shade.bin.gz": { body: SHADE, type: "application/gzip" } });
     const data = await loadData("data", s.fetchImpl);
