@@ -11,6 +11,7 @@ import { AdvisoryBar, Footer, TopBanner } from "./components/Chrome";
 import { DestinationSearch, ModeSwitch, TripFields } from "./components/Planner";
 import { TimeChips, WeatherChips } from "./components/TimeChips";
 import { ProfileToggles, RouteCard, StateMessage, type Highlight } from "./components/RouteCard";
+import RoutePeek from "./components/RoutePeek";
 import SunChip from "./components/SunChip";
 import { compass16, sunDay, sunPosition, type SunView } from "./lib/sun";
 import { rgba, skyTheme, type SkyTheme } from "./lib/skyTheme";
@@ -717,8 +718,13 @@ export default function App() {
     [stage, desktop, topH, panelH],
   );
 
+  // Phones show the route as a short sheet first, as map apps do, so the map keeps most of the screen.
+  const [sheetFull, setSheetFull] = useState(false);
+  const sheetDrag = useRef<number | null>(null);
+
   // Refit on new endpoints or profile, not on a new hour, so the scrubber does not swing the camera.
   const fitKey = display.length ? `${stage}|${from?.node}|${to?.node}|${mode}|${stepFree}|${includeUnchecked}` : "";
+  useEffect(() => setSheetFull(false), [fitKey]);
 
   const goBack = () => {
     if (historyIndex() > 0) return window.history.back();
@@ -918,7 +924,7 @@ export default function App() {
               tabIndex={-1}
               aria-label="Trip"
               className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 p-3 outline-none md:bottom-4 md:left-4 md:right-auto md:w-[368px] md:p-0"
-              style={{ maxHeight: short ? "calc(100% - 32px)" : desktop ? `calc(100% - ${(view === "dest" ? 0 : topH) + 40}px)` : view === "steps" ? "72%" : "70%" }}
+              style={{ maxHeight: short ? "calc(100% - 32px)" : desktop ? `calc(100% - ${(view === "dest" ? 0 : topH) + 40}px)` : `min(${view === "steps" ? 72 : 70}%, calc(100% - ${topH + 20}px))` }}
               data-testid="panel"
             >
               {datesPassed && (
@@ -1001,8 +1007,39 @@ export default function App() {
                       />
                     )}
                     {routing && !result && !routed.error && view === "results" && <Pending text="Finding routes..." />}
-                    {result && current && view === "results" && (
+                    {result && current && view === "results" && !desktop && !sheetFull && (
                       <div className={`transition-opacity motion-reduce:transition-none ${routing ? "opacity-60" : ""}`} aria-busy={routing}>
+                        <RoutePeek
+                          d={current}
+                          count={display.length}
+                          mode={routeMode}
+                          night={night}
+                          head={null}
+                          onExpand={() => setSheetFull(true)}
+                          onSteps={() => setShowSteps(true)}
+                          onNavigate={startNavigate}
+                        />
+                      </div>
+                    )}
+                    {result && current && view === "results" && (desktop || sheetFull) && (
+                      <div className={`transition-opacity motion-reduce:transition-none ${routing ? "opacity-60" : ""}`} aria-busy={routing}>
+                      {!desktop && (
+                        <button
+                          type="button"
+                          onClick={() => setSheetFull(false)}
+                          onPointerDown={(e) => (sheetDrag.current = e.clientY)}
+                          onPointerUp={(e) => {
+                            if (sheetDrag.current !== null && e.clientY - sheetDrag.current > 24) setSheetFull(false);
+                            sheetDrag.current = null;
+                          }}
+                          aria-expanded
+                          aria-label="Show less, more map"
+                          className="mb-1 flex h-7 w-full items-center justify-center rounded-t-card"
+                          data-testid="sheet-collapse"
+                        >
+                          <span className="h-1.5 w-10 rounded-full bg-white/90 shadow" aria-hidden="true" />
+                        </button>
+                      )}
                       <RouteCard
                         display={display}
                         selected={selected}
@@ -1019,7 +1056,8 @@ export default function App() {
                         onNavigate={startNavigate}
                         onAbout={openAbout}
                         dataDate={dataDate}
-                        compact={!desktop}
+                        // The phone's full sheet is the details view, so it shows notes, warnings, and options open.
+                        compact={false}
                         toggles={toggles}
                         onHighlight={setHighlight}
                       />
