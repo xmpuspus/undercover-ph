@@ -5,7 +5,9 @@
 #
 # Each area runs as its own job. The asset shade-YYYY-MM-DD.tar.gz holds, per area, manifest.json,
 # shade/<date>.bin for 7 dates, shade/lowconf.bin, READY.shade and graph.sha256, under <area id>/.
-# The deploy build shades an area itself when its graph.json no longer matches graph.sha256.
+# The deploy build shades an area itself when its graph.json no longer matches graph.sha256, or when the
+# asset lacks it. So one failed area does not hold back the rest: the release goes out with the areas that
+# finished, the failure opens an issue, and the deploy shades the missing area.
 
 name: shade
 
@@ -52,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
-      fail-fast: true
+      fail-fast: false
       max-parallel: 20
       matrix:
         area: ${{ fromJSON(needs.areas.outputs.ids) }}
@@ -96,6 +98,7 @@ jobs:
   release:
     name: publish the release
     needs: [areas, shade]
+    if: ${{ !cancelled() && needs.areas.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -109,10 +112,17 @@ jobs:
           pattern: shade-*
           merge-multiple: true
       - name: Join the areas into one asset
+        env:
+          IDS: ${{ needs.areas.outputs.ids }}
         run: |
           mkdir out
-          for f in shade-*.tar.gz; do tar -xzf "$f" -C out; done
-          ls out
+          shopt -s nullglob
+          parts=(shade-*.tar.gz)
+          if [ ${#parts[@]} -eq 0 ]; then echo "no area finished" >&2; exit 1; fi
+          for f in "${parts[@]}"; do tar -xzf "$f" -C out; done
+          missing="$(python3 -c 'import json, os, sys; print(" ".join(a for a in json.loads(sys.argv[1]) if not os.path.isdir("out/" + a)))' "$IDS")"
+          echo "MISSING=$missing" >> "$GITHUB_ENV"
+          echo "areas: $(find out -mindepth 1 -maxdepth 1 -type d | wc -l), missing: ${missing:-none}"
           tar -czf "shade-$DATE.tar.gz" -C out .
           ls -l "shade-$DATE.tar.gz"
       - name: Replace today's release and keep the 3 newest
@@ -120,7 +130,7 @@ jobs:
           tag="shade-$DATE"
           gh release delete "$tag" -R "$GITHUB_REPOSITORY" --cleanup-tag --yes 2>/dev/null || true
           gh release create "$tag" "shade-$DATE.tar.gz" -R "$GITHUB_REPOSITORY" --target main \
-            --title "Shade data $DATE" --notes "Seven dates of shade from $DATE for every routing area. Built by the shade workflow, read by the deploy build."
+            --title "Shade data $DATE" --notes "Seven dates of shade from $DATE for every routing area${MISSING:+ except $MISSING}. Built by the shade workflow, read by the deploy build."
           gh release list -R "$GITHUB_REPOSITORY" --limit 100 --json tagName --jq '.[].tagName' \
             | grep '^shade-' | sort -r | tail -n +4 \
             | while read -r old; do gh release delete "$old" -R "$GITHUB_REPOSITORY" --cleanup-tag --yes; done
@@ -128,7 +138,7 @@ jobs:
   deploy:
     name: empty commit to main
     needs: release
-    if: github.event_name == 'schedule' || inputs.deploy
+    if: ${{ !cancelled() && needs.release.result == 'success' && (github.event_name == 'schedule' || inputs.deploy) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
