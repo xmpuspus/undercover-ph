@@ -247,3 +247,28 @@ test("a start in another area says routes stay inside one area and offers to cha
   await expect(page.getByTestId("route-card")).toBeVisible({ timeout: 60_000 });
   await expect(page.getByTestId("cross-area")).toHaveCount(0);
 });
+
+// A tab opened before a deploy asks for code files that the deploy removed. The 404 must not blank the page.
+test("a Navigate file removed by a deploy reloads the page once and the trip comes back", async ({ page }) => {
+  await planTrip(page);
+  await page.route("**/assets/Navigate-*.js", (r) => r.fulfill({ status: 404, body: "" }));
+  const reloaded = page.waitForEvent("load");
+  await page.getByTestId("navigate").click();
+  await reloaded;
+  await page.unroute("**/assets/Navigate-*.js");
+  await expect(page.getByTestId("route-card")).toBeVisible({ timeout: 60_000 });
+  await page.getByTestId("navigate").click();
+  await expect(page.getByTestId("turn-card")).toBeVisible();
+});
+
+test("a second missing file within a minute shows a Reload card, not a blank page", async ({ page }) => {
+  await planTrip(page);
+  await page.route("**/assets/Navigate-*.js", (r) => r.fulfill({ status: 404, body: "" }));
+  const reloaded = page.waitForEvent("load");
+  await page.getByTestId("navigate").click();
+  await reloaded;
+  await expect(page.getByTestId("route-card")).toBeVisible({ timeout: 60_000 });
+  await page.getByTestId("navigate").click();
+  await expect(page.getByTestId("app-error")).toBeVisible();
+  await expect(page.getByTestId("app-error")).toContainText("Reload");
+});
