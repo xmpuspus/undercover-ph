@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T09:34:55+08:00",
+ "generated_at": "2026-10-22T14:19:19+08:00",
  "osm_extract": "philippines-261020.osm.pbf, md5 941dd405ba4f1c028ca874cde38ea200, clipped to ncr.osm.pbf with osmium extract -b 120.90,14.35,121.20,14.80",
  "pilot_bbox": [
   121.012,
@@ -62,7 +62,7 @@
   "edges": 6274,
   "routable_edges": 5586,
   "buildings": 35124,
-  "places": 1141
+  "places": 1187
  },
  "sources": [
   {
@@ -110,8 +110,8 @@
   "Both side edges share the road's nodes, so a route can change sides at any node, not only at a crossing.",
   "Side edge geometry starts and ends at the offset line, a few metres from its nodes.",
   "The offset ignores real kerb lines. A dual carriageway can get a side edge on its median.",
-  "Places snap to the largest routable network within 80 m when possible. 36 places still sit on small islands.",
-  "27 named places lie more than 80 m from a routable node, so the app omits them.",
+  "Places snap to the largest routable network within 80 m when possible. 37 places still sit on small islands.",
+  "28 named places lie more than 80 m from a routable node, so the app omits them.",
   "Mall hours come from a guide dated 2026-02-24. The guide warns that hours can change.",
   "The guide says Greenbelt 1 and 2 are closed for renovation until 2028, so they get no hours.",
   "OSM gives Glorietta shorter Friday and Saturday hours than the guide. The guide hours apply to edges.",
