@@ -93,6 +93,15 @@ async function pick(page, input, text, typed) {
 }
 
 async function chooseTime(page, day, minute, slow) {
+  // Phones have one "when" chip whose panel holds the dates and the hours.
+  if (await page.getByTestId("when-chip").isVisible().catch(() => false)) {
+    await page.getByTestId("when-chip").click();
+    if (slow) await page.waitForTimeout(650);
+    await page.locator(`[data-testid="date-option"][data-label="${day}"]`).click();
+    if (slow) await page.waitForTimeout(450);
+    await page.getByTestId(`hour-option-${minute}`).click();
+    return;
+  }
   await page.getByTestId("date-chip").click();
   if (slow) await page.waitForTimeout(650);
   await page.locator(`[data-testid="date-option"][data-label="${day}"]`).click();
@@ -111,7 +120,7 @@ async function planTrip(page, slow) {
   await pick(page, "from-input", FROM, slow);
   if (slow) await page.waitForTimeout(900);
   await chooseTime(page, "Tomorrow", 900, slow);
-  await page.locator('[data-testid="route-card"], [data-testid="route-state"]').first().waitFor({ timeout: 30000 });
+  await page.locator('[data-testid="route-card"], [data-testid="route-peek"], [data-testid="route-state"]').first().waitFor({ timeout: 30000 });
   if (await page.getByTestId("route-state").isVisible()) {
     const s = page.getByTestId("route-state");
     throw new Error(`router state ${await s.getAttribute("data-state")}: ${(await s.innerText()).replace(/\s+/g, " ")}`);
@@ -129,7 +138,8 @@ async function shadowsOn(page) {
 async function readCard(page) {
   const text = async (id) => ((await page.getByTestId(id).first().isVisible().catch(() => false)) ? (await page.getByTestId(id).first().innerText()).replace(/\s+/g, " ").trim() : null);
   return {
-    hour: await text("hour-chip"),
+    hour: (await text("hour-chip")) ?? (await text("when-chip")),
+    peek: await text("route-peek"),
     sun: await text("sun-chip"),
     summary: await text("route-summary"),
     sunMinutes: await text("sun-minutes"),
@@ -201,7 +211,14 @@ async function stepsPhone(page, m) {
   m.note("results", await readCard(page));
   m.mark("start");
   await page.waitForTimeout(2200);
-  await page.getByTestId("show-steps").click();
+  // The phone sheet opens to the full card first, so the clip shows the route, then the steps.
+  await page.getByTestId("peek-summary").click();
+  await page.getByTestId("route-card").waitFor();
+  await page.waitForTimeout(2000);
+  await page.getByTestId("sheet-collapse").click();
+  await page.getByTestId("route-peek").waitFor();
+  await page.waitForTimeout(900);
+  await page.getByTestId("peek-steps").click();
   await page.getByTestId("steps").waitFor();
   await idle(page, 300);
   m.note("steps", {
@@ -231,7 +248,7 @@ async function stepsPhone(page, m) {
   await page.waitForTimeout(1300);
   await page.getByTestId("steps-back").click();
   await page.waitForTimeout(900);
-  await page.getByTestId("navigate").click();
+  await page.getByTestId("peek-navigate").click();
   await page.getByTestId("turn-card").waitFor();
   await idle(page, 300);
   m.note("navigate", { turn: (await page.getByTestId("turn-text").innerText()).replace(/\s+/g, " ").trim() });
