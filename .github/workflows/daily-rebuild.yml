@@ -10,6 +10,11 @@ on:
   schedule:
     - cron: "40 21 * * *" # 05:40 Asia/Manila
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Push the empty commit even if main has a commit from today (tests the deploy chain)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -31,11 +36,13 @@ jobs:
           ref: main
           fetch-depth: 1
       - name: Push an empty commit unless main has a commit from today in Manila
+        env:
+          FORCE: ${{ inputs.force }}
         run: |
           # A push at 9 PM yesterday built yesterday's dates. Only a commit made today builds today's.
           last=$(TZ=Asia/Manila date -d "@$(git log -1 --format=%ct)" +%F)
           today=$(TZ=Asia/Manila date +%F)
-          if [ "$last" = "$today" ]; then
+          if [ "$last" = "$today" ] && [ "$FORCE" != "true" ]; then
             echo "main has a commit from today ($today), so Vercel built today's data then."
             exit 0
           fi
