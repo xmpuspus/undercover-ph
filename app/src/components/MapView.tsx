@@ -34,7 +34,7 @@ interface Props {
   // camera leaves the landing view). The landing poster fades out on onReady.
   onLoaded: () => void;
   onReady: () => void;
-  // Routing and data cover graph_bbox (the pilot box plus 500 m); the dashed box shows it.
+  // Routing and data cover graph_bbox (the pilot box plus 500 m). A solid blue outline shows it.
   coverBbox: [number, number, number, number] | null;
   routes: DisplayRoute[];
   selected: number;
@@ -262,7 +262,8 @@ export default function MapView(p: Props) {
         id: "hb-pilot-line",
         type: "line",
         source: "hb-pilot",
-        paint: { "line-color": COLORS.blue, "line-opacity": 0.55, "line-width": 1.5, "line-dasharray": [3, 3] },
+        // Solid, so it does not read as a basemap path or as the dashed lines of unchecked paths.
+        paint: { "line-color": COLORS.blue, "line-opacity": 0.8, "line-width": 2.5 },
       },
       firstSymbol,
     );
@@ -486,7 +487,7 @@ export default function MapView(p: Props) {
     const map = mapRef.current;
     if (!map || p.stage !== "plan" || p.routes.length) return;
     const ep = p.to ?? p.from;
-    // No point yet: pull back so the dashed pilot box is in view.
+    // No point yet: pull back so the outline of the covered area is in view.
     if (!ep) map.easeTo({ center: CBD_CENTER, zoom: 15.1, pitch: planPitch.current, bearing: -18, duration: 900 });
     else map.easeTo({ center: [ep.lon, ep.lat], zoom: 16.4, pitch: planPitch.current, duration: 900 });
   }, [p.to, p.from, p.stage]);

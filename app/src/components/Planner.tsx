@@ -29,6 +29,9 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (m: Mode)
   );
 }
 
+// One message for every search with no match: the list cannot tell a missing Makati place from a place elsewhere.
+const NO_MATCH = "Not in the place list for Makati CBD. Places outside it are not covered yet. Try another name, or tap the map.";
+
 function categoryLabel(c: string): string {
   const s = c.replace(/_/g, " ");
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -95,7 +98,11 @@ export function PlaceList({ id, places, onPick, testid, active }: { id: string; 
           <PinIcon size={16} className="mt-0.5 shrink-0 text-brand" />
           <span className="min-w-0">
             <span className="block truncate text-[15px] text-ink">{pl.name}</span>
-            <span className="block truncate text-[12px] text-slate-600">{categoryLabel(pl.category)}</span>
+            {/* detail tells apart places that share a name, for example "Muji, in Greenbelt 3". */}
+            <span className="block truncate text-[12px] text-slate-600">
+              {categoryLabel(pl.category)}
+              {pl.detail ? `, ${pl.detail}` : ""}
+            </span>
           </span>
         </li>
       ))}
@@ -173,7 +180,7 @@ export function DestinationSearch({ data, mode, query, onQuery, results, suggest
         <PlaceList id="dest-places" places={list} onPick={onPick} testid="destination-results" active={combo.active} />
       ) : (
         <p className="px-3 pb-3 pt-1 text-[13px] text-slate-500">
-          {query.trim() ? "No place by that name in the pilot area. Try another name, or tap the map." : "Type a place name, or tap the map."}
+          {query.trim() ? NO_MATCH : "Type a place name, or tap the map."}
         </p>
       )}
     </div>
@@ -264,7 +271,7 @@ export function TripFields(p: TripProps) {
           <PlaceList id="trip-places" places={list} onPick={p.onPick} testid={`${p.active}-results`} active={combo.active} />
         </div>
       )}
-      {p.data.status === "ready" && p.query.trim() && !list.length && <p className="px-3 pb-3 text-[13px] text-slate-500">No place by that name in the pilot area.</p>}
+      {p.data.status === "ready" && p.query.trim() && !list.length && <p className="px-3 pb-3 text-[13px] text-slate-500">{NO_MATCH}</p>}
     </div>
   );
 }

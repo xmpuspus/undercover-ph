@@ -471,7 +471,7 @@ export default function App() {
     const s = data ? snapToNode(data, lon, lat) : null;
     if (!s) return "The walking map is not loaded.";
     if (s.dist_m > MAX_SNAP_M) {
-      return `${label === MY_LOCATION ? "You are" : "That point is"} ${fmtDist(s.dist_m)} from the nearest mapped path. Routing works only inside the dashed box, the covered area.`;
+      return `${label === MY_LOCATION ? "You are" : "That point is"} ${fmtDist(s.dist_m)} from the nearest mapped path. Routing works only inside the blue outline around Makati CBD.`;
     }
     const [nlon, nlat] = nodeLL(s.node, [lon, lat]);
     return { label, sub: `${Math.round(s.dist_m)} m from the nearest path`, node: s.node, lon: nlon, lat: nlat, snap_m: s.dist_m };
