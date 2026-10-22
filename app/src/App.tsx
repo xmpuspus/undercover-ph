@@ -1,8 +1,9 @@
 import { Component, Suspense, lazy, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { CBD_CENTER, DATA_BASE, NIGHT_ALT_DEG, SUGGESTED } from "./config";
-import type { Advisory, Endpoint, Mode, Place, Result, Route, ShadowOverlay, Weather } from "./types";
-import { MAX_SNAP_M, findRoutes, loadData, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
-import { BUILDINGS_URL, exists, loadAdvisory, loadWeather } from "./lib/data";
+import { AREA_LABELS, CBD_CENTER, DEFAULT_AREA, NIGHT_ALT_DEG, SUGGESTED } from "./config";
+import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, ShadowOverlay, Weather } from "./types";
+import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, placeKeys, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
+import { BUILDINGS_URL, areaBase, areaPath, exists, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
+import { areaAt, areaCities, areaLabel, areaList, placeWhere } from "./lib/areas";
 import { clockPinned, dateLabel, dateShort, fmtDist, fmtMinute, manilaNow, type Clock } from "./lib/time";
 import { toDisplay } from "./lib/display";
 import type { Focus, Insets } from "./components/MapView";
@@ -92,17 +93,34 @@ function bearing(a: [number, number], b: [number, number]): number {
   return (Math.atan2((b[0] - a[0]) * k, b[1] - a[1]) * 180) / Math.PI;
 }
 
+// The routing node of a place or point, where the route line starts, so the marker sits on it.
+function nodeLL(d: Data, node: number, fallback: [number, number]): [number, number] {
+  const lon = d.nodeLon[node];
+  const lat = d.nodeLat[node];
+  return lon != null && lat != null && Number.isFinite(lon) && Number.isFinite(lat) ? [lon, lat] : fallback;
+}
+
+type Bundles = Record<string, Data>;
+
 export default function App() {
   const clock = useManilaClock();
-  const [data, setData] = useState<Data | null>(null);
-  // Route data (about 4 MB) loads on the first sign of intent: hovering, focusing or tapping a route type.
+  // Search covers every area: areas.json and places_index.json (about 1.3 MB) load on the first sign of intent,
+  // hovering, focusing or tapping a route type. status follows them.
+  const [areas, setAreas] = useState<AreaInfo[] | null>(null);
+  const [index, setIndex] = useState<Pick<Data, "places" | "placeKeys"> | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
+  // An area's routing bundle loads when a place or point in it is picked. Only the newest bundle and the current
+  // area's stay in memory, since one area's graph is up to 9 MB.
+  const [bundles, setBundles] = useState<Bundles>({});
+  const [areaFailed, setAreaFailed] = useState<Record<string, string>>({});
+  // Counts dates whose shade file arrived, so the routes recompute. The bundle fills its arrays in place.
+  const [shadeVer, setShadeVer] = useState(0);
   const [weather, setWeather] = useState<Weather | null>(null);
   const [advisory, setAdvisory] = useState<Advisory | null>(null);
   const [buildingsLoading, setBuildingsLoading] = useState(true);
 
-  // A link with a start or end in its fragment opens straight on that trip, once the places have loaded.
+  // A link with a start or end in its fragment opens straight on that trip, once its area has loaded.
   const [initialTrip] = useState<TripParams | null>(() => {
     const t = tripFromHash(window.location.hash);
     return t.start || t.end ? t : null;
@@ -112,6 +130,16 @@ export default function App() {
   const [mode, setMode] = useState<Mode>(initialTrip?.mode ?? "shade");
   const [from, setFrom] = useState<Endpoint | null>(null);
   const [to, setTo] = useState<Endpoint | null>(null);
+  // The trip's area is the end's, else the start's. A start in another area gets the one-area message.
+  // lastArea holds the area while no end is set, such as during a restore or after Back clears the fields.
+  const [lastArea, setLastArea] = useState<string | null>(initialTrip ? (initialTrip.area ?? DEFAULT_AREA) : null);
+  const areaId = to?.area ?? from?.area ?? lastArea;
+  const data = areaId ? (bundles[areaId] ?? null) : null;
+  const crossArea = !!from && !!to && from.area !== to.area;
+  const areaRef = useRef(areaId);
+  areaRef.current = areaId;
+  const bundlesRef = useRef(bundles);
+  bundlesRef.current = bundles;
   const [active, setActive] = useState<Field | null>(null);
   const [query, setQuery] = useState("");
   const [dateIdx, setDateIdx] = useState(0);
@@ -158,11 +186,21 @@ export default function App() {
   }, [mapOn]);
 
   useEffect(() => {
-    // A failed fetch shows "Weather unavailable", the same as a file that reports an error. Null means still loading.
-    loadWeather().then((w) => setWeather(w ?? { status: "unavailable", fetched_at: "" }));
-    loadAdvisory().then(setAdvisory);
-    exists("READY.shadows").then(setShadowsReady);
+    loadAdvisory(lastArea ?? DEFAULT_AREA).then(setAdvisory);
   }, []);
+  // Weather and the shadow images belong to the area.
+  useEffect(() => {
+    if (!areaId) return;
+    let live = true;
+    setWeather(null);
+    setShadowsReady(false);
+    // A failed fetch shows "Weather unavailable", the same as a file that reports an error. Null means still loading.
+    loadWeather(areaId).then((w) => live && setWeather(w ?? { status: "unavailable", fetched_at: "" }));
+    exists(`${areaPath(areaId)}READY.shadows`).then((r) => live && setShadowsReady(r));
+    return () => {
+      live = false;
+    };
+  }, [areaId]);
 
   useEffect(() => {
     if (!picking) return;
@@ -197,9 +235,11 @@ export default function App() {
     loading.current = true;
     setStatus("loading");
     setLoadError(null);
-    loadData(DATA_BASE)
-      .then((d) => {
-        setData(d);
+    Promise.all([loadAreas(), loadPlaceIndex()])
+      .then(([list, raw]) => {
+        const places = raw.map((pl) => ({ ...pl, aliases: Array.isArray(pl.aliases) ? pl.aliases : [] }));
+        setAreas(list);
+        setIndex({ places, placeKeys: placeKeys(places) });
         setStatus("ready");
       })
       .catch((e: unknown) => {
@@ -208,6 +248,28 @@ export default function App() {
         setLoadError(e instanceof Error ? e.message : String(e));
       });
   }, []);
+
+  // The date whose shade loads with a new area: the chosen date, or today before any time is set.
+  const wantDate = useRef(clock.date);
+  const areaLoading = useRef(new Set<string>());
+  const ensureArea = useCallback((id: string) => {
+    if (bundlesRef.current[id] || areaLoading.current.has(id)) return;
+    areaLoading.current.add(id);
+    setAreaFailed(({ [id]: _, ...rest }) => rest);
+    loadData(areaBase(id), undefined, { date: wantDate.current })
+      .then((d) =>
+        setBundles((prev) => {
+          const cur = areaRef.current;
+          return cur && cur !== id && prev[cur] ? { [cur]: prev[cur], [id]: d } : { [id]: d };
+        }),
+      )
+      .catch((e: unknown) => setAreaFailed((f) => ({ ...f, [id]: e instanceof Error ? e.message : String(e) })))
+      .finally(() => areaLoading.current.delete(id));
+  }, []);
+  useEffect(() => {
+    if (areaId) ensureArea(areaId);
+  }, [areaId, ensureArea]);
+  const areaError = areaId ? (areaFailed[areaId] ?? null) : null;
 
   const manifest = data?.manifest ?? null;
 
@@ -225,6 +287,7 @@ export default function App() {
     [datesPassed, manifest, futureDates],
   );
   const date = manifest?.dates[dateIdx] ?? "";
+  wantDate.current = date || clock.date;
   const bucketsFor = useCallback(
     (d: string) => {
       if (!manifest) return [];
@@ -334,10 +397,10 @@ export default function App() {
     (d: string, min: number) => {
       if (!shadowsReady || !overlayDef) return null;
       const hhmm = `${String(Math.floor(min / 60)).padStart(2, "0")}${String(min % 60).padStart(2, "0")}`;
-      if (!overlayDef.buckets[d]?.includes(hhmm)) return null;
-      return `${DATA_BASE}${overlayDef.path.replace("{date}", d).replace("{HHMM}", hhmm)}`;
+      if (!areaId || !overlayDef.buckets[d]?.includes(hhmm)) return null;
+      return `${areaBase(areaId)}${overlayDef.path.replace("{date}", d).replace("{HHMM}", hhmm)}`;
     },
-    [shadowsReady, overlayDef],
+    [shadowsReady, overlayDef, areaId],
   );
   const overlayUrl = date ? shadowUrl(date, minute) : null;
   const shadow = useMemo(
@@ -353,18 +416,60 @@ export default function App() {
     if (url) new Image().src = url;
   }, [shadow, manifest, minute, date, shadowUrl]);
 
+  // Set once the first area has loaded and the trip time is restored or set to Now.
+  const started = useRef(false);
+  // Areas come from one daily build, so their dates and slots match. If a newly loaded area's manifest differs,
+  // keep the chosen date and time when it has them, and fall back to Now when it does not.
+  const slot = useRef<{ date: string; minute: number } | null>(null);
+  useEffect(() => {
+    const s = slot.current;
+    if (!manifest || !s || !started.current) return;
+    if (manifest.dates[dateIdx] === s.date && manifest.buckets_min[bucketIdx] === s.minute) return;
+    const di = manifest.dates.indexOf(s.date);
+    const bi = manifest.buckets_min.indexOf(s.minute);
+    if (di >= 0 && bi >= 0) {
+      setDateIdx(di);
+      setBucketIdx(bi);
+    } else applyNow();
+  }, [manifest]);
+  useEffect(() => {
+    if (manifest) slot.current = { date: manifest.dates[dateIdx], minute: manifest.buckets_min[bucketIdx] };
+  }, [manifest, dateIdx, bucketIdx]);
+
+  // Shade comes one date per file. Fetch the chosen date's file when the bundle lacks it; routes wait for it.
+  // A date whose file fails is tried once, and then routes count only roofs, with a note on the card.
+  const shadeTried = useRef(new WeakMap<Data, Map<number, "loading" | "done">>());
+  const tried = data ? shadeTried.current.get(data) : undefined;
+  // A date outside the bundle never loads; the router then reports it as an error instead of a wait.
+  const shadeReady = !data?.shade || data.shade.loaded[dateIdx] === 1 || tried?.get(dateIdx) === "done" || dateIdx >= data.shade.nDates;
+  useEffect(() => {
+    if (!data?.shade || data.shade.loaded[dateIdx] || dateIdx >= data.shade.nDates) return;
+    const t = shadeTried.current.get(data) ?? new Map<number, "loading" | "done">();
+    shadeTried.current.set(data, t);
+    if (t.has(dateIdx)) return;
+    t.set(dateIdx, "loading");
+    loadShadeDate(data, dateIdx).then(() => {
+      t.set(dateIdx, "done");
+      setShadeVer((v) => v + 1);
+    });
+  }, [data, dateIdx]);
+
   // Routing runs in the browser. The router scores each edge at the slot when the walker reaches it.
   // The search runs on a deferred copy of its inputs, so a tap on a place or an hour paints at once and the
-  // routes follow; meanwhile the card says it is updating.
+  // routes follow; meanwhile the card says it is updating. The bundle rides along, so the ends and the graph
+  // they belong to always change together.
+  const [timeSet, setTimeSet] = useState(false);
   const routeInput = useMemo(
-    () => ({ from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute: departMin, stage }),
-    [from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, departMin, stage],
+    () => ({ data, area: areaId, from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute: departMin, stage, ready: timeSet && shadeReady, shadeVer }),
+    [data, areaId, from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, departMin, stage, timeSet, shadeReady, shadeVer],
   );
   const deferred = useDeferredValue(routeInput);
   const routing = deferred !== routeInput;
   const routed = useMemo<{ result: Result | null; error: string | null }>(() => {
-    const { from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute, stage } = deferred;
-    if (!data || !manifest || !from || !to || stage === "landing") return { result: null, error: null };
+    const { data, area, from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute, stage, ready } = deferred;
+    if (!data || !ready || !from || !to || stage === "landing") return { result: null, error: null };
+    // Routes stay inside one area: a start or end from another area's graph has no node here.
+    if (from.area !== area || to.area !== area) return { result: null, error: null };
     if (from.node === to.node) return { result: null, error: "Start and end are the same point. Pick a different start or end." };
     try {
       const result = findRoutes(data, {
@@ -383,8 +488,9 @@ export default function App() {
     } catch (e) {
       return { result: null, error: `The router failed: ${e instanceof Error ? e.message : String(e)}` };
     }
-  }, [data, manifest, deferred]);
-  const result = routed.result;
+  }, [deferred]);
+  // A stale result from before the start moved to another area never shows beside the one-area message.
+  const result = crossArea ? null : routed.result;
 
   // Label each node with its piece of the routable network. A start or end outside the largest piece
   // usually sits behind a gate or inside a gated village.
@@ -414,7 +520,8 @@ export default function App() {
     }
     return { comp, main: sizes.indexOf(Math.max(...sizes)) };
   }, [data]);
-  const gatedEnds = mainNet && from && to ? [from, to].filter((x) => mainNet.comp[x.node] !== mainNet.main).map((x) => x.label) : [];
+  const gatedEnds =
+    mainNet && from && to && !crossArea && to.area === areaId ? [from, to].filter((x) => mainNet.comp[x.node] !== mainNet.main).map((x) => x.label) : [];
   const night = result?.state === "night";
   const routerSun = result?.sun ?? null;
   const sunView: SunView | null = routerSun
@@ -444,21 +551,28 @@ export default function App() {
     [stage, editing, current, display],
   );
 
-  // Search and suggestions.
-  const results = useMemo(() => (data && query.trim() ? searchPlaces(data, query, 8) : []), [data, query]);
+  // Search covers every area. Within a tier, places in the other end's area come first.
+  const editingField: Field = view === "dest" ? "to" : (active ?? (!from ? "from" : "to"));
+  const otherArea = (editingField === "from" ? to : from)?.area ?? null;
+  const results = useMemo(
+    () => (index && query.trim() ? searchPlaces(index, query, 8, otherArea ? (p) => p.area === otherArea : undefined) : []),
+    [index, query, otherArea],
+  );
   const suggested = useMemo(() => {
-    if (!data) return [];
-    const taken = new Set([from?.node, to?.node]);
-    return SUGGESTED.map((n) => data.places.find((pl) => pl.name.toLowerCase() === n.toLowerCase())).filter(
-      (pl): pl is Place => !!pl && !taken.has(pl.node_id),
-    );
-  }, [data, from, to]);
+    if (!index) return [];
+    const taken = new Set([from, to].map((e) => (e ? `${e.area}|${e.node}` : "")));
+    const pick = (area: string) =>
+      (SUGGESTED[area] ?? [])
+        .map((n) => index.places.find((pl) => pl.area === area && pl.name.toLowerCase() === n.toLowerCase()))
+        .filter((pl): pl is Place => !!pl && !taken.has(`${area}|${pl.node_id}`));
+    if (otherArea) return pick(otherArea).slice(0, 4);
+    // Nothing picked yet: one place in each area, so the list shows where the app works.
+    return AREA_LABELS.map((a) => pick(a.id)[0]).filter((pl): pl is Place => !!pl);
+  }, [index, from, to, otherArea]);
+  const where = useCallback((p: Place) => placeWhere(p, areas), [areas]);
 
-  const nodeLL = (node: number, fallback: [number, number]): [number, number] => {
-    const lon = data?.nodeLon[node];
-    const lat = data?.nodeLat[node];
-    return lon != null && lat != null && Number.isFinite(lon) && Number.isFinite(lat) ? [lon, lat] : fallback;
-  };
+  // A map point or GPS fix waiting for its area's walking map to load.
+  const [pendingPoint, setPendingPoint] = useState<{ field: Field; lon: number; lat: number; label: string; area: string } | null>(null);
 
   const assign = (field: Field, ep: Endpoint) => {
     setNotice(null);
@@ -466,6 +580,8 @@ export default function App() {
     setPickedLabel(null);
     setShowSteps(false);
     setFocus(null);
+    setPendingPoint(null);
+    setLastArea(ep.area);
     const other = field === "from" ? to : from;
     if (field === "from") setFrom(ep);
     else setTo(ep);
@@ -474,33 +590,75 @@ export default function App() {
     refocus(other ? "panel" : `${field === "from" ? "to" : "from"}-input`);
   };
 
-  const placeEndpoint = (pl: Place): Endpoint => {
-    const [lon, lat] = nodeLL(pl.node_id, [pl.lon, pl.lat]);
-    return { label: pl.name, sub: pl.category, node: pl.node_id, lon, lat, snap_m: null };
+  // A place carries its area from the index. Before that area loads, its marker sits at the place itself.
+  const placeEndpoint = (pl: Place, area = pl.area ?? areaId ?? DEFAULT_AREA): Endpoint => {
+    const d = bundles[area];
+    const [lon, lat] = d ? nodeLL(d, pl.node_id, [pl.lon, pl.lat]) : [pl.lon, pl.lat];
+    return { label: pl.name, sub: pl.category, area, node: pl.node_id, lon, lat, snap_m: null };
   };
+  // Once the area loads, move such a marker to the place's path node, where its route starts.
+  useEffect(() => {
+    const fix = (ep: Endpoint | null) => {
+      const d = ep && ep.snap_m === null ? bundles[ep.area] : undefined;
+      if (!ep || !d) return ep;
+      const [lon, lat] = nodeLL(d, ep.node, [ep.lon, ep.lat]);
+      return lon === ep.lon && lat === ep.lat ? ep : { ...ep, lon, lat };
+    };
+    setFrom(fix);
+    setTo(fix);
+  }, [bundles]);
 
-  // A point farther than the router's snap limit is outside the pilot; say so instead of dropping a pin.
-  const pointEndpoint = (lon: number, lat: number, label: string): Endpoint | string => {
-    const s = data ? snapToNode(data, lon, lat) : null;
+  // A point farther than the router's snap limit is off the mapped paths; say so instead of dropping a pin.
+  const pointEndpoint = (d: Data, area: string, lon: number, lat: number, label: string): Endpoint | string => {
+    const s = snapToNode(d, lon, lat);
     if (!s) return "The walking map is not loaded.";
     if (s.dist_m > MAX_SNAP_M) {
-      return `${label === MY_LOCATION ? "You are" : "That point is"} ${fmtDist(s.dist_m)} from the nearest mapped path. Routing works only inside the blue outline around Makati CBD.`;
+      return `${label === MY_LOCATION ? "You are" : "That point is"} ${fmtDist(s.dist_m)} from the nearest mapped path. Pick a point on a street or path.`;
     }
-    const [nlon, nlat] = nodeLL(s.node, [lon, lat]);
-    return { label, sub: `${Math.round(s.dist_m)} m from the nearest path`, node: s.node, lon: nlon, lat: nlat, snap_m: s.dist_m };
+    const [nlon, nlat] = nodeLL(d, s.node, [lon, lat]);
+    return { label, sub: `${Math.round(s.dist_m)} m from the nearest path`, area, node: s.node, lon: nlon, lat: nlat, snap_m: s.dist_m };
   };
 
-  const onPick = (pl: Place) => {
-    const field: Field = view === "dest" ? "to" : (active ?? (!from ? "from" : "to"));
-    assign(field, placeEndpoint(pl));
+  // A map tap or GPS fix routes in the area whose graph covers it, on that area's nearest node.
+  const placePoint = (d: Data, field: Field, area: string, lon: number, lat: number, label: string) => {
+    const ep = pointEndpoint(d, area, lon, lat, label);
+    if (typeof ep === "string") setNotice(ep);
+    else assign(field, ep);
   };
+  const pickPoint = (field: Field, lon: number, lat: number, label: string) => {
+    if (!areas) {
+      ensureData();
+      setNotice("The walking map is still loading. Try again in a moment.");
+      return;
+    }
+    const a = areaAt(areas, lon, lat, areaId);
+    if (!a) {
+      setNotice(`${label === MY_LOCATION ? "You are" : "That point is"} outside the areas this app covers: ${areaList(areas)}.`);
+      return;
+    }
+    const d = bundles[a.id];
+    if (d) return placePoint(d, field, a.id, lon, lat, label);
+    setNotice(`Loading the walking map for ${areaLabel(a.id, areas)}...`);
+    setPendingPoint({ field, lon, lat, label, area: a.id });
+    ensureArea(a.id);
+  };
+  useEffect(() => {
+    if (!pendingPoint) return;
+    const d = bundles[pendingPoint.area];
+    if (d) {
+      setPendingPoint(null);
+      placePoint(d, pendingPoint.field, pendingPoint.area, pendingPoint.lon, pendingPoint.lat, pendingPoint.label);
+    } else if (areaFailed[pendingPoint.area]) {
+      setPendingPoint(null);
+      setNotice("The walking map did not load. Check your connection and try again.");
+    }
+  }, [pendingPoint, bundles, areaFailed]);
+
+  const onPick = (pl: Place) => assign(editingField, placeEndpoint(pl));
 
   const onMapClick = (lon: number, lat: number) => {
     if (stage !== "plan" || view === "results" || view === "steps") return;
-    const field: Field = view === "dest" ? "to" : (active ?? (!from ? "from" : "to"));
-    const ep = pointEndpoint(lon, lat, "Point on map");
-    if (typeof ep === "string") setNotice(ep);
-    else assign(field, ep);
+    pickPoint(editingField, lon, lat, "Point on map");
   };
 
   const onLocate = () => {
@@ -513,9 +671,7 @@ export default function App() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLocating(false);
-        const ep = pointEndpoint(pos.coords.longitude, pos.coords.latitude, MY_LOCATION);
-        if (typeof ep === "string") setNotice(ep);
-        else assign("from", ep);
+        pickPoint("from", pos.coords.longitude, pos.coords.latitude, MY_LOCATION);
       },
       (err) => {
         setLocating(false);
@@ -525,21 +681,24 @@ export default function App() {
     );
   };
 
-  // Once the places load: restore the trip from the link, or pick Now. The time chosen then stays put as the clock ticks.
-  const started = useRef(false);
+  // Once the first area loads: restore the trip from the link, or pick Now. The time chosen then stays put as the
+  // clock ticks. Routes wait for this (timeSet), so the first search never runs at a placeholder time.
   useEffect(() => {
     if (initialTrip) ensureData();
   }, []);
   useEffect(() => {
-    if (!data || !manifest || started.current) return;
+    if (!data || !manifest || !areaId || started.current) return;
     started.current = true;
+    setTimeSet(true);
     const trip = initialTrip;
     if (!trip) return applyNow();
+    // Names and points in the link resolve inside the link's area.
+    const area = areaId;
     const resolve = (token: string | null): Endpoint | null => {
       const ref = decodeEndpoint(token);
       if (!ref) return null;
       if (ref.kind === "point") {
-        const ep = pointEndpoint(ref.lon, ref.lat, "Point on map");
+        const ep = pointEndpoint(data, area, ref.lon, ref.lat, "Point on map");
         return typeof ep === "string" ? null : ep;
       }
       const named = (x: Place) => ref.kind === "name" && x.name.toLowerCase() === ref.name.toLowerCase();
@@ -547,7 +706,7 @@ export default function App() {
         ref.kind === "node"
           ? data.places.find((x) => x.node_id === ref.node)
           : (data.places.find((x) => named(x) && x.node_id === ref.node) ?? data.places.find(named));
-      return pl ? placeEndpoint(pl) : null;
+      return pl ? placeEndpoint(pl, area) : null;
     };
     const f = resolve(trip.start);
     const t = resolve(trip.end);
@@ -563,26 +722,28 @@ export default function App() {
     } else applyNow();
     setRestoring(false);
   }, [data, manifest]);
-  // If the places never load, drop the restoring card so the retry button shows.
+  // If the link's area never loads, drop the restoring card so the retry button shows.
   useEffect(() => {
-    if (status === "error") setRestoring(false);
-  }, [status]);
+    if (areaError) setRestoring(false);
+  }, [areaError]);
 
   // Every screen is a browser history entry, and the trip is kept in the fragment with replaceState.
   const tripParams = useMemo<TripParams | null>(() => {
     if (stage === "landing") return null;
-    const places = data?.places ?? [];
+    // A name gets a node suffix only when it repeats inside its own area.
+    const placesOf = (area: string) => bundles[area]?.places ?? index?.places.filter((p) => p.area === area) ?? [];
     const timed = !!manifest && !!(from || to);
     const live = isNow && !!nowAt;
     return {
-      start: from ? encodeEndpoint(from, places) : null,
-      end: to ? encodeEndpoint(to, places) : null,
+      area: to?.area ?? from?.area ?? null,
+      start: from ? encodeEndpoint(from, placesOf(from.area)) : null,
+      end: to ? encodeEndpoint(to, placesOf(to.area)) : null,
       date: timed && !live ? (manifest?.dates[dateIdx] ?? null) : null,
       time: timed ? (live ? "now" : minuteToHHMM(minute)) : null,
       mode,
       stepFree,
     };
-  }, [stage, data, manifest, from, to, isNow, nowAt, dateIdx, minute, mode, stepFree]);
+  }, [stage, bundles, index, manifest, from, to, isNow, nowAt, dateIdx, minute, mode, stepFree]);
   const tripHash = hashFor(tripParams);
   const lastScreen = useRef<Screen | null>(null);
   useEffect(() => {
@@ -665,7 +826,7 @@ export default function App() {
     if (stage === "navigate" && to) document.title = `Walking to ${to.label} | ${base}`;
     else if (stage === "plan" && from && to) document.title = `${from.label} to ${to.label} | ${base}`;
     else if (stage === "plan") document.title = `Plan a walk | ${base}`;
-    else document.title = `${base} | Shaded and sheltered walks in Makati`;
+    else document.title = `${base} | Shaded and sheltered walks in Metro Manila`;
   }, [stage, from, to]);
 
   const refocus = (testid: string) => {
@@ -717,8 +878,12 @@ export default function App() {
   }, [stage, navIdx, current]);
 
   // Read out new route results to screen readers, once each search lands.
+  // A start and end in different areas: no route, and the card names both areas.
+  const crossText = crossArea && from && to ? `${from.label} is in ${areaLabel(from.area, areas)}. ${to.label} is in ${areaLabel(to.area, areas)}.` : "";
   const announce = useMemo(() => {
-    if (stage !== "plan" || editing || !from || !to || routing) return "";
+    if (stage !== "plan" || editing || !from || !to) return "";
+    if (crossText) return `Routes stay inside one area. ${crossText}`;
+    if (routing) return "";
     if (routed.error) return routed.error;
     if (!result) return "";
     if (result.state === "no_route") return noRouteText(result.notes, from.label, to.label, []).title;
@@ -727,7 +892,7 @@ export default function App() {
     const n = display.length;
     const sunLine = result.state === "night" ? ((result.sun?.altitude ?? 0) > 0 ? "The sun is too low for shade." : "Shade does not apply after dark.") : `${fmtDuration(current.route.sun_minutes)} ${routeMode === "shade" ? "in sun" : "without a roof"}.`;
     return `${n} ${n === 1 ? "route" : "routes"} found. ${current.title}: ${current.pct}% ${current.pctWord}, ${current.route.minutes} min walk. ${sunLine}`;
-  }, [stage, editing, from, to, routing, routed.error, result, current, display.length, routeMode]);
+  }, [stage, editing, from, to, crossText, routing, routed.error, result, current, display.length, routeMode]);
 
   const vp = useViewport();
   const desktop = vp.w >= 768;
@@ -752,7 +917,7 @@ export default function App() {
   const sheetDrag = useRef<number | null>(null);
 
   // Refit on new endpoints or profile, not on a new hour, so the scrubber does not swing the camera.
-  const fitKey = display.length ? `${stage}|${from?.node}|${to?.node}|${mode}|${stepFree}|${includeUnchecked}` : "";
+  const fitKey = display.length ? `${stage}|${from?.area}|${from?.node}|${to?.node}|${mode}|${stepFree}|${includeUnchecked}` : "";
   useEffect(() => setSheetFull(false), [fitKey]);
 
   const goBack = () => {
@@ -790,7 +955,15 @@ export default function App() {
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-slate-200 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] font-sans text-ink">
       {banner && <TopBanner onClose={() => setBanner(false)} onAbout={openAbout} />}
-      <AdvisoryBar advisory={advisory} date={date} minute={departMin} mode={mode} onRain={() => setMode("rain")} />
+      {/* Before an area loads there is no trip time yet, so the bar checks the advisory against the clock. */}
+      <AdvisoryBar
+        advisory={advisory}
+        date={date || clock.date}
+        minute={manifest ? departMin : clock.minute}
+        mode={mode}
+        cities={areaCities(areaId, areas)}
+        onRain={() => setMode("rain")}
+      />
       <main className="relative min-h-0 flex-1 overflow-hidden">
         {mapOn && buildingsLoading && (
           <p className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1 text-[12px] text-slate-600 shadow-sm" role="status">
@@ -974,6 +1147,7 @@ export default function App() {
                       suggested={suggested}
                       onPick={onPick}
                       onBack={goBack}
+                      where={where}
                     />
                     {notice && (
                       <p className="mt-2 rounded-card bg-amber-50 px-3 py-2 text-[13px] text-amber-900" role="status">
@@ -1002,6 +1176,7 @@ export default function App() {
                       locating={locating}
                       notice={notice}
                       onBack={goBack}
+                      where={where}
                     />
                   </div>
                 </>
@@ -1025,9 +1200,28 @@ export default function App() {
                       <span className="h-1.5 w-10 rounded-full bg-white/90 shadow" aria-hidden="true" />
                     </button>
                   )}
-                  {(desktop || !current || (sheetFull && view === "results")) && toggles}
+                  {(desktop || !current || (sheetFull && view === "results")) && !crossArea && toggles}
                   <div className="flex min-h-0 flex-col overflow-y-auto rounded-card">
-                    {routed.error && (
+                    {crossArea && (
+                      <div className="rounded-card bg-white p-4 text-[14px] text-ink shadow-card" role="status" data-testid="cross-area">
+                        <p className="text-[16px] font-medium">Routes stay inside one area.</p>
+                        <p className="mt-1 text-slate-700">{crossText} Pick a start in the same area as your end.</p>
+                        <button type="button" onClick={() => editField("from")} className="mt-3 block h-11 rounded-card bg-brand px-4 text-white" data-testid="cross-area-edit">
+                          Change the start
+                        </button>
+                      </div>
+                    )}
+                    {!crossArea && areaError && (
+                      <div className="rounded-card bg-white p-4 text-[14px] text-ink shadow-card" role="alert" title={areaError} data-testid="area-error">
+                        The walking map for {areaLabel(areaId!, areas)} did not load. Check your connection and try again.
+                        <button type="button" onClick={() => ensureArea(areaId!)} className="mt-3 block h-11 rounded-card border border-slate-300 px-4 font-medium text-brand">
+                          Try again
+                        </button>
+                      </div>
+                    )}
+                    {!crossArea && !areaError && view === "results" && (!data || !timeSet) && <Pending text={`Loading the walking map for ${areaLabel(areaId!, areas)}...`} />}
+                    {!crossArea && data && timeSet && !shadeReady && view === "results" && <Pending text={`Loading shade for ${dateLabel(date, clock.date)}...`} />}
+                    {!crossArea && routed.error && (
                       <div className="rounded-card bg-white p-4 text-[14px] text-ink shadow-card" data-testid="route-state" data-state="error">
                         {routed.error}
                         <button type="button" onClick={() => editField("from")} className="mt-3 block h-11 rounded-card bg-brand px-4 text-white">
@@ -1035,7 +1229,7 @@ export default function App() {
                         </button>
                       </div>
                     )}
-                    {result && (result.state === "no_route" || result.state === "outside") && (
+                    {!crossArea && result && (result.state === "no_route" || result.state === "outside") && (
                       <StateMessage
                         result={result}
                         onEdit={() => editField("from")}
@@ -1048,7 +1242,7 @@ export default function App() {
                         gatedEnds={gatedEnds}
                       />
                     )}
-                    {routing && !result && !routed.error && view === "results" && <Pending text="Finding routes..." />}
+                    {!crossArea && data && timeSet && shadeReady && routing && !result && !routed.error && view === "results" && <Pending text="Finding routes..." />}
                     {result && current && view === "results" && !desktop && !sheetFull && (
                       <div className={`transition-opacity motion-reduce:transition-none ${routing ? "opacity-60" : ""}`} aria-busy={routing}>
                         <RoutePeek

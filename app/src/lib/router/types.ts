@@ -133,6 +133,8 @@ export interface Place {
   aliases: string[];
   /** Few words that tell apart places sharing a name, such as "in Greenbelt 5" or a street. Set only on repeated names. */
   detail?: string;
+  /** Area id, on places from places_index.json. node_id is a node of that area's graph. */
+  area?: string;
 }
 
 export interface Source {
@@ -147,6 +149,10 @@ export interface ShadeHeader {
   n_buckets: number;
   n_edges: number;
   layout: string;
+  /** One file per date (files, in manifest date order) and shade/lowconf.bin, instead of one shade.bin. */
+  per_date?: boolean;
+  files?: string[];
+  lowconf?: string;
 }
 
 export interface Manifest {
@@ -209,9 +215,12 @@ export interface RawFiles {
   hours: HoursRow[];
   /** shade.bin bytes, or null when the file is absent. */
   shade: ArrayBuffer | null;
+  /** Per-date layout: shade/lowconf.bin bytes, and the date files loaded so far by date index. */
+  lowconf?: ArrayBuffer | null;
+  days?: Record<number, ArrayBuffer | null>;
 }
 
-/** shade.bin split into its three parts. Index building and tree with (d * nBuckets + b) * nEdges + e. */
+/** Shade split into its three parts. Index building and tree with (d * nBuckets + b) * nEdges + e. */
 export interface Shade {
   nDates: number;
   nBuckets: number;
@@ -219,6 +228,8 @@ export interface Shade {
   building: Uint8Array;
   tree: Uint8Array;
   lowconf: Uint8Array;
+  /** 1 per date whose shade is in place. A per-date bundle starts with one date; loadShadeDate adds more. */
+  loaded: Uint8Array;
 }
 
 /** Everything the router needs, in typed arrays where speed matters. */
@@ -276,6 +287,8 @@ export interface Data {
   loadNotes: string[];
   /** Search keys per place, lower case without accents. */
   placeKeys: { name: string; aliases: string[]; tokens: string[] }[];
+  /** Where loadData fetched the files, so loadShadeDate can fetch another date. Null for hand-built data. */
+  source: { base: string; fetchImpl: FetchLike } | null;
 }
 
 /** The parts of a fetch Response that loadData reads. */

@@ -31,22 +31,27 @@ describe("endpoint tokens", () => {
 
 describe("trip query", () => {
   it("round-trips a trip and keeps the now and map params", () => {
-    const trip = { start: "Ayala MRT Station", end: "Greenbelt", date: "2026-10-23", time: "1500", mode: "rain" as const, stepFree: true };
+    const trip = { area: "metro-core", start: "Ayala MRT Station", end: "Greenbelt", date: "2026-10-23", time: "1500", mode: "rain" as const, stepFree: true };
     const search = buildSearch("?now=2026-10-22T09:00&map=eager", trip);
-    expect(search).toBe("?now=2026-10-22T09:00&map=eager&start=Ayala%20MRT%20Station&end=Greenbelt&date=2026-10-23&time=1500&mode=rain&step-free=1");
+    expect(search).toBe(
+      "?now=2026-10-22T09:00&map=eager&area=metro-core&start=Ayala%20MRT%20Station&end=Greenbelt&date=2026-10-23&time=1500&mode=rain&step-free=1",
+    );
     expect(parseTrip(search)).toEqual(trip);
   });
   it("replaces an old trip and drops it for a null trip", () => {
-    expect(buildSearch("?start=A&end=B&now=2026-10-22T09:00", null)).toBe("?now=2026-10-22T09:00");
+    expect(buildSearch("?area=manila&start=A&end=B&now=2026-10-22T09:00", null)).toBe("?now=2026-10-22T09:00");
     expect(buildSearch("?start=A&end=B", null)).toBe("");
   });
   it("keeps commas in map points readable", () => {
-    const s = buildSearch("", { start: "121.02346,14.55123", end: null, date: null, time: "now", mode: "shade", stepFree: false });
-    expect(s).toBe("?start=121.02346,14.55123&time=now&mode=shade");
+    const s = buildSearch("", { area: "pasay-moa", start: "121.02346,14.55123", end: null, date: null, time: "now", mode: "shade", stepFree: false });
+    expect(s).toBe("?area=pasay-moa&start=121.02346,14.55123&time=now&mode=shade");
   });
-  it("ignores bad date and time values", () => {
-    const t = parseTrip("?start=A&date=tomorrow&time=3pm&mode=other");
-    expect(t).toMatchObject({ start: "A", date: null, time: null, mode: "shade", stepFree: false });
+  it("ignores bad area, date and time values", () => {
+    const t = parseTrip("?area=../x&start=A&date=tomorrow&time=3pm&mode=other");
+    expect(t).toMatchObject({ area: null, start: "A", date: null, time: null, mode: "shade", stepFree: false });
+  });
+  it("reads an older link without an area as no area, which the app takes as metro-core", () => {
+    expect(parseTrip("?start=Ayala%20MRT%20Station&end=Greenbelt").area).toBeNull();
   });
   it("converts minutes and HHMM both ways", () => {
     expect(minuteToHHMM(900)).toBe("1500");
@@ -88,9 +93,9 @@ describe("Now slot", () => {
 
 describe("trip in the fragment", () => {
   it("round-trips through the hash and keeps the query empty", () => {
-    const trip = { start: "Ayala MRT Station", end: "121.02346,14.55123", date: "2026-10-23", time: "1500", mode: "shade" as const, stepFree: false };
+    const trip = { area: "metro-core", start: "Ayala MRT Station", end: "121.02346,14.55123", date: "2026-10-23", time: "1500", mode: "shade" as const, stepFree: false };
     const hash = hashFor(trip);
-    expect(hash).toBe("#start=Ayala%20MRT%20Station&end=121.02346,14.55123&date=2026-10-23&time=1500&mode=shade");
+    expect(hash).toBe("#area=metro-core&start=Ayala%20MRT%20Station&end=121.02346,14.55123&date=2026-10-23&time=1500&mode=shade");
     expect(tripFromHash(hash)).toEqual(trip);
     expect(hashFor(null)).toBe("");
   });

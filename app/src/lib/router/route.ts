@@ -299,15 +299,18 @@ export function findRoutes(data: Data, q: Query): Result {
   if (!validNode(data, q.from)) return empty("outside", "The start point is not on the walking map.");
   if (!validNode(data, q.to)) return empty("outside", "The end point is not on the walking map.");
   if ((q.from_snap_m ?? 0) > MAX_SNAP_M) {
-    return empty("outside", `The start point is ${Math.round(q.from_snap_m ?? 0)} m from the nearest mapped path. This prototype covers Makati CBD only.`);
+    return empty("outside", `The start point is ${Math.round(q.from_snap_m ?? 0)} m from the nearest mapped path. Routes need a start near a street or path.`);
   }
   if ((q.to_snap_m ?? 0) > MAX_SNAP_M) {
-    return empty("outside", `The end point is ${Math.round(q.to_snap_m ?? 0)} m from the nearest mapped path. This prototype covers Makati CBD only.`);
+    return empty("outside", `The end point is ${Math.round(q.to_snap_m ?? 0)} m from the nearest mapped path. Routes need an end near a street or path.`);
   }
   if (q.from === q.to) return empty("no_route", "Start and end are the same place.");
 
   const night = isNight(data, q.dateIdx, q.bucketIdx);
-  const cover: CoverMode = night || q.mode === "rain" || !data.shade ? "roof" : "shade";
+  // A per-date bundle holds only the dates fetched so far. The UI waits for the date; this guards other callers.
+  const dayShade = !!data.shade && data.shade.loaded[q.dateIdx] === 1;
+  if (data.shade && !dayShade) notes.push("Shade for this date did not load. Only roofs count as cover.");
+  const cover: CoverMode = night || q.mode === "rain" || !dayShade ? "roof" : "shade";
   if (q.stepFree) notes.push("Step-free avoids mapped steps only. Lifts and ramps are not checked.");
   const spec = buildSpec(data, q, cover, q.includeUnchecked, q.stepFree);
   const memo = new Map<number, Path | null>();

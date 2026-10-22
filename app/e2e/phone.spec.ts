@@ -2,8 +2,9 @@ import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 
 // The phone layout: the map keeps most of the screen, and no control sits under another one.
-const manifest = JSON.parse(readFileSync(new URL("../public/data/manifest.json", import.meta.url), "utf8")) as { dates: string[] };
+const manifest = JSON.parse(readFileSync(new URL("../public/data/areas/metro-core/manifest.json", import.meta.url), "utf8")) as { dates: string[] };
 const NOW = `${manifest.dates[0]}T09:00`;
+// A link from before the other areas, with no area key. It still opens in metro-core, which holds Makati CBD.
 const TRIP = `#start=Ayala%20MRT%20Station&end=Greenbelt&date=${manifest.dates[1]}&time=1500&mode=shade`;
 
 async function openTrip(page: Page) {

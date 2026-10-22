@@ -20,7 +20,7 @@ function heads(r: Result, mode: Mode = "shade") {
 // The card as static HTML, with the first route selected, as text without tags.
 function cardText(r: Result, mode: Mode = "shade"): string {
   const display = toDisplay(r, mode);
-  const end = { label: "End", sub: "", node: 1, lon: 0, lat: 0, snap_m: null };
+  const end = { label: "End", sub: "", area: "metro-core", node: 1, lon: 0, lat: 0, snap_m: null };
   const none = () => {};
   const html = renderToStaticMarkup(
     createElement(RouteCard, {
@@ -185,8 +185,8 @@ describe("no-route text", () => {
   });
 });
 
-// QA D-01 on the pipeline's real files. Skips until READY.graph and READY.shade exist.
-const DIR = join(dirname(fileURLToPath(import.meta.url)), "../../public/data");
+// QA D-01 on the pipeline's real files for metro-core, which holds Makati CBD. Skips until READY.graph and READY.shade exist.
+const DIR = join(dirname(fileURLToPath(import.meta.url)), "../../public/data/areas/metro-core");
 const mtime = (f: string) => (existsSync(join(DIR, f)) ? statSync(join(DIR, f)).mtimeMs : -1);
 const READY = mtime("READY.graph") > 0 && mtime("READY.shade") >= mtime("READY.graph");
 
@@ -196,9 +196,9 @@ const diskFetch: FetchLike = async (url) => {
   return { ok: true, status: 200, json: async () => JSON.parse(buf.toString("utf8")) as unknown, arrayBuffer: async () => new Uint8Array(buf).buffer };
 };
 
-describe.skipIf(!READY)("route card headline on real Makati data", () => {
+describe.skipIf(!READY)("route card headline on real metro-core data", () => {
   it("never calls the shortest the shadiest while a shown route has less sun", async () => {
-    const data = await loadData(DIR, diskFetch);
+    const data = await loadData(DIR, diskFetch, { dateIdx: 1 }); // the second date, as below; loadData clamps it
     const dateIdx = Math.min(1, data.manifest.dates.length - 1); // the build rolls dates daily, so never pin one
     const bucketIdx = data.manifest.buckets_min.indexOf(13 * 60);
     expect(dateIdx).toBeGreaterThanOrEqual(0);
@@ -225,7 +225,7 @@ describe.skipIf(!READY)("route card headline on real Makati data", () => {
   });
 
   it("keeps the rule line true over 300 random walks", async () => {
-    const data = await loadData(DIR, diskFetch);
+    const data = await loadData(DIR, diskFetch, { dateIdx: 1 }); // the second date, as below; loadData clamps it
     const dateIdx = Math.min(1, data.manifest.dates.length - 1); // the build rolls dates daily, so never pin one
     const nodes: number[] = [];
     for (let i = 0; i < data.nodeCount; i++) if (data.routableNode[i]) nodes.push(i);

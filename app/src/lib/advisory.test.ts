@@ -29,10 +29,21 @@ describe("PAGASA advisory window", () => {
 
   it("writes the banner line with or without Makati", () => {
     expect(advisoryLine(ISSUED, ["Marikina", "Quezon City"])).toEqual({
-      makati: false,
+      listed: false,
       text: "PAGASA thunderstorm advisory, issued 10:10 PM: Marikina, Quezon City. Makati is not listed.",
     });
     expect(advisoryLine(ISSUED, ["Makati", "Pasig"]).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Makati, Pasig. Makati is listed.");
-    expect(advisoryLine(ISSUED, ["Metro Manila"]).makati).toBe(true);
+    expect(advisoryLine(ISSUED, ["Metro Manila"]).listed).toBe(true);
+  });
+
+  it("names the cities of the area being planned", () => {
+    const core = ["Makati", "Mandaluyong", "Pasig", "Quezon City", "San Juan", "Taguig"];
+    expect(advisoryLine(ISSUED, ["Pasig", "Taguig", "Marikina"], core)).toEqual({
+      listed: true,
+      text: "PAGASA thunderstorm advisory, issued 10:10 PM: Pasig, Taguig, Marikina. Pasig and Taguig are listed.",
+    });
+    expect(advisoryLine(ISSUED, ["Marikina"], ["Pasay"]).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Marikina. Pasay is not listed.");
+    expect(advisoryLine(ISSUED, ["Marikina"], core).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Marikina. No covered city is listed.");
+    expect(advisoryLine(ISSUED, ["Metro Manila"], ["Manila"]).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Metro Manila. Metro Manila is listed.");
   });
 });

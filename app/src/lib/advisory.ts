@@ -27,12 +27,17 @@ export function advisoryCovers(issuedAt: string | null | undefined, date: string
   return t >= t0 && t <= t0 + ADVISORY_HOURS * 3600_000;
 }
 
-export function advisoryLine(issuedAt: string, cities: string[]): { text: string; makati: boolean } {
+const joinAnd = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+
+// mine: the cities of the area being planned. listed is true when the advisory names one of them or all of Metro Manila.
+export function advisoryLine(issuedAt: string, cities: string[], mine: string[] = ["Makati"]): { text: string; listed: boolean } {
   const time = /(\d{1,2}:\d{2}\s*[AP]M)/i.exec(issuedAt)?.[1] ?? issuedAt;
-  const makati = cities.includes("Makati") || cities.includes("Metro Manila");
+  const metro = cities.includes("Metro Manila");
+  const hit = mine.filter((c) => cities.includes(c));
+  const listed = metro || hit.length > 0;
+  const named = metro ? ["Metro Manila"] : listed ? hit : mine;
   const list = cities.length ? cities.join(", ") : "no Metro Manila city named";
-  return {
-    makati,
-    text: `PAGASA thunderstorm advisory, issued ${time}: ${list}. Makati is ${makati ? "listed" : "not listed"}.`,
-  };
+  // A long list of cities that are not named reads worse than one short line.
+  const verdict = !listed && named.length > 2 ? "No covered city is listed." : `${joinAnd(named)} ${named.length > 1 ? "are" : "is"} ${listed ? "listed" : "not listed"}.`;
+  return { listed, text: `PAGASA thunderstorm advisory, issued ${time}: ${list}. ${verdict}` };
 }

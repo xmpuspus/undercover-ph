@@ -51,11 +51,25 @@ export type Advisory = AdvisoryOk | Unavailable;
 export interface Endpoint {
   label: string;
   sub: string;
+  // The routing area; node is a node of that area's graph.
+  area: string;
   node: number;
   lon: number;
   lat: number;
   // Metres from the picked point to the routing node. Null for places, which the pipeline snapped.
   snap_m: number | null;
+}
+
+// One routing area from areas.json. graph_rects are the boxes its graph covers; bbox is the core area.
+export interface AreaInfo {
+  id: string;
+  name: string;
+  cities: string[];
+  bbox: [number, number, number, number];
+  graph_bbox: [number, number, number, number];
+  graph_rects: [number, number, number, number][];
+  neighbourhoods: { id: string; name: string; bbox: [number, number, number, number] }[];
+  center: [number, number];
 }
 
 export interface Markers {

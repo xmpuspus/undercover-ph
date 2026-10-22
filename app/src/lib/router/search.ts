@@ -50,12 +50,14 @@ function fuzzyWordDistance(w: string, tokens: string[]): number {
  * Case-insensitive place search over names and aliases.
  * Order: exact match, name prefix, alias prefix, every query word as a word prefix, then a typo tier.
  * In the typo tier each query word must be a word prefix or within the typo budget of a name or alias token.
+ * data can be an area's Data or any place list with its placeKeys, such as the index of every area.
+ * prefer puts its places first within a tier, for example the area of the end already picked.
  */
-export function searchPlaces(data: Data, q: string, limit = 8): Place[] {
+export function searchPlaces(data: Pick<Data, "places" | "placeKeys">, q: string, limit = 8, prefer?: (p: Place) => boolean): Place[] {
   const nq = normalize(q);
   if (!nq) return [];
   const words = nq.split(" ");
-  const hits: { place: Place; score: number; typos: number }[] = [];
+  const hits: { place: Place; score: number; typos: number; other: number }[] = [];
   data.placeKeys.forEach((k, i) => {
     let score = -1;
     let typos = 0;
@@ -80,9 +82,12 @@ export function searchPlaces(data: Data, q: string, limit = 8): Place[] {
         typos = total;
       }
     }
-    if (score >= 0) hits.push({ place: data.places[i], score, typos });
+    if (score >= 0) hits.push({ place: data.places[i], score, typos, other: prefer && !prefer(data.places[i]) ? 1 : 0 });
   });
-  hits.sort((a, b) => a.score - b.score || a.typos - b.typos || a.place.name.length - b.place.name.length || a.place.name.localeCompare(b.place.name));
+  hits.sort(
+    (a, b) =>
+      a.score - b.score || a.other - b.other || a.typos - b.typos || a.place.name.length - b.place.name.length || a.place.name.localeCompare(b.place.name),
+  );
   return hits.slice(0, limit).map((h) => h.place);
 }
 

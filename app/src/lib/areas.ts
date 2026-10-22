@@ -1,0 +1,43 @@
+import { AREA_LABELS } from "../config";
+import type { AreaInfo, Place } from "../types";
+
+type Box = [number, number, number, number];
+const inBox = ([w, s, e, n]: Box, lon: number, lat: number) => lon >= w && lon <= e && lat >= s && lat <= n;
+
+/** The short name the landing card uses, or the name from areas.json for an area the card does not list. */
+export function areaLabel(id: string, areas: AreaInfo[] | null): string {
+  return AREA_LABELS.find((a) => a.id === id)?.label ?? areas?.find((a) => a.id === id)?.name ?? id;
+}
+
+/**
+ * The area whose graph covers the point, or null outside every area. Graph boxes overlap at some edges
+ * (Greenhills and Cubao), so the current area wins, then the area whose core box holds the point.
+ */
+export function areaAt(areas: AreaInfo[], lon: number, lat: number, current: string | null): AreaInfo | null {
+  const hits = areas.filter((a) => a.graph_rects.some((r) => inBox(r, lon, lat)));
+  return hits.find((a) => a.id === current) ?? hits.find((a) => inBox(a.bbox, lon, lat)) ?? hits[0] ?? null;
+}
+
+/** Where a place is, for the search list: its neighbourhood, or its area when no neighbourhood box holds it. */
+export function placeWhere(p: Place, areas: AreaInfo[] | null): string | null {
+  const a = p.area ? areas?.find((x) => x.id === p.area) : undefined;
+  if (!a) return null;
+  return a.neighbourhoods.find((n) => inBox(n.bbox, p.lon, p.lat))?.name ?? areaLabel(a.id, areas);
+}
+
+/** The covered areas as one sentence part, in the landing card's order. */
+export function areaList(areas: AreaInfo[] | null): string {
+  const order = (id: string) => {
+    const i = AREA_LABELS.findIndex((a) => a.id === id);
+    return i < 0 ? AREA_LABELS.length : i;
+  };
+  const ids = areas ? areas.map((a) => a.id).sort((a, b) => order(a) - order(b)) : AREA_LABELS.map((a) => a.id);
+  return ids.map((id) => areaLabel(id, areas)).join("; ");
+}
+
+/** The cities PAGASA may name for an area. With no area picked, every covered city. */
+export function areaCities(id: string | null, areas: AreaInfo[] | null): string[] {
+  if (!areas) return ["Makati"];
+  const a = id ? areas.find((x) => x.id === id) : undefined;
+  return a ? a.cities : [...new Set(areas.flatMap((x) => x.cities))];
+}

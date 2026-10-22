@@ -30,23 +30,23 @@ async function getBytes(fetchImpl: FetchLike, base: string, file: string): Promi
   }
 }
 
-// Vercel compresses only listed MIME types, and shade.bin (application/octet-stream) is not one, so the deploy
-// build writes shade.bin.gz beside it: 0.54 MB instead of 2.29 MB. Inflate that here. Use shade.bin when the
-// copy is missing (dev server, local builds), broken, or the browser has no DecompressionStream.
+// Vercel compresses only listed MIME types, and .bin (application/octet-stream) is not one, so the deploy
+// build writes a .bin.gz copy beside each shade file, about a quarter of the size. Inflate that here. Use the
+// plain file when the copy is missing (dev server, local builds), broken, or the browser has no DecompressionStream.
 // expected is the size the manifest promises. A gzip copy that inflates to any other size counts as broken.
-async function getShade(fetchImpl: FetchLike, base: string, expected: number): Promise<ArrayBuffer | null> {
+async function getShade(fetchImpl: FetchLike, base: string, expected: number, file = "shade.bin"): Promise<ArrayBuffer | null> {
   if (typeof DecompressionStream === "function") {
-    const gz = await getBytes(fetchImpl, base, "shade.bin.gz");
+    const gz = await getBytes(fetchImpl, base, `${file}.gz`);
     if (gz) {
       try {
         const out = await gunzip(gz);
         if (out.byteLength === expected) return out;
       } catch {
-        // Fall through to shade.bin.
+        // Fall through to the plain file.
       }
     }
   }
-  return getBytes(fetchImpl, base, "shade.bin");
+  return getBytes(fetchImpl, base, file);
 }
 
 async function gunzip(buf: ArrayBuffer): Promise<ArrayBuffer> {
@@ -58,12 +58,20 @@ async function gunzip(buf: ArrayBuffer): Promise<ArrayBuffer> {
   return new Response(stream).arrayBuffer();
 }
 
+/** The shade file of one date in the per-date layout. */
+function dayFile(m: Manifest, dateIdx: number): string {
+  return m.shade?.files?.[dateIdx] ?? `shade/${m.dates[dateIdx]}.bin`;
+}
+
 /**
- * Fetch manifest.json, graph.json, places.json, hours.json, and shade.bin.gz or shade.bin (when manifest.shade exists).
- * Pass the UI's data URL as base, for example `${import.meta.env.BASE_URL}data/`.
- * A missing or mismatched shade.bin does not throw. data.shade is then null and data.loadNotes says why.
+ * Fetch manifest.json, graph.json, places.json, hours.json, and the shade files (when manifest.shade exists).
+ * Pass the UI's data URL for one area as base, for example `${import.meta.env.BASE_URL}data/areas/metro-core/`.
+ * A per-date manifest (shade.per_date) keeps one shade file per date, so only shade/lowconf.bin and one date's file
+ * load here: opts.date when the manifest has it, else opts.dateIdx, else the first date. loadShadeDate fetches
+ * another date when the walker picks it. An older manifest without per_date loads the single shade.bin.
+ * A missing or mismatched shade file does not throw. data.shade is then null and data.loadNotes says why.
  */
-export async function loadData(base = "data", fetchImpl?: FetchLike): Promise<Data> {
+export async function loadData(base = "data", fetchImpl?: FetchLike, opts: { dateIdx?: number; date?: string } = {}): Promise<Data> {
   const f: FetchLike = fetchImpl ?? ((url: string) => fetch(url, { cache: "no-cache" }));
   const [manifest, graph, places, hours] = await Promise.all([
     getJson(f, base, "manifest.json"),
@@ -72,27 +80,88 @@ export async function loadData(base = "data", fetchImpl?: FetchLike): Promise<Da
     getJson(f, base, "hours.json"),
   ]);
   const m = manifest as Manifest;
-  const shade = m.shade ? await getShade(f, base, 2 * m.shade.n_dates * m.shade.n_buckets * m.shade.n_edges + m.shade.n_edges) : null;
-  return buildData({
-    manifest: m,
-    graph: graph as RawGraph,
-    places: places as Place[],
-    hours: hours as HoursRow[],
-    shade,
-  });
+  const h = m.shade;
+  let shade: ArrayBuffer | null = null;
+  let lowconf: ArrayBuffer | null = null;
+  const days: Record<number, ArrayBuffer | null> = {};
+  if (h?.per_date) {
+    const named = opts.date ? m.dates.indexOf(opts.date) : -1;
+    const d = named >= 0 ? named : Math.min(Math.max(0, opts.dateIdx ?? 0), Math.max(0, m.dates.length - 1));
+    [lowconf, days[d]] = await Promise.all([
+      getBytes(f, base, h.lowconf ?? "shade/lowconf.bin"),
+      getShade(f, base, 2 * h.n_buckets * h.n_edges, dayFile(m, d)),
+    ]);
+  } else if (h) {
+    shade = await getShade(f, base, 2 * h.n_dates * h.n_buckets * h.n_edges + h.n_edges);
+  }
+  const data = buildData({ manifest: m, graph: graph as RawGraph, places: places as Place[], hours: hours as HoursRow[], shade, lowconf, days });
+  data.source = { base, fetchImpl: f };
+  return data;
 }
 
-function parseShade(manifest: Manifest, bytes: ArrayBuffer | null, edgeCount: number, notes: string[]): Shade | null {
+/**
+ * Fetch and add the shade file of one date, for data from a per-date manifest. True when that date's shade is
+ * in place, now or already. False when it did not load; findRoutes then counts only roofs on that date.
+ */
+export async function loadShadeDate(data: Data, dateIdx: number): Promise<boolean> {
+  const s = data.shade;
+  if (!s || !(dateIdx >= 0 && dateIdx < s.nDates)) return false;
+  if (s.loaded[dateIdx]) return true;
+  if (!data.source) return false;
+  const bytes = await getShade(data.source.fetchImpl, data.source.base, 2 * s.nBuckets * s.nEdges, dayFile(data.manifest, dateIdx));
+  return fillDay(s, dateIdx, bytes);
+}
+
+// One date's file: uint8 building[b][e], then uint8 tree[b][e]. It goes into that date's plane of the full
+// arrays, so the router reads every date the same way.
+function fillDay(s: Shade, d: number, bytes: ArrayBuffer | null): boolean {
+  const plane = s.nBuckets * s.nEdges;
+  if (!bytes || bytes.byteLength !== 2 * plane) return false;
+  s.building.set(new Uint8Array(bytes, 0, plane), d * plane);
+  s.tree.set(new Uint8Array(bytes, plane, plane), d * plane);
+  s.loaded[d] = 1;
+  return true;
+}
+
+function parseShade(manifest: Manifest, raw: RawFiles, edgeCount: number, notes: string[]): Shade | null {
   const h = manifest.shade;
   if (!h) {
     notes.push("Shade data is not ready. Only roofs count as cover.");
     return null;
   }
+  const plane = h.n_dates * h.n_buckets * h.n_edges;
+  if (h.per_date) {
+    const lc = raw.lowconf ?? null;
+    if (!lc) {
+      notes.push("shade/lowconf.bin did not load. Only roofs count as cover.");
+      return null;
+    }
+    if (h.n_edges !== edgeCount || lc.byteLength !== h.n_edges) {
+      notes.push(`The shade files do not match the graph (${lc.byteLength} bytes for ${h.n_edges} edges, ${edgeCount} edges in the graph). Only roofs count as cover.`);
+      return null;
+    }
+    if (h.n_dates !== manifest.dates.length || h.n_buckets !== manifest.buckets_min.length) {
+      notes.push("The shade dates or buckets do not match the manifest. Only roofs count as cover.");
+      return null;
+    }
+    // A date not loaded yet reads 255, no shade value, never 0, which would claim full sun.
+    const s: Shade = {
+      nDates: h.n_dates,
+      nBuckets: h.n_buckets,
+      nEdges: h.n_edges,
+      building: new Uint8Array(plane).fill(255),
+      tree: new Uint8Array(plane).fill(255),
+      lowconf: new Uint8Array(lc.slice(0)),
+      loaded: new Uint8Array(h.n_dates),
+    };
+    for (const [d, bytes] of Object.entries(raw.days ?? {})) fillDay(s, Number(d), bytes);
+    return s;
+  }
+  const bytes = raw.shade;
   if (!bytes) {
     notes.push("shade.bin did not load. Only roofs count as cover.");
     return null;
   }
-  const plane = h.n_dates * h.n_buckets * h.n_edges;
   const expected = 2 * plane + h.n_edges;
   if (h.n_edges !== edgeCount || bytes.byteLength !== expected) {
     notes.push(
@@ -112,7 +181,18 @@ function parseShade(manifest: Manifest, bytes: ArrayBuffer | null, edgeCount: nu
     building: new Uint8Array(bytes, 0, plane),
     tree: new Uint8Array(bytes, plane, plane),
     lowconf: new Uint8Array(bytes, 2 * plane, h.n_edges),
+    loaded: new Uint8Array(h.n_dates).fill(1),
   };
+}
+
+/** Search keys per place: lower case without accents, and every word of the name and aliases. */
+export function placeKeys(places: Place[]): Data["placeKeys"] {
+  return places.map((pl) => {
+    const name = normalize(pl.name);
+    const aliases = (pl.aliases ?? []).map(normalize).filter((a) => a.length > 0);
+    const tokens = [...new Set([name, ...aliases].flatMap((k) => k.split(" ")).filter((t) => t.length > 0))];
+    return { name, aliases, tokens };
+  });
 }
 
 /** Index parsed files for routing. Unit tests call it with hand-built graphs. */
@@ -228,17 +308,11 @@ export function buildData(raw: RawFiles): Data {
   }
 
   const loadNotes: string[] = [];
-  const shade = parseShade(manifest, raw.shade, E, loadNotes);
+  const shade = parseShade(manifest, raw, E, loadNotes);
   const nf = graph.node_flags;
   const nodeFlags = Array.isArray(nf) && nf.length === N ? Uint8Array.from(nf) : null;
   if (!nodeFlags) loadNotes.push("Crossing data is missing, so routes can change sides of a road mid-block.");
   const places: Place[] = (raw.places ?? []).map((pl) => ({ ...pl, aliases: Array.isArray(pl.aliases) ? pl.aliases : [] }));
-  const placeKeys = places.map((pl) => {
-    const name = normalize(pl.name);
-    const aliases = pl.aliases.map(normalize).filter((a) => a.length > 0);
-    const tokens = [...new Set([name, ...aliases].flatMap((k) => k.split(" ")).filter((t) => t.length > 0))];
-    return { name, aliases, tokens };
-  });
 
   return {
     manifest,
@@ -277,6 +351,7 @@ export function buildData(raw: RawFiles): Data {
     hoursOpen: parseHours(raw.hours ?? []),
     shade,
     loadNotes,
-    placeKeys,
+    placeKeys: placeKeys(places),
+    source: null,
   };
 }

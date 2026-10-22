@@ -29,8 +29,8 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (m: Mode)
   );
 }
 
-// One message for every search with no match: the list cannot tell a missing Makati place from a place elsewhere.
-const NO_MATCH = "Not in the place list for Makati CBD. Places outside it are not covered yet. Try another name, or tap the map.";
+// One message for every search with no match: the list cannot tell a missing place from a place outside the areas.
+const NO_MATCH = "No place by that name in the six covered areas. Try another name, or tap the map.";
 
 function categoryLabel(c: string): string {
   const s = c.replace(/_/g, " ");
@@ -82,12 +82,15 @@ function useCombobox(id: string, places: Place[], onPick: (p: Place) => void, qu
   };
 }
 
-export function PlaceList({ id, places, onPick, testid, active }: { id: string; places: Place[]; onPick: (p: Place) => void; testid: string; active: number }) {
+// where names the neighbourhood or area of a place, so a name found in several areas reads apart.
+type Where = (p: Place) => string | null;
+
+export function PlaceList({ id, places, onPick, testid, active, where }: { id: string; places: Place[]; onPick: (p: Place) => void; testid: string; active: number; where?: Where }) {
   return (
     <ul className="divide-y divide-slate-100" role="listbox" id={id} aria-label="Places" data-testid={testid}>
       {places.map((pl, i) => (
         <li
-          key={`${pl.name}-${pl.node_id}`}
+          key={`${pl.area ?? ""}-${pl.name}-${pl.node_id}`}
           id={`${id}-${i}`}
           role="option"
           aria-selected={i === active}
@@ -100,8 +103,7 @@ export function PlaceList({ id, places, onPick, testid, active }: { id: string; 
             <span className="block truncate text-[15px] text-ink">{pl.name}</span>
             {/* detail tells apart places that share a name, for example "Muji, in Greenbelt 3". */}
             <span className="block truncate text-[12px] text-slate-600">
-              {categoryLabel(pl.category)}
-              {pl.detail ? `, ${pl.detail}` : ""}
+              {[`${categoryLabel(pl.category)}${pl.detail ? `, ${pl.detail}` : ""}`, where?.(pl)].filter(Boolean).join(" · ")}
             </span>
           </span>
         </li>
@@ -141,9 +143,10 @@ interface SearchProps {
   suggested: Place[];
   onPick: (p: Place) => void;
   onBack: (() => void) | null;
+  where?: Where;
 }
 
-export function DestinationSearch({ data, mode, query, onQuery, results, suggested, onPick, onBack }: SearchProps) {
+export function DestinationSearch({ data, mode, query, onQuery, results, suggested, onPick, onBack, where }: SearchProps) {
   const list = data.status === "ready" ? (query.trim() ? results : suggested) : [];
   const combo = useCombobox("dest-places", list, onPick, query, onQuery);
   return (
@@ -177,7 +180,7 @@ export function DestinationSearch({ data, mode, query, onQuery, results, suggest
       {data.status !== "ready" ? (
         <DataNote data={data} />
       ) : list.length ? (
-        <PlaceList id="dest-places" places={list} onPick={onPick} testid="destination-results" active={combo.active} />
+        <PlaceList id="dest-places" places={list} onPick={onPick} testid="destination-results" active={combo.active} where={where} />
       ) : (
         <p className="px-3 pb-3 pt-1 text-[13px] text-slate-500">
           {query.trim() ? NO_MATCH : "Type a place name, or tap the map."}
@@ -202,6 +205,7 @@ interface TripProps {
   locating: boolean;
   notice: string | null;
   onBack: () => void;
+  where?: Where;
 }
 
 export function TripFields(p: TripProps) {
@@ -269,7 +273,7 @@ export function TripFields(p: TripProps) {
       {p.data.status === "ready" && list.length > 0 && (
         // Focusable, so keyboard users can scroll the list too (WCAG 2.1.1).
         <div className="max-h-[38vh] overflow-y-auto border-t border-slate-100" tabIndex={0} aria-label="Places">
-          <PlaceList id="trip-places" places={list} onPick={p.onPick} testid={`${p.active}-results`} active={combo.active} />
+          <PlaceList id="trip-places" places={list} onPick={p.onPick} testid={`${p.active}-results`} active={combo.active} where={p.where} />
         </div>
       )}
       {p.data.status === "ready" && p.query.trim() && !list.length && <p className="px-3 pb-3 text-[13px] text-slate-500">{NO_MATCH}</p>}

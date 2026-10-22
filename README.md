@@ -5,7 +5,16 @@
 [![Data: ODbL](https://img.shields.io/badge/data-ODbL%201.0-blue.svg)](LICENSE)
 [![Status: prototype](https://img.shields.io/badge/status-prototype-orange.svg)](#limits-and-the-honest-not-yet)
 
-> Walking routes in Makati CBD that keep you in the shade on sunny days, or under a roof when it rains. A Philippine take on Singapore's [Undercover](https://undercover.gov.sg/) prototype, built on open data. Every route runs in your browser, so no server sees where you start or where you go.
+> Walking routes in six areas of Metro Manila that keep you in the shade on sunny days, or under a roof when it rains. A Philippine take on Singapore's [Undercover](https://undercover.gov.sg/) prototype, built on open data. Every route runs in your browser, so no server sees where you start or where you go.
+
+The six areas:
+
+- Makati CBD, Rockwell, BGC, Shaw, Ortigas, Pasig and Greenhills
+- Bay Area and MOA
+- Cubao and Eastwood
+- North Avenue, QC Circle and UP Diliman
+- Manila
+- Alabang
 
 [![A walk from Ayala MRT Station to Greenbelt on undercover.ph: the landing card, the Shaded choice, the destination and start search, tomorrow at 3 PM, three routes on the 3D map with their shaded share, and the route card with minutes in sun and the roof, building, and tree split](docs/demo/hero.gif)](https://undercover.ph)
 
@@ -99,14 +108,18 @@ The full method, with its numbers and limits, is in [docs/methodology.md](docs/m
 
 ## Data products
 
+Each area keeps its files in `app/public/data/areas/<id>/`. Two files cover every area.
+
 | File | What it holds |
 | --- | --- |
-| `app/public/data/graph.json` | Walk network: 6,274 edges, 5,586 open to routes (221.4 km), with access, crossing, and cover flags |
-| `app/public/data/places.json` | 1,187 named places for search |
-| `app/public/data/hours.json` | 18 opening-hours rows, each with its source |
-| `app/public/data/buildings_display.geojson` | Buildings with heights for the 3D map |
-| `shade.bin` and `shadows/` | Shade per edge and ground shadow images, generated at build time |
-| `app/public/data/manifest.json` | Dates, sun positions, sources, and every method limit |
+| `app/public/data/areas.json` | The areas, their cities, and the boxes their walk networks cover |
+| `app/public/data/places_index.json` | Every named place of every area, for search |
+| `areas/<id>/graph.json` | Walk network, with access, crossing, and cover flags |
+| `areas/<id>/places.json` | The area's named places |
+| `areas/<id>/hours.json` | Opening-hours rows, each with its source |
+| `areas/<id>/shade/<date>.bin` and `shade/lowconf.bin` | Shade per edge, one file per date, generated at build time. The app fetches only the date you pick |
+| `areas/<id>/manifest.json` | Dates, sun positions, sources, and every method limit |
+| `app/public/data/buildings.pmtiles` and `trees.pmtiles` | Buildings with heights and trees for the 3D map |
 
 ## Limits and the honest "not yet"
 
@@ -116,7 +129,7 @@ The full method, with its numbers and limits, is in [docs/methodology.md](docs/m
 - **Heights.** Google's heights stop at 100 m and date from 2023. OpenStreetMap supplies most tower heights.
 - **Taglish copy.** A native speaker has not reviewed it yet.
 - **Next:** a field walk of Makati's covered network, and a check of the shade against photos.
-- **More areas:** BGC, Ortigas, Shaw and Boni, and Pasig first. Then Quezon City, Manila, Pasay, and Alabang.
+- **One area per route.** Each area has its own walk network. A start in one area and an end in another get no route, and the app says so.
 
 ## Data sources and licence
 

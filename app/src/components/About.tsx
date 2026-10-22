@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { APP_NAME, NIGHT_ALT_DEG } from "../config";
+import { APP_NAME, AREA_LABELS, NIGHT_ALT_DEG } from "../config";
 import type { Manifest } from "../types";
 import { REC_MAX_DETOUR, REC_MIN_CUT } from "../lib/routerClient";
 import { fmtStamp } from "../lib/time";
@@ -25,7 +25,7 @@ const SOURCES: { name: string; licence: string; text: string; url: string; licen
   {
     name: "Meta and WRI canopy height",
     licence: "CC BY 4.0. Source imagery for CHM © 2016 Maxar",
-    text: "Meta and World Resources Institute (WRI), 2024. High Resolution Canopy Height Maps (CHM). Clipped to Makati for tree shade.",
+    text: "Meta and World Resources Institute (WRI), 2024. High Resolution Canopy Height Maps (CHM). Clipped to the covered areas for tree shade.",
     url: "https://registry.opendata.aws/dataforgood-fb-forests/",
     licenceUrl: CC_BY,
   },
@@ -39,7 +39,7 @@ const SOURCES: { name: string; licence: string; text: string; url: string; licen
   {
     name: "Open-Meteo",
     licence: "CC BY 4.0",
-    text: "Hourly forecast for Makati.",
+    text: "Hourly forecast for each area.",
     url: "https://open-meteo.com/",
     licenceUrl: CC_BY,
   },
@@ -116,9 +116,16 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
           </button>
         </div>
         <p className="mt-2">
-          {APP_NAME} finds walking routes in Makati CBD that stay in shade or under a roof. It is a prototype by an independent developer. It is not affiliated with
-          any government agency.
+          {APP_NAME} finds walking routes that stay in shade or under a roof. It is a prototype by an independent developer. It is not affiliated with any
+          government agency.
         </p>
+        <p className="mt-2">It covers six areas of Metro Manila:</p>
+        <ul className="mt-1 list-disc space-y-0.5 pl-5" data-testid="about-areas">
+          {AREA_LABELS.map((a) => (
+            <li key={a.id}>{a.label}</li>
+          ))}
+        </ul>
+        <p className="mt-2">A route starts and ends in the same area.</p>
 
         <h3 className="mt-4 font-semibold text-ink">How it works</h3>
         <ul className="mt-1 list-disc space-y-1 pl-5">

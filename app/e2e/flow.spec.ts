@@ -3,8 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 
 const tripOf = (href: string) => new URLSearchParams(new URL(href).hash.replace(/^#/, ""));
 
-// Pin "now" to 09:00 on the first manifest date, so "Tomorrow" always exists in the data.
-const manifest = JSON.parse(readFileSync(new URL("../public/data/manifest.json", import.meta.url), "utf8")) as { dates: string[] };
+// Pin "now" to 09:00 on the first manifest date, so "Tomorrow" always exists in the data. Ayala MRT Station and
+// Greenbelt are in metro-core, the area that holds Makati CBD; every area comes from the same daily build.
+const manifest = JSON.parse(readFileSync(new URL("../public/data/areas/metro-core/manifest.json", import.meta.url), "utf8")) as { dates: string[] };
 const NOW = `${manifest.dates[0]}T09:00`;
 
 async function mapIdle(page: Page) {
@@ -105,6 +106,7 @@ test("Back steps to the previous stage and a reload keeps the trip", async ({ pa
   // The trip rides in the fragment, which the browser never sends to the server. ?now= stays in the query.
   const url = new URL(page.url());
   const trip = tripOf(page.url());
+  expect(trip.get("area")).toBe("metro-core");
   expect(trip.get("start")).toBe("Ayala MRT Station");
   expect(trip.get("end")).toBe("Greenbelt");
   expect(trip.get("time")).toBe("now");
@@ -197,4 +199,51 @@ test("Now after the last slot is a night walk today, not tomorrow morning", asyn
   await expect(page.getByTestId("now-chip")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("date-chip")).toContainText("Today");
   await expect(page.getByText("Leaving now, 7:10 PM, after dark")).toBeVisible();
+});
+
+test("plan a walk in BGC, tomorrow at 3 PM", async ({ page }) => {
+  await page.goto(`/?now=${NOW}`);
+  await expect(page.getByTestId("landing-areas")).toContainText("Bay Area and MOA");
+  await expect(page.getByTestId("pick-shade")).toBeEnabled({ timeout: 60_000 });
+  await page.getByTestId("pick-shade").click();
+  await pickPlace(page, "destination-input", "Market! Market!");
+  await pickPlace(page, "from-input", "Bonifacio High Street");
+  await page.getByTestId("date-chip").click();
+  await page.locator('[data-testid="date-option"][data-label="Tomorrow"]').click();
+  await page.getByTestId("hour-chip").click();
+  await page.getByTestId("hour-option-900").click();
+  // Bonifacio High Street to Market! Market! always has a route. A router error must fail the test.
+  // Tomorrow's shade file loads on the pick, and the card dims while the new search runs; wait for both.
+  await expect(page.getByTestId("route-card")).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+  await expect(page.getByTestId("route-state")).toHaveCount(0);
+  await expect(page.getByTestId("route-card")).toContainText("Leaving Tomorrow, 3 PM");
+  console.log(`[bgc] summary="${(await page.getByTestId("route-summary").innerText()).replace(/\s+/g, " ")}"`);
+  const trip = tripOf(page.url());
+  expect(trip.get("area")).toBe("metro-core");
+  expect(trip.get("end")).toBe("Market! Market!");
+  expect(trip.get("start")).toBe("Bonifacio High Street");
+  expect(trip.get("date")).toBe(manifest.dates[1]);
+  expect(trip.get("time")).toBe("1500");
+});
+
+test("a start in another area says routes stay inside one area and offers to change the start", async ({ page }) => {
+  await page.goto(`/?now=${NOW}`);
+  await expect(page.getByTestId("pick-shade")).toBeEnabled({ timeout: 60_000 });
+  await page.getByTestId("pick-shade").click();
+  await pickPlace(page, "destination-input", "Greenbelt");
+  await pickPlace(page, "from-input", "SM Mall of Asia");
+  const msg = page.getByTestId("cross-area");
+  await expect(msg).toBeVisible();
+  await expect(msg).toContainText("Routes stay inside one area.");
+  await expect(msg).toContainText("SM Mall of Asia is in Bay Area and MOA.");
+  await expect(msg).toContainText("Greenbelt is in Makati CBD, Rockwell, BGC, Shaw, Ortigas, Pasig and Greenhills.");
+  await expect(page.getByTestId("route-card")).toHaveCount(0);
+  await expect(page.getByTestId("route-peek")).toHaveCount(0);
+  // Change the start to a place in the end's area, and the route comes back.
+  await page.getByTestId("cross-area-edit").click();
+  await expect(page.getByTestId("from-input")).toBeVisible();
+  await pickPlace(page, "from-input", "Glorietta");
+  await expect(page.getByTestId("route-card")).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByTestId("cross-area")).toHaveCount(0);
 });

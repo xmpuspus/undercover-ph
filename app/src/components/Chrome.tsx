@@ -29,28 +29,31 @@ export function AdvisoryBar({
   date,
   minute,
   mode,
+  cities,
   onRain,
 }: {
   advisory: Advisory | null;
   date: string;
   minute: number;
   mode: Mode;
+  // The cities of the area being planned. The bar says whether the advisory names one of them.
+  cities: string[];
   onRain: () => void;
 }) {
   const [hidden, setHidden] = useState(false);
   if (hidden || !advisory || advisory.status !== "ok" || !advisory.text || !advisory.issued_at) return null;
   if (!advisoryCovers(advisory.issued_at, date, minute)) return null;
-  const { text, makati } = advisoryLine(advisory.issued_at, advisory.cities);
+  const { text, listed } = advisoryLine(advisory.issued_at, advisory.cities, cities);
   return (
     <div
-      className={`flex items-start gap-2 px-4 py-1.5 text-[12px] leading-snug ${makati ? "bg-amber-300 text-ink" : "bg-amber-50 text-amber-950"}`}
+      className={`flex items-start gap-2 px-4 py-1.5 text-[12px] leading-snug ${listed ? "bg-amber-300 text-ink" : "bg-amber-50 text-amber-950"}`}
       role="status"
       data-testid="advisory"
     >
       <AlertIcon size={14} className="mt-0.5 shrink-0" />
       <p className="min-w-0 flex-1">
         {text}{" "}
-        {makati &&
+        {listed &&
           (mode === "rain" ? (
             <span className="font-semibold">Rain mode first.</span>
           ) : (

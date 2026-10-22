@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { searchPlaces } from "../index";
+import { placeKeys, searchPlaces } from "../index";
 import { boundedEditDistance } from "../search";
 import type { Place } from "../types";
 import { fan, pt } from "./helpers";
@@ -89,5 +89,30 @@ describe("detail", () => {
   it("does not search the detail text", () => {
     const d = searchData([place("Muji", { detail: "in Greenbelt 3" })]);
     expect(searchPlaces(d, "greenbelt")).toEqual([]);
+  });
+});
+
+describe("search over every area", () => {
+  // The index of all areas is a place list with its keys, no graph.
+  const list = [
+    place("Starbucks", { area: "pasay-moa", node_id: 1 }),
+    place("Starbucks", { area: "metro-core", node_id: 2 }),
+    place("Starbucks Reserve", { area: "metro-core", node_id: 3 }),
+    place("SM Mall of Asia", { area: "pasay-moa", node_id: 4 }),
+  ];
+  const index = { places: list, placeKeys: placeKeys(list) };
+
+  it("searches an index built without a graph", () => {
+    expect(searchPlaces(index, "mall of asia")[0].area).toBe("pasay-moa");
+  });
+
+  it("puts the preferred area first within a tier, never above a better tier", () => {
+    const core = (p: Place) => p.area === "metro-core";
+    expect(searchPlaces(index, "starbucks", 8, core).map((p) => [p.name, p.area])).toEqual([
+      ["Starbucks", "metro-core"],
+      ["Starbucks", "pasay-moa"],
+      ["Starbucks Reserve", "metro-core"],
+    ]);
+    expect(searchPlaces(index, "sm mall of asia", 8, core)[0].name).toBe("SM Mall of Asia");
   });
 });

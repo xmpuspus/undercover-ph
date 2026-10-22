@@ -2,11 +2,14 @@ import type { Mode } from "../types";
 
 // The trip lives in the URL fragment, so a reload or a shared link restores it. Browsers never send the
 // fragment to a server, so no start or end reaches a request log.
-// #start=Ayala%20MRT%20Station&end=Greenbelt&date=2026-10-23&time=1500&mode=shade&step-free=1
+// #area=metro-core&start=Ayala%20MRT%20Station&end=Greenbelt&date=2026-10-23&time=1500&mode=shade&step-free=1
+// area names the routing area; start and end resolve inside it. A link without area predates the other areas
+// and means metro-core, which holds Makati CBD.
 // A place travels by name, or as n<node id> when its name is not unique. A map point travels as lon,lat.
 // time=now means "leave when the link is opened". Other query params (now, map) pass through untouched.
 
 export interface TripParams {
+  area: string | null;
   start: string | null;
   end: string | null;
   date: string | null;
@@ -20,7 +23,8 @@ export type EndpointRef =
   | { kind: "node"; node: number }
   | { kind: "point"; lon: number; lat: number };
 
-const TRIP_KEYS = new Set(["start", "end", "date", "time", "mode", "step-free"]);
+const TRIP_KEYS = new Set(["area", "start", "end", "date", "time", "mode", "step-free"]);
+const AREA_ID = /^[a-z0-9-]+$/;
 const POINT = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
 const NODE = /^n(\d+)$/;
 // "Muji~n3557": a repeated name with the node that tells its copies apart. Several places can share one node,
@@ -55,9 +59,11 @@ export const hhmmToMinute = (s: string) => Number(s.slice(0, 2)) * 60 + Number(s
 
 export function parseTrip(search: string): TripParams {
   const q = new URLSearchParams(search);
+  const area = q.get("area");
   const date = q.get("date");
   const time = q.get("time");
   return {
+    area: area && AREA_ID.test(area) ? area : null,
     start: q.get("start") || null,
     end: q.get("end") || null,
     date: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null,
@@ -77,6 +83,7 @@ export function buildSearch(search: string, trip: TripParams | null): string {
     const add = (k: string, v: string | null) => {
       if (v) keep.push(`${k}=${encodeURIComponent(v).replace(/%2C/g, ",")}`);
     };
+    add("area", trip.area);
     add("start", trip.start);
     add("end", trip.end);
     add("date", trip.date);

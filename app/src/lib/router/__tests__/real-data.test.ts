@@ -1,17 +1,24 @@
 /// <reference types="node" />
-// Loads the pipeline's real files from app/public/data. Skips until READY.graph and READY.shade exist.
+// Loads the pipeline's real files from app/public/data/areas/<id>. Each area skips until its READY.graph and
+// READY.shade exist.
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { sideSwitch, Switch } from "../astar";
 import { findRoutes, loadData, openAt, searchPlaces } from "../index";
-import type { Data, FetchLike, Query, Result, Route } from "../types";
+import type { Data, FetchLike, Place, Query, Result, Route } from "../types";
 
-const DIR = join(dirname(fileURLToPath(import.meta.url)), "../../../../public/data");
-const mtime = (f: string) => (existsSync(join(DIR, f)) ? statSync(join(DIR, f)).mtimeMs : -1);
+const AREAS = join(dirname(fileURLToPath(import.meta.url)), "../../../../public/data/areas");
+const DIR = join(AREAS, "metro-core");
 // Shade is built from the graph, so a shade marker older than the graph marker is stale.
-const READY = mtime("READY.graph") > 0 && mtime("READY.shade") >= mtime("READY.graph");
+function ready(dir: string): boolean {
+  const mtime = (f: string) => (existsSync(join(dir, f)) ? statSync(join(dir, f)).mtimeMs : -1);
+  return mtime("READY.graph") > 0 && mtime("READY.shade") >= mtime("READY.graph");
+}
+const READY = ready(DIR);
+// The build rolls dates daily, so never pin one: use the second manifest date. loadData clamps it.
+const SECOND_DATE = { dateIdx: 1 };
 
 const diskFetch: FetchLike = async (url) => {
   const missing = { ok: false, status: 404, json: async () => null, arrayBuffer: async () => new ArrayBuffer(0) };
@@ -103,13 +110,14 @@ function sides(data: Data, route: Route) {
 
 const routeSides = (data: Data, r: Result) => ({ state: r.state, sun: r.sun, notes: r.notes, routes: r.routes.map((x) => sides(data, x)) });
 
-describe.skipIf(!READY)("real Makati data", () => {
+describe.skipIf(!READY)("real metro-core data (Makati CBD and its neighbours)", () => {
   it("routes Ayala MRT Station to Greenbelt at 15:00 on the second data date and times 100 pairs", async () => {
     const t0 = performance.now();
-    const data = await loadData(DIR, diskFetch);
+    const data = await loadData(DIR, diskFetch, SECOND_DATE);
     const loadMs = performance.now() - t0;
     expect(data.loadNotes).toEqual([]);
     expect(data.shade).not.toBeNull();
+    expect(data.shade!.loaded[Math.min(1, data.manifest.dates.length - 1)]).toBe(1);
     // A* stays admissible only if the heuristic scale is at most the smallest len_m / chord ratio.
     const ratio = minLenChordRatio(data);
     expect(data.hScale).toBeLessThanOrEqual(ratio);
@@ -240,3 +248,63 @@ describe.skipIf(!READY)("real Makati data", () => {
     );
   }, 120000);
 });
+
+// One walk between two real places in each area. Each end lists the names it may go by, first match wins,
+// so a rename in the place list fails here with the names it looked for.
+const TRIPS: { area: string; label: string; from: string[]; to: string[] }[] = [
+  { area: "metro-core", label: "BGC", from: ["Bonifacio High Street"], to: ["Market! Market!"] },
+  { area: "metro-core", label: "Ortigas", from: ["SM Megamall"], to: ["The Podium"] },
+  { area: "pasay-moa", label: "Bay Area", from: ["SM Mall of Asia"], to: ["SMX Convention Center"] },
+  { area: "cubao-eastwood", label: "Cubao", from: ["Gateway Mall 1", "Gateway Mall"], to: ["Smart Araneta Coliseum", "Araneta Coliseum"] },
+  { area: "qc-north", label: "North Avenue", from: ["TriNoma"], to: ["SM City North EDSA"] },
+  { area: "manila", label: "Intramuros", from: ["Intramuros"], to: ["Rizal Park", "Jose Rizal Monument"] },
+  { area: "alabang", label: "Alabang", from: ["Festival Mall", "Festival Alabang"], to: ["Alabang Town Center"] },
+];
+
+const loaded = new Map<string, Promise<Data>>();
+const areaData = (id: string) => {
+  if (!loaded.has(id)) loaded.set(id, loadData(join(AREAS, id), diskFetch, SECOND_DATE));
+  return loaded.get(id)!;
+};
+const byName = (data: Data, names: string[]): Place | undefined => {
+  for (const n of names) {
+    const p = data.places.find((x) => x.name.toLowerCase() === n.toLowerCase());
+    if (p) return p;
+  }
+  return undefined;
+};
+
+for (const trip of TRIPS) {
+  describe.skipIf(!ready(join(AREAS, trip.area)))(`real ${trip.area} data`, () => {
+    it(`routes ${trip.label}: ${trip.from[0]} to ${trip.to[0]} at 15:00 on the second data date`, async () => {
+      const data = await areaData(trip.area);
+      expect(data.loadNotes).toEqual([]);
+      const dateIdx = Math.min(1, data.manifest.dates.length - 1);
+      expect(data.shade?.loaded[dateIdx]).toBe(1);
+      const bucketIdx = data.manifest.buckets_min.indexOf(900);
+      expect(bucketIdx).toBeGreaterThanOrEqual(0);
+      const from = byName(data, trip.from);
+      const to = byName(data, trip.to);
+      expect(from, `no place named ${trip.from.join(" or ")} in ${trip.area}`).toBeDefined();
+      expect(to, `no place named ${trip.to.join(" or ")} in ${trip.area}`).toBeDefined();
+      const r = findRoutes(data, { from: from!.node_id, to: to!.node_id, dateIdx, bucketIdx, mode: "shade", stepFree: false, includeUnchecked: false, departMin: 900 });
+      console.log(
+        "AREA_TRIP",
+        JSON.stringify({
+          area: trip.area,
+          date: data.manifest.dates[dateIdx],
+          from: from!.name,
+          to: to!.name,
+          state: r.state,
+          notes: r.notes,
+          routes: r.routes.map((x) => ({ label: x.label, length_m: x.length_m, minutes: x.minutes, covered_pct: x.covered_pct, sun_minutes: x.sun_minutes })),
+        }),
+      );
+      expect(r.state).toBe("ok");
+      expect(r.routes.length).toBeGreaterThan(0);
+      for (const x of r.routes) expect(x.length_m).toBeGreaterThan(0);
+      // Some route uses the date's shade, so the per-date file is in play.
+      expect(r.routes.some((x) => x.split.building_m + x.split.tree_m > 0)).toBe(true);
+    }, 60000);
+  });
+}
