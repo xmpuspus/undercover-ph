@@ -71,6 +71,36 @@ function line(coords: [number, number][], props: Record<string, unknown>): GeoJS
   return { type: "Feature", properties: props, geometry: { type: "LineString", coordinates: coords } };
 }
 
+// The dark basemap draws its labels in dim grey (about 2:1 on its ground) and has no place labels,
+// but night steps still name landmarks ("past SM Makati"). Lighten its labels and add place names
+// with the day style's rank and zoom steps. They sit under the route lines, which are added later.
+const NIGHT_TEXT = { "text-color": "#CBD5E1", "text-halo-color": "rgba(15,23,42,0.9)", "text-halo-width": 1.2 } as const;
+function nightLabels(map: maplibregl.Map, layers: maplibregl.LayerSpecification[]) {
+  for (const l of layers) {
+    if (l.type !== "symbol") continue;
+    for (const [k, v] of Object.entries(NIGHT_TEXT)) map.setPaintProperty(l.id, k, v);
+  }
+  const point: maplibregl.ExpressionSpecification = ["match", ["geometry-type"], ["MultiPoint", "Point"], true, false];
+  const ranks: [string, number, maplibregl.ExpressionSpecification][] = [
+    ["hb-night-poi-r1", 15, ["all", point, [">=", ["get", "rank"], 1], ["<", ["get", "rank"], 7]]],
+    ["hb-night-poi-r7", 16, ["all", point, [">=", ["get", "rank"], 7], ["<", ["get", "rank"], 20]]],
+    ["hb-night-poi-r20", 17, ["all", point, [">=", ["get", "rank"], 20]]],
+  ];
+  for (const [id, minzoom, filter] of ranks) {
+    if (map.getLayer(id)) continue;
+    map.addLayer({
+      id,
+      type: "symbol",
+      source: "openmaptiles",
+      "source-layer": "poi",
+      minzoom,
+      filter,
+      layout: { "text-field": ["get", "name"], "text-font": ["Noto Sans Regular"], "text-size": 12, "text-max-width": 9 },
+      paint: { ...NIGHT_TEXT, "text-color": "#E2E8F0" },
+    });
+  }
+}
+
 export default function MapView(p: Props) {
   const box = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -236,6 +266,7 @@ export default function MapView(p: Props) {
       },
       firstSymbol,
     );
+    if (dark) nightLabels(map, layers);
     const round = { "line-join": "round", "line-cap": "round" } as const;
     // Alternate routes sit 3 px to one side, so a shared stretch shows both lines.
     const off = { "line-offset": 3 } as const;

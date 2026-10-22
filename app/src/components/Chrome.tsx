@@ -8,7 +8,7 @@ export function TopBanner({ onClose, onAbout }: { onClose: () => void; onAbout: 
     <div className="flex items-center gap-1 bg-ink py-0.5 pl-4 pr-1 text-[13px] leading-snug text-white" role="note" data-testid="prototype-banner">
       {/* One line on phones, so the map keeps its height. About says the rest. */}
       <p className="min-w-0 flex-1 py-1.5">
-        <span className="md:hidden">Independent prototype. Routes can be wrong.</span>
+        <span className="md:hidden">Prototype. Routes can be wrong.</span>
         <span className="hidden md:inline">Prototype. Routes and data can be wrong. Independent project, not affiliated with any government agency.</span>
       </p>
       <button type="button" onClick={onAbout} className="h-11 shrink-0 rounded px-2 underline underline-offset-2 hover:bg-white/10">

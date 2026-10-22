@@ -4,8 +4,9 @@ import { dateLabel, dateShort, fmtMinute, fmtStamp } from "../lib/time";
 import { heatBand, uvWord, weatherAt } from "../lib/weather";
 import { CalendarIcon, ChevronDown, ClockIcon, MoonIcon, RainIcon, SunIcon } from "./Icons";
 
+// Tighter on phones, so Now, the date, the hour, and play fit one row from 360 px.
 const chip =
-  "flex h-11 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-[14px] text-ink shadow-sm hover:border-slate-300";
+  "flex h-11 items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 text-[13px] text-ink shadow-sm hover:border-slate-300 md:gap-1.5 md:px-3 md:text-[14px]";
 
 interface Props {
   // The live Manila clock. Tapping the chip picks the next half hour.
@@ -136,7 +137,8 @@ function NowChip({ minute, active, onClick }: Props["now"]) {
     >
       <span className={`h-2 w-2 shrink-0 rounded-full ${active ? "bg-brand" : "border border-slate-500"}`} aria-hidden="true" />
       <span className="font-medium">Now</span>
-      <span className="tabular-nums">
+      {/* Phones show the clock only while Now is chosen, so the time chips keep to one row. */}
+      <span className={`tabular-nums ${active ? "" : "hidden md:inline"}`}>
         {hm}
         <span className="hidden md:inline"> {ap}</span>
       </span>
