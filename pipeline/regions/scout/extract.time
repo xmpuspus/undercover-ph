@@ -1,0 +1,1 @@
+pipeline/.venv/bin/python -I pipeline/regions/scout/extract.py >  2>&1  355.09s user 13.72s system 97% cpu 6:20.04 total

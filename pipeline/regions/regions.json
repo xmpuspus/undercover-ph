@@ -1,0 +1,732 @@
+{
+ "note": "Source settings per region. A district in pipeline/regions/districts.json names its region. osm_bbox is [west, south, east, north]: cut_pbf.py cuts the region PBF to it from the Geofabrik Philippines extract. utm_epsg is 32651 east of 120 E and 32650 west of it. pagasa_prsd is the slug of the PAGASA regional forecast page, https://www.pagasa.dost.gov.ph/regional-forecast/<slug>; null means no advisory. advisory_provinces are the province names the advisory text uses for the region. crossing_streets only name the streets whose crossings graph_log.json counts. The ncr row records the Metro Manila settings for reference. Metro Manila builds keep them in pipeline/common.py, ctx.py and fetch_weather.py and never read this file.",
+ "regions": [
+  {
+   "id": "ncr",
+   "name": "Metro Manila",
+   "osm_bbox": [
+    120.9,
+    14.35,
+    121.2,
+    14.8
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd"
+  },
+  {
+   "id": "cebu",
+   "name": "Metro Cebu",
+   "osm_bbox": [
+    123.75,
+    10.2,
+    124.05,
+    10.45
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Cebu"
+   ],
+   "crossing_streets": [
+    "Osmeña Boulevard",
+    "Cardinal Rosales Avenue",
+    "Archbishop Reyes Avenue",
+    "Colon Street"
+   ]
+  },
+  {
+   "id": "baguio",
+   "name": "Baguio",
+   "osm_bbox": [
+    120.548,
+    16.372,
+    120.644,
+    16.458
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "nlprsd",
+   "advisory_provinces": [
+    "Benguet"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "angeles",
+   "name": "Angeles and Clark",
+   "osm_bbox": [
+    120.544,
+    15.102,
+    120.632,
+    15.21
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Pampanga"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "san-fernando-pampanga",
+   "name": "San Fernando (Pampanga)",
+   "osm_bbox": [
+    120.644,
+    14.99,
+    120.736,
+    15.078
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Pampanga"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "olongapo",
+   "name": "Olongapo and Subic",
+   "osm_bbox": [
+    120.242,
+    14.788,
+    120.322,
+    14.876
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Zambales"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "malolos",
+   "name": "Malolos",
+   "osm_bbox": [
+    120.774,
+    14.804,
+    120.854,
+    14.892
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Bulacan"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "baliwag",
+   "name": "Baliwag",
+   "osm_bbox": [
+    120.846,
+    14.914,
+    120.938,
+    14.996
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Bulacan"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "tarlac",
+   "name": "Tarlac City",
+   "osm_bbox": [
+    120.552,
+    15.444,
+    120.636,
+    15.532
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Tarlac"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "balanga",
+   "name": "Balanga",
+   "osm_bbox": [
+    120.488,
+    14.634,
+    120.58,
+    14.716
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Bataan"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "cabanatuan",
+   "name": "Cabanatuan",
+   "osm_bbox": [
+    120.918,
+    15.44,
+    121.014,
+    15.536
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Nueva Ecija"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "dagupan",
+   "name": "Dagupan",
+   "osm_bbox": [
+    120.298,
+    16.002,
+    120.378,
+    16.078
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "nlprsd",
+   "advisory_provinces": [
+    "Pangasinan"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "vigan",
+   "name": "Vigan",
+   "osm_bbox": [
+    120.348,
+    17.538,
+    120.428,
+    17.614
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "nlprsd",
+   "advisory_provinces": [
+    "Ilocos Sur"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "laoag",
+   "name": "Laoag",
+   "osm_bbox": [
+    120.554,
+    18.162,
+    120.634,
+    18.238
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "nlprsd",
+   "advisory_provinces": [
+    "Ilocos Norte"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "tuguegarao",
+   "name": "Tuguegarao",
+   "osm_bbox": [
+    121.682,
+    17.58,
+    121.77,
+    17.666
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "nlprsd",
+   "advisory_provinces": [
+    "Cagayan"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "davao-city",
+   "name": "Davao City",
+   "osm_bbox": [
+    125.57,
+    7.03,
+    125.65,
+    7.12
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Davao del Sur",
+    "Davao City"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "digos",
+   "name": "Digos",
+   "osm_bbox": [
+    125.31,
+    6.72,
+    125.39,
+    6.79
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Davao del Sur"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "tagum",
+   "name": "Tagum",
+   "osm_bbox": [
+    125.76,
+    7.41,
+    125.84,
+    7.49
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Davao del Norte"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "cagayan-de-oro",
+   "name": "Cagayan de Oro",
+   "osm_bbox": [
+    124.6,
+    8.44,
+    124.69,
+    8.51
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Misamis Oriental",
+    "Cagayan de Oro"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "iligan",
+   "name": "Iligan",
+   "osm_bbox": [
+    124.2,
+    8.19,
+    124.29,
+    8.28
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Lanao del Norte"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "zamboanga-city",
+   "name": "Zamboanga City",
+   "osm_bbox": [
+    122.03,
+    6.88,
+    122.11,
+    6.95
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Zamboanga del Sur",
+    "Zamboanga City"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "pagadian",
+   "name": "Pagadian",
+   "osm_bbox": [
+    123.4,
+    7.79,
+    123.47,
+    7.86
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Zamboanga del Sur"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "dipolog",
+   "name": "Dipolog",
+   "osm_bbox": [
+    123.31,
+    8.55,
+    123.38,
+    8.61
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Zamboanga del Norte"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "general-santos",
+   "name": "General Santos",
+   "osm_bbox": [
+    125.13,
+    6.08,
+    125.21,
+    6.15
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "South Cotabato",
+    "General Santos"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "koronadal",
+   "name": "Koronadal",
+   "osm_bbox": [
+    124.8,
+    6.46,
+    124.89,
+    6.54
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "South Cotabato"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "cotabato-city",
+   "name": "Cotabato City",
+   "osm_bbox": [
+    124.21,
+    7.17,
+    124.28,
+    7.25
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Maguindanao",
+    "Cotabato City"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "butuan",
+   "name": "Butuan",
+   "osm_bbox": [
+    125.5,
+    8.91,
+    125.58,
+    8.99
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Agusan del Norte",
+    "Butuan"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "surigao",
+   "name": "Surigao",
+   "osm_bbox": [
+    125.46,
+    9.75,
+    125.53,
+    9.82
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "minprsd",
+   "advisory_provinces": [
+    "Surigao del Norte"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "iloilo",
+   "name": "Iloilo City",
+   "osm_bbox": [
+    122.42,
+    10.55,
+    122.72,
+    10.85
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Iloilo"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "bacolod",
+   "name": "Bacolod and Talisay",
+   "osm_bbox": [
+    122.85,
+    10.55,
+    123.1,
+    10.85
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Negros Occidental"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "dumaguete",
+   "name": "Dumaguete",
+   "osm_bbox": [
+    123.15,
+    9.15,
+    123.45,
+    9.5
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Negros Oriental"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "tagbilaran",
+   "name": "Tagbilaran",
+   "osm_bbox": [
+    123.7,
+    9.5,
+    124.0,
+    9.8
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Bohol"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "tacloban",
+   "name": "Tacloban",
+   "osm_bbox": [
+    124.85,
+    11.05,
+    125.15,
+    11.4
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Leyte"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "ormoc",
+   "name": "Ormoc",
+   "osm_bbox": [
+    124.45,
+    10.85,
+    124.75,
+    11.15
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Leyte"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "roxas",
+   "name": "Roxas City",
+   "osm_bbox": [
+    122.6,
+    11.4,
+    122.9,
+    11.75
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Capiz"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "kalibo",
+   "name": "Kalibo",
+   "osm_bbox": [
+    122.2,
+    11.55,
+    122.5,
+    11.85
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Aklan"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "cavite",
+   "name": "Cavite uplands (Dasmarinas, Tagaytay)",
+   "osm_bbox": [
+    120.88,
+    14.06,
+    121.02,
+    14.37
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Cavite"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "laguna",
+   "name": "Laguna (Santa Rosa, Calamba, Los Banos, San Pablo)",
+   "osm_bbox": [
+    121.04,
+    14.02,
+    121.38,
+    14.38
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Laguna"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "batangas",
+   "name": "Batangas (Lipa, Batangas City)",
+   "osm_bbox": [
+    121.0,
+    13.7,
+    121.22,
+    13.99
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Batangas"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "antipolo",
+   "name": "Antipolo",
+   "osm_bbox": [
+    121.12,
+    14.53,
+    121.24,
+    14.64
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Rizal"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "lucena",
+   "name": "Lucena",
+   "osm_bbox": [
+    121.55,
+    13.88,
+    121.68,
+    13.99
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "ncrprsd",
+   "advisory_provinces": [
+    "Quezon"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "naga",
+   "name": "Naga (Camarines Sur)",
+   "osm_bbox": [
+    123.13,
+    13.57,
+    123.27,
+    13.69
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "slprsd",
+   "advisory_provinces": [
+    "Camarines Sur"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "legazpi",
+   "name": "Legazpi (Albay)",
+   "osm_bbox": [
+    123.66,
+    13.08,
+    123.81,
+    13.2
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "slprsd",
+   "advisory_provinces": [
+    "Albay"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "calapan",
+   "name": "Calapan (Oriental Mindoro)",
+   "osm_bbox": [
+    121.12,
+    13.35,
+    121.24,
+    13.46
+   ],
+   "utm_epsg": 32651,
+   "pagasa_prsd": "slprsd",
+   "advisory_provinces": [
+    "Oriental Mindoro"
+   ],
+   "crossing_streets": []
+  },
+  {
+   "id": "puerto-princesa",
+   "name": "Puerto Princesa (Palawan)",
+   "osm_bbox": [
+    118.68,
+    9.68,
+    118.8,
+    9.79
+   ],
+   "utm_epsg": 32650,
+   "pagasa_prsd": "visprsd",
+   "advisory_provinces": [
+    "Palawan"
+   ],
+   "crossing_streets": []
+  }
+ ]
+}

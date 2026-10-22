@@ -3,6 +3,9 @@
 Writes weather.json, advisory.json and READY.weather to UCPH_DATA (default app/public/data).
 The forecast point is the centre of the area's pilot box, read from its manifest.json.
 With UCPH_ADVISORY_FROM set, the advisory is copied from that file, so many areas share one fetch.
+An area outside Metro Manila has a "region" block in its manifest (pipeline/regions/regions.json). It reads
+its own PAGASA regional page and matches its own cities, and it skips a shared advisory from another page.
+A region with no PAGASA page gets {"status": "unavailable"}, so the app shows no advisory.
 `fetch_weather.py --advisory-to PATH` fetches only the advisory and writes it to PATH.
 A failed fetch writes {"status": "unavailable"} so the app shows no invented number.
 curl does the HTTP work because Python's SSL store on this Mac fails on some hosts.
@@ -39,6 +42,10 @@ NCR_CITIES = [
     "San Juan", "Taguig", "Valenzuela",
 ]
 ADVISORY_URL = "https://www.pagasa.dost.gov.ph/regional-forecast/ncrprsd"
+# Areas outside Metro Manila: the region block that pipeline/districts/build_manifest.py writes.
+REGION = _M.get("region")
+if REGION:
+    ADVISORY_URL = REGION.get("advisory_url")
 FORECAST_URL = (
     "https://api.open-meteo.com/v1/forecast"
     f"?latitude={LAT}&longitude={LON}"
@@ -81,7 +88,82 @@ def weather():
         return {"status": "unavailable", "fetched_at": now(), "reason": str(e)[:300]}
 
 
+def area_cities():
+    out = []
+    for nb in (_M.get("area") or {}).get("neighbourhoods") or []:
+        out += [c for c in nb.get("cities") or [] if c not in out]
+    return out
+
+
+def _key(name):
+    """One key for "Cebu City", "CebuCity" and "CityOfCebu": letters only, without "city of" or "city"."""
+    k = re.sub(r"[^a-z]", "", name.lower().replace("ñ", "n"))
+    return re.sub(r"city$", "", re.sub(r"^cityof", "", k)) or k
+
+
+def latest_block(text):
+    """The newest thunderstorm advisory on a regional page, up to the next advisory or section."""
+    m = re.search(r"(Thunderstorm Advisory No\.\s*\d+.*?)(?=Thunderstorm Advisory No\.|Thunderstorm Watch|"
+                  r"Heavy Rainfall|Rainfall Advisory|Regional Forecast|$)", text)
+    return m.group(1)[:1500].strip() if m else None
+
+
+def region_places(block, cities, provinces, region_name=""):
+    """Area cities and whole provinces that a regional advisory names.
+
+    Regional pages list places as "#Cebu(Badian, CityOfCarcar)" or "Pampanga (Lubao and Guagua)".
+    A city counts when a list names it. A province counts when it appears without a list.
+    """
+    city_keys = {_key(c): c for c in cities}
+    prov_keys = {_key(p): p for p in provinces}
+    found = set()
+    for m in re.finditer(r"\(([^()]*)\)", block):
+        for item in re.split(r",|\band\b", m.group(1)):
+            if _key(item) in city_keys:
+                found.add(city_keys[_key(item)])
+    bare = re.sub(r"#?[\w.\-]+\s*\([^()]*\)", " ", block)  # drop "Province(list)" groups
+    for c in cities:  # a city written out in plain text, such as "Cebu City"
+        if re.search(r"\b" + re.escape(c) + r"\b", bare):
+            found.add(c)
+    for tag in re.findall(r"#([\w.\-]+)", bare):
+        if _key(tag) in prov_keys:
+            found.add(prov_keys[_key(tag)])
+    for p in provinces:
+        if re.search(r"\b" + re.escape(p) + r"\b(?!\s*City)", re.sub(r"#[\w.\-]+", " ", bare)):
+            found.add(p)
+    if region_name and re.search(r"\b" + re.escape(region_name) + r"\b", block):
+        found.add(region_name)
+    return sorted(found)
+
+
+def region_advisory():
+    if not ADVISORY_URL:
+        return {"status": "unavailable", "fetched_at": now(), "reason": "no PAGASA regional page is set for this area"}
+    try:
+        page = curl(ADVISORY_URL)
+        text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", page)))
+        warning = re.search(r"(As of today, there is no Heavy Rainfall Warning[^.]*\.)", text)
+        block = latest_block(text)
+        if not block:
+            return {
+                "status": "ok", "source_url": ADVISORY_URL, "fetched_at": now(), "issued_at": None,
+                "text": None, "cities": [], "heavy_rainfall": warning.group(1) if warning else None,
+                "note": "No thunderstorm advisory text found on the page at fetch time.",
+            }
+        issued = re.search(r"Issued at:?\s*([0-9]{1,2}:[0-9]{2}\s*[AP]M,?\s*[0-9]{1,2}\s+\w+\s+[0-9]{4})", block)
+        cities = region_places(block, area_cities(), REGION.get("advisory_provinces") or [], REGION.get("name", ""))
+        return {
+            "status": "ok", "source_url": ADVISORY_URL, "fetched_at": now(),
+            "issued_at": issued.group(1) if issued else None, "text": block, "cities": cities,
+            "heavy_rainfall": warning.group(1) if warning else None,
+        }
+    except Exception as e:
+        return {"status": "unavailable", "fetched_at": now(), "reason": str(e)[:300]}
+
+
 def advisory():
+    if REGION:
+        return region_advisory()
     try:
         page = curl(ADVISORY_URL)
         text = html.unescape(re.sub(r"<[^>]+>", " ", page))
@@ -115,9 +197,12 @@ def shared_advisory():
     if not src:
         return advisory()
     try:
-        return json.loads(Path(src).read_text())
+        shared = json.loads(Path(src).read_text())
     except (OSError, ValueError) as e:
         return {"status": "unavailable", "fetched_at": now(), "reason": f"shared advisory unreadable: {e}"[:300]}
+    if REGION and shared.get("source_url") != ADVISORY_URL:  # another region's page
+        return advisory()
+    return shared
 
 
 def main():

@@ -804,9 +804,21 @@ def limits_text(stats, low_sun_buckets):
     return lines
 
 
+def _canopy_source_name(path=CANOPY):
+    """leaves-ph clips name the NCR raster. pipeline/regions/fetch_canopy.py clips name their AWS quadkey tiles."""
+    try:
+        with rasterio.open(path) as src:
+            first = (src.tags().get("CLIPPED_FROM") or "").split(" ")[0]
+    except rasterio.errors.RasterioIOError:
+        first = ""
+    if first.endswith(".tif") and first[:-4].isdigit():
+        return "Meta and WRI Global Canopy Height (AWS Open Data tiles)"
+    return "Meta and WRI Global Canopy Height (via leaves-ph)"
+
+
 SOURCES = [
     {
-        "name": "Meta and WRI Global Canopy Height (via leaves-ph)",
+        "name": _canopy_source_name(),
         "licence": "CC-BY-4.0",
         "url": "s3://dataforgood-fb-data/forests/v1/alsgedi_global_v6_float/chm/",
         "used_for": "tree crown heights for tree shade",
@@ -1121,6 +1133,10 @@ def main_area(args):
     t_all = time.perf_counter()
     timings = {}
     if not CANOPY.exists():
+        if _AREA.get("region"):  # outside Metro Manila: the NCR raster does not cover the area
+            raise SystemExit(
+                f"{CANOPY} is missing; run pipeline/regions/fetch_canopy.py {AREA_ID} first"
+            )
         if not NCR_CANOPY.exists():
             raise SystemExit(
                 f"{CANOPY} is missing and the NCR canopy raster {NCR_CANOPY} is not here to clip it"

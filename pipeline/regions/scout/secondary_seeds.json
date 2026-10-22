@@ -1,0 +1,98 @@
+{
+ "angeles": {
+  "bbox": [
+   120.582,
+   15.164,
+   120.602,
+   15.18
+  ],
+  "walk_km": 91.76,
+  "covered_km": 0.254,
+  "places": 249,
+  "buildings": 13261,
+  "height_tag_share": 0.036,
+  "n_univ": 2,
+  "n_mall": 2,
+  "n_transit": 20
+ },
+ "clark": {
+  "bbox": [
+   120.57,
+   15.162,
+   120.59,
+   15.178
+  ],
+  "walk_km": 71.8,
+  "covered_km": 1.204,
+  "places": 248,
+  "buildings": 5822,
+  "height_tag_share": 0.043,
+  "n_univ": 2,
+  "n_mall": 1,
+  "n_transit": 19
+ },
+ "olongapo": {
+  "bbox": [
+   120.272,
+   14.818,
+   120.292,
+   14.834
+  ],
+  "walk_km": 67.72,
+  "covered_km": 0.447,
+  "places": 146,
+  "buildings": 5141,
+  "height_tag_share": 0.004,
+  "n_univ": 4,
+  "n_mall": 2,
+  "n_transit": 2
+ },
+ "subic": {
+  "bbox": [
+   120.266,
+   14.818,
+   120.286,
+   14.834
+  ],
+  "walk_km": 59.64,
+  "covered_km": 0.609,
+  "places": 131,
+  "buildings": 3829,
+  "height_tag_share": 0.005,
+  "n_univ": 4,
+  "n_mall": 2,
+  "n_transit": 2
+ },
+ "santa-rosa": {
+  "bbox": [
+   121.076,
+   14.324,
+   121.096,
+   14.34
+  ],
+  "walk_km": 78.83,
+  "covered_km": 0.0,
+  "places": 219,
+  "buildings": 1839,
+  "height_tag_share": 0.016,
+  "n_univ": 6,
+  "n_mall": 4,
+  "n_transit": 3
+ },
+ "nuvali": {
+  "bbox": [
+   121.046,
+   14.234,
+   121.066,
+   14.25
+  ],
+  "walk_km": 55.31,
+  "covered_km": 0.91,
+  "places": 62,
+  "buildings": 687,
+  "height_tag_share": 0.105,
+  "n_univ": 0,
+  "n_mall": 3,
+  "n_transit": 1
+ }
+}

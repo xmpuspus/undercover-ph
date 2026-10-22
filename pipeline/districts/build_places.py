@@ -1,0 +1,219 @@
+"""District copy of pipeline/build_places.py. Run through pipeline/districts/build.py, which sets UC_DISTRICT.
+
+Write places.json: named OSM features in the graph area, snapped to the nearest routable node.
+
+Usage: pipeline/.venv/bin/python -I pipeline/build_places.py
+Reads pipeline/work/features.jsonl and app/public/data/graph.json.
+Writes app/public/data/places.json and pipeline/work/places_log.json.
+A place is dropped when no routable node lies within 80 m of its point or polygon. Within 80 m, a node in
+the largest routable component wins over a closer node on a small island, so the place stays reachable.
+"""
+import json
+import re
+import sys
+from collections import Counter
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import numpy as np  # noqa: E402
+import shapely  # noqa: E402
+from scipy.sparse import coo_matrix  # noqa: E402
+from scipy.sparse.csgraph import connected_components  # noqa: E402
+from shapely.strtree import STRtree  # noqa: E402
+
+from ctx import GRAPH_BBOX, OUT, TO_UTM, WORK, in_bbox, write_json  # noqa: E402
+
+SNAP_MAX_M = 80.0
+SKIPPED_STATIONS = Counter()
+DEDUPE_M = 150.0
+PRIORITY = ["station", "bus_station", "mall", "store", "hotel", "hospital", "school", "place_of_worship", "museum",
+            "park", "plaza", "landmark", "embassy", "office", "residential", "shopping_area", "building",
+            "neighbourhood"]
+ALIAS_KEYS = ("alt_name", "short_name", "official_name", "old_name", "loc_name", "name:en", "alt_name:en")
+
+
+def category(t):
+    rail = (t.get("railway") in ("station", "halt") or t.get("building") == "train_station"
+            or t.get("station") in ("light_rail", "subway", "train"))
+    unbuilt = ("construction", "proposed", "disused", "abandoned")
+    if rail and (t.get("railway") in unbuilt or any(k.startswith(unbuilt) for k in t)
+                 or "subway" in t.get("network", "").lower()):
+        # OSM marks Metro Manila Subway stations as stations. This build cannot confirm service, so it skips them.
+        SKIPPED_STATIONS[t.get("name", "")] += 1
+        return None
+    if rail and t.get("public_transport") not in ("platform", "stop_position"):
+        return "station"
+    if t.get("amenity") == "bus_station" or (t.get("public_transport") == "station" and "railway" not in t):
+        return "bus_station"
+    if t.get("shop") == "mall" or (t.get("shop") == "department_store" and t.get("building", "no") != "no"):
+        return "mall"
+    if t.get("shop") == "department_store":
+        return "store"
+    if t.get("tourism") == "hotel" or t.get("building") == "hotel":
+        return "hotel"
+    if t.get("amenity") == "hospital":
+        return "hospital"
+    if t.get("amenity") in ("school", "college", "university", "kindergarten"):
+        return "school"
+    if t.get("amenity") == "place_of_worship":
+        return "place_of_worship"
+    if t.get("tourism") == "museum":
+        return "museum"
+    if t.get("leisure") in ("park", "garden"):
+        return "park"
+    if t.get("place") == "square" or t.get("leisure") == "plaza" or (
+            t.get("highway") == "pedestrian" and t.get("area") == "yes"):
+        return "plaza"
+    if "historic" in t or t.get("tourism") in ("attraction", "artwork") or t.get("amenity") == "townhall":
+        return "landmark"
+    if t.get("office") == "diplomatic":
+        return "embassy"
+    b = t.get("building", "no")
+    if b in ("office", "commercial") or ("office" in t and b != "no"):
+        return "office"
+    if b in ("residential", "apartments", "condominium", "dormitory"):
+        return "residential"
+    if t.get("landuse") == "retail":
+        return "shopping_area"
+    if b != "no":
+        return "building"
+    if t.get("place") in ("neighbourhood", "quarter", "suburb", "city_block"):
+        return "neighbourhood"
+    return None
+
+
+def rail_network(t):
+    text = " ".join(t.get(k, "") for k in ("network", "operator", "alt_name")).lower()
+    if "mrt" in text or "mass rail" in text or "metro rail" in text:
+        return "MRT"
+    if "lrt" in text or "light rail" in text:
+        return "LRT"
+    if "philippine national railways" in text or "pnr" in text:
+        return "PNR"
+    if "subway" in text:
+        return "Subway"
+    return None
+
+
+def norm(s):
+    return re.sub(r"[^a-z0-9]+", "", s.lower())
+
+
+def make_place(r):
+    t = r["tags"]
+    cat = category(t)
+    if not cat or t.get("highway") == "bus_stop" or t.get("public_transport") in ("platform", "stop_position"):
+        return None
+    if r["type"] == "area":
+        g = shapely.from_wkt(r["wkt"])
+        p = g.representative_point()
+    else:
+        g = p = shapely.Point(r["lon"], r["lat"])
+    if not in_bbox(p.x, p.y, GRAPH_BBOX):
+        return None
+    name = t["name"].strip()
+    aliases = []
+    for k in ALIAS_KEYS:
+        aliases += [a.strip() for a in t.get(k, "").split(";") if a.strip()]
+    if cat == "station":
+        net = rail_network(t)
+        aliases.append(name)
+        aliases.append(f"{name} Station")
+        if net:
+            aliases += [f"{name} {net}", f"{net} {name}"]
+            name = f"{name} {net} Station"
+    if name.startswith("The "):
+        aliases.append(name[4:])
+    seen, out = {norm(name)}, []
+    for a in aliases:
+        if norm(a) not in seen:
+            seen.add(norm(a))
+            out.append(a)
+    utm = shapely.transform(g, lambda a: np.column_stack(TO_UTM.transform(a[:, 0], a[:, 1])))
+    return {"name": name, "category": cat, "lon": round(p.x, 7), "lat": round(p.y, 7), "aliases": out,
+            "osm": r["osm"], "utm": utm, "rep": shapely.Point(*TO_UTM.transform(p.x, p.y)),
+            "area": utm.area}
+
+
+def main():
+    graph = json.load(open(OUT / "graph.json"))
+    rout = [e for e in graph["edges"] if e["routable"]]
+    # The largest network of always-open routable edges (no hours row) stays reachable when malls are shut.
+    open_edges = [e for e in rout if e["hours_idx"] is None]
+    oadj = coo_matrix((np.ones(len(open_edges)), ([e["u"] for e in open_edges], [e["v"] for e in open_edges])),
+                      shape=(len(graph["nodes"]), len(graph["nodes"])))
+    _, olab = connected_components(oadj, directed=False)
+    open_nodes = sorted({e[k] for e in open_edges for k in ("u", "v")})
+    main_open = Counter(int(olab[i]) for i in open_nodes).most_common(1)[0][0]
+    always_open = {i for i in open_nodes if olab[i] == main_open}
+    routable_nodes = sorted({e[k] for e in rout for k in ("u", "v")})
+    pts = [shapely.Point(*TO_UTM.transform(*graph["nodes"][i])) for i in routable_nodes]
+    tree = STRtree(pts)
+    n = len(graph["nodes"])
+    adj = coo_matrix((np.ones(len(rout)), ([e["u"] for e in rout], [e["v"] for e in rout])), shape=(n, n))
+    _, lab = connected_components(adj, directed=False)
+    main_comp = Counter(int(lab[i]) for i in routable_nodes).most_common(1)[0][0]
+
+    cands = []
+    for line in open(WORK / "features.jsonl"):
+        p = make_place(json.loads(line))
+        if p:
+            cands.append(p)
+
+    # Merge the same name within 150 m. Keep the higher-priority category, then polygons, then larger area.
+    cands.sort(key=lambda p: (PRIORITY.index(p["category"]), p["area"] == 0, -p["area"]))
+    kept, merged = [], 0
+    for p in cands:
+        dup = next((k for k in kept if norm(k["name"]) == norm(p["name"])
+                    and k["rep"].distance(p["rep"]) <= DEDUPE_M), None)
+        if dup:
+            merged += 1
+            for a in p["aliases"]:
+                if norm(a) != norm(dup["name"]) and norm(a) not in {norm(x) for x in dup["aliases"]}:
+                    dup["aliases"].append(a)
+            continue
+        kept.append(p)
+
+    places, dropped, snap_m, moved, island, hours_only = [], Counter(), [], 0, 0, 0
+    for p in kept:
+        best = nearest = None
+        for k in tree.query(p["utm"].buffer(SNAP_MAX_M)):
+            d = p["utm"].distance(pts[k])
+            if d > SNAP_MAX_M:
+                continue
+            on_main = lab[routable_nodes[k]] == main_comp
+            # A node inside the largest routable component wins over a closer node on a small island.
+            # Then a node in the largest always-open network wins over one reached only through hours-bound edges.
+            key = (not on_main, routable_nodes[k] not in always_open, round(d, 1), p["rep"].distance(pts[k]))
+            if best is None or key < best[0]:
+                best = (key, routable_nodes[k], d)
+            if nearest is None or key[2:] < nearest[0]:
+                nearest = (key[2:], routable_nodes[k])
+        if best is None:
+            dropped[p["category"]] += 1
+            continue
+        moved += best[1] != nearest[1]
+        island += best[0][0]
+        hours_only += best[0][1]
+        snap_m.append(best[2])
+        places.append({"name": p["name"], "category": p["category"], "lon": p["lon"], "lat": p["lat"],
+                       "node_id": int(best[1]), "aliases": p["aliases"]})
+    places.sort(key=lambda p: (PRIORITY.index(p["category"]), p["name"]))
+    write_json(OUT / "places.json", places, indent=1)
+    log = {"candidates": len(cands), "merged_same_name": merged, "kept_before_snap": len(kept),
+           "places": len(places), "dropped_over_80m": sum(dropped.values()),
+           "skipped_unbuilt_or_subway_stations": dict(SKIPPED_STATIONS),
+           "dropped_by_category": dict(dropped), "by_category": dict(Counter(p["category"] for p in places)),
+           "snapped_away_from_nearest_node": int(moved),
+           "places_on_small_components": int(island),
+           "places_outside_largest_always_open_network": int(hours_only),
+           "snap_m_median": round(float(np.median(snap_m)), 1) if snap_m else None,
+           "snap_m_max": round(float(max(snap_m)), 1) if snap_m else None,
+           "dropped_names": sorted(p["name"] for p in kept
+                                   if not any(q["name"] == p["name"] and q["lon"] == p["lon"] for q in places))}
+    write_json(WORK / "places_log.json", log, indent=1)
+    print(json.dumps({k: v for k, v in log.items() if k != "dropped_names"}, indent=1))
+
+
+if __name__ == "__main__":
+    main()
