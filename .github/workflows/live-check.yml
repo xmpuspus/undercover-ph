@@ -1,7 +1,8 @@
 # The daily rebuild only proves that a commit reached main. A failed Vercel build keeps
 # the old deployment up, and its 7 shade dates run out within a week with no alert.
-# This job reads the live manifest after the rebuild window and opens an issue when
-# today's Manila date is missing or the shade marker is gone.
+# This job reads the live manifest after the rebuild window and opens an issue when the
+# first shade date is not today (Manila) or the shade marker is gone. A failed rebuild
+# then shows the next morning, with about 6 days of old data left to fix it.
 
 name: live-check
 
@@ -15,7 +16,7 @@ permissions:
 
 jobs:
   check:
-    name: today's date is on the live site
+    name: the live shade dates start today
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -39,8 +40,8 @@ jobs:
           manifest = json.loads(body)
           dates = manifest.get("dates") or []
           print(f"today {today}, live dates {dates[:1]} to {dates[-1:]}, generated_at {manifest.get('generated_at')}")
-          if today not in dates:
-              sys.exit(f"Today {today} is not in the live manifest dates.")
+          if not dates or dates[0] != today:
+              sys.exit(f"The live shade dates start {dates[:1]}, not today {today}. The last daily rebuild did not deploy.")
           kind, _ = get("/data/READY.shade")
           if "text/html" in kind:
               sys.exit("READY.shade is missing on the live site.")
