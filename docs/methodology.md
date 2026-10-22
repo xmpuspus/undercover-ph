@@ -10,6 +10,7 @@ The data file formats are in [data-contract.md](data-contract.md). The build ste
 - Every `footway`, `path`, `steps`, `corridor`, and walkable road becomes an edge between two nodes.
 - Roads of tertiary class and above get a separate edge for each sidewalk. The pipeline offsets each sidewalk line from the road centre and keeps it outside building footprints.
 - An edge with an unchecked access rule (a gate, an entrance, a private passage) stays out of routes by default. The user can turn such paths on, and the app then draws them dashed.
+- Bollards, height bars and raised curbs do not count as an access rule. Walkers pass all three.
 - A gate or other node rule closes only the stretch of way between the two junctions around it. The rest of that way stays walkable, so a public road stays open up to a village gate. A stretch through a closed node, such as a gate tagged `access=private`, is left out of the graph.
 - Each area keeps every way with a node inside its graph boxes. If a walkable way outside the boxes joins two separate parts of the area's walk network within 300 m, it stays. A bridge in the gap between two districts is one case.
 - Mall and building passages with published opening hours enter routes only while they are open.
@@ -49,7 +50,7 @@ The search runs in the browser, so no server of this project sees a start or end
 - The most covered route uses k = 8, lowered while the detour exceeds 50%.
 - The recommended route starts at k = 2 and lowers k until the detour is 20% or less. The app shows it only if it cuts sun exposure by at least 15%. If it does not, the most covered route takes its place when it meets both limits.
 - The reported numbers use the shade at the time the walker reaches each edge. The time comes from the departure time and a walking speed of 1.1 m/s.
-- A route moves to the other side of a road free at a mapped crossing or a traffic signal. At a junction with no mapped crossing the move adds 60 x (1 + k) m of cost, 60 m on the shortest route and 540 m at k = 8, and the step shows a warning. Mid-block the router forbids it.
+- A route moves to the other side of a road free at a mapped crossing or a traffic signal. At a junction with no mapped crossing the move adds 60 x (1 + k) m of cost. That is 60 m on the shortest route and 540 m at k = 8, and the step shows a warning. Mid-block the router forbids it.
 - The router tells the two sidewalks apart from each sidewalk's side of its OpenStreetMap way and the direction walked. Each sidewalk stays on the same hand of the walker along the road, round bends and corners.
 - When the sun is 3 degrees or less above the horizon, the app says that shade does not apply.
 - Rain mode counts only roofed, underground, and indoor edges as covered.

@@ -658,4 +658,13 @@ Three items stay open.
 
 - Gated villages are a project decision. In paranaque-bf-aguirre, 120 edges, 7.1 km, pass a gate and stay unroutable, and 298 pieces, 12.2 km, pass a closed gate and stay out. With every gate in its graph open, 66.8% of place pairs would route.
 - `barrier=bollard` and `barrier=height_restrictor` still need an access check, although both let walkers pass. In north-coast they hold 1.1 km of unroutable edges.
-- Fixed later on 2026-10-22. The step text named a sidewalk's compass side from the same mean vertex vector. On 20% to 33% of side edges that word differed from the side the line's ends show, and on 6% to 11% by 90 degrees or more. `steps.ts` now takes the word from the edge's `side` and its u-to-v chord.
+- Fixed later on 2026-10-22. The step text took a sidewalk's compass side from the same mean vertex vector. On 20% to 33% of side edges that word differed from the side the line's ends show, and on 6% to 11% by 90 degrees or more. `steps.ts` now takes the word from the edge's `side` and its u-to-v chord.
+
+### Bollards and height bars stop closing paths, and metro-core gains 9 km of walkable path
+
+On 2026-10-22 `pipeline/access_policy.py` stopped treating `barrier=bollard` and `barrier=height_restrictor` as an access rule. Walkers pass both. All 14 areas were rebuilt with `pipeline/districts/build.py` and published with `publish.py --no-tiles`, since buildings and trees did not change.
+
+- Metro-core holds back 66.0 km of paths for an access check, down from 75.0 km. North-coast gains 1.2 km of walkable path.
+- Place-pair reach moves by less than a point in most areas. Most of those paths already had another way in.
+- cubao-eastwood and taguig-pateros lost 30 and 10 connector edges, so their shade was rebuilt. The other 12 kept their edge counts.
+

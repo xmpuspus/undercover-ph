@@ -2,9 +2,13 @@
 
 Each line matches the recording made with `pnpm demo:record` on 2026-10-22, with shade data built Thu, Oct 22. Check the numbers against new frames after each new recording.
 
-## hero.gif
+## walkthrough.gif and walkthrough.mp4
 
-Real recording of undercover.ph: the landing card over a 3D map of Makati, Shaded picked, Greenbelt typed as the destination and Ayala MRT Station as the start, the time set to Tomorrow at 3 PM, and two routes drawn with yellow sun segments, the recommended one 88% shaded and the shortest 72% shaded, with a card that reads 22 min, 1.4 km, 2.6 min in sun, roof 7%, building shade 68%, tree shade 13% and sun 12%.
+Real recording of undercover.ph with a numbered caption for each step and a dot on each tap. Shaded is picked. Greenbelt is typed as the destination and Ayala MRT Station as the start, and the time is set to Tomorrow at 3 PM. The map shows two routes with shadows on: the recommended one 88% shaded and the shortest 72% shaded. The card reads 22 min, 1.4 km, 2.6 min in sun. The Shortest tab, then the Recommended tab, is opened. The pointer moves along the cover bar. The time goes to 9 AM and the play button moves the shadows until about 1 PM. The step list opens with 12 steps, Navigate shows the turn card and steps forward, and Sheltered picks a walk that is 25% under a roof with rain on the map. The map zooms out to the area outlines across Metro Manila, and the last caption reads "Free, with no sign-up. Try it at undercover.ph". The GIF plays the take 1.5 times faster than the MP4.
+
+## walkthrough-tall.mp4
+
+The same steps in the phone layout, cut 4:5 for a phone feed. The phone screen sits in a dark frame with the caption above it. Play runs the shadows from 3 PM to 5 PM, and the cover bar picks a stretch of tree shade.
 
 ## sun-direction.gif
 

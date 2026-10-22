@@ -5,6 +5,8 @@
    restrict vehicles only (oneway, motor_vehicle, maxspeed, parking and so on), so the check ignores them.
 3. An indoor, corridor or building-passage edge with a cited hours.json row is routable while open.
    build_graph.py applies this rule after it assigns hours.
+4. A barrier=bollard or barrier=height_restrictor node does not trigger the access check (2026-10-22).
+   Both stop vehicles and let walkers through. An access, foot or entrance tag on the node still applies.
 """
 import sys
 from pathlib import Path
@@ -30,9 +32,13 @@ def way_requires_evaluation(tags):
     return requires_access_evaluation(walker_tags(tags))
 
 
+# Barriers that stop vehicles, not walkers.
+WALKER_PASSES = {"kerb", "bollard", "height_restrictor"}
+
+
 def node_walker_tags(tags):
     t = walker_tags(tags)
-    if t.get("barrier") == "kerb":
+    if t.get("barrier") in WALKER_PASSES:
         del t["barrier"]
     return t
 

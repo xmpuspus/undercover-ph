@@ -7,33 +7,33 @@
 
 > Walking routes in Metro Manila's busiest centres that keep you in the shade on sunny days, or under a roof when it rains. A Philippine take on Singapore's [Undercover](https://undercover.gov.sg/) prototype, built on open data. Every route runs in your browser, so no server that this project runs sees where you start or where you go.
 
+[![A screen recording of undercover.ph with a caption for each step. Shaded is picked, Greenbelt is typed as the destination and Ayala MRT Station as the start, and the time is set to tomorrow at 3 PM. Two routes show on the 3D map with their shaded share. The cover bar, the play button with moving shadows, the step list, Navigate and the Sheltered mode follow. The map then zooms out to the area outlines across Metro Manila](docs/demo/walkthrough.gif)](docs/demo/walkthrough.mp4)
+
+<sub>Real recording of the app, played 1.5 times faster. The [75-second video at 1080p](docs/demo/walkthrough.mp4) plays in real time, and a [4:5 cut of the phone layout](docs/demo/walkthrough-tall.mp4) shows the same steps on a phone. It plans a walk from Ayala MRT Station to Greenbelt for tomorrow at 3 PM. The recommended walk is 88% shaded with 2.6 minutes in sun, and the shortest walk is 72% shaded. In Sheltered mode the app picks a walk that is 25% under a roof.</sub>
+
+Try it at **[undercover.ph](https://undercover.ph)**. Pick Shaded or Sheltered, choose where you start and where you go, and pick the half hour you leave.
+
 The app covers 14 walking areas, from Caloocan to Alabang. Each area is a downtown, business district, university belt or transit hub, and none is a whole city. A trip that starts or ends outside every area gets no route. The numbers below come from the committed data. `pipeline/tools/coverage_table.py` writes this table.
 
 <!-- coverage:start -->
 | Area | Cities | Walkable km in routes | Places | Buildings |
 | --- | --- | ---: | ---: | ---: |
-| Makati, BGC, Ortigas and Shaw | Makati, Mandaluyong, Pasig, Quezon City, San Juan, Taguig | 1,333 | 4,130 | 189,704 |
-| Bay Area and Mall of Asia | Pasay | 250 | 524 | 25,183 |
+| Makati, BGC, Ortigas and Shaw | Makati, Mandaluyong, Pasig, Quezon City, San Juan, Taguig | 1,342 | 4,130 | 189,704 |
+| Bay Area and Mall of Asia | Pasay | 251 | 524 | 25,183 |
 | Cubao and Eastwood | Quezon City | 321 | 813 | 65,167 |
 | North Avenue, Quezon Memorial Circle and UP Diliman | Quezon City | 507 | 1,474 | 96,652 |
-| Intramuros, Ermita, Binondo and University Belt | Manila | 809 | 3,241 | 100,359 |
+| Intramuros, Ermita, Binondo and University Belt | Manila | 810 | 3,241 | 100,359 |
 | Alabang and Filinvest City | Muntinlupa | 261 | 481 | 21,701 |
-| Caloocan, Malabon, Navotas and Valenzuela | Caloocan, Malabon, Navotas, Valenzuela | 853 | 1,470 | 136,324 |
-| Marikina Centre and Riverbanks | Marikina | 389 | 819 | 82,926 |
+| Caloocan, Malabon, Navotas and Valenzuela | Caloocan, Malabon, Navotas, Valenzuela | 854 | 1,470 | 136,324 |
+| Marikina Centre and Riverbanks | Marikina | 391 | 819 | 82,926 |
 | Aseana, PITX and NAIA | Paranaque, Pasay | 317 | 405 | 31,350 |
 | Las Pinas and Alabang-Zapote Road | Las Pinas | 274 | 515 | 47,566 |
 | BF Homes and Aguirre Avenue | Paranaque | 222 | 321 | 29,438 |
-| McKinley Hill, Taguig Centre, Arca South and Pateros | Pateros, Taguig | 740 | 997 | 136,126 |
-| Commonwealth, Fairview and SM Fairview | Quezon City | 498 | 969 | 193,787 |
+| McKinley Hill, Taguig Centre, Arca South and Pateros | Pateros, Taguig | 744 | 997 | 136,126 |
+| Commonwealth, Fairview and SM Fairview | Quezon City | 499 | 969 | 193,787 |
 | Banawe and Quezon Avenue | Quezon City | 404 | 508 | 64,510 |
-| **14 areas** | | **7,177** | **16,667** | **1,220,793** |
+| **14 areas** | | **7,196** | **16,667** | **1,220,793** |
 <!-- coverage:end -->
-
-[![A walk from Ayala MRT Station to Greenbelt on undercover.ph. It shows the landing card, the Shaded choice, destination and start search, and tomorrow at 3 PM. Then three routes on the 3D map with their shaded share. Then the route card with minutes in sun and the roof, building, and tree split](docs/demo/hero.gif)](https://undercover.ph)
-
-<sub>Real recording of the app (via `app/scripts/demo-record.mjs`). Ayala MRT Station to Greenbelt, leaving at 3 PM. The recommended walk is 1,406 m, 88% shaded, with 2.6 minutes in sun. The shortest walk is 1,230 m, 72% shaded, with 5.2 minutes in sun.</sub>
-
-Try it at **[undercover.ph](https://undercover.ph)**. Pick Shaded or Sheltered, choose where you start and where you go, and pick the half hour you leave.
 
 ## The sidewalk on the sun's side gets more building shade
 
@@ -103,7 +103,7 @@ pnpm dev            # http://localhost:5173
 pnpm test           # unit tests: router, search, route card text, sky theme, trip links, advisory
 pnpm build          # type check and production build
 pnpm e2e            # browser tests on desktop and phone: trip flow, Back, links, Now, phone layout
-pnpm demo:record    # re-record the GIFs in docs/demo/ from a production build
+pnpm demo:record    # re-record the walkthrough MP4, the GIFs and the share images in docs/demo/ from a production build
 ```
 
 The deployed site rebuilds its shade data every day. To build it yourself, see `pipeline/NOTES.md` and `pipeline/shade/NOTES.md`.
@@ -137,9 +137,9 @@ Each area keeps its files in `app/public/data/areas/<id>/`. Two files cover ever
 ## Known limits and the work still to do
 
 <!-- limits:start -->
-- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds 28.6 km of sheltered path. Nobody has measured how much exists on the street.
-- **Access.** Gates and entrances that need a field check remove 341 km of paths from routes.
-- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. That covers 1,020 km of the 3,305 km of side-of-street paths. A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.
+- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds 28.7 km of sheltered path. Nobody has measured how much exists on the street.
+- **Access.** Gates and entrances that need a field check remove 321 km of paths from routes.
+- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. That covers 1,021 km of the 3,306 km of side-of-street paths. A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.
 <!-- limits:end -->
 - **Heights.** Google's heights stop at 100 m and date from 2023. OpenStreetMap supplies most tower heights.
 - **Taglish copy.** A native speaker has not reviewed it yet.

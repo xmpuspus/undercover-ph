@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T17:06:42+08:00",
+ "generated_at": "2026-10-22T19:27:16+08:00",
  "osm_extract": "philippines-261020.osm.pbf, md5 941dd405ba4f1c028ca874cde38ea200, clipped to ncr.osm.pbf with osmium extract -b 120.90,14.35,121.20,14.80",
  "pilot_bbox": [
   121.004,
@@ -60,7 +60,7 @@
  "counts": {
   "nodes": 3137,
   "edges": 6015,
-  "routable_edges": 5754,
+  "routable_edges": 5757,
   "buildings": 64510,
   "places": 559
  },
@@ -79,7 +79,7 @@
   }
  ],
  "limits": [
-  "Edges with unchecked access rules are not routable by default. That removes 261 of 6015 edges, or 11.5 km.",
+  "Edges with unchecked access rules are not routable by default. That removes 258 of 6015 edges, or 11.4 km.",
   "The largest routable network holds 96.1% of routable nodes and 99.0% of routable length.",
   "Kerbs do not trigger an access check. 0 edges that cross a raised kerb carry the steps flag, so step-free routes avoid them.",
   "Gates alone remove 245 edges and 11.0 km. Village and estate gates need a field check.",

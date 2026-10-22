@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T17:09:39+08:00",
+ "generated_at": "2026-10-22T19:10:57+08:00",
  "osm_extract": "philippines-261020.osm.pbf, md5 941dd405ba4f1c028ca874cde38ea200, clipped to ncr.osm.pbf with osmium extract -b 120.90,14.35,121.20,14.80",
  "pilot_bbox": [
   121.046,
@@ -58,9 +58,9 @@
   1110
  ],
  "counts": {
-  "nodes": 3857,
-  "edges": 6463,
-  "routable_edges": 6131,
+  "nodes": 3838,
+  "edges": 6433,
+  "routable_edges": 6110,
   "buildings": 65167,
   "places": 854
  },
@@ -91,8 +91,8 @@
   }
  ],
  "limits": [
-  "Edges with unchecked access rules are not routable by default. That removes 332 of 6463 edges, or 17.4 km.",
-  "The largest routable network holds 93.3% of routable nodes and 96.5% of routable length.",
+  "Edges with unchecked access rules are not routable by default. That removes 323 of 6433 edges, or 17.2 km.",
+  "The largest routable network holds 93.2% of routable nodes and 96.5% of routable length.",
   "Kerbs do not trigger an access check. 2 edges that cross a raised kerb carry the steps flag, so step-free routes avoid them.",
   "Gates alone remove 278 edges and 14.5 km. Village and estate gates need a field check.",
   "Only access, foot and opening-hours rules restrict walkers. Vehicle-only conditional tags, such as a Sunday car-free rule, do not.",
@@ -105,7 +105,7 @@
   "47 unsheltered edges, 1.8 km, run mostly inside a building footprint with no cover tag.",
   "Those edges carry flag 1024, inside a footprint with cover unverified. They get no shelter flag, and their shade counts as low confidence.",
   "The graph keeps each whole way that has a node in the graph area. Some edges reach 489 m past it.",
-  "31 ways outside the graph area, 2.4 km, join walk network pieces that the area edge cut apart.",
+  "21 ways outside the graph area, 1.9 km, join walk network pieces that the area edge cut apart.",
   "A road side edge starts half the carriageway width plus 1 m from the road centreline.",
   "The offset shrinks in 0.5 m steps, down to 1.5 m, until no 1 m sample sits inside a ground-level footprint.",
   "587 side edges moved closer to the road. 84 sides still inside a footprint at 1.5 m became 73 centre edges.",
