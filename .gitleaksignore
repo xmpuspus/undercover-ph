@@ -1,0 +1,6 @@
+# SHA-256 hashes of research/20261021T120813Z/scripts/05/extract_walk_graph.py and
+# research/20261021T120813Z/scripts/pedestrian_access.py in docs/extraction-verification.json.
+# The generic-api-key rule reads them as keys because the file names hold "access". Recompute with
+# `shasum -a 256 <file>` to check.
+b4b80115fcaf5014c80517b5f9507e71c89376b0:docs/extraction-verification.json:generic-api-key:47
+b4b80115fcaf5014c80517b5f9507e71c89376b0:docs/extraction-verification.json:generic-api-key:48
