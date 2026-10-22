@@ -10,7 +10,7 @@ import Landing from "./components/Landing";
 import { AdvisoryBar, Footer, TopBanner } from "./components/Chrome";
 import { DestinationSearch, ModeSwitch, TripFields } from "./components/Planner";
 import { TimeChips, WeatherChips } from "./components/TimeChips";
-import { ProfileToggles, RouteCard, StateMessage, fmtDuration, noRouteText, type Highlight } from "./components/RouteCard";
+import { ProfileToggles, RouteCard, StateMessage, fmtDuration, headline, noRouteText, type Highlight } from "./components/RouteCard";
 import RoutePeek from "./components/RoutePeek";
 import SunChip from "./components/SunChip";
 import { compass16, sunDay, sunPosition, type SunView } from "./lib/sun";
@@ -985,7 +985,24 @@ export default function App() {
               )}
               {(view === "results" || view === "steps") && from && to && (
                 <>
-                  {(desktop || !current) && toggles}
+                  {!desktop && sheetFull && view === "results" && current && (
+                    <button
+                      type="button"
+                      onClick={() => setSheetFull(false)}
+                      onPointerDown={(e) => (sheetDrag.current = e.clientY)}
+                      onPointerUp={(e) => {
+                        if (sheetDrag.current !== null && e.clientY - sheetDrag.current > 24) setSheetFull(false);
+                        sheetDrag.current = null;
+                      }}
+                      aria-expanded
+                      aria-label="Show less, more map"
+                      className="-mb-1 flex h-7 w-full shrink-0 items-center justify-center"
+                      data-testid="sheet-collapse"
+                    >
+                      <span className="h-1.5 w-10 rounded-full bg-white/90 shadow" aria-hidden="true" />
+                    </button>
+                  )}
+                  {(desktop || !current || (sheetFull && view === "results")) && toggles}
                   <div className="flex min-h-0 flex-col overflow-y-auto rounded-card">
                     {routed.error && (
                       <div className="rounded-card bg-white p-4 text-[14px] text-ink shadow-card" data-testid="route-state" data-state="error">
@@ -1016,7 +1033,7 @@ export default function App() {
                           count={display.length}
                           mode={routeMode}
                           night={night}
-                          head={null}
+                          head={headline(current, display, result, routeMode)}
                           onExpand={() => setSheetFull(true)}
                           onSteps={() => setShowSteps(true)}
                           onNavigate={startNavigate}
@@ -1025,23 +1042,6 @@ export default function App() {
                     )}
                     {result && current && view === "results" && (desktop || sheetFull) && (
                       <div className={`transition-opacity motion-reduce:transition-none ${routing ? "opacity-60" : ""}`} aria-busy={routing}>
-                      {!desktop && (
-                        <button
-                          type="button"
-                          onClick={() => setSheetFull(false)}
-                          onPointerDown={(e) => (sheetDrag.current = e.clientY)}
-                          onPointerUp={(e) => {
-                            if (sheetDrag.current !== null && e.clientY - sheetDrag.current > 24) setSheetFull(false);
-                            sheetDrag.current = null;
-                          }}
-                          aria-expanded
-                          aria-label="Show less, more map"
-                          className="mb-1 flex h-7 w-full items-center justify-center rounded-t-card"
-                          data-testid="sheet-collapse"
-                        >
-                          <span className="h-1.5 w-10 rounded-full bg-white/90 shadow" aria-hidden="true" />
-                        </button>
-                      )}
                       <RouteCard
                         display={display}
                         selected={selected}
@@ -1090,6 +1090,22 @@ export default function App() {
               )}
             </div>
           </>
+        )}
+
+        {/* Phones: Play as a round map button above the sheet, as map apps place their map controls. */}
+        {stage === "plan" && !desktop && view === "results" && !sheetFull && current && daySlots.length > 1 && (
+          <button
+            type="button"
+            data-scrubber
+            onClick={togglePlay}
+            aria-label={playing ? "Stop the hour scrubber" : "Play the day hour by hour"}
+            aria-pressed={playing}
+            className={`absolute right-3 z-20 grid h-12 w-12 place-items-center rounded-full border shadow-card ${playing ? "border-brand bg-brand text-white" : "border-slate-200 bg-white text-ink"}`}
+            style={{ bottom: panelH + 4 }}
+            data-testid="map-play"
+          >
+            {playing ? <PauseIcon size={16} /> : <PlayIcon size={16} />}
+          </button>
         )}
 
         {stage === "navigate" && current && from && to && (

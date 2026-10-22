@@ -40,7 +40,8 @@ function Seg<T extends string>({
 
 export function ProfileToggles(p: { stepFree: boolean; onStepFree: (v: boolean) => void; mode: Mode; onMode: (m: Mode) => void }) {
   return (
-    <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 md:flex-wrap">
+    // Wraps instead of scrolling sideways, and never shrinks under a capped panel (WCAG 1.4.10).
+    <div className="flex shrink-0 flex-wrap gap-2">
       <Seg
         label="Walking profile"
         value={p.stepFree ? "free" : "walk"}
@@ -55,8 +56,8 @@ export function ProfileToggles(p: { stepFree: boolean; onStepFree: (v: boolean) 
         value={p.mode}
         onChange={p.onMode}
         options={[
-          { v: "shade", label: "Stay cool", icon: <SunIcon size={15} />, testid: "goal-cool" },
-          { v: "rain", label: "Stay dry", icon: <RainIcon size={15} />, testid: "goal-dry" },
+          { v: "shade", label: "Shaded", icon: <SunIcon size={15} />, testid: "goal-cool" },
+          { v: "rain", label: "Sheltered", icon: <RainIcon size={15} />, testid: "goal-dry" },
         ]}
       />
     </div>

@@ -114,7 +114,7 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
           <li>Roofed, indoor, and underground paths count as covered. When the sun is {NIGHT_ALT_DEG} degrees up or lower, only a roof counts.</li>
           <li data-testid="about-rule">
             The recommended walk is at most {Math.round(REC_MAX_DETOUR * 100)}% longer than the shortest walk and has at least {Math.round(REC_MIN_CUT * 100)}% less
-            time in sun, or without a roof with Stay dry. If no walk meets both, the shortest walk is recommended.
+            time in sun, or without a roof with Sheltered. If no walk meets both, the shortest walk is recommended.
           </li>
           <li>Paths with unchecked access stay out of routes unless you include them.</li>
         </ul>
