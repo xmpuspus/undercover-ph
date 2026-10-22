@@ -5,7 +5,8 @@ This page explains how the app turns map data into a shaded or sheltered route. 
 ## 1. The walk network comes from OpenStreetMap with strict access rules
 
 - Source: the Geofabrik Philippines extract of 2026-10-20, clipped to Metro Manila.
-- Area: the Makati CBD pilot box plus 500 m on each side.
+- Areas: 13 walking areas across Metro Manila, listed in `app/public/data/areas.json`. Each area joins one or more district boxes around a busy centre. Its walk network covers each box plus 500 m on each side.
+- Each area routes on its own network. Where two areas overlap, a trip across the seam routes in the area whose network holds both ends.
 - Every footway, path, steps, corridor, and walkable road becomes an edge between two nodes.
 - Roads of tertiary class and above get a separate edge for each sidewalk. The pipeline offsets each sidewalk line from the road centre and keeps it outside building footprints.
 - An edge with an unchecked access rule (a gate, an entrance, a private passage) stays out of routes by default. The user can turn such paths on, and the app then draws them dashed.

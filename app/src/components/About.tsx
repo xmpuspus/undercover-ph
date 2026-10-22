@@ -119,7 +119,7 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
           {APP_NAME} finds walking routes that stay in shade or under a roof. It is a prototype by an independent developer. It is not affiliated with any
           government agency.
         </p>
-        <p className="mt-2">It covers six areas of Metro Manila:</p>
+        <p className="mt-2">It covers {AREA_LABELS.length} walking areas around Metro Manila's busiest centres. A trip that starts or ends outside them gets no route:</p>
         <ul className="mt-1 list-disc space-y-0.5 pl-5" data-testid="about-areas">
           {AREA_LABELS.map((a) => (
             <li key={a.id}>{a.label}</li>

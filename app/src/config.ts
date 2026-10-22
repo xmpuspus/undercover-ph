@@ -33,6 +33,13 @@ export const AREA_LABELS: { id: string; label: string }[] = [
   { id: "qc-north", label: "North Avenue, QC Circle and UP Diliman" },
   { id: "manila", label: "Manila" },
   { id: "alabang", label: "Alabang" },
+  { id: "north-coast", label: "Caloocan, Malabon, Navotas and Valenzuela" },
+  { id: "marikina", label: "Marikina" },
+  { id: "paranaque-airport", label: "Aseana, PITX and NAIA" },
+  { id: "paranaque-bf-aguirre", label: "BF Homes and Aguirre Avenue" },
+  { id: "taguig-pateros", label: "McKinley Hill, Taguig Centre, Arca South and Pateros" },
+  { id: "qc-commonwealth-fairview", label: "Commonwealth and Fairview" },
+  { id: "qc-banawe", label: "Banawe and Quezon Avenue" },
 ];
 
 // Shown before the user types, if the place list has them. With no area picked yet, the first of each area shows.
@@ -43,6 +50,13 @@ export const SUGGESTED: Record<string, string[]> = {
   "qc-north": ["TriNoma", "SM City North EDSA", "Quezon Memorial Circle"],
   manila: ["Intramuros", "Manila City Hall"],
   alabang: ["Alabang Town Center", "Festival Alabang"],
+  "north-coast": ["Yamaha Monumento LRT Station", "Malabon City Hall", "Navotas Fishport Complex", "SM City Valenzuela"],
+  marikina: ["Riverbanks Center", "Marikina City Hall", "SM City Marikina"],
+  "paranaque-airport": ["Parañaque Integrated Terminal Exchange", "Ayala Malls Manila Bay", "Okada Manila"],
+  "paranaque-bf-aguirre": ["SM City BF Parañaque", "Aguirre Central Park"],
+  "taguig-pateros": ["Ayala Malls Arca South", "New Taguig City Hall", "Pateros Municipal Hall"],
+  "qc-commonwealth-fairview": ["SM City Fairview", "Fairview Center Mall", "Batasan MRT Station"],
+  "qc-banawe": ["Fisher Mall Quezon Avenue", "St. Luke's Medical Center"],
 };
 
 // The router treats the sun at or below this altitude as night. The basemap and hour chips follow it.

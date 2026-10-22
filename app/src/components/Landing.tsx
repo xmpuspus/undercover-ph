@@ -38,13 +38,10 @@ export default function Landing({ onPick, onIntent, status, error, theme, minute
           </span>
         </h1>
         <p className="mt-2 text-[16px] font-light leading-relaxed text-slate-700">Walk in the shade on sunny days, or under cover when it rains.</p>
-        {/* index.html repeats this list in its static shell. Keep the two the same. */}
-        <p className="mt-3 text-[13px] text-slate-700">It covers six areas of Metro Manila:</p>
-        <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[13px] leading-snug text-slate-600" data-testid="landing-areas">
-          {AREA_LABELS.map((a) => (
-            <li key={a.id}>{a.label}</li>
-          ))}
-        </ul>
+        {/* One line, so the buttons stay in view on a phone. About lists every area. index.html repeats this line. */}
+        <p className="mt-3 text-[13px] text-slate-700" data-testid="landing-areas">
+          {AREA_LABELS.length} walking areas in Metro Manila's busiest centres, from Caloocan to Alabang.
+        </p>
         <div className="mt-5 grid grid-cols-2 gap-3">
           <ModeButton mode="shade" onPick={onPick} busy={picking === "shade"} />
           <ModeButton mode="rain" onPick={onPick} busy={picking === "rain"} />

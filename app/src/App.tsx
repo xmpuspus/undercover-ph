@@ -1,8 +1,8 @@
 import { Component, Suspense, lazy, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AREA_LABELS, CBD_CENTER, DEFAULT_AREA, NIGHT_ALT_DEG, SUGGESTED } from "./config";
-import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, ShadowOverlay, Weather } from "./types";
+import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, Weather } from "./types";
 import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, placeKeys, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
-import { BUILDINGS_URL, areaBase, areaPath, exists, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
+import { areaBase, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
 import { areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea } from "./lib/areas";
 import { clockPinned, dateLabel, dateShort, fmtDist, fmtMinute, manilaNow, type Clock } from "./lib/time";
 import { toDisplay } from "./lib/display";
@@ -157,7 +157,6 @@ export default function App() {
   const [banner, setBanner] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
-  const [shadowsReady, setShadowsReady] = useState(false);
   const [shadowsOn, setShadowsOn] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [mapBearing, setMapBearing] = useState(0);
@@ -191,15 +190,13 @@ export default function App() {
   useEffect(() => {
     loadAdvisory(lastArea ?? DEFAULT_AREA).then(setAdvisory);
   }, []);
-  // Weather and the shadow images belong to the area.
+  // Weather belongs to the area.
   useEffect(() => {
     if (!areaId) return;
     let live = true;
     setWeather(null);
-    setShadowsReady(false);
     // A failed fetch shows "Weather unavailable", the same as a file that reports an error. Null means still loading.
     loadWeather(areaId).then((w) => live && setWeather(w ?? { status: "unavailable", fetched_at: "" }));
-    exists(`${areaPath(areaId)}READY.shadows`).then((r) => live && setShadowsReady(r));
     return () => {
       live = false;
     };
@@ -326,11 +323,6 @@ export default function App() {
   const togglePlay = () => {
     if (playing) return setPlaying(false);
     if (!daySlots.length) return;
-    // Fetch the day's shadow images up front (about 170 KB each), so the overlay keeps pace with the scrubber.
-    for (const b of daySlots) {
-      const url = shadowUrl(date, b.min);
-      if (url) new Image().src = url;
-    }
     const i = daySlots.findIndex((b) => b.idx === bucketIdx);
     if (i < 0 || i >= daySlots.length - 1) setBucketIdx(daySlots[0].idx);
     setNowAt(null);
@@ -394,30 +386,7 @@ export default function App() {
   const [themeAlt, themeAz] = stage === "landing" || !sun ? liveSun : sun;
   const theme = useMemo(() => skyTheme(themeAlt, themeAz), [themeAlt, themeAz]);
 
-  // Ground shadow PNGs. Hidden until READY.shadows exists; a slot missing from the list means no overlay.
-  const overlayDef = (manifest as { shadow_overlay?: ShadowOverlay } | null)?.shadow_overlay ?? null;
-  const shadowUrl = useCallback(
-    (d: string, min: number) => {
-      if (!shadowsReady || !overlayDef) return null;
-      const hhmm = `${String(Math.floor(min / 60)).padStart(2, "0")}${String(min % 60).padStart(2, "0")}`;
-      if (!areaId || !overlayDef.buckets[d]?.includes(hhmm)) return null;
-      return `${areaBase(areaId)}${overlayDef.path.replace("{date}", d).replace("{HHMM}", hhmm)}`;
-    },
-    [shadowsReady, overlayDef, areaId],
-  );
-  const overlayUrl = date ? shadowUrl(date, minute) : null;
-  const shadow = useMemo(
-    () => (overlayUrl && overlayDef && shadowsOn && !dark ? { url: overlayUrl, coords: overlayDef.coords } : null),
-    [overlayUrl, overlayDef, shadowsOn, dark],
-  );
-  // Fetch only the next slot's image ahead of time; the play button fetches the rest of the day.
-  useEffect(() => {
-    if (!shadow || !manifest) return;
-    const i = manifest.buckets_min.indexOf(minute);
-    const next = i >= 0 ? manifest.buckets_min[i + 1] : undefined;
-    const url = next !== undefined ? shadowUrl(date, next) : null;
-    if (url) new Image().src = url;
-  }, [shadow, manifest, minute, date, shadowUrl]);
+  // The map draws building and tree shadows in the browser for the chosen hour's sun (MapView, shadowWorker).
 
   // Set once the first area has loaded and the trip time is restored or set to Now.
   const started = useRef(false);
@@ -1003,11 +972,11 @@ export default function App() {
         <Suspense fallback={null}>
           <MapView
             theme={theme}
-            buildingsUrl={BUILDINGS_URL}
             onBuildings={() => setBuildingsLoading(false)}
             onLoaded={() => setMapLoaded(true)}
             onReady={() => setMapReady(true)}
-            coverBbox={manifest?.graph_bbox ?? null}
+            areas={areas}
+            coverBbox={null}
             routes={mapRoutes}
             selected={stage === "navigate" ? 0 : selected}
             mode={routeMode}
@@ -1021,7 +990,8 @@ export default function App() {
             fitKey={fitKey}
             onMapClick={onMapClick}
             onBearing={setMapBearing}
-            shadow={shadow}
+            sun={sun}
+            shadowsOn={shadowsOn && !dark}
             highlight={stage === "plan" && view === "results" ? highlight : null}
             onSelect={(i) => {
               const d = display[i];
@@ -1096,7 +1066,7 @@ export default function App() {
                         day={manifest ? sunDay(manifest.sunrise_sunset?.[date], manifest.buckets_min, manifest.sun?.[date], minute) : null}
                         accent={theme.accent}
                       />
-                      {overlayUrl && !dark && (
+                      {!dark && (
                         <button
                           type="button"
                           role="switch"
@@ -1137,7 +1107,7 @@ export default function App() {
                       bearing={mapBearing}
                       day={manifest ? sunDay(manifest.sunrise_sunset?.[date], manifest.buckets_min, manifest.sun?.[date], minute) : null}
                       accent={theme.accent}
-                      shadows={overlayUrl && !dark ? { on: shadowsOn, toggle: () => setShadowsOn(!shadowsOn) } : null}
+                      shadows={!dark ? { on: shadowsOn, toggle: () => setShadowsOn(!shadowsOn) } : null}
                     />
                   </div>
                 )}

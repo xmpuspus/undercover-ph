@@ -1,6 +1,6 @@
 # Build a shade and shelter walking router for Makati CBD first, then add one district at a time
 
-Date: 2026-10-21, updated 2026-10-22. Status: a local prototype for Makati CBD runs from `app/` (see the README). It covers step 0 of the roadmap. The field sprint, partner outreach, and launch steps are still open.
+Date: 2026-10-21, updated 2026-10-22. Status on 2026-10-22: live at https://undercover.ph for 13 walking areas across Metro Manila (see the README). The Makati-first plan below is the history of how it started. The field sprint and partner outreach are still open.
 
 Evidence: 12 research reports in `research/20261021T120813Z/`. Each claim names its report number in brackets, for example [02].
 
