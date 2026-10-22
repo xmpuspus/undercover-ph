@@ -50,7 +50,7 @@ Like Singapore's version, the app returns three walks: the shortest, the most co
 
 ## What is in this repo
 
-- **`app/`**: the web app (Vite, React, TypeScript, MapLibre GL). The router lives in `app/src/lib/router/`: a custom A* search with access, opening-hours, side-of-street, and night rules, covered by 40 unit tests.
+- **`app/`**: the web app (Vite, React, TypeScript, MapLibre GL). The router lives in `app/src/lib/router/`: a custom A* search with access, opening-hours, side-of-street, and night rules, covered by 55 unit tests.
 - **`pipeline/`**: the data build. It reads OpenStreetMap, assigns building heights, builds the walk graph, and fetches weather and the PAGASA advisory.
 - **`pipeline/shade/`**: the shade engine. It casts rays toward the sun from every 5 m of every sidewalk, each half hour. It also renders the ground shadow images.
 - **`docs/`**: the [method](docs/methodology.md), the [sun-direction analysis](docs/sun-direction.md), the [data contract](docs/data-contract.md), the [design](docs/design.md), and the [research corrections](docs/research-corrections.md).
@@ -76,9 +76,9 @@ git clone https://github.com/xmpuspus/undercover-ph
 cd undercover-ph/app
 pnpm install
 pnpm dev            # http://localhost:5173
-pnpm test           # 67 unit tests for the router, the sky theme, and the advisory window
+pnpm test           # 120 unit tests: router, search, route card text, sky theme, trip links, advisory
 pnpm build          # type check and production build
-pnpm e2e            # browser flow: Ayala MRT Station to Greenbelt, tomorrow at 3 PM
+pnpm e2e            # 9 browser tests on desktop and phone: trip flow, Back, links, Now, phone layout
 pnpm demo:record    # re-record the GIFs in docs/demo/ from a production build
 ```
 
@@ -90,7 +90,7 @@ The deployed site rebuilds its shade data every day. To build it yourself, see `
 2. **Building heights:** OpenStreetMap heights first, then Google Open Buildings 2.5D (2023) estimates. Together they give a height to 96.2% of Makati CBD buildings, 98.0% by footprint area.
 3. **Tree canopy:** the Meta and WRI canopy height map, about 1 m pixels.
 4. **Shade:** a ray toward the sun from every 5 m of every sidewalk, at 1.5 m high. It runs every 30 minutes from 06:00 to 18:30 for 7 days.
-5. **Routes:** cost = length x (1 + k x sun exposure). The recommended route must cut sun by at least 15% within a 20% detour, or the app says no shadier walk exists.
+5. **Routes:** cost = length x (1 + k x sun exposure). The recommended walk is at most 20% longer than the shortest and has at least 15% less time in sun. If no walk meets both, the shortest is recommended.
 6. **Crossings:** a route changes to the other side of a road only at a mapped crossing or a traffic signal. Before this rule, 80 of 100 random shortest routes crossed a road mid-block.
 
 The full method, with its numbers and limits, is in [docs/methodology.md](docs/methodology.md).
