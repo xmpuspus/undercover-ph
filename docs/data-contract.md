@@ -110,10 +110,14 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 
 ```json
 [{"name": "Ayala MRT Station", "category": "station", "lon": 0, "lat": 0,
-  "node_id": 0, "aliases": ["Ayala MRT"]}]
+  "node_id": 0, "aliases": ["Ayala MRT"]},
+ {"name": "Muji", "category": "store", "lon": 0, "lat": 0,
+  "node_id": 0, "aliases": [], "detail": "in Greenbelt 3"}]
 ```
 
 Every place has a snapped `node_id` on a routable edge. Places come from named OSM features in the graph area.
+
+`detail` is optional. It is set only on places whose name appears more than once, and it tells them apart in a few words. It comes from OSM: the named building or mall that contains the place, the address house name, the address street, or the nearest named street. The app shows it next to the name and never searches it.
 
 ### `hours.json`
 

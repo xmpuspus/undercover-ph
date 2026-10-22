@@ -131,6 +131,8 @@ export interface Place {
   node_id: number;
   /** Always an array after loadData, possibly empty. */
   aliases: string[];
+  /** Few words that tell apart places sharing a name, such as "in Greenbelt 5" or a street. Set only on repeated names. */
+  detail?: string;
 }
 
 export interface Source {
