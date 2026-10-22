@@ -811,59 +811,94 @@ export default function App() {
           <>
             {view !== "dest" && manifest && (
               <div ref={setTopEl} className="pointer-events-none absolute left-3 right-3 top-3 z-30 flex flex-col items-start gap-2 md:left-4 md:top-4 md:short:left-[396px]">
-                <div className="flex items-start gap-2">
-                  <TimeChips
-                    now={{ minute: clock.minute, active: isNow, onClick: goNow }}
-                    today={clock.date}
-                    dates={dateOpts}
-                    dateIdx={dateIdx}
-                    buckets={bucketOpts}
-                    bucketIdx={bucketIdx}
-                    allDates={manifest.dates}
-                    bucketsMin={manifest.buckets_min}
-                    onDate={pickDate}
-                    onBucket={(i) => {
-                      setPlaying(false);
-                      setBucketIdx(i);
-                    }}
-                  />
-                  {daySlots.length > 1 && (
-                    <button
-                      type="button"
-                      data-scrubber
-                      onClick={togglePlay}
-                      aria-label={playing ? "Stop the hour scrubber" : "Play the day hour by hour"}
-                      aria-pressed={playing}
-                      className={`pointer-events-auto grid h-11 w-11 shrink-0 place-items-center rounded-full border shadow-sm ${playing ? "border-brand bg-brand text-white" : "border-slate-200 bg-white text-ink hover:border-slate-300"}`}
-                      data-testid="scrubber"
-                    >
-                      {playing ? <PauseIcon size={15} /> : <PlayIcon size={15} />}
-                    </button>
-                  )}
-                </div>
-                <div className="flex flex-wrap items-start gap-2">
-                  <WeatherChips weather={weather} date={date} minute={minute} mode={mode} dark={dark} />
-                  <SunChip
-                    sun={sunView}
-                    bearing={mapBearing}
-                    day={manifest ? sunDay(manifest.sunrise_sunset?.[date], manifest.buckets_min, manifest.sun?.[date], minute) : null}
-                    accent={theme.accent}
-                  />
-                  {overlayUrl && !dark && (
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={shadowsOn}
-                      onClick={() => setShadowsOn(!shadowsOn)}
-                      aria-label="Shadows on the map"
-                      className={`pointer-events-auto flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-3 text-[13px] shadow-sm ${shadowsOn ? "border-brand bg-blue-50 text-brand" : "border-slate-200 bg-white/95 text-slate-600"}`}
-                      data-testid="shadows-toggle"
-                    >
-                      <span className={`h-2.5 w-2.5 rounded-sm ${shadowsOn ? "bg-slate-600/70" : "border border-slate-500"}`} />
-                      <span className="hidden md:inline">Shadows</span>
-                    </button>
-                  )}
-                </div>
+                {desktop ? (
+                  <>
+                    <div className="flex items-start gap-2">
+                      <TimeChips
+                        now={{ minute: clock.minute, active: isNow, onClick: goNow }}
+                        today={clock.date}
+                        dates={dateOpts}
+                        dateIdx={dateIdx}
+                        buckets={bucketOpts}
+                        bucketIdx={bucketIdx}
+                        allDates={manifest.dates}
+                        bucketsMin={manifest.buckets_min}
+                        onDate={pickDate}
+                        onBucket={(i) => {
+                          setPlaying(false);
+                          setBucketIdx(i);
+                        }}
+                      />
+                      {daySlots.length > 1 && (
+                        <button
+                          type="button"
+                          data-scrubber
+                          onClick={togglePlay}
+                          aria-label={playing ? "Stop the hour scrubber" : "Play the day hour by hour"}
+                          aria-pressed={playing}
+                          className={`pointer-events-auto grid h-11 w-11 shrink-0 place-items-center rounded-full border shadow-sm ${playing ? "border-brand bg-brand text-white" : "border-slate-200 bg-white text-ink hover:border-slate-300"}`}
+                          data-testid="scrubber"
+                        >
+                          {playing ? <PauseIcon size={15} /> : <PlayIcon size={15} />}
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-start gap-2">
+                      <WeatherChips weather={weather} date={date} minute={minute} mode={mode} dark={dark} />
+                      <SunChip
+                        sun={sunView}
+                        bearing={mapBearing}
+                        day={manifest ? sunDay(manifest.sunrise_sunset?.[date], manifest.buckets_min, manifest.sun?.[date], minute) : null}
+                        accent={theme.accent}
+                      />
+                      {overlayUrl && !dark && (
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={shadowsOn}
+                          onClick={() => setShadowsOn(!shadowsOn)}
+                          aria-label="Shadows on the map"
+                          className={`pointer-events-auto flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-3 text-[13px] shadow-sm ${shadowsOn ? "border-brand bg-blue-50 text-brand" : "border-slate-200 bg-white/95 text-slate-600"}`}
+                          data-testid="shadows-toggle"
+                        >
+                          <span className={`h-2.5 w-2.5 rounded-sm ${shadowsOn ? "bg-slate-600/70" : "border border-slate-500"}`} />
+                          <span className="hidden md:inline">Shadows</span>
+                        </button>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  // Phones: one row, as in map apps, so the map keeps the height. Play and the map shadows
+                  // switch sit behind the when chip and the sun chip. Below 360 px the row wraps.
+                  <div className="flex flex-wrap items-start gap-2">
+                    <TimeChips
+                      compact
+                      play={daySlots.length > 1 ? { playing, onToggle: togglePlay } : null}
+                      now={{ minute: clock.minute, active: isNow, onClick: goNow }}
+                      today={clock.date}
+                      dates={dateOpts}
+                      dateIdx={dateIdx}
+                      buckets={bucketOpts}
+                      bucketIdx={bucketIdx}
+                      allDates={manifest.dates}
+                      bucketsMin={manifest.buckets_min}
+                      onDate={pickDate}
+                      onBucket={(i) => {
+                        setPlaying(false);
+                        setBucketIdx(i);
+                      }}
+                    />
+                    <WeatherChips compact weather={weather} date={date} minute={minute} mode={mode} dark={dark} />
+                    <SunChip
+                      compact
+                      sun={sunView}
+                      bearing={mapBearing}
+                      day={manifest ? sunDay(manifest.sunrise_sunset?.[date], manifest.buckets_min, manifest.sun?.[date], minute) : null}
+                      accent={theme.accent}
+                      shadows={overlayUrl && !dark ? { on: shadowsOn, toggle: () => setShadowsOn(!shadowsOn) } : null}
+                    />
+                  </div>
+                )}
               </div>
             )}
             <div

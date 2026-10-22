@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Mode, Weather } from "../types";
 import { dateLabel, dateShort, fmtMinute, fmtStamp } from "../lib/time";
 import { heatBand, uvWord, weatherAt } from "../lib/weather";
-import { CalendarIcon, ChevronDown, ClockIcon, MoonIcon, RainIcon, SunIcon } from "./Icons";
+import { CalendarIcon, ChevronDown, ClockIcon, MoonIcon, PauseIcon, PlayIcon, RainIcon, SunIcon } from "./Icons";
 
 // Tighter on phones, so Now, the date, the hour, and play fit one row from 360 px.
 const chip =
@@ -20,6 +20,9 @@ interface Props {
   bucketsMin: number[];
   onDate: (idx: number) => void;
   onBucket: (idx: number) => void;
+  // Phones get one "when" chip that opens Now, the dates, the hours, and Play in one panel.
+  compact?: boolean;
+  play?: { playing: boolean; onToggle: () => void } | null;
 }
 
 // Close on a tap outside, or on Escape (which also returns focus to the chip that opened the menu).
@@ -42,6 +45,138 @@ function useOutside(open: boolean, close: (refocus: boolean) => void) {
 }
 
 export function TimeChips(p: Props) {
+  return p.compact ? <WhenChip {...p} /> : <TimeChipRow {...p} />;
+}
+
+function HourGrid({ p, onPicked }: { p: Props; onPicked: () => void }) {
+  return (
+    <div className="grid grid-cols-4 gap-1.5">
+      {p.buckets.map((b) => (
+        <button
+          key={b.min}
+          type="button"
+          onClick={() => {
+            p.onBucket(b.idx);
+            onPicked();
+          }}
+          className={`flex min-h-11 items-center justify-center gap-1 rounded-full border px-1 text-[13px] ${
+            b.idx === p.bucketIdx ? "border-brand bg-blue-50 font-medium text-brand" : "border-slate-200 text-ink hover:border-slate-300"
+          }`}
+          data-testid={`hour-option-${b.min}`}
+          aria-label={b.night ? `${fmtMinute(b.min)}, sun too low for shade` : undefined}
+        >
+          {b.night && <MoonIcon size={12} className="text-slate-500" />}
+          {fmtMinute(b.min, true)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function SlotNote({ p }: { p: Props }) {
+  if (p.bucketsMin.length < 2) return null;
+  return (
+    <p className="mt-2 flex flex-wrap items-center gap-x-1 px-1 text-[12px] text-slate-500">
+      <span>
+        Shade is computed every {p.bucketsMin[1] - p.bucketsMin[0]} minutes, {fmtMinute(p.bucketsMin[0], true)} to {fmtMinute(p.bucketsMin[p.bucketsMin.length - 1], true)}.
+      </span>
+      {p.buckets.some((b) => b.night) && (
+        <span className="inline-flex items-center gap-1">
+          <MoonIcon size={11} /> means the sun is too low for shade.
+        </span>
+      )}
+    </p>
+  );
+}
+
+function WhenChip(p: Props) {
+  const [open, setOpen] = useState(false);
+  const btn = useRef<HTMLButtonElement>(null);
+  const close = (refocus: boolean) => {
+    if (refocus) btn.current?.focus();
+    setOpen(false);
+  };
+  const ref = useOutside(open, close);
+  const date = p.allDates[p.dateIdx];
+  const minute = p.bucketsMin[p.bucketIdx];
+  const label = p.now.active ? `Now ${fmtMinute(p.now.minute)}` : `${date ? dateLabel(date, p.today) : "Date"} ${minute != null ? fmtMinute(minute, true) : "time"}`;
+  return (
+    <div ref={ref} className="pointer-events-auto relative">
+      <button
+        ref={btn}
+        type="button"
+        className={`${chip} ${p.now.active ? "border-brand bg-blue-50 text-brand" : ""} ${p.play?.playing ? "border-brand" : ""}`}
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-label={`Leaving ${label}. Change the time`}
+        data-testid="when-chip"
+      >
+        {p.play?.playing && <PauseIcon size={13} />}
+        <span className="whitespace-nowrap">{label}</span>
+        <ChevronDown size={13} className="text-slate-500" />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-12 z-40 w-[min(340px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-2 shadow-card" role="dialog" aria-label="When you leave" data-testid="when-panel">
+          <div className="flex gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                p.now.onClick();
+                close(true);
+              }}
+              aria-pressed={p.now.active}
+              className={`flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full border px-3 text-[14px] ${p.now.active ? "border-brand bg-blue-50 font-medium text-brand" : "border-slate-200 text-ink"}`}
+              data-testid="when-now"
+            >
+              Leave now, {fmtMinute(p.now.minute)}
+            </button>
+            {p.play && (
+              <button
+                type="button"
+                data-scrubber
+                onClick={() => {
+                  p.play?.onToggle();
+                  close(false);
+                }}
+                className="flex min-h-11 items-center gap-1.5 rounded-full border border-slate-200 px-3 text-[14px] text-ink"
+                data-testid="when-play"
+              >
+                {p.play.playing ? <PauseIcon size={13} /> : <PlayIcon size={13} />}
+                {p.play.playing ? "Stop" : "Play the day"}
+              </button>
+            )}
+          </div>
+          <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" role="listbox" aria-label="Date">
+            {p.dates.map((d) => (
+              <button
+                key={d.date}
+                type="button"
+                role="option"
+                aria-selected={d.idx === p.dateIdx}
+                onClick={() => p.onDate(d.idx)}
+                className={`flex min-h-11 shrink-0 flex-col items-center justify-center rounded-xl border px-3 text-[13px] leading-tight ${
+                  d.idx === p.dateIdx ? "border-brand bg-blue-50 font-medium text-brand" : "border-slate-200 text-ink"
+                }`}
+                data-testid="date-option"
+                data-label={dateLabel(d.date, p.today)}
+              >
+                <span>{dateLabel(d.date, p.today)}</span>
+                <span className="text-[11px] text-slate-500">{dateShort(d.date)}</span>
+              </button>
+            ))}
+          </div>
+          <div className="mt-2">
+            <HourGrid p={p} onPicked={() => close(true)} />
+          </div>
+          <SlotNote p={p} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TimeChipRow(p: Props) {
   const [menu, setMenu] = useState<"date" | "hour" | null>(null);
   const dateBtn = useRef<HTMLButtonElement>(null);
   const hourBtn = useRef<HTMLButtonElement>(null);
@@ -91,32 +226,8 @@ export function TimeChips(p: Props) {
       )}
       {menu === "hour" && (
         <div className="absolute left-0 top-12 z-40 w-[min(332px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-2 shadow-card" role="dialog" aria-label="Departure time">
-          <div className="grid grid-cols-4 gap-1.5">
-            {p.buckets.map((b) => (
-              <button
-                key={b.min}
-                type="button"
-                onClick={() => {
-                  p.onBucket(b.idx);
-                  close(true);
-                }}
-                className={`flex min-h-11 items-center justify-center gap-1 rounded-full border px-1 text-[13px] ${
-                  b.idx === p.bucketIdx ? "border-brand bg-blue-50 font-medium text-brand" : "border-slate-200 text-ink hover:border-slate-300"
-                }`}
-                data-testid={`hour-option-${b.min}`}
-                title={b.night ? "Sun very low or down: shade does not apply" : undefined}
-              >
-                {b.night && <MoonIcon size={12} className="text-slate-500" />}
-                {fmtMinute(b.min, true)}
-              </button>
-            ))}
-          </div>
-          {p.bucketsMin.length > 1 && (
-            <p className="mt-2 px-1 text-[12px] text-slate-500">
-              Shade is computed every {p.bucketsMin[1] - p.bucketsMin[0]} minutes, {fmtMinute(p.bucketsMin[0], true)} to{" "}
-              {fmtMinute(p.bucketsMin[p.bucketsMin.length - 1], true)}.
-            </p>
-          )}
+          <HourGrid p={p} onPicked={() => close(true)} />
+          <SlotNote p={p} />
         </div>
       )}
     </div>
@@ -155,7 +266,21 @@ const HEAT: Record<1 | 2 | 3 | 4, string> = {
 };
 const HEAT_DOT: Record<1 | 2 | 3 | 4, string> = { 1: "bg-yellow-400", 2: "bg-orange-500", 3: "bg-red-600", 4: "bg-white" };
 
-export function WeatherChips({ weather, date, minute, mode, dark }: { weather: Weather | null; date: string; minute: number; mode: Mode; dark: boolean }) {
+export function WeatherChips({
+  weather,
+  date,
+  minute,
+  mode,
+  dark,
+  compact = false,
+}: {
+  weather: Weather | null;
+  date: string;
+  minute: number;
+  mode: Mode;
+  dark: boolean;
+  compact?: boolean;
+}) {
   const small = "flex h-11 items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 px-3 text-[13px] text-ink shadow-sm";
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -206,26 +331,23 @@ export function WeatherChips({ weather, date, minute, mode, dark }: { weather: W
         {w.feels != null ? (
           <>
             <span className={`h-2 w-2 shrink-0 rounded-full ${band ? HEAT_DOT[band.level] : "bg-slate-300"}`} aria-hidden="true" />
-            <span className="md:hidden">Feels {Math.round(w.feels)}°C</span>
-            <span className="hidden md:inline">Feels like {Math.round(w.feels)}°C</span>
+            {compact ? `${Math.round(w.feels)}°C` : `Feels like ${Math.round(w.feels)}°C`}
           </>
         ) : (
           `${Math.round(w.temp)}°C${w.condition ? `, ${w.condition}` : ""}`
         )}
       </button>
-      {mode === "shade" && w.uv != null && !dark && (
-        // Phones show UV in the weather details only, so the chips stay in two rows.
-        <span className={`${small} hidden md:flex`}>
+      {mode === "shade" && w.uv != null && !dark && !compact && (
+        <span className={small}>
           <SunIcon size={14} className="text-amber-500" />
           UV {Math.round(w.uv)}
-          <span className="hidden md:inline">, {uvWord(w.uv)}</span>
+, {uvWord(w.uv)}
         </span>
       )}
       {mode === "rain" && w.rain != null && (
         <span className={small}>
           <RainIcon size={14} className="text-brand" />
-          {Math.round(w.rain)}%<span className="md:hidden"> rain</span>
-          <span className="hidden md:inline"> chance of rain</span>
+          {Math.round(w.rain)}%{compact ? "" : " chance of rain"}
         </span>
       )}
       {open && (
@@ -233,7 +355,7 @@ export function WeatherChips({ weather, date, minute, mode, dark }: { weather: W
           id="weather-details"
           role="dialog"
           aria-label="Weather details"
-          className="absolute left-0 top-12 z-40 w-[min(300px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-3 text-[13px] leading-snug text-slate-700 shadow-card"
+          className={`absolute top-12 z-40 w-[min(300px,calc(100vw-24px))] rounded-card border border-slate-200 bg-white p-3 text-[13px] leading-snug text-slate-700 shadow-card ${compact ? "left-1/2 -translate-x-1/2" : "left-0"}`}
           data-testid="weather-details"
         >
           {w.feels != null && (
