@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: "undercover.ph: shaded and sheltered walking routes for Makati CBD"
+message: "If you use undercover.ph in research, please cite it using these metadata."
+type: software
+authors:
+  - given-names: Xavier
+    family-names: Puspus
+repository-code: "https://github.com/xmpuspus/undercover-ph"
+license: MIT
+version: "0.1.0"
+date-released: "2026-10-22"
+keywords:
+  - walking
+  - routing
+  - shade
+  - urban heat
+  - covered walkways
+  - openstreetmap
+  - maplibre
+  - makati
+  - metro manila
+  - civic technology
+abstract: >
+  undercover.ph finds walking routes in Makati CBD that stay in shade on sunny
+  days or under cover when it rains, a Philippine take on Singapore's
+  Undercover prototype. It casts shadows from OpenStreetMap and Google Open
+  Buildings heights and from a tree canopy height raster, every 30 minutes for
+  each sidewalk edge, and routes in the browser with a custom A* search that
+  returns the shortest, the most covered, and a recommended route. Paths with
+  unchecked access, closed mall passages, and mid-block road crossings stay out
+  of routes. The shade values are modelled and not yet checked in the field.

@@ -1,0 +1,2 @@
+{"set": "all pairs", "pairs": 941, "pairs_compared": 823, "sun_side_shadier": 435, "far_side_shadier": 61, "within_5_points": 327, "sun_side_minus_far_side_pts": 17.0}
+{"set": "both sides mapped", "pairs": 674, "pairs_compared": 595, "sun_side_shadier": 338, "far_side_shadier": 53, "within_5_points": 204, "sun_side_minus_far_side_pts": 17.8}

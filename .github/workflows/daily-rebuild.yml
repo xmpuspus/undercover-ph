@@ -1,0 +1,61 @@
+# Vercel generates the dated data (7 shade dates, overlays, weather, PAGASA advisory)
+# in every build (pipeline/vercel_build.sh), so the site goes stale unless main gets
+# a commit each day. This job pushes an empty commit when main has had none in the
+# last 20 hours. Vercel's Git integration then rebuilds and deploys.
+# No secrets and no Vercel token. A failed Vercel build keeps the last good deployment.
+
+name: daily-rebuild
+
+on:
+  schedule:
+    - cron: "40 21 * * *" # 05:40 Asia/Manila
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-rebuild
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    name: empty commit to main
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Push an empty commit unless main changed in the last 20 hours
+        run: |
+          age=$(( $(date +%s) - $(git log -1 --format=%ct) ))
+          if [ "$age" -lt 72000 ]; then
+            echo "main has a commit from $((age / 3600)) h ago, so Vercel built current data then."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "Daily data rebuild $(TZ=Asia/Manila date +%F)"
+          git push origin HEAD:main
+
+  report-failure:
+    name: open an issue
+    needs: rebuild
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue with the run link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create -R "$GITHUB_REPOSITORY" \
+            --title "Daily data rebuild failed $(TZ=Asia/Manila date +%F)" \
+            --body "The daily-rebuild workflow failed: $RUN_URL. The site keeps its last deployment, and its shade dates go stale until a commit reaches main."

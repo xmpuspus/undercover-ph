@@ -1,0 +1,7 @@
+noon sun north of zenith: 01 May to 14 Aug (106 days)
+2026-03-21 declination -0.1 noon altitude 75.4 sun south 30 m building noon shadow 7.8 m
+2026-05-01 declination +14.8 noon altitude 89.7 sun north 30 m building noon shadow 0.1 m
+2026-06-21 declination +23.5 noon altitude 81.1 sun north 30 m building noon shadow 4.7 m
+2026-08-15 declination +14.3 noon altitude 89.7 sun south 30 m building noon shadow 0.1 m
+2026-10-22 declination -10.8 noon altitude 64.7 sun south 30 m building noon shadow 14.2 m
+2026-12-21 declination -23.4 noon altitude 52.0 sun south 30 m building noon shadow 23.4 m

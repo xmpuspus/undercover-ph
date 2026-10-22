@@ -1,0 +1,696 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import type * as maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+import { CBD_CENTER, COLORS, STYLE_DAY, STYLE_NIGHT } from "../config";
+import type { Endpoint, Mode, ShadowOverlay } from "../types";
+import { segColor, type DisplayRoute } from "../lib/display";
+import { anchorCandidates, nearestOnRect, placeBubbles, type Rect } from "../lib/callouts";
+import { mixTheme, rgba, type SkyTheme } from "../lib/skyTheme";
+import { animate, prefersReducedMotion } from "../lib/motion";
+import { lengthM, sliceAlong } from "../lib/ribbon";
+import { mapLibre } from "../lib/maplibre";
+import { MoonIcon, SunIcon, UmbrellaIcon } from "./Icons";
+
+export interface Insets {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
+export interface Focus {
+  at: [number, number];
+  bearing: number | null;
+  zoom: number;
+}
+
+interface Props {
+  // Sky, light and building colours for the chosen hour. theme.dark picks the night basemap.
+  theme: SkyTheme;
+  // GeoJSON of 3D buildings. MapLibre's worker fetches and parses it.
+  buildingsUrl: string;
+  onBuildings: () => void;
+  // onLoaded: the style is in. onReady: the map is worth showing (first idle, or once it has loaded and the
+  // camera leaves the landing view). The landing poster fades out on onReady.
+  onLoaded: () => void;
+  onReady: () => void;
+  // Routing and data cover graph_bbox (the pilot box plus 500 m); the dashed box shows it.
+  coverBbox: [number, number, number, number] | null;
+  routes: DisplayRoute[];
+  selected: number;
+  mode: Mode;
+  nightState: boolean;
+  from: Endpoint | null;
+  to: Endpoint | null;
+  insets: Insets;
+  stage: "landing" | "plan" | "navigate";
+  focus: Focus | null;
+  showCallouts: boolean;
+  fitKey: string;
+  onMapClick: (lon: number, lat: number) => void;
+  onSelect: (i: number) => void;
+  onBearing: (deg: number) => void;
+  shadow: { url: string; coords: ShadowOverlay["coords"] } | null;
+  // A stretch of the selected route to light up, from the route ribbon.
+  highlight: { coords: [number, number][]; color: string } | null;
+}
+
+const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
+// Motion timings. Reduced motion makes all of them instant.
+const DRAW_MS = 700;
+const FADE_MS = 400;
+const NO_TRANSITION = { duration: 0, delay: 0 };
+const BUBBLE_W = 150;
+const BUBBLE_H = 46;
+// Tilted far enough that a band of sky shows above the skyline.
+const LANDING = { center: CBD_CENTER, zoom: 15.6, pitch: 74, bearing: -28 };
+
+type Src = maplibregl.GeoJSONSource;
+
+function line(coords: [number, number][], props: Record<string, unknown>): GeoJSON.Feature {
+  return { type: "Feature", properties: props, geometry: { type: "LineString", coordinates: coords } };
+}
+
+export default function MapView(p: Props) {
+  const box = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const ready = useRef(false);
+  const styleUrl = useRef("");
+  const props = useRef(p);
+  props.current = p;
+  const markers = useRef<{ from?: maplibregl.Marker; to?: maplibregl.Marker }>({});
+  // Plan views open at this pitch; a pitch the user sets by hand replaces it for later fits.
+  const planPitch = useRef(35);
+  const [failed, setFailed] = useState<string | null>(null);
+  const shownOnce = useRef({ loaded: false, ready: false });
+  const announceReady = () => {
+    if (shownOnce.current.ready) return;
+    shownOnce.current.ready = true;
+    props.current.onReady();
+  };
+  const toneRef = useRef<HTMLDivElement>(null);
+  const washRef = useRef<HTMLDivElement>(null);
+  // The theme now on screen. It differs from props.theme while a change of hour eases in.
+  const shown = useRef(p.theme);
+  // How much of the selected route is drawn, 0 to 1. A newly selected route draws itself in.
+  const drawn = useRef(1);
+  // Two ground-shadow images take turns, so a new hour fades in over the old one.
+  const shade = useRef<ShadeState>({ front: "a", url: null, token: 0 });
+  const [tick, setTick] = useState(0);
+  const [styleTick, setStyleTick] = useState(0);
+
+  const routeData = useMemo(() => {
+    const alt: GeoJSON.Feature[] = [];
+    const sel: GeoJSON.Feature[] = [];
+    let selFull: GeoJSON.Feature[] = [];
+    p.routes.forEach((d, i) => {
+      if (i === p.selected) {
+        selFull = [line(d.route.coords, {})];
+        for (const s of d.route.segments) {
+          sel.push(line(s.coords, { kind: s.kind, color: segColor(s.kind, p.mode, p.nightState) }));
+        }
+        if (!d.route.segments.length) sel.push(line(d.route.coords, { kind: "roof", color: COLORS.blue }));
+      } else {
+        const segs = d.route.segments.length ? d.route.segments : [{ coords: d.route.coords, kind: "sun" }];
+        for (const s of segs) alt.push(line(s.coords, { idx: i, kind: s.kind }));
+      }
+    });
+    return {
+      alt: { type: "FeatureCollection", features: alt } as GeoJSON.FeatureCollection,
+      sel: { type: "FeatureCollection", features: sel } as GeoJSON.FeatureCollection,
+      selFull: { type: "FeatureCollection", features: selFull } as GeoJSON.FeatureCollection,
+      key: p.routes[p.selected]?.key ?? "",
+    };
+  }, [p.routes, p.selected, p.mode, p.nightState]);
+  const routeRef = useRef(routeData);
+  routeRef.current = routeData;
+
+  // The selected route, drawn up to the current progress.
+  function syncSelected() {
+    const map = mapRef.current;
+    if (!map || !ready.current) return;
+    const r = routeRef.current;
+    const [sel, full] = drawn.current >= 1 ? [r.sel, r.selFull] : partRoute(r.sel, r.selFull, drawn.current);
+    (map.getSource("hb-sel") as Src | undefined)?.setData(sel);
+    (map.getSource("hb-sel-full") as Src | undefined)?.setData(full);
+    const h = props.current.highlight;
+    (map.getSource("hb-hl") as Src | undefined)?.setData(h && drawn.current >= 1 ? { type: "FeatureCollection", features: [line(h.coords, { color: h.color })] } : EMPTY);
+  }
+
+  // Push current data into the map sources. Safe to call before the style loads; it waits.
+  function sync() {
+    const map = mapRef.current;
+    if (!map || !ready.current) return;
+    const q = props.current;
+    (map.getSource("hb-alt") as Src | undefined)?.setData(routeRef.current.alt);
+    syncSelected();
+    const b = q.coverBbox;
+    (map.getSource("hb-pilot") as Src | undefined)?.setData(
+      b && q.stage === "plan"
+        ? {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "LineString",
+              coordinates: [
+                [b[0], b[1]],
+                [b[2], b[1]],
+                [b[2], b[3]],
+                [b[0], b[3]],
+                [b[0], b[1]],
+              ],
+            },
+          }
+        : EMPTY,
+    );
+    syncShadow(map, q.shadow, shade.current);
+    paint(shown.current);
+  }
+
+  // Sky, light, building colour and the haze over the map, for one theme.
+  function paint(th: SkyTheme) {
+    const tone = toneRef.current;
+    const wash = washRef.current;
+    if (tone) tone.style.background = rgba(th.tone, th.toneAlpha);
+    if (wash) {
+      wash.style.background = `linear-gradient(to bottom, ${rgba(th.wash, th.washAlpha)} 0%, ${rgba(th.wash, th.washAlpha * 0.45)} 22%, ${rgba(th.wash, 0)} 50%)`;
+    }
+    const map = mapRef.current;
+    if (!map || !ready.current) return;
+    // The hour change eases frame by frame here, so MapLibre's own transitions are off.
+    map.setSky({
+      "sky-color": th.sky,
+      "horizon-color": th.horizon,
+      "fog-color": th.fog,
+      "sky-horizon-blend": th.skyHorizonBlend,
+      "horizon-fog-blend": 0.6,
+      "fog-ground-blend": 0.8,
+      "atmosphere-blend": 0,
+      "sky-color-transition": NO_TRANSITION,
+      "horizon-color-transition": NO_TRANSITION,
+      "sky-horizon-blend-transition": NO_TRANSITION,
+      // The validator rejects these transition keys although MapLibre honours them, so skip validation.
+    }, { validate: false });
+    map.setLight({ ...th.light, "color-transition": NO_TRANSITION, "intensity-transition": NO_TRANSITION, "position-transition": NO_TRANSITION });
+    if (map.getLayer("hb-buildings-3d")) {
+      const look = buildingLook(th, !!props.current.shadow);
+      map.setPaintProperty("hb-buildings-3d", "fill-extrusion-color", look["fill-extrusion-color"]);
+      map.setPaintProperty("hb-buildings-3d", "fill-extrusion-opacity", look["fill-extrusion-opacity"]);
+    }
+  }
+
+  function install(map: maplibregl.Map, dark: boolean) {
+    const layers = map.getStyle().layers ?? [];
+    // The basemap's flat or generic 3D buildings would draw under ours; hide them.
+    for (const l of layers) {
+      if ("source-layer" in l && l["source-layer"] === "building") map.setLayoutProperty(l.id, "visibility", "none");
+    }
+    const firstSymbol = layers.find((l) => l.type === "symbol")?.id;
+    if (!map.getSource("hb-buildings")) map.addSource("hb-buildings", { type: "geojson", data: props.current.buildingsUrl });
+    for (const id of ["hb-pilot", "hb-alt", "hb-sel", "hb-sel-full", "hb-hl"]) {
+      if (!map.getSource(id)) map.addSource(id, { type: "geojson", data: EMPTY });
+    }
+    map.addLayer(
+      {
+        id: "hb-buildings-3d",
+        type: "fill-extrusion",
+        source: "hb-buildings",
+        // Footprints without a height are left out rather than drawn at a guessed height.
+        filter: ["to-boolean", ["get", "height_m"]],
+        paint: {
+          ...buildingLook(shown.current, !!props.current.shadow),
+          "fill-extrusion-height": ["get", "height_m"],
+          "fill-extrusion-base": ["coalesce", ["get", "min_height_m"], 0],
+          "fill-extrusion-vertical-gradient": true,
+          "fill-extrusion-color-transition": NO_TRANSITION,
+        },
+      },
+      firstSymbol,
+    );
+    map.addLayer(
+      {
+        id: "hb-pilot-line",
+        type: "line",
+        source: "hb-pilot",
+        paint: { "line-color": COLORS.blue, "line-opacity": 0.55, "line-width": 1.5, "line-dasharray": [3, 3] },
+      },
+      firstSymbol,
+    );
+    const round = { "line-join": "round", "line-cap": "round" } as const;
+    // Alternate routes sit 3 px to one side, so a shared stretch shows both lines.
+    const off = { "line-offset": 3 } as const;
+    map.addLayer({ id: "hb-alt-casing", type: "line", source: "hb-alt", layout: round, paint: { "line-color": "#ffffff", "line-width": zw(11), "line-opacity": 0.95, ...off } });
+    map.addLayer({
+      id: "hb-alt",
+      type: "line",
+      source: "hb-alt",
+      layout: round,
+      filter: ["!=", ["get", "kind"], "unchecked"],
+      paint: { "line-color": dark ? "#94A3B8" : COLORS.alt, "line-width": zw(7), ...off },
+    });
+    map.addLayer({
+      id: "hb-alt-dash",
+      type: "line",
+      source: "hb-alt",
+      filter: ["==", ["get", "kind"], "unchecked"],
+      paint: { "line-color": dark ? "#94A3B8" : COLORS.alt, "line-width": zw(6), "line-dasharray": [1, 1.4], ...off },
+    });
+    map.addLayer({ id: "hb-sel-casing", type: "line", source: "hb-sel-full", layout: round, paint: { "line-color": "#ffffff", "line-width": zw(13) } });
+    map.addLayer({
+      id: "hb-sel",
+      type: "line",
+      source: "hb-sel",
+      layout: round,
+      filter: ["!=", ["get", "kind"], "unchecked"],
+      paint: { "line-color": ["get", "color"], "line-width": zw(8) },
+    });
+    map.addLayer({
+      id: "hb-sel-dash",
+      type: "line",
+      source: "hb-sel",
+      filter: ["==", ["get", "kind"], "unchecked"],
+      paint: { "line-color": ["get", "color"], "line-width": zw(7), "line-dasharray": [1, 1.2] },
+    });
+    // A stretch picked on the route ribbon: a wide halo with the stretch's colour on top.
+    map.addLayer({ id: "hb-hl-halo", type: "line", source: "hb-hl", layout: round, paint: { "line-color": COLORS.ink, "line-width": zw(17), "line-opacity": 0.85 } });
+    map.addLayer({ id: "hb-hl-line", type: "line", source: "hb-hl", layout: round, paint: { "line-color": ["get", "color"], "line-width": zw(10) } });
+  }
+
+  // Create the map once.
+  useEffect(() => {
+    if (!box.current) return;
+    let map: maplibregl.Map;
+    const url = props.current.theme.dark ? STYLE_NIGHT : STYLE_DAY;
+    try {
+      map = new (mapLibre().Map)({
+        container: box.current,
+        style: url,
+        ...LANDING,
+        attributionControl: false,
+        maxPitch: 76,
+        minZoom: 12,
+        maxZoom: 19.5,
+      });
+    } catch (e) {
+      setFailed(e instanceof Error ? e.message : "The map could not start.");
+      announceReady();
+      return;
+    }
+    styleUrl.current = url;
+    mapRef.current = map;
+    if (import.meta.env.DEV) (window as unknown as { __hbMap: maplibregl.Map }).__hbMap = map;
+    // The basemap asks for sprite icons it does not ship; a transparent pixel keeps the console clean.
+    map.on("sourcedata", (e) => {
+      if (e.sourceId === "hb-buildings" && e.isSourceLoaded) props.current.onBuildings();
+    });
+    map.on("styleimagemissing", (e) => {
+      if (!map.hasImage(e.id)) map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) });
+    });
+    map.on("style.load", () => {
+      ready.current = true;
+      // A new style drops the shadow images; start the pair again.
+      shade.current = { front: "a", url: null, token: shade.current.token + 1 };
+      guardNumericFilters(map);
+      install(map, styleUrl.current === STYLE_NIGHT);
+      sync();
+      setStyleTick((t) => t + 1);
+    });
+    // Tests and the screenshot script wait for data-idle="1" before capturing.
+    const el = box.current;
+    map.on("load", () => {
+      shownOnce.current.loaded = true;
+      props.current.onLoaded();
+      if (props.current.stage !== "landing") announceReady();
+    });
+    map.on("idle", () => {
+      if (map.loaded()) el.dataset.idle = "1";
+      announceReady();
+    });
+    map.on("movestart", (e) => {
+      el.dataset.idle = "0";
+      if ((e as { originalEvent?: Event }).originalEvent && shownOnce.current.loaded) announceReady();
+    });
+    map.on("dataloading", () => (el.dataset.idle = "0"));
+    let raf = 0;
+    map.on("move", () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        setTick((t) => t + 1);
+        props.current.onBearing(map.getBearing());
+      });
+    });
+    map.on("click", (e) => {
+      const ids = ["hb-alt", "hb-alt-dash"].filter((id) => map.getLayer(id));
+      const hits = ids.length ? map.queryRenderedFeatures(e.point, { layers: ids }) : [];
+      const idx = hits[0]?.properties?.idx;
+      if (typeof idx === "number") props.current.onSelect(idx);
+      else props.current.onMapClick(e.lngLat.lng, e.lngLat.lat);
+    });
+    map.on("pitchend", (e) => {
+      if ((e as { originalEvent?: Event }).originalEvent && props.current.stage === "plan") planPitch.current = map.getPitch();
+    });
+    map.on("mousemove", (e) => {
+      const ids = ["hb-alt", "hb-alt-dash"].filter((id) => map.getLayer(id));
+      const hit = ids.length ? map.queryRenderedFeatures(e.point, { layers: ids }).length > 0 : false;
+      map.getCanvas().style.cursor = hit || props.current.stage === "plan" ? "pointer" : "";
+    });
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      ready.current = false;
+    };
+  }, []);
+
+  // Switch between the light and dark basemap. Only night uses the dark one.
+  useEffect(() => {
+    const map = mapRef.current;
+    const url = p.theme.dark ? STYLE_NIGHT : STYLE_DAY;
+    if (!map || styleUrl.current === url) return;
+    styleUrl.current = url;
+    ready.current = false;
+    map.setStyle(url, { diff: false });
+  }, [p.theme.dark]);
+
+  // Runs before sync below, so a new route never shows in full for a frame before it draws in.
+  // A newly selected route draws itself from start to end, then holds.
+  useEffect(() => {
+    if (!routeData.key || prefersReducedMotion()) {
+      drawn.current = 1;
+      syncSelected();
+      return;
+    }
+    drawn.current = 0;
+    syncSelected();
+    const stop = animate(DRAW_MS, (t) => {
+      drawn.current = 1 - (1 - t) * (1 - t);
+      syncSelected();
+    });
+    return () => {
+      stop();
+      drawn.current = 1;
+    };
+  }, [routeData.key]);
+
+  useEffect(sync, [routeData, p.coverBbox, p.stage, p.shadow?.url]);
+  useEffect(syncSelected, [p.highlight]);
+
+  // A new hour: the sky, light and buildings ease to its theme.
+  useEffect(() => {
+    const from = shown.current;
+    const to = p.theme;
+    if (from === to || prefersReducedMotion() || !ready.current) {
+      shown.current = to;
+      paint(to);
+      return;
+    }
+    return animate(FADE_MS, (t) => {
+      shown.current = mixTheme(from, to, t * t * (3 - 2 * t));
+      paint(shown.current);
+    });
+  }, [p.theme]);
+  useEffect(() => paint(shown.current), [!!p.shadow, styleTick]);
+
+  // Start and end pins.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    for (const key of ["from", "to"] as const) {
+      const ep = p[key];
+      const existing = markers.current[key];
+      if (!ep) {
+        existing?.remove();
+        markers.current[key] = undefined;
+        continue;
+      }
+      if (existing) {
+        existing.setLngLat([ep.lon, ep.lat]);
+        continue;
+      }
+      const el = document.createElement("div");
+      el.className = key === "from" ? "hb-pin-start" : "hb-pin-end";
+      el.setAttribute("aria-label", key === "from" ? "Start" : "End");
+      markers.current[key] = new (mapLibre().Marker)({ element: el, anchor: key === "from" ? "center" : "bottom" })
+        .setLngLat([ep.lon, ep.lat])
+        .addTo(map);
+    }
+  }, [p.from, p.to]);
+
+  // Camera: frame new routes, and frame them again when the panels change size.
+  // The short delay lets the panel finish its layout before the fit reads the insets.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !p.fitKey || !p.routes.length || p.stage !== "plan" || p.focus) return;
+    const t = setTimeout(() => {
+      const b = new (mapLibre().LngLatBounds)();
+      for (const d of props.current.routes) for (const c of d.route.coords) b.extend(c);
+      if (b.isEmpty()) return;
+      map.fitBounds(b, { padding: 28, maxZoom: 17.4, pitch: planPitch.current, bearing: map.getBearing(), duration: 700 });
+    }, 120);
+    return () => clearTimeout(t);
+  }, [p.fitKey, p.insets.top, p.insets.bottom, p.insets.left, p.focus]);
+
+  // Camera: go to a picked destination before routes exist.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || p.stage !== "plan" || p.routes.length) return;
+    const ep = p.to ?? p.from;
+    // No point yet: pull back so the dashed pilot box is in view.
+    if (!ep) map.easeTo({ center: CBD_CENTER, zoom: 15.1, pitch: planPitch.current, bearing: -18, duration: 900 });
+    else map.easeTo({ center: [ep.lon, ep.lat], zoom: 16.4, pitch: planPitch.current, duration: 900 });
+  }, [p.to, p.from, p.stage]);
+
+  // Camera: follow a step in navigate mode, or a tapped step.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !p.focus) return;
+    moveToFocus(map, p.focus, p.stage, p.insets, planPitch.current);
+  }, [p.focus]);
+
+  // Leaving the landing view moves the camera, so the poster of that view has to go.
+  useEffect(() => {
+    if (p.stage !== "landing" && shownOnce.current.loaded) announceReady();
+  }, [p.stage]);
+
+  // Camera: back to the landing view.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || p.stage !== "landing") return;
+    map.easeTo({ ...LANDING, duration: 800 });
+  }, [p.stage]);
+
+  // The map keeps the panel insets as its own padding, so centring and fitting use the visible area.
+  // fitBounds subtracts this padding and its own, so the fit passes only a small margin.
+  // An instant setPadding would cancel a running move to a step, so with a focus the padding rides on that move.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.resize();
+    if (props.current.focus) moveToFocus(map, props.current.focus, props.current.stage, p.insets, planPitch.current);
+    else map.setPadding(p.insets);
+  }, [p.insets.top, p.insets.bottom, p.insets.left, p.insets.right]);
+
+  const candidates = useMemo(() => anchorCandidates(p.routes.map((d) => d.route.coords)), [p.routes]);
+
+  const bubbles = useMemo(() => {
+    const map = mapRef.current;
+    if (!map || !p.showCallouts || !p.routes.length) return [];
+    const c = map.getContainer();
+    const W = c.clientWidth;
+    const H = c.clientHeight;
+    const safe: Rect = {
+      left: Math.max(8, p.insets.left - 12),
+      top: Math.max(8, p.insets.top - 12),
+      right: W - Math.max(8, p.insets.right - 12),
+      bottom: H - Math.max(8, p.insets.bottom - 12),
+    };
+    const anchors = candidates.map((list) => {
+      for (const ll of list) {
+        const pt = map.project(ll);
+        if (pt.x > safe.left + 4 && pt.x < safe.right - 4 && pt.y > safe.top + 4 && pt.y < safe.bottom - 4) return { x: pt.x, y: pt.y };
+      }
+      return null;
+    });
+    const order = p.routes.map((_, i) => i).sort((a, b) => (a === p.selected ? -1 : b === p.selected ? 1 : a - b));
+    // Keep bubbles off the start and end pins (end pin is 28 x 36, anchored at its tip).
+    const pins: Rect[] = [];
+    for (const ep of [p.from, p.to]) {
+      if (!ep) continue;
+      const q = map.project([ep.lon, ep.lat]);
+      pins.push(ep === p.to ? { left: q.x - 16, top: q.y - 38, right: q.x + 16, bottom: q.y + 2 } : { left: q.x - 11, top: q.y - 11, right: q.x + 11, bottom: q.y + 11 });
+    }
+    const rects = placeBubbles(anchors, safe, BUBBLE_W, BUBBLE_H, order, pins);
+    return p.routes.map((d, i) => ({ d, i, a: anchors[i], r: rects[i] }));
+  }, [tick, styleTick, candidates, p.routes, p.selected, p.showCallouts, p.insets, p.from, p.to]);
+
+  const Icon = p.nightState ? MoonIcon : p.mode === "shade" ? SunIcon : UmbrellaIcon;
+
+  return (
+    <div className="absolute inset-0">
+      <div ref={box} className="h-full w-full" data-testid="map" />
+      <div ref={toneRef} className="pointer-events-none absolute inset-0 mix-blend-multiply" aria-hidden="true" data-testid="map-tone" />
+      <div ref={washRef} className="pointer-events-none absolute inset-0" aria-hidden="true" />
+      {failed && (
+        <div className="absolute inset-0 grid place-items-center bg-slate-100 p-6 text-center text-sm text-slate-600">
+          The map needs WebGL, and this browser could not start it. {failed}
+        </div>
+      )}
+      {bubbles.length > 0 && (
+        <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
+          {bubbles.map(({ a, r, i }) =>
+            a && r ? (
+              <line
+                key={i}
+                x1={a.x}
+                y1={a.y}
+                x2={nearestOnRect(a, r).x}
+                y2={nearestOnRect(a, r).y}
+                stroke={i === p.selected ? COLORS.blue : "#ffffff"}
+                strokeWidth={1.5}
+              />
+            ) : null,
+          )}
+          {bubbles.map(({ a, i }) =>
+            a ? <circle key={`c${i}`} cx={a.x} cy={a.y} r={3} fill={i === p.selected ? COLORS.blue : "#64748B"} stroke="#fff" strokeWidth={1.5} /> : null,
+          )}
+        </svg>
+      )}
+      {[...bubbles]
+        .sort((x, y) => (x.i === p.selected ? 1 : y.i === p.selected ? -1 : 0))
+        .map(({ d, i, r }) =>
+          r ? (
+            <button
+              key={d.key}
+              type="button"
+              data-testid="route-callout"
+              onClick={() => p.onSelect(i)}
+              className={`absolute flex flex-col justify-center rounded-xl px-3 text-left shadow-card transition-colors ${
+                i === p.selected ? "bg-brand text-white" : "bg-white text-ink hover:bg-slate-50"
+              }`}
+              style={{ left: r.left, top: r.top, width: BUBBLE_W, height: BUBBLE_H }}
+            >
+              <span className="flex items-center gap-1 text-[13px] font-semibold leading-tight">
+                <Icon size={13} />
+                {d.pct}% {d.pctWord}
+              </span>
+              <span className={`truncate text-[12px] leading-tight ${i === p.selected ? "text-white" : "text-slate-600"}`}>{d.short}</span>
+            </button>
+          ) : null,
+        )}
+    </div>
+  );
+}
+
+// Building colour follows the light. With ground shadows on, towers stay opaque so the shadows read between them.
+function buildingLook(th: SkyTheme, shadows: boolean) {
+  return { "fill-extrusion-color": th.building, "fill-extrusion-opacity": th.dark ? 0.9 : shadows ? 1 : 0.9 };
+}
+
+// Basemap filters compare fields such as rank or ref_length with numbers. A tile feature without the
+// field makes MapLibre log "Expected value to be of type number, but found null". Checking ["has", field]
+// first drops the same features without the warning.
+function guardNumericFilters(map: maplibregl.Map) {
+  const guard = (e: unknown): unknown => {
+    if (!Array.isArray(e)) return e;
+    const [op, a] = e;
+    if (["<", "<=", ">", ">="].includes(op as string) && Array.isArray(a) && a[0] === "get" && typeof a[1] === "string" && a.length === 2) {
+      return ["all", ["has", a[1]], e];
+    }
+    return e.map(guard);
+  };
+  for (const l of map.getStyle().layers ?? []) {
+    if (!("filter" in l) || !l.filter || l.id.startsWith("hb-")) continue;
+    const next = guard(l.filter);
+    if (JSON.stringify(next) !== JSON.stringify(l.filter)) map.setFilter(l.id, next as maplibregl.FilterSpecification);
+  }
+}
+
+// The first share of the selected route: whole segments up to the cut, and the cut segment trimmed.
+function partRoute(sel: GeoJSON.FeatureCollection, full: GeoJSON.FeatureCollection, share: number): [GeoJSON.FeatureCollection, GeoJSON.FeatureCollection] {
+  const coordsOf = (f: GeoJSON.Feature) => (f.geometry as GeoJSON.LineString).coordinates as [number, number][];
+  const fullCoords = full.features[0] ? coordsOf(full.features[0]) : [];
+  let left = lengthM(fullCoords) * share;
+  const features: GeoJSON.Feature[] = [];
+  for (const f of sel.features) {
+    if (left <= 0) break;
+    const c = coordsOf(f);
+    const m = lengthM(c);
+    features.push(m <= left ? f : { ...f, geometry: { type: "LineString", coordinates: sliceAlong(c, left) } });
+    left -= m;
+  }
+  const fullPart = full.features[0] ? [{ ...full.features[0], geometry: { type: "LineString", coordinates: sliceAlong(fullCoords, lengthM(fullCoords) * share) } } as GeoJSON.Feature] : [];
+  return [
+    { type: "FeatureCollection", features },
+    { type: "FeatureCollection", features: fullPart },
+  ];
+}
+
+interface ShadeState {
+  front: "a" | "b";
+  url: string | null;
+  token: number;
+}
+
+// Ground shadows for the chosen slot: two image sources under the 3D buildings and the route lines.
+// A new slot loads into the hidden one, then the two crossfade. The PNG carries its own alpha.
+function syncShadow(map: maplibregl.Map, shadow: Props["shadow"], st: ShadeState) {
+  const id = (k: "a" | "b") => `hb-shadows-${k}`;
+  const layer = (k: "a" | "b") => `hb-shadows-${k}-layer`;
+  const opacity = (k: "a" | "b", v: number) => map.getLayer(layer(k)) && map.setPaintProperty(layer(k), "raster-opacity", v);
+  if (!shadow) {
+    st.url = null;
+    st.token++;
+    opacity("a", 0);
+    opacity("b", 0);
+    return;
+  }
+  if (shadow.url === st.url) {
+    opacity(st.front, 1);
+    return;
+  }
+  st.url = shadow.url;
+  const token = ++st.token;
+  const first = !map.getSource(id("a"));
+  const next = first ? "a" : st.front === "a" ? "b" : "a";
+  const src = map.getSource(id(next)) as maplibregl.ImageSource | undefined;
+  if (src) src.updateImage({ url: shadow.url, coordinates: shadow.coords });
+  else {
+    map.addSource(id(next), { type: "image", url: shadow.url, coordinates: shadow.coords });
+    const fade = prefersReducedMotion() ? NO_TRANSITION : { duration: FADE_MS, delay: 0 };
+    map.addLayer(
+      { id: layer(next), type: "raster", source: id(next), paint: { "raster-opacity": 0, "raster-opacity-transition": fade, "raster-fade-duration": 0 } },
+      map.getLayer("hb-buildings-3d") ? "hb-buildings-3d" : undefined,
+    );
+  }
+  // Swap once the new image has loaded, or after a second and a half if no load event comes.
+  const swap = () => {
+    map.off("sourcedata", onData);
+    clearTimeout(timer);
+    if (token !== st.token) return;
+    const old = st.front;
+    st.front = next;
+    opacity(next, 1);
+    if (old !== next) opacity(old, 0);
+  };
+  const onData = (e: maplibregl.MapSourceDataEvent) => {
+    if (e.sourceId === id(next) && e.sourceDataType === "metadata") swap();
+  };
+  map.on("sourcedata", onData);
+  const timer = setTimeout(swap, 1500);
+}
+
+function moveToFocus(map: maplibregl.Map, f: Focus, stage: Props["stage"], insets: Insets, planPitch: number) {
+  map.easeTo({
+    center: f.at,
+    zoom: f.zoom,
+    pitch: stage === "navigate" ? 60 : planPitch,
+    bearing: f.bearing ?? map.getBearing(),
+    padding: insets,
+    duration: 900,
+  });
+}
+
+// Line width that grows with zoom, so routes stay readable in navigate mode.
+function zw(w: number): maplibregl.ExpressionSpecification {
+  return ["interpolate", ["linear"], ["zoom"], 14, w * 0.6, 16, w, 18.5, w * 1.8];
+}

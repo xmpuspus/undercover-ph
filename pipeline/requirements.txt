@@ -1,0 +1,17 @@
+# Graph build (pipeline/run_all.sh) and tests/test_pedestrian_access.py. Pinned from pipeline/.venv, Python 3.12.
+# Top level: osmium numpy shapely scipy rasterio pyproj; every other line is a transitive pin.
+affine==3.0.1
+attrs==26.1.0
+certifi==2026.10.19
+charset-normalizer==3.5.2
+click==8.5.0
+idna==3.20
+numpy==2.5.4
+osmium==4.3.2
+pyparsing==3.3.3
+pyproj==3.8.0
+rasterio==1.5.2
+requests==2.34.2
+scipy==1.18.1
+shapely==2.2.0
+urllib3==2.8.0

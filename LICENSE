@@ -1,0 +1,59 @@
+undercover.ph uses three licences: one for code, one for data built from
+OpenStreetMap, and the upstream licences of the other data it redistributes.
+
+CODE: MIT License
+
+Copyright (c) 2026 Xavier Puspus
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+DATA BUILT FROM OPENSTREETMAP: Open Database License (ODbL) 1.0
+
+These files contain or derive from OpenStreetMap data, so they are released
+under the ODbL 1.0, the licence OpenStreetMap requires for derived databases:
+
+- app/public/data/graph.json (walk network, access flags, crossings)
+- app/public/data/places.json (named places)
+- app/public/data/hours.json (opening hours; OSM rows plus hours cited from a
+  public mall guide, each row with its source)
+- app/public/data/buildings_display.geojson and pipeline/inputs/buildings.geojson
+  (building outlines and heights)
+- app/public/data/shade.bin and the shadow overlay images (shade computed from
+  the building data above, Google Open Buildings heights, and tree canopy)
+
+Attribution: "© OpenStreetMap contributors, undercover.ph"
+Licence text: https://opendatacommons.org/licenses/odbl/1-0/
+OpenStreetMap copyright: https://www.openstreetmap.org/copyright
+
+UPSTREAM DATA (cited, not re-licensed by us):
+
+- OpenStreetMap: © OpenStreetMap contributors, ODbL 1.0. Geofabrik extract
+  philippines-261020.
+- Google Open Buildings 2.5D Temporal (2023 heights): CC BY 4.0.
+  https://sites.research.google/gr/open-buildings/temporal/
+- Tree canopy height (pipeline/inputs/canopy_height_makati.tif, a clip):
+  Meta and World Resources Institute (WRI), 2024. High Resolution Canopy
+  Height Maps (CHM). CC BY 4.0. Source imagery for CHM © 2016 Maxar.
+- Weather (app/public/data/weather.json): Open-Meteo, CC BY 4.0.
+- Thunderstorm advisory text (app/public/data/advisory.json): PAGASA, a
+  Philippine government work, shown with credit and a link to the source.
+- Basemap tiles at runtime: OpenFreeMap, © OpenMapTiles, © OpenStreetMap
+  contributors.
+
+This summary is not legal advice. The upstream licence texts govern.

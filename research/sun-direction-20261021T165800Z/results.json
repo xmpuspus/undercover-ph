@@ -1,0 +1,4255 @@
+{
+ "side_edges": 2123,
+ "side_pairs": 941,
+ "axis_hist_15deg_km": {
+  "000-015": 4.1,
+  "015-030": 9.9,
+  "030-045": 9.4,
+  "045-060": 6.8,
+  "060-075": 18.1,
+  "075-090": 20.0,
+  "090-105": 9.1,
+  "105-120": 8.2,
+  "120-135": 13.9,
+  "135-150": 4.7,
+  "150-165": 21.7,
+  "165-180": 18.7
+ },
+ "oct22": [
+  {
+   "date": "2026-10-22",
+   "time": "06:30",
+   "sun_alt": 9.1,
+   "sun_az": 103.9,
+   "sun_compass": "east",
+   "pairs_compared": 817,
+   "sun_side_shadier": 116,
+   "far_side_shadier": 34,
+   "within_5_points": 667,
+   "sun_side_minus_far_side_pts": 1.9,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 92.8,
+    "along (0-30)": 85.3,
+    "oblique (30-60)": 81.3
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "07:00",
+   "sun_alt": 16.0,
+   "sun_az": 106.2,
+   "sun_compass": "east",
+   "pairs_compared": 820,
+   "sun_side_shadier": 223,
+   "far_side_shadier": 67,
+   "within_5_points": 530,
+   "sun_side_minus_far_side_pts": 6.1,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 85.5,
+    "along (0-30)": 67.5,
+    "oblique (30-60)": 70.0
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "07:30",
+   "sun_alt": 22.9,
+   "sun_az": 108.8,
+   "sun_compass": "east",
+   "pairs_compared": 798,
+   "sun_side_shadier": 291,
+   "far_side_shadier": 70,
+   "within_5_points": 437,
+   "sun_side_minus_far_side_pts": 10.3,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 76.3,
+    "along (0-30)": 55.1,
+    "oblique (30-60)": 61.6
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "08:00",
+   "sun_alt": 29.7,
+   "sun_az": 112.0,
+   "sun_compass": "east",
+   "pairs_compared": 798,
+   "sun_side_shadier": 339,
+   "far_side_shadier": 80,
+   "within_5_points": 379,
+   "sun_side_minus_far_side_pts": 13.1,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 64.8,
+    "along (0-30)": 42.6,
+    "oblique (30-60)": 56.4
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "08:30",
+   "sun_alt": 36.4,
+   "sun_az": 115.8,
+   "sun_compass": "southeast",
+   "pairs_compared": 797,
+   "sun_side_shadier": 367,
+   "far_side_shadier": 71,
+   "within_5_points": 359,
+   "sun_side_minus_far_side_pts": 15.7,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 54.9,
+    "along (0-30)": 31.7,
+    "oblique (30-60)": 50.9
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "09:00",
+   "sun_alt": 42.8,
+   "sun_az": 120.5,
+   "sun_compass": "southeast",
+   "pairs_compared": 775,
+   "sun_side_shadier": 374,
+   "far_side_shadier": 63,
+   "within_5_points": 338,
+   "sun_side_minus_far_side_pts": 16.6,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 50.8,
+    "along (0-30)": 23.2,
+    "oblique (30-60)": 43.2
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "09:30",
+   "sun_alt": 48.8,
+   "sun_az": 126.6,
+   "sun_compass": "southeast",
+   "pairs_compared": 771,
+   "sun_side_shadier": 389,
+   "far_side_shadier": 66,
+   "within_5_points": 316,
+   "sun_side_minus_far_side_pts": 17.6,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 48.1,
+    "along (0-30)": 17.4,
+    "oblique (30-60)": 40.0
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "10:00",
+   "sun_alt": 54.3,
+   "sun_az": 134.4,
+   "sun_compass": "southeast",
+   "pairs_compared": 797,
+   "sun_side_shadier": 389,
+   "far_side_shadier": 66,
+   "within_5_points": 342,
+   "sun_side_minus_far_side_pts": 16.1,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 42.4,
+    "along (0-30)": 16.4,
+    "oblique (30-60)": 35.6
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "10:30",
+   "sun_alt": 59.0,
+   "sun_az": 144.7,
+   "sun_compass": "southeast",
+   "pairs_compared": 796,
+   "sun_side_shadier": 415,
+   "far_side_shadier": 59,
+   "within_5_points": 322,
+   "sun_side_minus_far_side_pts": 16.9,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 37.7,
+    "along (0-30)": 17.9,
+    "oblique (30-60)": 28.6
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "11:00",
+   "sun_alt": 62.5,
+   "sun_az": 158.1,
+   "sun_compass": "south",
+   "pairs_compared": 733,
+   "sun_side_shadier": 354,
+   "far_side_shadier": 54,
+   "within_5_points": 325,
+   "sun_side_minus_far_side_pts": 17.4,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 31.9,
+    "along (0-30)": 8.6,
+    "oblique (30-60)": 35.9
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "11:30",
+   "sun_alt": 64.3,
+   "sun_az": 174.1,
+   "sun_compass": "south",
+   "pairs_compared": 769,
+   "sun_side_shadier": 347,
+   "far_side_shadier": 47,
+   "within_5_points": 375,
+   "sun_side_minus_far_side_pts": 15.7,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 30.8,
+    "along (0-30)": 5.5,
+    "oblique (30-60)": 31.4
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "12:00",
+   "sun_alt": 64.0,
+   "sun_az": 191.0,
+   "sun_compass": "south",
+   "pairs_compared": 873,
+   "sun_side_shadier": 393,
+   "far_side_shadier": 64,
+   "within_5_points": 416,
+   "sun_side_minus_far_side_pts": 12.6,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 36.0,
+    "along (0-30)": 16.1,
+    "oblique (30-60)": 17.8
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "12:30",
+   "sun_alt": 61.6,
+   "sun_az": 206.3,
+   "sun_compass": "southwest",
+   "pairs_compared": 807,
+   "sun_side_shadier": 385,
+   "far_side_shadier": 66,
+   "within_5_points": 356,
+   "sun_side_minus_far_side_pts": 13.5,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 38.7,
+    "along (0-30)": 10.0,
+    "oblique (30-60)": 25.9
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "13:00",
+   "sun_alt": 57.7,
+   "sun_az": 218.7,
+   "sun_compass": "southwest",
+   "pairs_compared": 787,
+   "sun_side_shadier": 398,
+   "far_side_shadier": 57,
+   "within_5_points": 332,
+   "sun_side_minus_far_side_pts": 15.3,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 32.2,
+    "along (0-30)": 17.9,
+    "oblique (30-60)": 32.7
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "13:30",
+   "sun_alt": 52.7,
+   "sun_az": 228.1,
+   "sun_compass": "southwest",
+   "pairs_compared": 819,
+   "sun_side_shadier": 417,
+   "far_side_shadier": 56,
+   "within_5_points": 346,
+   "sun_side_minus_far_side_pts": 15.8,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 34.6,
+    "along (0-30)": 26.9,
+    "oblique (30-60)": 39.3
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "14:00",
+   "sun_alt": 47.0,
+   "sun_az": 235.3,
+   "sun_compass": "southwest",
+   "pairs_compared": 823,
+   "sun_side_shadier": 435,
+   "far_side_shadier": 61,
+   "within_5_points": 327,
+   "sun_side_minus_far_side_pts": 17.0,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 42.9,
+    "along (0-30)": 31.5,
+    "oblique (30-60)": 38.6
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "14:30",
+   "sun_alt": 40.8,
+   "sun_az": 240.9,
+   "sun_compass": "southwest",
+   "pairs_compared": 769,
+   "sun_side_shadier": 399,
+   "far_side_shadier": 62,
+   "within_5_points": 308,
+   "sun_side_minus_far_side_pts": 17.4,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 46.1,
+    "along (0-30)": 32.5,
+    "oblique (30-60)": 45.8
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "15:00",
+   "sun_alt": 34.3,
+   "sun_az": 245.3,
+   "sun_compass": "southwest",
+   "pairs_compared": 747,
+   "sun_side_shadier": 380,
+   "far_side_shadier": 65,
+   "within_5_points": 302,
+   "sun_side_minus_far_side_pts": 16.2,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 48.2,
+    "along (0-30)": 33.0,
+    "oblique (30-60)": 61.7
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "15:30",
+   "sun_alt": 27.6,
+   "sun_az": 248.9,
+   "sun_compass": "west",
+   "pairs_compared": 713,
+   "sun_side_shadier": 318,
+   "far_side_shadier": 37,
+   "within_5_points": 358,
+   "sun_side_minus_far_side_pts": 14.2,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 55.8,
+    "along (0-30)": 40.2,
+    "oblique (30-60)": 72.0
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "16:00",
+   "sun_alt": 20.8,
+   "sun_az": 251.9,
+   "sun_compass": "west",
+   "pairs_compared": 704,
+   "sun_side_shadier": 263,
+   "far_side_shadier": 35,
+   "within_5_points": 406,
+   "sun_side_minus_far_side_pts": 9.7,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 65.6,
+    "along (0-30)": 48.8,
+    "oblique (30-60)": 77.8
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "16:30",
+   "sun_alt": 13.9,
+   "sun_az": 254.4,
+   "sun_compass": "west",
+   "pairs_compared": 701,
+   "sun_side_shadier": 169,
+   "far_side_shadier": 38,
+   "within_5_points": 494,
+   "sun_side_minus_far_side_pts": 4.5,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 75.5,
+    "along (0-30)": 62.8,
+    "oblique (30-60)": 86.5
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "time": "17:00",
+   "sun_alt": 6.9,
+   "sun_az": 256.6,
+   "sun_compass": "west",
+   "pairs_compared": 694,
+   "sun_side_shadier": 88,
+   "far_side_shadier": 18,
+   "within_5_points": 588,
+   "sun_side_minus_far_side_pts": 1.3,
+   "building_shade_pct_by_street_angle": {
+    "across (60-90)": 87.3,
+    "along (0-30)": 79.6,
+    "oblique (30-60)": 95.3
+   }
+  }
+ ],
+ "streets_oct22": [
+  {
+   "street": "Ayala Avenue",
+   "axis_deg": 124,
+   "time": "08:00",
+   "sun_az": 112,
+   "sun_alt": 30,
+   "building_shade_pct_by_side": {
+    "north": 58.2,
+    "northwest": 20.4,
+    "northeast": 42.3,
+    "southwest": 33.3,
+    "west": 27.7
+   }
+  },
+  {
+   "street": "Ayala Avenue",
+   "axis_deg": 124,
+   "time": "12:00",
+   "sun_az": 191,
+   "sun_alt": 64,
+   "building_shade_pct_by_side": {
+    "north": 24.2,
+    "northwest": 55.5,
+    "northeast": 29.5,
+    "southwest": 57.0,
+    "west": 51.5
+   }
+  },
+  {
+   "street": "Ayala Avenue",
+   "axis_deg": 124,
+   "time": "16:00",
+   "sun_az": 252,
+   "sun_alt": 21,
+   "building_shade_pct_by_side": {
+    "north": 88.5,
+    "northwest": 93.5,
+    "northeast": 96.6,
+    "southwest": 98.9,
+    "west": 100.0
+   }
+  },
+  {
+   "street": "Paseo de Roxas",
+   "axis_deg": 73,
+   "time": "08:00",
+   "sun_az": 112,
+   "sun_alt": 30,
+   "building_shade_pct_by_side": {
+    "southeast": 82.8,
+    "north": 49.4,
+    "south": 49.7,
+    "southwest": 72.7,
+    "west": 57.6,
+    "east": 26.0,
+    "northeast": 0.0,
+    "northwest": 57.2
+   }
+  },
+  {
+   "street": "Paseo de Roxas",
+   "axis_deg": 73,
+   "time": "12:00",
+   "sun_az": 191,
+   "sun_alt": 64,
+   "building_shade_pct_by_side": {
+    "southeast": 43.4,
+    "north": 20.9,
+    "south": 22.0,
+    "southwest": 20.1,
+    "west": 22.2,
+    "east": 0.0,
+    "northeast": 0.0,
+    "northwest": 0.0
+   }
+  },
+  {
+   "street": "Paseo de Roxas",
+   "axis_deg": 73,
+   "time": "16:00",
+   "sun_az": 252,
+   "sun_alt": 21,
+   "building_shade_pct_by_side": {
+    "southeast": 80.7,
+    "north": 69.0,
+    "south": 74.7,
+    "southwest": 100.0,
+    "west": 98.7,
+    "east": 82.9,
+    "northeast": 0.0,
+    "northwest": 100.0
+   }
+  },
+  {
+   "street": "Makati Avenue",
+   "axis_deg": 26,
+   "time": "08:00",
+   "sun_az": 112,
+   "sun_alt": 30,
+   "building_shade_pct_by_side": {
+    "southeast": 86.5,
+    "northwest": 77.7,
+    "west": 89.2,
+    "east": 97.6,
+    "south": 96.2
+   }
+  },
+  {
+   "street": "Makati Avenue",
+   "axis_deg": 26,
+   "time": "12:00",
+   "sun_az": 191,
+   "sun_alt": 64,
+   "building_shade_pct_by_side": {
+    "southeast": 16.7,
+    "northwest": 0.0,
+    "west": 28.0,
+    "east": 47.3,
+    "south": 37.0
+   }
+  },
+  {
+   "street": "Makati Avenue",
+   "axis_deg": 26,
+   "time": "16:00",
+   "sun_az": 252,
+   "sun_alt": 21,
+   "building_shade_pct_by_side": {
+    "southeast": 65.6,
+    "northwest": 82.8,
+    "west": 97.9,
+    "east": 100.0,
+    "south": 42.7
+   }
+  },
+  {
+   "street": "Senator Gil J. Puyat Avenue",
+   "axis_deg": 81,
+   "time": "08:00",
+   "sun_az": 112,
+   "sun_alt": 30,
+   "building_shade_pct_by_side": {
+    "northwest": 51.9,
+    "north": 66.8,
+    "southeast": 87.3,
+    "south": 72.9,
+    "east": 87.3,
+    "northeast": 67.2,
+    "southwest": 67.3,
+    "west": 0.0
+   }
+  },
+  {
+   "street": "Senator Gil J. Puyat Avenue",
+   "axis_deg": 81,
+   "time": "12:00",
+   "sun_az": 191,
+   "sun_alt": 64,
+   "building_shade_pct_by_side": {
+    "northwest": 16.7,
+    "north": 46.6,
+    "southeast": 48.3,
+    "south": 51.4,
+    "east": 53.0,
+    "northeast": 31.3,
+    "southwest": 54.7,
+    "west": 72.0
+   }
+  },
+  {
+   "street": "Senator Gil J. Puyat Avenue",
+   "axis_deg": 81,
+   "time": "16:00",
+   "sun_az": 252,
+   "sun_alt": 21,
+   "building_shade_pct_by_side": {
+    "northwest": 62.7,
+    "north": 69.6,
+    "southeast": 33.0,
+    "south": 90.1,
+    "east": 90.7,
+    "northeast": 97.6,
+    "southwest": 100.0,
+    "west": 100.0
+   }
+  },
+  {
+   "street": "Dela Rosa Street",
+   "axis_deg": 117,
+   "time": "08:00",
+   "sun_az": 112,
+   "sun_alt": 30,
+   "building_shade_pct_by_side": {
+    "north": 42.6,
+    "southwest": 49.0,
+    "northeast": 78.3,
+    "south": 79.1,
+    "west": 98.2
+   }
+  },
+  {
+   "street": "Dela Rosa Street",
+   "axis_deg": 117,
+   "time": "12:00",
+   "sun_az": 191,
+   "sun_alt": 64,
+   "building_shade_pct_by_side": {
+    "north": 6.4,
+    "southwest": 82.2,
+    "northeast": 40.9,
+    "south": 54.1,
+    "west": 32.3
+   }
+  },
+  {
+   "street": "Dela Rosa Street",
+   "axis_deg": 117,
+   "time": "16:00",
+   "sun_az": 252,
+   "sun_alt": 21,
+   "building_shade_pct_by_side": {
+    "north": 29.9,
+    "southwest": 89.6,
+    "northeast": 87.4,
+    "south": 29.6,
+    "west": 44.6
+   }
+  },
+  {
+   "street": "Legazpi Street",
+   "axis_deg": 93,
+   "time": "08:00",
+   "sun_az": 112,
+   "sun_alt": 30,
+   "building_shade_pct_by_side": {
+    "east": 25.8,
+    "southeast": 29.8,
+    "north": 21.2,
+    "south": 62.4
+   }
+  },
+  {
+   "street": "Legazpi Street",
+   "axis_deg": 93,
+   "time": "12:00",
+   "sun_az": 191,
+   "sun_alt": 64,
+   "building_shade_pct_by_side": {
+    "east": 0.0,
+    "southeast": 15.9,
+    "north": 0.0,
+    "south": 5.7
+   }
+  },
+  {
+   "street": "Legazpi Street",
+   "axis_deg": 93,
+   "time": "16:00",
+   "sun_az": 252,
+   "sun_alt": 21,
+   "building_shade_pct_by_side": {
+    "east": 14.1,
+    "southeast": 35.3,
+    "north": 16.8,
+    "south": 5.7
+   }
+  },
+  {
+   "street": "Valero Street",
+   "axis_deg": 74,
+   "time": "08:00",
+   "sun_az": 112,
+   "sun_alt": 30,
+   "building_shade_pct_by_side": {
+    "northeast": 100.0,
+    "southwest": 84.2,
+    "northwest": 98.3,
+    "south": 98.8,
+    "north": 100.0,
+    "west": 83.1
+   }
+  },
+  {
+   "street": "Valero Street",
+   "axis_deg": 74,
+   "time": "12:00",
+   "sun_az": 191,
+   "sun_alt": 64,
+   "building_shade_pct_by_side": {
+    "northeast": 81.5,
+    "southwest": 80.1,
+    "northwest": 51.9,
+    "south": 37.1,
+    "north": 49.2,
+    "west": 54.4
+   }
+  },
+  {
+   "street": "Valero Street",
+   "axis_deg": 74,
+   "time": "16:00",
+   "sun_az": 252,
+   "sun_alt": 21,
+   "building_shade_pct_by_side": {
+    "northeast": 100.0,
+    "southwest": 86.0,
+    "northwest": 100.0,
+    "south": 42.4,
+    "north": 49.2,
+    "west": 95.4
+   }
+  }
+ ],
+ "seasonal": {
+  "2026-03-21": {
+   "rows": [
+    {
+     "date": "2026-03-21",
+     "time": "06:30",
+     "sun_alt": 6.6,
+     "sun_az": 91.6,
+     "sun_compass": "east",
+     "pairs_compared": 781,
+     "sun_side_shadier": 85,
+     "far_side_shadier": 23,
+     "within_5_points": 673,
+     "sun_side_minus_far_side_pts": 2.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 95.1,
+      "along (0-30)": 88.2,
+      "oblique (30-60)": 88.1
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "07:00",
+     "sun_alt": 13.8,
+     "sun_az": 93.5,
+     "sun_compass": "east",
+     "pairs_compared": 788,
+     "sun_side_shadier": 203,
+     "far_side_shadier": 49,
+     "within_5_points": 536,
+     "sun_side_minus_far_side_pts": 4.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 86.8,
+      "along (0-30)": 69.2,
+      "oblique (30-60)": 72.4
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "07:30",
+     "sun_alt": 21.0,
+     "sun_az": 95.6,
+     "sun_compass": "east",
+     "pairs_compared": 807,
+     "sun_side_shadier": 268,
+     "far_side_shadier": 64,
+     "within_5_points": 475,
+     "sun_side_minus_far_side_pts": 8.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 77.8,
+      "along (0-30)": 57.7,
+      "oblique (30-60)": 60.0
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "08:00",
+     "sun_alt": 28.2,
+     "sun_az": 97.8,
+     "sun_compass": "east",
+     "pairs_compared": 827,
+     "sun_side_shadier": 343,
+     "far_side_shadier": 78,
+     "within_5_points": 406,
+     "sun_side_minus_far_side_pts": 11.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 70.0,
+      "along (0-30)": 50.9,
+      "oblique (30-60)": 49.3
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "08:30",
+     "sun_alt": 35.4,
+     "sun_az": 100.4,
+     "sun_compass": "east",
+     "pairs_compared": 833,
+     "sun_side_shadier": 367,
+     "far_side_shadier": 76,
+     "within_5_points": 390,
+     "sun_side_minus_far_side_pts": 14.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 61.7,
+      "along (0-30)": 42.5,
+      "oblique (30-60)": 43.5
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "09:00",
+     "sun_alt": 42.5,
+     "sun_az": 103.5,
+     "sun_compass": "east",
+     "pairs_compared": 818,
+     "sun_side_shadier": 387,
+     "far_side_shadier": 78,
+     "within_5_points": 353,
+     "sun_side_minus_far_side_pts": 15.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 54.8,
+      "along (0-30)": 36.8,
+      "oblique (30-60)": 38.1
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "09:30",
+     "sun_alt": 49.5,
+     "sun_az": 107.4,
+     "sun_compass": "east",
+     "pairs_compared": 818,
+     "sun_side_shadier": 389,
+     "far_side_shadier": 81,
+     "within_5_points": 348,
+     "sun_side_minus_far_side_pts": 15.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 50.0,
+      "along (0-30)": 29.5,
+      "oblique (30-60)": 33.8
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "10:00",
+     "sun_alt": 56.3,
+     "sun_az": 112.6,
+     "sun_compass": "southeast",
+     "pairs_compared": 797,
+     "sun_side_shadier": 369,
+     "far_side_shadier": 83,
+     "within_5_points": 345,
+     "sun_side_minus_far_side_pts": 14.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 41.7,
+      "along (0-30)": 19.7,
+      "oblique (30-60)": 30.8
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "10:30",
+     "sun_alt": 62.9,
+     "sun_az": 119.9,
+     "sun_compass": "southeast",
+     "pairs_compared": 777,
+     "sun_side_shadier": 370,
+     "far_side_shadier": 63,
+     "within_5_points": 344,
+     "sun_side_minus_far_side_pts": 13.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 33.7,
+      "along (0-30)": 12.9,
+      "oblique (30-60)": 26.2
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "11:00",
+     "sun_alt": 68.8,
+     "sun_az": 131.2,
+     "sun_compass": "southeast",
+     "pairs_compared": 786,
+     "sun_side_shadier": 370,
+     "far_side_shadier": 58,
+     "within_5_points": 358,
+     "sun_side_minus_far_side_pts": 12.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 29.3,
+      "along (0-30)": 7.3,
+      "oblique (30-60)": 23.0
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "11:30",
+     "sun_alt": 73.5,
+     "sun_az": 149.5,
+     "sun_compass": "southeast",
+     "pairs_compared": 788,
+     "sun_side_shadier": 331,
+     "far_side_shadier": 58,
+     "within_5_points": 399,
+     "sun_side_minus_far_side_pts": 12.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 23.0,
+      "along (0-30)": 7.5,
+      "oblique (30-60)": 18.2
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "12:00",
+     "sun_alt": 75.6,
+     "sun_az": 176.8,
+     "sun_compass": "south",
+     "pairs_compared": 779,
+     "sun_side_shadier": 280,
+     "far_side_shadier": 41,
+     "within_5_points": 458,
+     "sun_side_minus_far_side_pts": 10.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 19.9,
+      "along (0-30)": 3.0,
+      "oblique (30-60)": 18.6
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "12:30",
+     "sun_alt": 74.2,
+     "sun_az": 205.4,
+     "sun_compass": "southwest",
+     "pairs_compared": 808,
+     "sun_side_shadier": 322,
+     "far_side_shadier": 50,
+     "within_5_points": 436,
+     "sun_side_minus_far_side_pts": 10.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 23.3,
+      "along (0-30)": 5.5,
+      "oblique (30-60)": 14.0
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "13:00",
+     "sun_alt": 69.9,
+     "sun_az": 225.7,
+     "sun_compass": "southwest",
+     "pairs_compared": 840,
+     "sun_side_shadier": 367,
+     "far_side_shadier": 51,
+     "within_5_points": 422,
+     "sun_side_minus_far_side_pts": 12.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 20.9,
+      "along (0-30)": 12.2,
+      "oblique (30-60)": 21.4
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "13:30",
+     "sun_alt": 64.2,
+     "sun_az": 238.2,
+     "sun_compass": "southwest",
+     "pairs_compared": 795,
+     "sun_side_shadier": 390,
+     "far_side_shadier": 51,
+     "within_5_points": 354,
+     "sun_side_minus_far_side_pts": 15.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 27.5,
+      "along (0-30)": 17.5,
+      "oblique (30-60)": 23.1
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "14:00",
+     "sun_alt": 57.8,
+     "sun_az": 246.2,
+     "sun_compass": "southwest",
+     "pairs_compared": 726,
+     "sun_side_shadier": 367,
+     "far_side_shadier": 46,
+     "within_5_points": 313,
+     "sun_side_minus_far_side_pts": 17.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 29.2,
+      "along (0-30)": 15.8,
+      "oblique (30-60)": 40.8
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "14:30",
+     "sun_alt": 51.0,
+     "sun_az": 251.8,
+     "sun_compass": "west",
+     "pairs_compared": 704,
+     "sun_side_shadier": 363,
+     "far_side_shadier": 50,
+     "within_5_points": 291,
+     "sun_side_minus_far_side_pts": 19.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 33.1,
+      "along (0-30)": 19.8,
+      "oblique (30-60)": 49.6
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "15:00",
+     "sun_alt": 44.0,
+     "sun_az": 255.9,
+     "sun_compass": "west",
+     "pairs_compared": 697,
+     "sun_side_shadier": 345,
+     "far_side_shadier": 38,
+     "within_5_points": 314,
+     "sun_side_minus_far_side_pts": 19.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 37.3,
+      "along (0-30)": 22.4,
+      "oblique (30-60)": 55.3
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "15:30",
+     "sun_alt": 36.9,
+     "sun_az": 259.1,
+     "sun_compass": "west",
+     "pairs_compared": 709,
+     "sun_side_shadier": 347,
+     "far_side_shadier": 36,
+     "within_5_points": 326,
+     "sun_side_minus_far_side_pts": 18.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 42.9,
+      "along (0-30)": 29.6,
+      "oblique (30-60)": 59.9
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "16:00",
+     "sun_alt": 29.8,
+     "sun_az": 261.8,
+     "sun_compass": "west",
+     "pairs_compared": 703,
+     "sun_side_shadier": 314,
+     "far_side_shadier": 44,
+     "within_5_points": 345,
+     "sun_side_minus_far_side_pts": 14.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 51.9,
+      "along (0-30)": 37.4,
+      "oblique (30-60)": 66.4
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "16:30",
+     "sun_alt": 22.6,
+     "sun_az": 264.1,
+     "sun_compass": "west",
+     "pairs_compared": 707,
+     "sun_side_shadier": 274,
+     "far_side_shadier": 45,
+     "within_5_points": 388,
+     "sun_side_minus_far_side_pts": 9.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 62.1,
+      "along (0-30)": 45.4,
+      "oblique (30-60)": 75.1
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "17:00",
+     "sun_alt": 15.4,
+     "sun_az": 266.2,
+     "sun_compass": "west",
+     "pairs_compared": 714,
+     "sun_side_shadier": 199,
+     "far_side_shadier": 34,
+     "within_5_points": 481,
+     "sun_side_minus_far_side_pts": 5.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 72.8,
+      "along (0-30)": 60.4,
+      "oblique (30-60)": 82.6
+     }
+    },
+    {
+     "date": "2026-03-21",
+     "time": "17:30",
+     "sun_alt": 8.2,
+     "sun_az": 268.2,
+     "sun_compass": "west",
+     "pairs_compared": 739,
+     "sun_side_shadier": 118,
+     "far_side_shadier": 42,
+     "within_5_points": 579,
+     "sun_side_minus_far_side_pts": 2.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 87.0,
+      "along (0-30)": 79.9,
+      "oblique (30-60)": 91.0
+     }
+    }
+   ],
+   "streets": [
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "08:00",
+     "sun_az": 98,
+     "sun_alt": 28,
+     "building_shade_pct_by_side": {
+      "north": 66.4,
+      "northwest": 25.5,
+      "northeast": 58.8,
+      "southwest": 40.3,
+      "west": 29.0
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "12:00",
+     "sun_az": 177,
+     "sun_alt": 76,
+     "building_shade_pct_by_side": {
+      "north": 0.0,
+      "northwest": 0.0,
+      "northeast": 6.4,
+      "southwest": 29.1,
+      "west": 51.5
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "16:00",
+     "sun_az": 262,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "north": 78.1,
+      "northwest": 92.0,
+      "northeast": 87.7,
+      "southwest": 93.9,
+      "west": 90.1
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "08:00",
+     "sun_az": 98,
+     "sun_alt": 28,
+     "building_shade_pct_by_side": {
+      "southeast": 79.2,
+      "north": 47.2,
+      "south": 52.5,
+      "southwest": 54.8,
+      "west": 27.8,
+      "east": 21.3,
+      "northeast": 0.0,
+      "northwest": 60.9
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "12:00",
+     "sun_az": 177,
+     "sun_alt": 76,
+     "building_shade_pct_by_side": {
+      "southeast": 38.4,
+      "north": 7.2,
+      "south": 13.3,
+      "southwest": 0.0,
+      "west": 0.0,
+      "east": 0.0,
+      "northeast": 0.0,
+      "northwest": 0.0
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "16:00",
+     "sun_az": 262,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "southeast": 77.6,
+      "north": 85.9,
+      "south": 71.7,
+      "southwest": 97.8,
+      "west": 92.1,
+      "east": 62.5,
+      "northeast": 100.0,
+      "northwest": 100.0
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "08:00",
+     "sun_az": 98,
+     "sun_alt": 28,
+     "building_shade_pct_by_side": {
+      "southeast": 81.5,
+      "northwest": 69.0,
+      "west": 88.4,
+      "east": 100.0,
+      "south": 100.0
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "12:00",
+     "sun_az": 177,
+     "sun_alt": 76,
+     "building_shade_pct_by_side": {
+      "southeast": 13.9,
+      "northwest": 0.0,
+      "west": 12.3,
+      "east": 45.0,
+      "south": 33.3
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "16:00",
+     "sun_az": 262,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "southeast": 54.0,
+      "northwest": 68.0,
+      "west": 89.2,
+      "east": 47.3,
+      "south": 49.6
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "08:00",
+     "sun_az": 98,
+     "sun_alt": 28,
+     "building_shade_pct_by_side": {
+      "northwest": 54.3,
+      "north": 77.8,
+      "southeast": 75.0,
+      "south": 71.3,
+      "east": 61.0,
+      "northeast": 47.8,
+      "southwest": 63.0,
+      "west": 0.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "12:00",
+     "sun_az": 177,
+     "sun_alt": 76,
+     "building_shade_pct_by_side": {
+      "northwest": 5.5,
+      "north": 13.0,
+      "southeast": 34.2,
+      "south": 26.4,
+      "east": 36.4,
+      "northeast": 16.1,
+      "southwest": 34.4,
+      "west": 18.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "16:00",
+     "sun_az": 262,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "northwest": 51.1,
+      "north": 26.2,
+      "southeast": 33.7,
+      "south": 22.0,
+      "east": 85.5,
+      "northeast": 81.2,
+      "southwest": 48.4,
+      "west": 100.0
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "08:00",
+     "sun_az": 98,
+     "sun_alt": 28,
+     "building_shade_pct_by_side": {
+      "north": 39.1,
+      "southwest": 74.5,
+      "northeast": 87.7,
+      "south": 78.6,
+      "west": 86.0
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "12:00",
+     "sun_az": 177,
+     "sun_alt": 76,
+     "building_shade_pct_by_side": {
+      "north": 0.4,
+      "southwest": 54.4,
+      "northeast": 23.9,
+      "south": 30.2,
+      "west": 24.2
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "16:00",
+     "sun_az": 262,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "north": 77.0,
+      "southwest": 84.6,
+      "northeast": 71.9,
+      "south": 51.9,
+      "west": 70.8
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "08:00",
+     "sun_az": 98,
+     "sun_alt": 28,
+     "building_shade_pct_by_side": {
+      "east": 58.4,
+      "southeast": 37.0,
+      "north": 39.3,
+      "south": 40.4
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "12:00",
+     "sun_az": 177,
+     "sun_alt": 76,
+     "building_shade_pct_by_side": {
+      "east": 0.0,
+      "southeast": 0.0,
+      "north": 0.0,
+      "south": 0.0
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "16:00",
+     "sun_az": 262,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "east": 0.0,
+      "southeast": 16.3,
+      "north": 33.2,
+      "south": 0.0
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "08:00",
+     "sun_az": 98,
+     "sun_alt": 28,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 97.0,
+      "northwest": 100.0,
+      "south": 90.2,
+      "north": 75.3,
+      "west": 72.6
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "12:00",
+     "sun_az": 177,
+     "sun_alt": 76,
+     "building_shade_pct_by_side": {
+      "northeast": 52.2,
+      "southwest": 48.0,
+      "northwest": 20.7,
+      "south": 26.4,
+      "north": 48.1,
+      "west": 54.4
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "16:00",
+     "sun_az": 262,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 98.9,
+      "northwest": 98.3,
+      "south": 100.0,
+      "north": 100.0,
+      "west": 100.0
+     }
+    }
+   ]
+  },
+  "2026-05-01": {
+   "rows": [
+    {
+     "date": "2026-05-01",
+     "time": "06:00",
+     "sun_alt": 5.5,
+     "sun_az": 75.9,
+     "sun_compass": "east",
+     "pairs_compared": 697,
+     "sun_side_shadier": 41,
+     "far_side_shadier": 10,
+     "within_5_points": 646,
+     "sun_side_minus_far_side_pts": 1.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 95.5,
+      "along (0-30)": 84.5,
+      "oblique (30-60)": 94.7
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "06:30",
+     "sun_alt": 12.5,
+     "sun_az": 77.5,
+     "sun_compass": "east",
+     "pairs_compared": 703,
+     "sun_side_shadier": 138,
+     "far_side_shadier": 27,
+     "within_5_points": 538,
+     "sun_side_minus_far_side_pts": 3.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 83.1,
+      "along (0-30)": 65.0,
+      "oblique (30-60)": 86.5
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "07:00",
+     "sun_alt": 19.6,
+     "sun_az": 78.9,
+     "sun_compass": "east",
+     "pairs_compared": 708,
+     "sun_side_shadier": 242,
+     "far_side_shadier": 36,
+     "within_5_points": 430,
+     "sun_side_minus_far_side_pts": 7.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 71.1,
+      "along (0-30)": 51.8,
+      "oblique (30-60)": 75.3
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "07:30",
+     "sun_alt": 26.7,
+     "sun_az": 80.3,
+     "sun_compass": "east",
+     "pairs_compared": 711,
+     "sun_side_shadier": 293,
+     "far_side_shadier": 40,
+     "within_5_points": 378,
+     "sun_side_minus_far_side_pts": 11.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 60.1,
+      "along (0-30)": 43.0,
+      "oblique (30-60)": 62.9
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "08:00",
+     "sun_alt": 33.9,
+     "sun_az": 81.5,
+     "sun_compass": "east",
+     "pairs_compared": 701,
+     "sun_side_shadier": 313,
+     "far_side_shadier": 44,
+     "within_5_points": 344,
+     "sun_side_minus_far_side_pts": 15.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 51.6,
+      "along (0-30)": 37.3,
+      "oblique (30-60)": 55.8
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "08:30",
+     "sun_alt": 41.0,
+     "sun_az": 82.6,
+     "sun_compass": "east",
+     "pairs_compared": 701,
+     "sun_side_shadier": 328,
+     "far_side_shadier": 45,
+     "within_5_points": 328,
+     "sun_side_minus_far_side_pts": 16.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 45.2,
+      "along (0-30)": 30.7,
+      "oblique (30-60)": 49.8
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "09:00",
+     "sun_alt": 48.3,
+     "sun_az": 83.6,
+     "sun_compass": "east",
+     "pairs_compared": 704,
+     "sun_side_shadier": 348,
+     "far_side_shadier": 45,
+     "within_5_points": 311,
+     "sun_side_minus_far_side_pts": 18.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 39.6,
+      "along (0-30)": 24.5,
+      "oblique (30-60)": 44.4
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "09:30",
+     "sun_alt": 55.5,
+     "sun_az": 84.5,
+     "sun_compass": "east",
+     "pairs_compared": 709,
+     "sun_side_shadier": 356,
+     "far_side_shadier": 51,
+     "within_5_points": 302,
+     "sun_side_minus_far_side_pts": 19.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 33.6,
+      "along (0-30)": 18.7,
+      "oblique (30-60)": 38.4
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "10:00",
+     "sun_alt": 62.7,
+     "sun_az": 85.3,
+     "sun_compass": "east",
+     "pairs_compared": 711,
+     "sun_side_shadier": 344,
+     "far_side_shadier": 45,
+     "within_5_points": 322,
+     "sun_side_minus_far_side_pts": 17.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 26.9,
+      "along (0-30)": 14.4,
+      "oblique (30-60)": 32.1
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "10:30",
+     "sun_alt": 69.9,
+     "sun_az": 85.9,
+     "sun_compass": "east",
+     "pairs_compared": 713,
+     "sun_side_shadier": 304,
+     "far_side_shadier": 42,
+     "within_5_points": 367,
+     "sun_side_minus_far_side_pts": 15.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 20.5,
+      "along (0-30)": 10.1,
+      "oblique (30-60)": 24.1
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "11:00",
+     "sun_alt": 77.2,
+     "sun_az": 86.1,
+     "sun_compass": "east",
+     "pairs_compared": 713,
+     "sun_side_shadier": 279,
+     "far_side_shadier": 33,
+     "within_5_points": 401,
+     "sun_side_minus_far_side_pts": 11.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 13.9,
+      "along (0-30)": 6.1,
+      "oblique (30-60)": 15.9
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "11:30",
+     "sun_alt": 84.4,
+     "sun_az": 84.1,
+     "sun_compass": "east",
+     "pairs_compared": 706,
+     "sun_side_shadier": 171,
+     "far_side_shadier": 18,
+     "within_5_points": 517,
+     "sun_side_minus_far_side_pts": 6.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 5.4,
+      "along (0-30)": 2.0,
+      "oblique (30-60)": 6.3
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "12:00",
+     "sun_alt": 88.2,
+     "sun_az": 287.1,
+     "sun_compass": "west",
+     "pairs_compared": 817,
+     "sun_side_shadier": 80,
+     "far_side_shadier": 6,
+     "within_5_points": 731,
+     "sun_side_minus_far_side_pts": 2.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 1.9,
+      "along (0-30)": 0.7,
+      "oblique (30-60)": 1.0
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "12:30",
+     "sun_alt": 81.1,
+     "sun_az": 274.5,
+     "sun_compass": "west",
+     "pairs_compared": 799,
+     "sun_side_shadier": 238,
+     "far_side_shadier": 28,
+     "within_5_points": 533,
+     "sun_side_minus_far_side_pts": 8.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 11.3,
+      "along (0-30)": 4.9,
+      "oblique (30-60)": 5.5
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "13:00",
+     "sun_alt": 73.8,
+     "sun_az": 274.0,
+     "sun_compass": "west",
+     "pairs_compared": 793,
+     "sun_side_shadier": 344,
+     "far_side_shadier": 38,
+     "within_5_points": 411,
+     "sun_side_minus_far_side_pts": 14.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 19.6,
+      "along (0-30)": 9.1,
+      "oblique (30-60)": 12.7
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "13:30",
+     "sun_alt": 66.6,
+     "sun_az": 274.4,
+     "sun_compass": "west",
+     "pairs_compared": 799,
+     "sun_side_shadier": 376,
+     "far_side_shadier": 52,
+     "within_5_points": 371,
+     "sun_side_minus_far_side_pts": 15.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 28.1,
+      "along (0-30)": 15.7,
+      "oblique (30-60)": 18.0
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "14:00",
+     "sun_alt": 59.3,
+     "sun_az": 275.1,
+     "sun_compass": "west",
+     "pairs_compared": 804,
+     "sun_side_shadier": 401,
+     "far_side_shadier": 64,
+     "within_5_points": 339,
+     "sun_side_minus_far_side_pts": 16.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 38.0,
+      "along (0-30)": 22.4,
+      "oblique (30-60)": 21.8
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "14:30",
+     "sun_alt": 52.1,
+     "sun_az": 276.0,
+     "sun_compass": "west",
+     "pairs_compared": 813,
+     "sun_side_shadier": 409,
+     "far_side_shadier": 71,
+     "within_5_points": 333,
+     "sun_side_minus_far_side_pts": 16.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 45.0,
+      "along (0-30)": 29.4,
+      "oblique (30-60)": 27.6
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "15:00",
+     "sun_alt": 44.9,
+     "sun_az": 277.0,
+     "sun_compass": "west",
+     "pairs_compared": 826,
+     "sun_side_shadier": 407,
+     "far_side_shadier": 79,
+     "within_5_points": 340,
+     "sun_side_minus_far_side_pts": 16.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 50.3,
+      "along (0-30)": 36.1,
+      "oblique (30-60)": 31.8
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "15:30",
+     "sun_alt": 37.7,
+     "sun_az": 278.0,
+     "sun_compass": "west",
+     "pairs_compared": 827,
+     "sun_side_shadier": 406,
+     "far_side_shadier": 75,
+     "within_5_points": 346,
+     "sun_side_minus_far_side_pts": 16.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 56.7,
+      "along (0-30)": 44.2,
+      "oblique (30-60)": 37.1
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "16:00",
+     "sun_alt": 30.5,
+     "sun_az": 279.2,
+     "sun_compass": "west",
+     "pairs_compared": 829,
+     "sun_side_shadier": 390,
+     "far_side_shadier": 77,
+     "within_5_points": 362,
+     "sun_side_minus_far_side_pts": 15.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 65.5,
+      "along (0-30)": 52.3,
+      "oblique (30-60)": 44.0
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "16:30",
+     "sun_alt": 23.4,
+     "sun_az": 280.5,
+     "sun_compass": "west",
+     "pairs_compared": 832,
+     "sun_side_shadier": 346,
+     "far_side_shadier": 65,
+     "within_5_points": 421,
+     "sun_side_minus_far_side_pts": 12.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 74.8,
+      "along (0-30)": 61.3,
+      "oblique (30-60)": 53.9
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "17:00",
+     "sun_alt": 16.3,
+     "sun_az": 281.8,
+     "sun_compass": "west",
+     "pairs_compared": 819,
+     "sun_side_shadier": 275,
+     "far_side_shadier": 63,
+     "within_5_points": 481,
+     "sun_side_minus_far_side_pts": 8.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 85.6,
+      "along (0-30)": 72.2,
+      "oblique (30-60)": 65.5
+     }
+    },
+    {
+     "date": "2026-05-01",
+     "time": "17:30",
+     "sun_alt": 9.3,
+     "sun_az": 283.4,
+     "sun_compass": "west",
+     "pairs_compared": 817,
+     "sun_side_shadier": 144,
+     "far_side_shadier": 38,
+     "within_5_points": 635,
+     "sun_side_minus_far_side_pts": 2.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 94.4,
+      "along (0-30)": 86.9,
+      "oblique (30-60)": 84.4
+     }
+    }
+   ],
+   "streets": [
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "08:00",
+     "sun_az": 81,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "north": 68.7,
+      "northwest": 45.1,
+      "northeast": 54.5,
+      "southwest": 36.7,
+      "west": 40.4
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "12:00",
+     "sun_az": 287,
+     "sun_alt": 88,
+     "building_shade_pct_by_side": {
+      "north": 0.0,
+      "northwest": 0.0,
+      "northeast": 0.0,
+      "southwest": 0.0,
+      "west": 0.0
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "16:00",
+     "sun_az": 279,
+     "sun_alt": 31,
+     "building_shade_pct_by_side": {
+      "north": 80.6,
+      "northwest": 94.9,
+      "northeast": 73.1,
+      "southwest": 92.5,
+      "west": 92.1
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "08:00",
+     "sun_az": 81,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "southeast": 68.0,
+      "north": 33.5,
+      "south": 54.2,
+      "southwest": 44.1,
+      "west": 21.3,
+      "east": 23.6,
+      "northeast": 0.0,
+      "northwest": 57.1
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "12:00",
+     "sun_az": 287,
+     "sun_alt": 88,
+     "building_shade_pct_by_side": {
+      "southeast": 0.0,
+      "north": 0.0,
+      "south": 0.0,
+      "southwest": 0.0,
+      "west": 0.0,
+      "east": 0.0,
+      "northeast": 0.0,
+      "northwest": 20.2
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "16:00",
+     "sun_az": 279,
+     "sun_alt": 31,
+     "building_shade_pct_by_side": {
+      "southeast": 88.4,
+      "north": 92.8,
+      "south": 79.1,
+      "southwest": 77.1,
+      "west": 80.5,
+      "east": 68.9,
+      "northeast": 78.0,
+      "northwest": 98.1
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "08:00",
+     "sun_az": 81,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "southeast": 73.7,
+      "northwest": 58.6,
+      "west": 82.0,
+      "east": 100.0,
+      "south": 94.3
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "12:00",
+     "sun_az": 287,
+     "sun_alt": 88,
+     "building_shade_pct_by_side": {
+      "southeast": 0.0,
+      "northwest": 0.0,
+      "west": 0.0,
+      "east": 0.0,
+      "south": 0.0
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "16:00",
+     "sun_az": 279,
+     "sun_alt": 31,
+     "building_shade_pct_by_side": {
+      "southeast": 47.8,
+      "northwest": 63.6,
+      "west": 77.2,
+      "east": 47.3,
+      "south": 63.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "08:00",
+     "sun_az": 81,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "northwest": 27.1,
+      "north": 9.9,
+      "southeast": 66.3,
+      "south": 0.0,
+      "east": 39.8,
+      "northeast": 25.9,
+      "southwest": 5.9,
+      "west": 0.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "12:00",
+     "sun_az": 287,
+     "sun_alt": 88,
+     "building_shade_pct_by_side": {
+      "northwest": 0.5,
+      "north": 0.0,
+      "southeast": 0.0,
+      "south": 0.0,
+      "east": 0.0,
+      "northeast": 6.6,
+      "southwest": 0.0,
+      "west": 0.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "16:00",
+     "sun_az": 279,
+     "sun_alt": 31,
+     "building_shade_pct_by_side": {
+      "northwest": 59.5,
+      "north": 21.7,
+      "southeast": 42.1,
+      "south": 37.9,
+      "east": 58.3,
+      "northeast": 71.3,
+      "southwest": 65.5,
+      "west": 96.0
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "08:00",
+     "sun_az": 81,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "north": 25.2,
+      "southwest": 75.3,
+      "northeast": 84.6,
+      "south": 35.5,
+      "west": 40.4
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "12:00",
+     "sun_az": 287,
+     "sun_alt": 88,
+     "building_shade_pct_by_side": {
+      "north": 3.2,
+      "southwest": 0.0,
+      "northeast": 0.0,
+      "south": 0.0,
+      "west": 0.0
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "16:00",
+     "sun_az": 279,
+     "sun_alt": 31,
+     "building_shade_pct_by_side": {
+      "north": 82.3,
+      "southwest": 91.0,
+      "northeast": 83.0,
+      "south": 69.0,
+      "west": 100.0
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "08:00",
+     "sun_az": 81,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "east": 100.0,
+      "southeast": 100.0,
+      "north": 72.6,
+      "south": 7.6
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "12:00",
+     "sun_az": 287,
+     "sun_alt": 88,
+     "building_shade_pct_by_side": {
+      "east": 0.0,
+      "southeast": 0.0,
+      "north": 5.1,
+      "south": 0.0
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "16:00",
+     "sun_az": 279,
+     "sun_alt": 31,
+     "building_shade_pct_by_side": {
+      "east": 0.0,
+      "southeast": 37.0,
+      "north": 60.1,
+      "south": 36.2
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "08:00",
+     "sun_az": 81,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 86.4,
+      "northwest": 80.4,
+      "south": 65.0,
+      "north": 50.8,
+      "west": 85.9
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "12:00",
+     "sun_az": 287,
+     "sun_alt": 88,
+     "building_shade_pct_by_side": {
+      "northeast": 0.0,
+      "southwest": 9.9,
+      "northwest": 0.0,
+      "south": 0.0,
+      "north": 12.3,
+      "west": 18.5
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "16:00",
+     "sun_az": 279,
+     "sun_alt": 31,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 100.0,
+      "northwest": 98.3,
+      "south": 100.0,
+      "north": 100.0,
+      "west": 100.0
+     }
+    }
+   ]
+  },
+  "2026-06-21": {
+   "rows": [
+    {
+     "date": "2026-06-21",
+     "time": "06:00",
+     "sun_alt": 6.4,
+     "sun_az": 67.4,
+     "sun_compass": "northeast",
+     "pairs_compared": 718,
+     "sun_side_shadier": 49,
+     "far_side_shadier": 16,
+     "within_5_points": 653,
+     "sun_side_minus_far_side_pts": 0.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 94.6,
+      "along (0-30)": 86.7,
+      "oblique (30-60)": 93.8
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "06:30",
+     "sun_alt": 13.1,
+     "sun_az": 68.8,
+     "sun_compass": "east",
+     "pairs_compared": 713,
+     "sun_side_shadier": 146,
+     "far_side_shadier": 28,
+     "within_5_points": 539,
+     "sun_side_minus_far_side_pts": 3.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 81.9,
+      "along (0-30)": 67.1,
+      "oblique (30-60)": 86.1
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "07:00",
+     "sun_alt": 19.8,
+     "sun_az": 69.9,
+     "sun_compass": "east",
+     "pairs_compared": 706,
+     "sun_side_shadier": 233,
+     "far_side_shadier": 33,
+     "within_5_points": 440,
+     "sun_side_minus_far_side_pts": 7.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 70.9,
+      "along (0-30)": 53.3,
+      "oblique (30-60)": 77.5
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "07:30",
+     "sun_alt": 26.7,
+     "sun_az": 70.8,
+     "sun_compass": "east",
+     "pairs_compared": 705,
+     "sun_side_shadier": 300,
+     "far_side_shadier": 35,
+     "within_5_points": 370,
+     "sun_side_minus_far_side_pts": 11.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 60.8,
+      "along (0-30)": 42.4,
+      "oblique (30-60)": 68.0
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "08:00",
+     "sun_alt": 33.5,
+     "sun_az": 71.3,
+     "sun_compass": "east",
+     "pairs_compared": 705,
+     "sun_side_shadier": 316,
+     "far_side_shadier": 36,
+     "within_5_points": 353,
+     "sun_side_minus_far_side_pts": 14.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 52.7,
+      "along (0-30)": 34.7,
+      "oblique (30-60)": 61.1
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "08:30",
+     "sun_alt": 40.4,
+     "sun_az": 71.4,
+     "sun_compass": "east",
+     "pairs_compared": 704,
+     "sun_side_shadier": 329,
+     "far_side_shadier": 41,
+     "within_5_points": 334,
+     "sun_side_minus_far_side_pts": 17.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 45.7,
+      "along (0-30)": 28.8,
+      "oblique (30-60)": 54.0
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "09:00",
+     "sun_alt": 47.3,
+     "sun_az": 71.1,
+     "sun_compass": "east",
+     "pairs_compared": 705,
+     "sun_side_shadier": 349,
+     "far_side_shadier": 44,
+     "within_5_points": 312,
+     "sun_side_minus_far_side_pts": 18.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 40.0,
+      "along (0-30)": 24.1,
+      "oblique (30-60)": 49.4
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "09:30",
+     "sun_alt": 54.1,
+     "sun_az": 70.0,
+     "sun_compass": "east",
+     "pairs_compared": 706,
+     "sun_side_shadier": 364,
+     "far_side_shadier": 40,
+     "within_5_points": 302,
+     "sun_side_minus_far_side_pts": 20.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 33.9,
+      "along (0-30)": 20.0,
+      "oblique (30-60)": 43.0
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "10:00",
+     "sun_alt": 60.9,
+     "sun_az": 67.8,
+     "sun_compass": "east",
+     "pairs_compared": 718,
+     "sun_side_shadier": 366,
+     "far_side_shadier": 40,
+     "within_5_points": 312,
+     "sun_side_minus_far_side_pts": 19.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 28.3,
+      "along (0-30)": 15.4,
+      "oblique (30-60)": 38.1
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "10:30",
+     "sun_alt": 67.5,
+     "sun_az": 63.5,
+     "sun_compass": "northeast",
+     "pairs_compared": 760,
+     "sun_side_shadier": 364,
+     "far_side_shadier": 51,
+     "within_5_points": 345,
+     "sun_side_minus_far_side_pts": 16.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 24.2,
+      "along (0-30)": 14.3,
+      "oblique (30-60)": 26.0
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "11:00",
+     "sun_alt": 73.8,
+     "sun_az": 54.7,
+     "sun_compass": "northeast",
+     "pairs_compared": 823,
+     "sun_side_shadier": 358,
+     "far_side_shadier": 62,
+     "within_5_points": 403,
+     "sun_side_minus_far_side_pts": 13.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 19.5,
+      "along (0-30)": 11.6,
+      "oblique (30-60)": 18.3
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "11:30",
+     "sun_alt": 79.0,
+     "sun_az": 35.3,
+     "sun_compass": "northeast",
+     "pairs_compared": 783,
+     "sun_side_shadier": 306,
+     "far_side_shadier": 41,
+     "within_5_points": 436,
+     "sun_side_minus_far_side_pts": 11.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 14.3,
+      "along (0-30)": 4.5,
+      "oblique (30-60)": 12.5
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "12:00",
+     "sun_alt": 81.1,
+     "sun_az": 356.5,
+     "sun_compass": "north",
+     "pairs_compared": 778,
+     "sun_side_shadier": 252,
+     "far_side_shadier": 33,
+     "within_5_points": 493,
+     "sun_side_minus_far_side_pts": 9.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 14.7,
+      "along (0-30)": 2.3,
+      "oblique (30-60)": 9.6
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "12:30",
+     "sun_alt": 78.3,
+     "sun_az": 320.5,
+     "sun_compass": "northwest",
+     "pairs_compared": 785,
+     "sun_side_shadier": 297,
+     "far_side_shadier": 39,
+     "within_5_points": 449,
+     "sun_side_minus_far_side_pts": 11.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 18.6,
+      "along (0-30)": 4.6,
+      "oblique (30-60)": 13.5
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "13:00",
+     "sun_alt": 72.8,
+     "sun_az": 303.5,
+     "sun_compass": "northwest",
+     "pairs_compared": 771,
+     "sun_side_shadier": 346,
+     "far_side_shadier": 47,
+     "within_5_points": 378,
+     "sun_side_minus_far_side_pts": 13.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 22.3,
+      "along (0-30)": 6.9,
+      "oblique (30-60)": 19.4
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "13:30",
+     "sun_alt": 66.5,
+     "sun_az": 295.7,
+     "sun_compass": "northwest",
+     "pairs_compared": 796,
+     "sun_side_shadier": 390,
+     "far_side_shadier": 64,
+     "within_5_points": 342,
+     "sun_side_minus_far_side_pts": 14.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 27.8,
+      "along (0-30)": 12.1,
+      "oblique (30-60)": 23.3
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "14:00",
+     "sun_alt": 59.8,
+     "sun_az": 291.8,
+     "sun_compass": "west",
+     "pairs_compared": 798,
+     "sun_side_shadier": 399,
+     "far_side_shadier": 64,
+     "within_5_points": 335,
+     "sun_side_minus_far_side_pts": 16.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 37.5,
+      "along (0-30)": 19.8,
+      "oblique (30-60)": 27.3
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "14:30",
+     "sun_alt": 53.0,
+     "sun_az": 289.8,
+     "sun_compass": "west",
+     "pairs_compared": 789,
+     "sun_side_shadier": 389,
+     "far_side_shadier": 71,
+     "within_5_points": 329,
+     "sun_side_minus_far_side_pts": 14.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 45.4,
+      "along (0-30)": 27.4,
+      "oblique (30-60)": 31.5
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "15:00",
+     "sun_alt": 46.2,
+     "sun_az": 288.8,
+     "sun_compass": "west",
+     "pairs_compared": 800,
+     "sun_side_shadier": 399,
+     "far_side_shadier": 73,
+     "within_5_points": 328,
+     "sun_side_minus_far_side_pts": 15.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 52.9,
+      "along (0-30)": 34.3,
+      "oblique (30-60)": 35.5
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "15:30",
+     "sun_alt": 39.3,
+     "sun_az": 288.6,
+     "sun_compass": "west",
+     "pairs_compared": 806,
+     "sun_side_shadier": 396,
+     "far_side_shadier": 78,
+     "within_5_points": 332,
+     "sun_side_minus_far_side_pts": 15.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 58.3,
+      "along (0-30)": 41.1,
+      "oblique (30-60)": 40.1
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "16:00",
+     "sun_alt": 32.5,
+     "sun_az": 288.8,
+     "sun_compass": "west",
+     "pairs_compared": 801,
+     "sun_side_shadier": 387,
+     "far_side_shadier": 75,
+     "within_5_points": 339,
+     "sun_side_minus_far_side_pts": 14.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 65.3,
+      "along (0-30)": 48.1,
+      "oblique (30-60)": 46.8
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "16:30",
+     "sun_alt": 25.6,
+     "sun_az": 289.4,
+     "sun_compass": "west",
+     "pairs_compared": 792,
+     "sun_side_shadier": 344,
+     "far_side_shadier": 68,
+     "within_5_points": 380,
+     "sun_side_minus_far_side_pts": 13.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 74.0,
+      "along (0-30)": 57.7,
+      "oblique (30-60)": 55.9
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "17:00",
+     "sun_alt": 18.8,
+     "sun_az": 290.2,
+     "sun_compass": "west",
+     "pairs_compared": 789,
+     "sun_side_shadier": 292,
+     "far_side_shadier": 61,
+     "within_5_points": 436,
+     "sun_side_minus_far_side_pts": 9.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 79.3,
+      "along (0-30)": 68.3,
+      "oblique (30-60)": 68.5
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "17:30",
+     "sun_alt": 12.0,
+     "sun_az": 291.4,
+     "sun_compass": "west",
+     "pairs_compared": 796,
+     "sun_side_shadier": 198,
+     "far_side_shadier": 54,
+     "within_5_points": 544,
+     "sun_side_minus_far_side_pts": 3.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 87.8,
+      "along (0-30)": 79.2,
+      "oblique (30-60)": 81.8
+     }
+    },
+    {
+     "date": "2026-06-21",
+     "time": "18:00",
+     "sun_alt": 5.4,
+     "sun_az": 292.9,
+     "sun_compass": "northwest",
+     "pairs_compared": 795,
+     "sun_side_shadier": 48,
+     "far_side_shadier": 25,
+     "within_5_points": 722,
+     "sun_side_minus_far_side_pts": 0.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 97.4,
+      "along (0-30)": 90.4,
+      "oblique (30-60)": 94.7
+     }
+    }
+   ],
+   "streets": [
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "08:00",
+     "sun_az": 71,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "north": 73.1,
+      "northwest": 48.8,
+      "northeast": 52.6,
+      "southwest": 40.7,
+      "west": 40.2
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "12:00",
+     "sun_az": 357,
+     "sun_alt": 81,
+     "building_shade_pct_by_side": {
+      "north": 14.1,
+      "northwest": 0.0,
+      "northeast": 6.8,
+      "southwest": 0.0,
+      "west": 5.9
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "16:00",
+     "sun_az": 289,
+     "sun_alt": 32,
+     "building_shade_pct_by_side": {
+      "north": 57.0,
+      "northwest": 92.0,
+      "northeast": 59.4,
+      "southwest": 79.8,
+      "west": 85.5
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "08:00",
+     "sun_az": 71,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "southeast": 63.2,
+      "north": 13.5,
+      "south": 0.5,
+      "southwest": 25.1,
+      "west": 26.4,
+      "east": 32.4,
+      "northeast": 11.0,
+      "northwest": 46.0
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "12:00",
+     "sun_az": 357,
+     "sun_alt": 81,
+     "building_shade_pct_by_side": {
+      "southeast": 1.8,
+      "north": 17.1,
+      "south": 5.4,
+      "southwest": 36.6,
+      "west": 44.0,
+      "east": 10.9,
+      "northeast": 39.0,
+      "northwest": 46.5
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "16:00",
+     "sun_az": 289,
+     "sun_alt": 32,
+     "building_shade_pct_by_side": {
+      "southeast": 88.5,
+      "north": 90.5,
+      "south": 83.2,
+      "southwest": 82.7,
+      "west": 79.1,
+      "east": 61.8,
+      "northeast": 100.0,
+      "northwest": 93.2
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "08:00",
+     "sun_az": 71,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "southeast": 67.8,
+      "northwest": 49.1,
+      "west": 74.5,
+      "east": 100.0,
+      "south": 87.4
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "12:00",
+     "sun_az": 357,
+     "sun_alt": 81,
+     "building_shade_pct_by_side": {
+      "southeast": 0.0,
+      "northwest": 0.0,
+      "west": 38.2,
+      "east": 0.0,
+      "south": 0.0
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "16:00",
+     "sun_az": 289,
+     "sun_alt": 32,
+     "building_shade_pct_by_side": {
+      "southeast": 45.6,
+      "northwest": 60.1,
+      "west": 94.5,
+      "east": 47.3,
+      "south": 88.8
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "08:00",
+     "sun_az": 71,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "northwest": 25.7,
+      "north": 5.9,
+      "southeast": 47.5,
+      "south": 3.7,
+      "east": 23.3,
+      "northeast": 16.4,
+      "southwest": 16.2,
+      "west": 77.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "12:00",
+     "sun_az": 357,
+     "sun_alt": 81,
+     "building_shade_pct_by_side": {
+      "northwest": 19.4,
+      "north": 2.5,
+      "southeast": 0.0,
+      "south": 0.0,
+      "east": 0.0,
+      "northeast": 20.6,
+      "southwest": 0.0,
+      "west": 0.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "16:00",
+     "sun_az": 289,
+     "sun_alt": 32,
+     "building_shade_pct_by_side": {
+      "northwest": 46.9,
+      "north": 25.3,
+      "southeast": 42.8,
+      "south": 37.5,
+      "east": 56.4,
+      "northeast": 58.6,
+      "southwest": 56.1,
+      "west": 54.0
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "08:00",
+     "sun_az": 71,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "north": 37.0,
+      "southwest": 79.5,
+      "northeast": 86.3,
+      "south": 25.8,
+      "west": 50.5
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "12:00",
+     "sun_az": 357,
+     "sun_alt": 81,
+     "building_shade_pct_by_side": {
+      "north": 23.3,
+      "southwest": 0.0,
+      "northeast": 18.6,
+      "south": 7.7,
+      "west": 16.1
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "16:00",
+     "sun_az": 289,
+     "sun_alt": 32,
+     "building_shade_pct_by_side": {
+      "north": 73.2,
+      "southwest": 94.4,
+      "northeast": 57.7,
+      "south": 69.8,
+      "west": 100.0
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "08:00",
+     "sun_az": 71,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "east": 98.5,
+      "southeast": 93.5,
+      "north": 55.8,
+      "south": 40.5
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "12:00",
+     "sun_az": 357,
+     "sun_alt": 81,
+     "building_shade_pct_by_side": {
+      "east": 78.7,
+      "southeast": 24.0,
+      "north": 90.7,
+      "south": 0.0
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "16:00",
+     "sun_az": 289,
+     "sun_alt": 32,
+     "building_shade_pct_by_side": {
+      "east": 66.1,
+      "southeast": 37.0,
+      "north": 86.5,
+      "south": 81.5
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "08:00",
+     "sun_az": 71,
+     "sun_alt": 34,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 56.3,
+      "northwest": 97.6,
+      "south": 9.9,
+      "north": 52.8,
+      "west": 100.0
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "12:00",
+     "sun_az": 357,
+     "sun_alt": 81,
+     "building_shade_pct_by_side": {
+      "northeast": 54.1,
+      "southwest": 30.3,
+      "northwest": 47.6,
+      "south": 12.5,
+      "north": 74.5,
+      "west": 42.1
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "16:00",
+     "sun_az": 289,
+     "sun_alt": 32,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 100.0,
+      "northwest": 90.3,
+      "south": 95.1,
+      "north": 100.0,
+      "west": 100.0
+     }
+    }
+   ]
+  },
+  "2026-12-21": {
+   "rows": [
+    {
+     "date": "2026-12-21",
+     "time": "07:00",
+     "sun_alt": 8.9,
+     "sun_az": 117.1,
+     "sun_compass": "southeast",
+     "pairs_compared": 793,
+     "sun_side_shadier": 117,
+     "far_side_shadier": 36,
+     "within_5_points": 640,
+     "sun_side_minus_far_side_pts": 2.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 86.6,
+      "along (0-30)": 76.8,
+      "oblique (30-60)": 91.6
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "07:30",
+     "sun_alt": 15.3,
+     "sun_az": 119.8,
+     "sun_compass": "southeast",
+     "pairs_compared": 777,
+     "sun_side_shadier": 228,
+     "far_side_shadier": 63,
+     "within_5_points": 486,
+     "sun_side_minus_far_side_pts": 5.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 73.7,
+      "along (0-30)": 61.1,
+      "oblique (30-60)": 81.1
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "08:00",
+     "sun_alt": 21.4,
+     "sun_az": 122.9,
+     "sun_compass": "southeast",
+     "pairs_compared": 772,
+     "sun_side_shadier": 301,
+     "far_side_shadier": 66,
+     "within_5_points": 405,
+     "sun_side_minus_far_side_pts": 10.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 68.9,
+      "along (0-30)": 45.9,
+      "oblique (30-60)": 73.3
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "08:30",
+     "sun_alt": 27.4,
+     "sun_az": 126.7,
+     "sun_compass": "southeast",
+     "pairs_compared": 773,
+     "sun_side_shadier": 342,
+     "far_side_shadier": 77,
+     "within_5_points": 354,
+     "sun_side_minus_far_side_pts": 14.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 63.4,
+      "along (0-30)": 36.6,
+      "oblique (30-60)": 64.2
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "09:00",
+     "sun_alt": 33.0,
+     "sun_az": 131.2,
+     "sun_compass": "southeast",
+     "pairs_compared": 786,
+     "sun_side_shadier": 366,
+     "far_side_shadier": 63,
+     "within_5_points": 357,
+     "sun_side_minus_far_side_pts": 15.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 60.1,
+      "along (0-30)": 31.3,
+      "oblique (30-60)": 56.4
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "09:30",
+     "sun_alt": 38.3,
+     "sun_az": 136.7,
+     "sun_compass": "southeast",
+     "pairs_compared": 794,
+     "sun_side_shadier": 403,
+     "far_side_shadier": 66,
+     "within_5_points": 325,
+     "sun_side_minus_far_side_pts": 17.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 54.5,
+      "along (0-30)": 28.6,
+      "oblique (30-60)": 51.9
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "10:00",
+     "sun_alt": 42.9,
+     "sun_az": 143.4,
+     "sun_compass": "southeast",
+     "pairs_compared": 794,
+     "sun_side_shadier": 418,
+     "far_side_shadier": 66,
+     "within_5_points": 310,
+     "sun_side_minus_far_side_pts": 18.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 51.1,
+      "along (0-30)": 27.7,
+      "oblique (30-60)": 45.2
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "10:30",
+     "sun_alt": 46.9,
+     "sun_az": 151.3,
+     "sun_compass": "southeast",
+     "pairs_compared": 780,
+     "sun_side_shadier": 400,
+     "far_side_shadier": 65,
+     "within_5_points": 315,
+     "sun_side_minus_far_side_pts": 17.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 46.5,
+      "along (0-30)": 23.3,
+      "oblique (30-60)": 46.2
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "11:00",
+     "sun_alt": 49.8,
+     "sun_az": 160.7,
+     "sun_compass": "south",
+     "pairs_compared": 717,
+     "sun_side_shadier": 355,
+     "far_side_shadier": 50,
+     "within_5_points": 312,
+     "sun_side_minus_far_side_pts": 19.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 41.7,
+      "along (0-30)": 12.5,
+      "oblique (30-60)": 51.1
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "11:30",
+     "sun_alt": 51.6,
+     "sun_az": 171.2,
+     "sun_compass": "south",
+     "pairs_compared": 768,
+     "sun_side_shadier": 373,
+     "far_side_shadier": 47,
+     "within_5_points": 348,
+     "sun_side_minus_far_side_pts": 18.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 42.3,
+      "along (0-30)": 8.9,
+      "oblique (30-60)": 43.8
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "12:00",
+     "sun_alt": 52.0,
+     "sun_az": 182.3,
+     "sun_compass": "south",
+     "pairs_compared": 826,
+     "sun_side_shadier": 388,
+     "far_side_shadier": 59,
+     "within_5_points": 379,
+     "sun_side_minus_far_side_pts": 15.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 42.1,
+      "along (0-30)": 18.0,
+      "oblique (30-60)": 34.8
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "12:30",
+     "sun_alt": 51.0,
+     "sun_az": 193.2,
+     "sun_compass": "south",
+     "pairs_compared": 833,
+     "sun_side_shadier": 412,
+     "far_side_shadier": 69,
+     "within_5_points": 352,
+     "sun_side_minus_far_side_pts": 14.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 47.1,
+      "along (0-30)": 25.9,
+      "oblique (30-60)": 27.5
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "13:00",
+     "sun_alt": 48.7,
+     "sun_az": 203.3,
+     "sun_compass": "southwest",
+     "pairs_compared": 813,
+     "sun_side_shadier": 397,
+     "far_side_shadier": 74,
+     "within_5_points": 342,
+     "sun_side_minus_far_side_pts": 15.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 49.3,
+      "along (0-30)": 20.9,
+      "oblique (30-60)": 34.4
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "13:30",
+     "sun_alt": 45.3,
+     "sun_az": 212.1,
+     "sun_compass": "southwest",
+     "pairs_compared": 790,
+     "sun_side_shadier": 402,
+     "far_side_shadier": 70,
+     "within_5_points": 318,
+     "sun_side_minus_far_side_pts": 15.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 47.4,
+      "along (0-30)": 16.1,
+      "oblique (30-60)": 41.0
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "14:00",
+     "sun_alt": 41.1,
+     "sun_az": 219.5,
+     "sun_compass": "southwest",
+     "pairs_compared": 788,
+     "sun_side_shadier": 425,
+     "far_side_shadier": 60,
+     "within_5_points": 303,
+     "sun_side_minus_far_side_pts": 17.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 42.7,
+      "along (0-30)": 31.9,
+      "oblique (30-60)": 47.8
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "14:30",
+     "sun_alt": 36.2,
+     "sun_az": 225.7,
+     "sun_compass": "southwest",
+     "pairs_compared": 840,
+     "sun_side_shadier": 417,
+     "far_side_shadier": 72,
+     "within_5_points": 351,
+     "sun_side_minus_far_side_pts": 16.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 47.0,
+      "along (0-30)": 41.3,
+      "oblique (30-60)": 53.5
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "15:00",
+     "sun_alt": 30.8,
+     "sun_az": 230.8,
+     "sun_compass": "southwest",
+     "pairs_compared": 834,
+     "sun_side_shadier": 412,
+     "far_side_shadier": 75,
+     "within_5_points": 347,
+     "sun_side_minus_far_side_pts": 15.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 53.7,
+      "along (0-30)": 47.2,
+      "oblique (30-60)": 60.6
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "15:30",
+     "sun_alt": 25.0,
+     "sun_az": 235.0,
+     "sun_compass": "southwest",
+     "pairs_compared": 821,
+     "sun_side_shadier": 377,
+     "far_side_shadier": 62,
+     "within_5_points": 382,
+     "sun_side_minus_far_side_pts": 13.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 64.5,
+      "along (0-30)": 54.5,
+      "oblique (30-60)": 62.2
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "16:00",
+     "sun_alt": 18.9,
+     "sun_az": 238.5,
+     "sun_compass": "southwest",
+     "pairs_compared": 787,
+     "sun_side_shadier": 290,
+     "far_side_shadier": 62,
+     "within_5_points": 435,
+     "sun_side_minus_far_side_pts": 8.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 72.1,
+      "along (0-30)": 60.8,
+      "oblique (30-60)": 72.1
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "16:30",
+     "sun_alt": 12.7,
+     "sun_az": 241.4,
+     "sun_compass": "southwest",
+     "pairs_compared": 763,
+     "sun_side_shadier": 187,
+     "far_side_shadier": 48,
+     "within_5_points": 528,
+     "sun_side_minus_far_side_pts": 4.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 80.1,
+      "along (0-30)": 66.6,
+      "oblique (30-60)": 85.9
+     }
+    },
+    {
+     "date": "2026-12-21",
+     "time": "17:00",
+     "sun_alt": 6.3,
+     "sun_az": 243.8,
+     "sun_compass": "southwest",
+     "pairs_compared": 757,
+     "sun_side_shadier": 71,
+     "far_side_shadier": 27,
+     "within_5_points": 659,
+     "sun_side_minus_far_side_pts": 1.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 90.7,
+      "along (0-30)": 83.0,
+      "oblique (30-60)": 97.3
+     }
+    }
+   ],
+   "streets": [
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "08:00",
+     "sun_az": 123,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "north": 44.6,
+      "northwest": 30.5,
+      "northeast": 51.6,
+      "southwest": 25.7,
+      "west": 26.1
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "12:00",
+     "sun_az": 182,
+     "sun_alt": 52,
+     "building_shade_pct_by_side": {
+      "north": 29.9,
+      "northwest": 79.6,
+      "northeast": 48.5,
+      "southwest": 80.8,
+      "west": 82.9
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "16:00",
+     "sun_az": 238,
+     "sun_alt": 19,
+     "building_shade_pct_by_side": {
+      "north": 83.3,
+      "northwest": 90.4,
+      "northeast": 90.9,
+      "southwest": 93.7,
+      "west": 98.0
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "08:00",
+     "sun_az": 123,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "southeast": 80.2,
+      "north": 41.8,
+      "south": 42.6,
+      "southwest": 71.5,
+      "west": 62.7,
+      "east": 43.9,
+      "northeast": 0.0,
+      "northwest": 71.6
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "12:00",
+     "sun_az": 182,
+     "sun_alt": 52,
+     "building_shade_pct_by_side": {
+      "southeast": 62.9,
+      "north": 21.4,
+      "south": 23.1,
+      "southwest": 20.1,
+      "west": 20.1,
+      "east": 6.8,
+      "northeast": 0.0,
+      "northwest": 19.5
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "16:00",
+     "sun_az": 238,
+     "sun_alt": 19,
+     "building_shade_pct_by_side": {
+      "southeast": 79.8,
+      "north": 73.5,
+      "south": 80.8,
+      "southwest": 82.1,
+      "west": 100.0,
+      "east": 90.6,
+      "northeast": 100.0,
+      "northwest": 100.0
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "08:00",
+     "sun_az": 123,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "southeast": 85.0,
+      "northwest": 83.5,
+      "west": 85.7,
+      "east": 100.0,
+      "south": 94.4
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "12:00",
+     "sun_az": 182,
+     "sun_alt": 52,
+     "building_shade_pct_by_side": {
+      "southeast": 40.1,
+      "northwest": 14.3,
+      "west": 77.0,
+      "east": 47.3,
+      "south": 87.4
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "16:00",
+     "sun_az": 238,
+     "sun_alt": 19,
+     "building_shade_pct_by_side": {
+      "southeast": 71.7,
+      "northwest": 85.0,
+      "west": 100.0,
+      "east": 59.4,
+      "south": 67.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "08:00",
+     "sun_az": 123,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "northwest": 52.4,
+      "north": 92.8,
+      "southeast": 85.6,
+      "south": 88.0,
+      "east": 87.8,
+      "northeast": 74.0,
+      "southwest": 73.6,
+      "west": 0.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "12:00",
+     "sun_az": 182,
+     "sun_alt": 52,
+     "building_shade_pct_by_side": {
+      "northwest": 26.3,
+      "north": 52.6,
+      "southeast": 52.4,
+      "south": 54.7,
+      "east": 61.0,
+      "northeast": 38.7,
+      "southwest": 63.8,
+      "west": 90.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "16:00",
+     "sun_az": 238,
+     "sun_alt": 19,
+     "building_shade_pct_by_side": {
+      "northwest": 46.2,
+      "north": 80.2,
+      "southeast": 44.1,
+      "south": 96.9,
+      "east": 82.5,
+      "northeast": 46.9,
+      "southwest": 97.6,
+      "west": 100.0
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "08:00",
+     "sun_az": 123,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "north": 40.6,
+      "southwest": 12.1,
+      "northeast": 24.6,
+      "south": 82.0,
+      "west": 59.6
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "12:00",
+     "sun_az": 182,
+     "sun_alt": 52,
+     "building_shade_pct_by_side": {
+      "north": 18.5,
+      "southwest": 85.2,
+      "northeast": 55.1,
+      "south": 68.4,
+      "west": 34.1
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "16:00",
+     "sun_az": 238,
+     "sun_alt": 19,
+     "building_shade_pct_by_side": {
+      "north": 30.3,
+      "southwest": 97.0,
+      "northeast": 89.6,
+      "south": 88.6,
+      "west": 48.7
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "08:00",
+     "sun_az": 123,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "east": 25.8,
+      "southeast": 26.2,
+      "north": 44.6,
+      "south": 65.2
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "12:00",
+     "sun_az": 182,
+     "sun_alt": 52,
+     "building_shade_pct_by_side": {
+      "east": 0.0,
+      "southeast": 31.5,
+      "north": 0.0,
+      "south": 53.3
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "16:00",
+     "sun_az": 238,
+     "sun_alt": 19,
+     "building_shade_pct_by_side": {
+      "east": 32.7,
+      "southeast": 29.0,
+      "north": 0.0,
+      "south": 44.9
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "08:00",
+     "sun_az": 123,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "northeast": 87.8,
+      "southwest": 93.7,
+      "northwest": 100.0,
+      "south": 97.6,
+      "north": 89.6,
+      "west": 58.1
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "12:00",
+     "sun_az": 182,
+     "sun_alt": 52,
+     "building_shade_pct_by_side": {
+      "northeast": 91.4,
+      "southwest": 80.1,
+      "northwest": 67.7,
+      "south": 52.6,
+      "north": 51.7,
+      "west": 59.4
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "16:00",
+     "sun_az": 238,
+     "sun_alt": 19,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 100.0,
+      "northwest": 100.0,
+      "south": 100.0,
+      "north": 100.0,
+      "west": 100.0
+     }
+    }
+   ]
+  },
+  "2026-10-22": {
+   "rows": [
+    {
+     "date": "2026-10-22",
+     "time": "06:30",
+     "sun_alt": 9.1,
+     "sun_az": 103.9,
+     "sun_compass": "east",
+     "pairs_compared": 817,
+     "sun_side_shadier": 116,
+     "far_side_shadier": 34,
+     "within_5_points": 667,
+     "sun_side_minus_far_side_pts": 1.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 92.8,
+      "along (0-30)": 85.3,
+      "oblique (30-60)": 81.3
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "07:00",
+     "sun_alt": 16.0,
+     "sun_az": 106.2,
+     "sun_compass": "east",
+     "pairs_compared": 820,
+     "sun_side_shadier": 223,
+     "far_side_shadier": 67,
+     "within_5_points": 530,
+     "sun_side_minus_far_side_pts": 6.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 85.5,
+      "along (0-30)": 67.5,
+      "oblique (30-60)": 70.0
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "07:30",
+     "sun_alt": 22.9,
+     "sun_az": 108.9,
+     "sun_compass": "east",
+     "pairs_compared": 798,
+     "sun_side_shadier": 291,
+     "far_side_shadier": 70,
+     "within_5_points": 437,
+     "sun_side_minus_far_side_pts": 10.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 76.3,
+      "along (0-30)": 55.1,
+      "oblique (30-60)": 61.6
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "08:00",
+     "sun_alt": 29.7,
+     "sun_az": 112.0,
+     "sun_compass": "east",
+     "pairs_compared": 798,
+     "sun_side_shadier": 339,
+     "far_side_shadier": 80,
+     "within_5_points": 379,
+     "sun_side_minus_far_side_pts": 13.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 64.8,
+      "along (0-30)": 42.6,
+      "oblique (30-60)": 56.4
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "08:30",
+     "sun_alt": 36.4,
+     "sun_az": 115.8,
+     "sun_compass": "southeast",
+     "pairs_compared": 798,
+     "sun_side_shadier": 367,
+     "far_side_shadier": 72,
+     "within_5_points": 359,
+     "sun_side_minus_far_side_pts": 15.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 54.9,
+      "along (0-30)": 31.7,
+      "oblique (30-60)": 50.9
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "09:00",
+     "sun_alt": 42.8,
+     "sun_az": 120.5,
+     "sun_compass": "southeast",
+     "pairs_compared": 775,
+     "sun_side_shadier": 374,
+     "far_side_shadier": 63,
+     "within_5_points": 338,
+     "sun_side_minus_far_side_pts": 16.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 50.8,
+      "along (0-30)": 23.2,
+      "oblique (30-60)": 43.2
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "09:30",
+     "sun_alt": 48.8,
+     "sun_az": 126.6,
+     "sun_compass": "southeast",
+     "pairs_compared": 771,
+     "sun_side_shadier": 389,
+     "far_side_shadier": 66,
+     "within_5_points": 316,
+     "sun_side_minus_far_side_pts": 17.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 48.1,
+      "along (0-30)": 17.4,
+      "oblique (30-60)": 40.0
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "10:00",
+     "sun_alt": 54.3,
+     "sun_az": 134.4,
+     "sun_compass": "southeast",
+     "pairs_compared": 797,
+     "sun_side_shadier": 389,
+     "far_side_shadier": 66,
+     "within_5_points": 342,
+     "sun_side_minus_far_side_pts": 16.1,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 42.4,
+      "along (0-30)": 16.3,
+      "oblique (30-60)": 35.6
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "10:30",
+     "sun_alt": 59.0,
+     "sun_az": 144.7,
+     "sun_compass": "southeast",
+     "pairs_compared": 796,
+     "sun_side_shadier": 415,
+     "far_side_shadier": 59,
+     "within_5_points": 322,
+     "sun_side_minus_far_side_pts": 16.9,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 37.7,
+      "along (0-30)": 17.9,
+      "oblique (30-60)": 28.6
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "11:00",
+     "sun_alt": 62.5,
+     "sun_az": 158.1,
+     "sun_compass": "south",
+     "pairs_compared": 733,
+     "sun_side_shadier": 354,
+     "far_side_shadier": 54,
+     "within_5_points": 325,
+     "sun_side_minus_far_side_pts": 17.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 31.9,
+      "along (0-30)": 8.6,
+      "oblique (30-60)": 35.9
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "11:30",
+     "sun_alt": 64.3,
+     "sun_az": 174.1,
+     "sun_compass": "south",
+     "pairs_compared": 769,
+     "sun_side_shadier": 347,
+     "far_side_shadier": 47,
+     "within_5_points": 375,
+     "sun_side_minus_far_side_pts": 15.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 30.8,
+      "along (0-30)": 5.5,
+      "oblique (30-60)": 31.4
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "12:00",
+     "sun_alt": 64.0,
+     "sun_az": 191.0,
+     "sun_compass": "south",
+     "pairs_compared": 873,
+     "sun_side_shadier": 393,
+     "far_side_shadier": 64,
+     "within_5_points": 416,
+     "sun_side_minus_far_side_pts": 12.6,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 36.0,
+      "along (0-30)": 16.1,
+      "oblique (30-60)": 17.8
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "12:30",
+     "sun_alt": 61.6,
+     "sun_az": 206.3,
+     "sun_compass": "southwest",
+     "pairs_compared": 807,
+     "sun_side_shadier": 385,
+     "far_side_shadier": 66,
+     "within_5_points": 356,
+     "sun_side_minus_far_side_pts": 13.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 38.7,
+      "along (0-30)": 10.0,
+      "oblique (30-60)": 25.9
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "13:00",
+     "sun_alt": 57.7,
+     "sun_az": 218.7,
+     "sun_compass": "southwest",
+     "pairs_compared": 787,
+     "sun_side_shadier": 398,
+     "far_side_shadier": 57,
+     "within_5_points": 332,
+     "sun_side_minus_far_side_pts": 15.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 32.2,
+      "along (0-30)": 17.9,
+      "oblique (30-60)": 32.7
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "13:30",
+     "sun_alt": 52.7,
+     "sun_az": 228.1,
+     "sun_compass": "southwest",
+     "pairs_compared": 819,
+     "sun_side_shadier": 417,
+     "far_side_shadier": 56,
+     "within_5_points": 346,
+     "sun_side_minus_far_side_pts": 15.8,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 34.6,
+      "along (0-30)": 26.9,
+      "oblique (30-60)": 39.3
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "14:00",
+     "sun_alt": 47.0,
+     "sun_az": 235.3,
+     "sun_compass": "southwest",
+     "pairs_compared": 823,
+     "sun_side_shadier": 435,
+     "far_side_shadier": 61,
+     "within_5_points": 327,
+     "sun_side_minus_far_side_pts": 17.0,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 42.9,
+      "along (0-30)": 31.5,
+      "oblique (30-60)": 38.6
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "14:30",
+     "sun_alt": 40.8,
+     "sun_az": 240.9,
+     "sun_compass": "southwest",
+     "pairs_compared": 769,
+     "sun_side_shadier": 399,
+     "far_side_shadier": 62,
+     "within_5_points": 308,
+     "sun_side_minus_far_side_pts": 17.4,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 46.1,
+      "along (0-30)": 32.5,
+      "oblique (30-60)": 45.8
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "15:00",
+     "sun_alt": 34.3,
+     "sun_az": 245.3,
+     "sun_compass": "southwest",
+     "pairs_compared": 746,
+     "sun_side_shadier": 380,
+     "far_side_shadier": 65,
+     "within_5_points": 301,
+     "sun_side_minus_far_side_pts": 16.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 48.2,
+      "along (0-30)": 33.0,
+      "oblique (30-60)": 61.7
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "15:30",
+     "sun_alt": 27.6,
+     "sun_az": 248.9,
+     "sun_compass": "west",
+     "pairs_compared": 713,
+     "sun_side_shadier": 318,
+     "far_side_shadier": 37,
+     "within_5_points": 358,
+     "sun_side_minus_far_side_pts": 14.2,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 55.9,
+      "along (0-30)": 40.2,
+      "oblique (30-60)": 71.9
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:00",
+     "sun_alt": 20.8,
+     "sun_az": 251.9,
+     "sun_compass": "west",
+     "pairs_compared": 704,
+     "sun_side_shadier": 263,
+     "far_side_shadier": 35,
+     "within_5_points": 406,
+     "sun_side_minus_far_side_pts": 9.7,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 65.6,
+      "along (0-30)": 48.8,
+      "oblique (30-60)": 77.8
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "16:30",
+     "sun_alt": 13.9,
+     "sun_az": 254.4,
+     "sun_compass": "west",
+     "pairs_compared": 701,
+     "sun_side_shadier": 169,
+     "far_side_shadier": 38,
+     "within_5_points": 494,
+     "sun_side_minus_far_side_pts": 4.5,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 75.5,
+      "along (0-30)": 62.8,
+      "oblique (30-60)": 86.5
+     }
+    },
+    {
+     "date": "2026-10-22",
+     "time": "17:00",
+     "sun_alt": 6.9,
+     "sun_az": 256.6,
+     "sun_compass": "west",
+     "pairs_compared": 694,
+     "sun_side_shadier": 88,
+     "far_side_shadier": 18,
+     "within_5_points": 588,
+     "sun_side_minus_far_side_pts": 1.3,
+     "building_shade_pct_by_street_angle": {
+      "across (60-90)": 87.3,
+      "along (0-30)": 79.6,
+      "oblique (30-60)": 95.3
+     }
+    }
+   ],
+   "streets": [
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "08:00",
+     "sun_az": 112,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "north": 58.2,
+      "northwest": 20.4,
+      "northeast": 42.3,
+      "southwest": 33.3,
+      "west": 27.7
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "12:00",
+     "sun_az": 191,
+     "sun_alt": 64,
+     "building_shade_pct_by_side": {
+      "north": 24.2,
+      "northwest": 55.5,
+      "northeast": 29.5,
+      "southwest": 57.0,
+      "west": 51.5
+     }
+    },
+    {
+     "street": "Ayala Avenue",
+     "axis_deg": 124,
+     "time": "16:00",
+     "sun_az": 252,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "north": 88.5,
+      "northwest": 93.5,
+      "northeast": 96.6,
+      "southwest": 98.9,
+      "west": 100.0
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "08:00",
+     "sun_az": 112,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "southeast": 82.8,
+      "north": 49.4,
+      "south": 49.7,
+      "southwest": 72.7,
+      "west": 57.6,
+      "east": 26.0,
+      "northeast": 0.0,
+      "northwest": 57.2
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "12:00",
+     "sun_az": 191,
+     "sun_alt": 64,
+     "building_shade_pct_by_side": {
+      "southeast": 43.4,
+      "north": 20.9,
+      "south": 22.0,
+      "southwest": 20.1,
+      "west": 22.2,
+      "east": 0.0,
+      "northeast": 0.0,
+      "northwest": 0.0
+     }
+    },
+    {
+     "street": "Paseo de Roxas",
+     "axis_deg": 73,
+     "time": "16:00",
+     "sun_az": 252,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "southeast": 80.7,
+      "north": 69.0,
+      "south": 74.7,
+      "southwest": 100.0,
+      "west": 98.7,
+      "east": 82.9,
+      "northeast": 0.0,
+      "northwest": 100.0
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "08:00",
+     "sun_az": 112,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "southeast": 86.5,
+      "northwest": 77.7,
+      "west": 89.2,
+      "east": 97.6,
+      "south": 96.2
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "12:00",
+     "sun_az": 191,
+     "sun_alt": 64,
+     "building_shade_pct_by_side": {
+      "southeast": 16.7,
+      "northwest": 0.0,
+      "west": 28.0,
+      "east": 47.3,
+      "south": 37.0
+     }
+    },
+    {
+     "street": "Makati Avenue",
+     "axis_deg": 26,
+     "time": "16:00",
+     "sun_az": 252,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "southeast": 65.6,
+      "northwest": 82.8,
+      "west": 97.9,
+      "east": 100.0,
+      "south": 42.7
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "08:00",
+     "sun_az": 112,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "northwest": 51.9,
+      "north": 66.8,
+      "southeast": 87.3,
+      "south": 72.9,
+      "east": 87.3,
+      "northeast": 67.2,
+      "southwest": 67.3,
+      "west": 0.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "12:00",
+     "sun_az": 191,
+     "sun_alt": 64,
+     "building_shade_pct_by_side": {
+      "northwest": 16.7,
+      "north": 46.6,
+      "southeast": 48.3,
+      "south": 51.4,
+      "east": 53.0,
+      "northeast": 31.3,
+      "southwest": 54.7,
+      "west": 72.0
+     }
+    },
+    {
+     "street": "Senator Gil J. Puyat Avenue",
+     "axis_deg": 81,
+     "time": "16:00",
+     "sun_az": 252,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "northwest": 62.7,
+      "north": 69.6,
+      "southeast": 33.0,
+      "south": 90.1,
+      "east": 90.7,
+      "northeast": 97.6,
+      "southwest": 100.0,
+      "west": 100.0
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "08:00",
+     "sun_az": 112,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "north": 42.6,
+      "southwest": 49.0,
+      "northeast": 78.3,
+      "south": 79.1,
+      "west": 98.2
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "12:00",
+     "sun_az": 191,
+     "sun_alt": 64,
+     "building_shade_pct_by_side": {
+      "north": 6.4,
+      "southwest": 82.2,
+      "northeast": 40.9,
+      "south": 54.1,
+      "west": 32.3
+     }
+    },
+    {
+     "street": "Dela Rosa Street",
+     "axis_deg": 117,
+     "time": "16:00",
+     "sun_az": 252,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "north": 29.9,
+      "southwest": 89.6,
+      "northeast": 87.4,
+      "south": 29.6,
+      "west": 44.6
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "08:00",
+     "sun_az": 112,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "east": 25.8,
+      "southeast": 29.8,
+      "north": 21.2,
+      "south": 62.4
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "12:00",
+     "sun_az": 191,
+     "sun_alt": 64,
+     "building_shade_pct_by_side": {
+      "east": 0.0,
+      "southeast": 15.9,
+      "north": 0.0,
+      "south": 5.7
+     }
+    },
+    {
+     "street": "Legazpi Street",
+     "axis_deg": 93,
+     "time": "16:00",
+     "sun_az": 252,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "east": 14.1,
+      "southeast": 35.3,
+      "north": 16.8,
+      "south": 5.7
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "08:00",
+     "sun_az": 112,
+     "sun_alt": 30,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 84.2,
+      "northwest": 98.3,
+      "south": 98.8,
+      "north": 100.0,
+      "west": 83.1
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "12:00",
+     "sun_az": 191,
+     "sun_alt": 64,
+     "building_shade_pct_by_side": {
+      "northeast": 81.5,
+      "southwest": 80.1,
+      "northwest": 51.9,
+      "south": 37.1,
+      "north": 49.2,
+      "west": 54.4
+     }
+    },
+    {
+     "street": "Valero Street",
+     "axis_deg": 74,
+     "time": "16:00",
+     "sun_az": 252,
+     "sun_alt": 21,
+     "building_shade_pct_by_side": {
+      "northeast": 100.0,
+      "southwest": 86.0,
+      "northwest": 100.0,
+      "south": 42.4,
+      "north": 49.2,
+      "west": 95.4
+     }
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,66 @@
+# The daily rebuild only proves that a commit reached main. A failed Vercel build keeps
+# the old deployment up, and its 7 shade dates run out within a week with no alert.
+# This job reads the live manifest after the rebuild window and opens an issue when
+# today's Manila date is missing or the shade marker is gone.
+
+name: live-check
+
+on:
+  schedule:
+    - cron: "10 23 * * *" # 07:10 Asia/Manila, 90 minutes after daily-rebuild
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: today's date is on the live site
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read the live manifest and the shade marker
+        env:
+          SITE: https://undercover.ph
+        run: |
+          python3 - <<'EOF'
+          import json, os, sys, time, urllib.request
+          from datetime import datetime, timedelta, timezone
+
+          site = os.environ["SITE"]
+          today = datetime.now(timezone(timedelta(hours=8))).date().isoformat()
+
+          def get(path):
+              req = urllib.request.Request(f"{site}{path}?cb={int(time.time())}", headers={"Cache-Control": "no-cache"})
+              with urllib.request.urlopen(req, timeout=30) as res:
+                  return res.headers.get("content-type", ""), res.read()
+
+          _, body = get("/data/manifest.json")
+          manifest = json.loads(body)
+          dates = manifest.get("dates") or []
+          print(f"today {today}, live dates {dates[:1]} to {dates[-1:]}, generated_at {manifest.get('generated_at')}")
+          if today not in dates:
+              sys.exit(f"Today {today} is not in the live manifest dates.")
+          kind, _ = get("/data/READY.shade")
+          if "text/html" in kind:
+              sys.exit("READY.shade is missing on the live site.")
+          print("live data is current")
+          EOF
+
+  report-failure:
+    name: open an issue
+    needs: check
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue with the run link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create -R "$GITHUB_REPOSITORY" \
+            --title "Live site data is stale $(TZ=Asia/Manila date +%F)" \
+            --body "The live-check workflow found that undercover.ph does not serve today's shade data: $RUN_URL. Check the latest Vercel build log for the Python data step."

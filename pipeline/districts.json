@@ -1,0 +1,21 @@
+{
+  "note": "Walking areas the app covers. bbox is [west, south, east, north] in WGS84. The graph area adds 500 m on each side, the building area 800 m more. Order is build priority.",
+  "districts": [
+    {"id": "makati-cbd", "name": "Makati CBD", "cities": ["Makati"], "bbox": [121.012, 14.548, 121.032, 14.562], "wave": 0},
+    {"id": "bgc", "name": "Bonifacio Global City", "cities": ["Taguig"], "bbox": [121.040, 14.533, 121.062, 14.563], "wave": 1},
+    {"id": "ortigas", "name": "Ortigas Center and Kapitolyo", "cities": ["Pasig", "Mandaluyong", "Quezon City"], "bbox": [121.050, 14.562, 121.068, 14.594], "wave": 1},
+    {"id": "mandaluyong-shaw", "name": "Shaw and Boni", "cities": ["Mandaluyong"], "bbox": [121.030, 14.568, 121.052, 14.585], "wave": 1},
+    {"id": "pasig-center", "name": "Pasig City Center", "cities": ["Pasig"], "bbox": [121.070, 14.553, 121.090, 14.570], "wave": 1},
+    {"id": "rockwell-poblacion", "name": "Rockwell and Poblacion", "cities": ["Makati"], "bbox": [121.024, 14.560, 121.042, 14.572], "wave": 2},
+    {"id": "greenhills", "name": "Greenhills", "cities": ["San Juan"], "bbox": [121.040, 14.594, 121.058, 14.608], "wave": 2},
+    {"id": "cubao", "name": "Cubao and Araneta City", "cities": ["Quezon City"], "bbox": [121.046, 14.612, 121.062, 14.627], "wave": 2},
+    {"id": "eastwood", "name": "Eastwood and Libis", "cities": ["Quezon City"], "bbox": [121.072, 14.602, 121.086, 14.615], "wave": 2},
+    {"id": "qc-triangle", "name": "North Avenue and Quezon Memorial Circle", "cities": ["Quezon City"], "bbox": [121.024, 14.640, 121.055, 14.662], "wave": 2},
+    {"id": "up-diliman", "name": "UP Diliman", "cities": ["Quezon City"], "bbox": [121.055, 14.647, 121.075, 14.664], "wave": 2},
+    {"id": "manila-ubelt", "name": "University Belt", "cities": ["Manila"], "bbox": [120.978, 14.596, 121.000, 14.614], "wave": 2},
+    {"id": "binondo", "name": "Binondo and Quiapo", "cities": ["Manila"], "bbox": [120.968, 14.594, 120.988, 14.606], "wave": 2},
+    {"id": "manila-ermita", "name": "Intramuros, Ermita, and Malate", "cities": ["Manila"], "bbox": [120.968, 14.560, 120.998, 14.596], "wave": 2},
+    {"id": "pasay-moa", "name": "Bay Area and Mall of Asia", "cities": ["Pasay"], "bbox": [120.976, 14.525, 121.003, 14.545], "wave": 2},
+    {"id": "alabang", "name": "Alabang and Filinvest City", "cities": ["Muntinlupa"], "bbox": [121.022, 14.408, 121.050, 14.432], "wave": 2}
+  ]
+}

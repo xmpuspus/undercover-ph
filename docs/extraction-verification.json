@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-21",
+  "profile": "public-through-static-v1",
+  "routing_ready": false,
+  "tests": {
+    "command": "research/20261021T120813Z/scripts/05/venv/bin/python -m unittest discover -s tests -v",
+    "tests_passed": 9,
+    "access_subcases": 66,
+    "osm_fixture_checks": 5,
+    "additional_shelter_classification_test": true
+  },
+  "output_checks": {
+    "cached_ways": 144451,
+    "explicit_access_violations": 0,
+    "busway_or_vehicle_tunnel_violations": 0,
+    "specific_foot_overrides_preserved": 713,
+    "ways_excluded_by_blocked_node": 17752,
+    "regions": {
+      "ncr": {
+        "edges": 176122,
+        "ways_with_linked_rules": 96071,
+        "pending_access_edges": 18834,
+        "vehicle_ways_flagged_as_shelter": 0
+      },
+      "makati_cbd": {
+        "edges": 2903,
+        "ways_with_linked_rules": 1732,
+        "pending_access_edges": 809,
+        "vehicle_ways_flagged_as_shelter": 0
+      },
+      "sampaloc": {
+        "edges": 1736,
+        "ways_with_linked_rules": 965,
+        "pending_access_edges": 147,
+        "vehicle_ways_flagged_as_shelter": 0
+      }
+    }
+  },
+  "source_sha256": {
+    "docs/acceptance-cases.md": "097f19272b54c3ff91387b9ba3c952dce054463eb26b06e8dc6a863042cd9ee3",
+    "docs/research-corrections.md": "f6c6f1c5c99f14b2b530e3fd8358ba78a385e17a0da808be402f8a38655e0f63",
+    "research/20261021T120813Z/scripts/01/analyze_pilots.py": "5a04198c9670d853839869f7f785acbc095f1b50f9928642880f765f8bcdc967",
+    "research/20261021T120813Z/scripts/01/extract_ped.py": "18262ccaf032629adcd9261e2addd206260e8eda5e8964c5598690bfcc97b6b3",
+    "research/20261021T120813Z/scripts/03/extract_ncr.py": "429cc3ac52e68b31db206c539fb544f16afe51c9c6cfc937e67688d304d7a087",
+    "research/20261021T120813Z/scripts/05/export_walk_geojson.py": "814f4412de8cf5fd4eb3830d280bee8c79f01a97c15fbcde05ffc7d7e9bfccc7",
+    "research/20261021T120813Z/scripts/05/extract_walk_graph.py": "9f01b37279cfcdf4c399527d05384173d2fda75d394effd10e338d8e56a96eb3",
+    "research/20261021T120813Z/scripts/pedestrian_access.py": "0a15d3606bcc62b78d1af2d72eb590c8dbce4742c8c413c0f462b1064885c201",
+    "tests/test_pedestrian_access.py": "8a92789c7f08d3699469e0a54aadb622844dc49d3a8d753cf1991010ed1b0d85"
+  },
+  "limits": [
+    "No schedule evaluator",
+    "No field validation",
+    "No real shadow output",
+    "No phone benchmark",
+    "Whole ways touching explicitly blocked nodes are omitted conservatively",
+    "Historical performance, payload and route-choice benchmarks were not rerun on the corrected graph",
+    "Vehicle tunnels without explicit foot permission are excluded; shelter flags apply only to pedestrian-class ways"
+  ],
+  "corrected_reports": [
+    "research/20261021T120813Z/01-osm-pedestrian-network.md",
+    "research/20261021T120813Z/02-building-heights.md",
+    "research/20261021T120813Z/03-sheltered-infrastructure.md",
+    "research/20261021T120813Z/04-shadow-methods.md",
+    "research/20261021T120813Z/05-routing-architecture.md",
+    "research/20261021T120813Z/08-licensing-privacy.md",
+    "research/20261021T120813Z/09-ground-truth-collection.md"
+  ],
+  "data_outputs": [
+    "research/20261021T120813Z/raw/access-correction-20261021/01/ncr_walk.pkl",
+    "research/20261021T120813Z/raw/access-correction-20261021/01/pilots.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/ayala_station_nodes.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/covered_reach.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/footbridge_structures.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/footbridge_summary.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/makati_underpass_structures.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/ncr_nodes.jsonl",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/ncr_ways.jsonl",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/opening_hours_counts.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/03/summary_v3_all_pilots.csv",
+    "research/20261021T120813Z/raw/access-correction-20261021/05/graph_counts.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/05/graph_makati_cbd.npz",
+    "research/20261021T120813Z/raw/access-correction-20261021/05/graph_makati_cbd_rules.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/05/graph_ncr.npz",
+    "research/20261021T120813Z/raw/access-correction-20261021/05/graph_ncr_rules.json",
+    "research/20261021T120813Z/raw/access-correction-20261021/05/graph_sampaloc.npz",
+    "research/20261021T120813Z/raw/access-correction-20261021/05/graph_sampaloc_rules.json"
+  ],
+  "input": {
+    "path": "research/20261021T120813Z/raw/shared/ncr.osm.pbf",
+    "bytes": 73255751,
+    "sha256": "48d222f5dd9f75eee9b605ec09a1b0ffc0667a3ea4c566386703ed09e9a44e27"
+  },
+  "recorded_at_utc": "2026-10-21T14:17:14.807755+00:00",
+  "report_sha256": {
+    "research/20261021T120813Z/01-osm-pedestrian-network.md": "7533b2ea35a3ec34d2066b9e34ba03eafcbe07b9d33145448e14dffb77e1d6d2",
+    "research/20261021T120813Z/02-building-heights.md": "fd1e1648c08468cd03850a70ffb8d2d495f3242ca9d32e64ae856affbbe403ed",
+    "research/20261021T120813Z/03-sheltered-infrastructure.md": "60066f4fab017a2cf49c38a768fa2fdaf5aaeda886a8da16099052128b748150",
+    "research/20261021T120813Z/04-shadow-methods.md": "7420b6e1a734616cc1ae7693c2e661f923d2751f0c8f5f86600f923e6ab2794c",
+    "research/20261021T120813Z/05-routing-architecture.md": "77b4d337680ac6c72414b775e455b7cfcf3a7ec0774e17f3fe379fbd367d26d4",
+    "research/20261021T120813Z/08-licensing-privacy.md": "eba540915cc33f7404a512b26114b335155eaf66706e9c4b6c837f9ecdfeeaa7",
+    "research/20261021T120813Z/09-ground-truth-collection.md": "339e3648046c87a7359ed8d386096c635d6fd52094eb92a4216dd2d6b8c16191"
+  },
+  "design_context": {
+    "path": "docs/design.md",
+    "sha256_at_handoff": "158f0380261e67582193220df4a2a45db03b7e926f13c748995590e10c03c932",
+    "owner": "The project updates the design. Use current correction JSON for graph metrics."
+  }
+}
