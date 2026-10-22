@@ -16,6 +16,25 @@
     {"id": "binondo", "name": "Binondo and Quiapo", "cities": ["Manila"], "bbox": [120.968, 14.594, 120.988, 14.606], "wave": 2},
     {"id": "manila-ermita", "name": "Intramuros, Ermita, and Malate", "cities": ["Manila"], "bbox": [120.968, 14.560, 120.998, 14.596], "wave": 2},
     {"id": "pasay-moa", "name": "Bay Area and Mall of Asia", "cities": ["Pasay"], "bbox": [120.976, 14.525, 121.003, 14.545], "wave": 2},
-    {"id": "alabang", "name": "Alabang and Filinvest City", "cities": ["Muntinlupa"], "bbox": [121.022, 14.408, 121.050, 14.432], "wave": 2}
+    {"id": "alabang", "name": "Alabang and Filinvest City", "cities": ["Muntinlupa"], "bbox": [121.022, 14.408, 121.050, 14.432], "wave": 2},
+    {"id": "caloocan-monumento", "name": "Monumento and Grace Park", "cities": ["Caloocan"], "bbox": [120.972, 14.64, 120.994, 14.662], "wave": 3},
+    {"id": "malabon-navotas-center", "name": "Malabon and Navotas town centres", "cities": ["Malabon", "Navotas"], "bbox": [120.94, 14.65, 120.966, 14.668], "wave": 3},
+    {"id": "navotas-fishport", "name": "Navotas Fish Port", "cities": ["Navotas"], "bbox": [120.94, 14.637, 120.962, 14.652], "wave": 3},
+    {"id": "valenzuela-center", "name": "Valenzuela MacArthur Highway centre", "cities": ["Valenzuela"], "bbox": [120.968, 14.676, 120.986, 14.696], "wave": 3},
+    {"id": "valenzuela-malinta", "name": "Malinta", "cities": ["Valenzuela"], "bbox": [120.952, 14.68, 120.968, 14.697], "wave": 3},
+    {"id": "marikina-center", "name": "Marikina City Centre", "cities": ["Marikina"], "bbox": [121.088, 14.622, 121.11, 14.645], "wave": 3},
+    {"id": "marikina-riverbanks", "name": "Riverbanks and SM Marikina", "cities": ["Marikina"], "bbox": [121.074, 14.624, 121.094, 14.64], "wave": 3},
+    {"id": "paranaque-aseana-pitx", "name": "Aseana and PITX", "cities": ["Paranaque"], "bbox": [120.98, 14.503, 121.002, 14.526], "wave": 3},
+    {"id": "paranaque-naia", "name": "NAIA Terminals", "cities": ["Paranaque", "Pasay"], "bbox": [121.0, 14.502, 121.022, 14.524], "wave": 3},
+    {"id": "paranaque-bf-aguirre", "name": "BF Homes and Aguirre Avenue", "cities": ["Paranaque"], "bbox": [121.018, 14.438, 121.042, 14.462], "wave": 3},
+    {"id": "las-pinas-center", "name": "Las Pinas and Alabang-Zapote Road", "cities": ["Las Pinas"], "bbox": [120.972, 14.438, 121.002, 14.458], "wave": 3},
+    {"id": "pateros-center", "name": "Pateros Town Centre", "cities": ["Pateros"], "bbox": [121.056, 14.538, 121.078, 14.554], "wave": 3},
+    {"id": "qc-commonwealth", "name": "Commonwealth Market", "cities": ["Quezon City"], "bbox": [121.076, 14.672, 121.096, 14.7], "wave": 3},
+    {"id": "qc-fairview", "name": "Fairview Centre", "cities": ["Quezon City"], "bbox": [121.058, 14.696, 121.082, 14.72], "wave": 3},
+    {"id": "qc-sm-fairview", "name": "SM Fairview and Fairview Terraces", "cities": ["Quezon City"], "bbox": [121.048, 14.722, 121.068, 14.742], "wave": 3},
+    {"id": "qc-banawe", "name": "Banawe and Quezon Avenue", "cities": ["Quezon City"], "bbox": [121.004, 14.614, 121.026, 14.638], "wave": 3},
+    {"id": "taguig-mckinley-hill", "name": "McKinley Hill", "cities": ["Taguig"], "bbox": [121.042, 14.518, 121.064, 14.534], "wave": 3},
+    {"id": "taguig-center", "name": "Taguig Centre", "cities": ["Taguig"], "bbox": [121.062, 14.514, 121.082, 14.534], "wave": 3},
+    {"id": "arca-south", "name": "Arca South", "cities": ["Taguig"], "bbox": [121.034, 14.496, 121.056, 14.514], "wave": 3}
   ]
 }

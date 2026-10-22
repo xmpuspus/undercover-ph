@@ -88,5 +88,121 @@
    "Alabang PNR",
    "Alabang Town Center"
   ]
+ ],
+ "north-coast": [
+  [
+   "Yamaha Monumento LRT Station",
+   "Malabon Town Center"
+  ],
+  [
+   "Navotas City Hall",
+   "Navotas Fishport Complex"
+  ],
+  [
+   "Valenzuela City Medical Center",
+   "Valenzuela Town Center"
+  ],
+  [
+   "Caloocan PNR Station",
+   "Yamaha Monumento LRT Station"
+  ]
+ ],
+ "marikina": [
+  [
+   "Santolan LRT Station",
+   "Riverbanks Center"
+  ],
+  [
+   "Riverbanks Center",
+   "Marikina City Hall"
+  ],
+  [
+   "Marikina-Pasig LRT Station",
+   "Marikina City Hall"
+  ]
+ ],
+ "paranaque-airport": [
+  [
+   "PITX LRT Station",
+   "Ayala Malls Manila Bay"
+  ],
+  [
+   "MIA Road LRT Station",
+   "Aseana Powerstation"
+  ],
+  [
+   "Nichols PNR Station",
+   "Newport Mall"
+  ]
+ ],
+ "las-pinas": [
+  [
+   "Robinsons Place Las Pi\u00f1as",
+   "SM Center Las Pi\u00f1as"
+  ],
+  [
+   "Robinsons Place Las Pi\u00f1as",
+   "Las Pi\u00f1as City Hall"
+  ],
+  [
+   "Vista Mall Las Pi\u00f1as",
+   "Las Pi\u00f1as Doctors Hospital"
+  ]
+ ],
+ "paranaque-bf-aguirre": [
+  [
+   "SM City BF Para\u00f1aque",
+   "Aguirre Central Park"
+  ],
+  [
+   "SM City BF Para\u00f1aque",
+   "Vista Mall Lakefront"
+  ],
+  [
+   "Aguirre Central Park",
+   "W.Mall"
+  ]
+ ],
+ "taguig-pateros": [
+  [
+   "Venice Grand Canal Mall",
+   "New Taguig City Hall"
+  ],
+  [
+   "Ayala Malls Arca South",
+   "Taguig-Pateros District Hospital"
+  ],
+  [
+   "Pateros Municipal Hall",
+   "Taguig City Hall"
+  ]
+ ],
+ "qc-commonwealth-fairview": [
+  [
+   "Batasan MRT Station",
+   "Ever Gotesco Commonwealth"
+  ],
+  [
+   "Regalado Avenue MRT Station",
+   "Fairview Center Mall"
+  ],
+  [
+   "Regalado Avenue MRT Station",
+   "SM City Fairview"
+  ]
+ ],
+ "qc-banawe": [
+  [
+   "Fe Del Mundo Medical Center",
+   "St. Luke's Medical Center"
+  ],
+  [
+   "Z Square",
+   "Fisher Mall Quezon Avenue"
+  ],
+  [
+   "Fisher Mall Quezon Avenue",
+   "Capitol Medical Center"
+  ]
  ]
 }

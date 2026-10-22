@@ -11,7 +11,8 @@ with an hours_idx, as at a time when the malls are shut. Otherwise hours are ign
 The search follows the browser router's side-switch rule (app/src/lib/router/astar.ts, sideSwitch).
 A move between opposite side edges of one road is free at a node with flag 1 or 2 (crossing or signals).
 At a node with flag 4 (junction) it costs 60 m x (1 + K). Anywhere else it is forbidden.
-So each search state is a directed edge, as in the browser, not a node.
+So each search state is a directed edge, as in the browser, not a node. As in the browser, a walk never
+turns back along the edge it just walked, because that U-turn would dodge the side-switch rule.
 """
 import heapq
 import json
@@ -128,7 +129,8 @@ def search(graph, src, dst, k, closed):
             goal = d
             break
         for e2 in adj.get(x, []):
-            relax(d, x, e2, g)
+            if e2 != e:  # as in the browser: no turning back along the edge just walked
+                relax(d, x, e2, g)
     if goal is None:
         return None, 0
     states, d = [], goal

@@ -261,6 +261,336 @@
      14.4365
     ]
    ]
+  },
+  {
+   "id": "north-coast",
+   "name": "Caloocan, Malabon, Navotas and Valenzuela",
+   "districts": [
+    "caloocan-monumento",
+    "malabon-navotas-center",
+    "navotas-fishport",
+    "valenzuela-center",
+    "valenzuela-malinta"
+   ],
+   "cities": [
+    "Caloocan",
+    "Malabon",
+    "Navotas",
+    "Valenzuela"
+   ],
+   "wave": 3,
+   "bbox": [
+    120.94,
+    14.637,
+    120.994,
+    14.697
+   ],
+   "graph_bbox": [
+    120.9354,
+    14.6325,
+    120.9986,
+    14.7015
+   ],
+   "graph_rects": [
+    [
+     120.9674,
+     14.6355,
+     120.9986,
+     14.6665
+    ],
+    [
+     120.9354,
+     14.6455,
+     120.9706,
+     14.6725
+    ],
+    [
+     120.9354,
+     14.6325,
+     120.9666,
+     14.6565
+    ],
+    [
+     120.9634,
+     14.6715,
+     120.9906,
+     14.7005
+    ],
+    [
+     120.9474,
+     14.6755,
+     120.9726,
+     14.7015
+    ]
+   ]
+  },
+  {
+   "id": "marikina",
+   "name": "Marikina Centre and Riverbanks",
+   "districts": [
+    "marikina-center",
+    "marikina-riverbanks"
+   ],
+   "cities": [
+    "Marikina"
+   ],
+   "wave": 3,
+   "bbox": [
+    121.074,
+    14.622,
+    121.11,
+    14.645
+   ],
+   "graph_bbox": [
+    121.0694,
+    14.6175,
+    121.1146,
+    14.6495
+   ],
+   "graph_rects": [
+    [
+     121.0834,
+     14.6175,
+     121.1146,
+     14.6495
+    ],
+    [
+     121.0694,
+     14.6195,
+     121.0986,
+     14.6445
+    ]
+   ]
+  },
+  {
+   "id": "paranaque-airport",
+   "name": "Aseana, PITX and NAIA",
+   "districts": [
+    "paranaque-aseana-pitx",
+    "paranaque-naia"
+   ],
+   "cities": [
+    "Paranaque",
+    "Pasay"
+   ],
+   "wave": 3,
+   "bbox": [
+    120.98,
+    14.502,
+    121.022,
+    14.526
+   ],
+   "graph_bbox": [
+    120.9754,
+    14.4975,
+    121.0266,
+    14.5305
+   ],
+   "graph_rects": [
+    [
+     120.9754,
+     14.4985,
+     121.0066,
+     14.5305
+    ],
+    [
+     120.9954,
+     14.4975,
+     121.0266,
+     14.5285
+    ]
+   ]
+  },
+  {
+   "id": "las-pinas",
+   "name": "Las Pinas and Alabang-Zapote Road",
+   "districts": [
+    "las-pinas-center"
+   ],
+   "cities": [
+    "Las Pinas"
+   ],
+   "wave": 3,
+   "bbox": [
+    120.972,
+    14.438,
+    121.002,
+    14.458
+   ],
+   "graph_bbox": [
+    120.9674,
+    14.4335,
+    121.0066,
+    14.4625
+   ],
+   "graph_rects": [
+    [
+     120.9674,
+     14.4335,
+     121.0066,
+     14.4625
+    ]
+   ]
+  },
+  {
+   "id": "paranaque-bf-aguirre",
+   "name": "BF Homes and Aguirre Avenue",
+   "districts": [
+    "paranaque-bf-aguirre"
+   ],
+   "cities": [
+    "Paranaque"
+   ],
+   "wave": 3,
+   "bbox": [
+    121.018,
+    14.438,
+    121.042,
+    14.462
+   ],
+   "graph_bbox": [
+    121.0134,
+    14.4335,
+    121.0466,
+    14.4665
+   ],
+   "graph_rects": [
+    [
+     121.0134,
+     14.4335,
+     121.0466,
+     14.4665
+    ]
+   ]
+  },
+  {
+   "id": "taguig-pateros",
+   "name": "McKinley Hill, Taguig Centre, Arca South and Pateros",
+   "districts": [
+    "taguig-mckinley-hill",
+    "taguig-center",
+    "arca-south",
+    "pateros-center"
+   ],
+   "cities": [
+    "Pateros",
+    "Taguig"
+   ],
+   "wave": 3,
+   "bbox": [
+    121.034,
+    14.496,
+    121.082,
+    14.554
+   ],
+   "graph_bbox": [
+    121.0294,
+    14.4915,
+    121.0866,
+    14.5585
+   ],
+   "graph_rects": [
+    [
+     121.0374,
+     14.5135,
+     121.0686,
+     14.5385
+    ],
+    [
+     121.0574,
+     14.5095,
+     121.0866,
+     14.5385
+    ],
+    [
+     121.0294,
+     14.4915,
+     121.0606,
+     14.5185
+    ],
+    [
+     121.0514,
+     14.5335,
+     121.0826,
+     14.5585
+    ]
+   ]
+  },
+  {
+   "id": "qc-commonwealth-fairview",
+   "name": "Commonwealth, Fairview and SM Fairview",
+   "districts": [
+    "qc-commonwealth",
+    "qc-fairview",
+    "qc-sm-fairview"
+   ],
+   "cities": [
+    "Quezon City"
+   ],
+   "wave": 3,
+   "bbox": [
+    121.048,
+    14.672,
+    121.096,
+    14.742
+   ],
+   "graph_bbox": [
+    121.0434,
+    14.6675,
+    121.1006,
+    14.7465
+   ],
+   "graph_rects": [
+    [
+     121.0714,
+     14.6675,
+     121.1006,
+     14.7045
+    ],
+    [
+     121.0534,
+     14.6915,
+     121.0866,
+     14.7245
+    ],
+    [
+     121.0434,
+     14.7175,
+     121.0726,
+     14.7465
+    ]
+   ]
+  },
+  {
+   "id": "qc-banawe",
+   "name": "Banawe and Quezon Avenue",
+   "districts": [
+    "qc-banawe"
+   ],
+   "cities": [
+    "Quezon City"
+   ],
+   "wave": 3,
+   "bbox": [
+    121.004,
+    14.614,
+    121.026,
+    14.638
+   ],
+   "graph_bbox": [
+    120.9994,
+    14.6095,
+    121.0306,
+    14.6425
+   ],
+   "graph_rects": [
+    [
+     120.9994,
+     14.6095,
+     121.0306,
+     14.6425
+    ]
+   ]
   }
  ]
 }
