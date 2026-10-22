@@ -3,7 +3,7 @@ import { AREA_LABELS, CBD_CENTER, DEFAULT_AREA, NIGHT_ALT_DEG, SUGGESTED } from 
 import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, ShadowOverlay, Weather } from "./types";
 import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, placeKeys, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
 import { BUILDINGS_URL, areaBase, areaPath, exists, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
-import { areaAt, areaCities, areaLabel, areaList, placeWhere } from "./lib/areas";
+import { areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea } from "./lib/areas";
 import { clockPinned, dateLabel, dateShort, fmtDist, fmtMinute, manilaNow, type Clock } from "./lib/time";
 import { toDisplay } from "./lib/display";
 import type { Focus, Insets } from "./components/MapView";
@@ -136,6 +136,9 @@ export default function App() {
   const areaId = to?.area ?? from?.area ?? lastArea;
   const data = areaId ? (bundles[areaId] ?? null) : null;
   const crossArea = !!from && !!to && from.area !== to.area;
+  // Ends in two areas still route when one area's graph holds both. Only a trip no graph holds gets the message.
+  const shared = crossArea && from && to && areas ? sharedArea(areas, from, to) : null;
+  const blocked = crossArea && !shared;
   const areaRef = useRef(areaId);
   areaRef.current = areaId;
   const bundlesRef = useRef(bundles);
@@ -608,6 +611,31 @@ export default function App() {
     setTo(fix);
   }, [bundles]);
 
+  // Move the end that sits in another area onto the shared area's graph: the same place by name within 150 m,
+  // else the nearest path node there.
+  useEffect(() => {
+    if (!shared || !from || !to) return;
+    const d = bundles[shared];
+    if (!d) return ensureArea(shared);
+    const near = (p: { lon: number; lat: number }, q: { lon: number; lat: number }) =>
+      Math.hypot((p.lon - q.lon) * 107_550, (p.lat - q.lat) * 110_574) < 150;
+    const rehome = (ep: Endpoint): Endpoint | null => {
+      if (ep.area === shared) return ep;
+      const twin = ep.snap_m === null ? d.places.find((p) => p.name === ep.label && near(p, ep)) : undefined;
+      if (twin) return placeEndpoint(twin, shared);
+      const s = snapToNode(d, ep.lon, ep.lat);
+      if (!s || s.dist_m > MAX_SNAP_M) return null;
+      const [lon, lat] = nodeLL(d, s.node, [ep.lon, ep.lat]);
+      return { ...ep, area: shared, node: s.node, lon, lat, snap_m: s.dist_m };
+    };
+    const f = rehome(from);
+    const t2 = rehome(to);
+    if (f && t2) {
+      setFrom(f);
+      setTo(t2);
+    }
+  }, [shared, bundles, from, to]);
+
   // A point farther than the router's snap limit is off the mapped paths; say so instead of dropping a pin.
   const pointEndpoint = (d: Data, area: string, lon: number, lat: number, label: string): Endpoint | string => {
     const s = snapToNode(d, lon, lat);
@@ -879,7 +907,7 @@ export default function App() {
 
   // Read out new route results to screen readers, once each search lands.
   // A start and end in different areas: no route, and the card names both areas.
-  const crossText = crossArea && from && to ? `${from.label} is in ${areaLabel(from.area, areas)}. ${to.label} is in ${areaLabel(to.area, areas)}.` : "";
+  const crossText = blocked && from && to ? `${from.label} is in ${areaLabel(from.area, areas)}. ${to.label} is in ${areaLabel(to.area, areas)}.` : "";
   const announce = useMemo(() => {
     if (stage !== "plan" || editing || !from || !to) return "";
     if (crossText) return `Routes stay inside one area. ${crossText}`;
@@ -1202,7 +1230,8 @@ export default function App() {
                   )}
                   {(desktop || !current || (sheetFull && view === "results")) && !crossArea && toggles}
                   <div className="flex min-h-0 flex-col overflow-y-auto rounded-card">
-                    {crossArea && (
+                    {crossArea && !blocked && <Pending text={`Loading the walking map for ${areaLabel(shared!, areas)}...`} />}
+                    {blocked && (
                       <div className="rounded-card bg-white p-4 text-[14px] text-ink shadow-card" role="status" data-testid="cross-area">
                         <p className="text-[16px] font-medium">Routes stay inside one area.</p>
                         <p className="mt-1 text-slate-700">{crossText} Pick a start in the same area as your end.</p>

@@ -31,7 +31,7 @@ const want = (name) => !only || only.includes(name);
 const HOLD_S = 1.5;
 const FROM = "Ayala MRT Station";
 const TO = "Greenbelt";
-const dates = JSON.parse(readFileSync(path.join(root, "public/data/manifest.json"), "utf8")).dates;
+const dates = JSON.parse(readFileSync(path.join(root, "public/data/areas/metro-core/manifest.json"), "utf8")).dates;
 const NOW = `${dates[0]}T09:00`;
 
 // Try each setting until the GIF fits its budget. The sun-direction clip relights the whole map at every

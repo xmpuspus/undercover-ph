@@ -38,7 +38,7 @@ if (!base) {
   base = server.resolvedUrls.local[0].replace(/\/$/, "");
 }
 // Default "now" is 09:00 on the first manifest date, so "Tomorrow" exists whatever the wall clock says.
-const dates = JSON.parse(await readFile(path.join(root, "public/data/manifest.json"), "utf8")).dates;
+const dates = JSON.parse(await readFile(path.join(root, "public/data/areas/metro-core/manifest.json"), "utf8")).dates;
 const query = `?now=${arg("now") ?? `${dates[0]}T09:00`}`;
 
 // Landing map stills with no UI on top: day and night, desktop (1280 wide) and phone (640 wide at 390 CSS px).

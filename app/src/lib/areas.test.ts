@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { AreaInfo } from "../types";
-import { areaAt, areaCities, areaLabel, areaList, placeWhere } from "./areas";
+import { areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea } from "./areas";
 
 // Two areas whose graph boxes overlap, as Greenhills (metro-core) and Cubao do.
 const core: AreaInfo = {
@@ -69,5 +69,22 @@ describe("area words", () => {
   it("gives the advisory the cities of the area, or of every area before one is picked", () => {
     expect(areaCities("cubao-eastwood", AREAS)).toEqual(["Quezon City"]);
     expect(areaCities(null, AREAS)).toEqual(["Makati", "Taguig", "Quezon City"]);
+  });
+});
+
+describe("sharedArea", () => {
+  const box = (id: string, rects: [number, number, number, number][]) =>
+    ({ id, name: id, cities: [], bbox: rects[0], graph_bbox: rects[0], graph_rects: rects, neighbourhoods: [], center: [0, 0] }) as unknown as AreaInfo;
+  const core = box("metro-core", [[121.0354, 14.5285, 121.0666, 14.5675]]);
+  const taguig = box("taguig-pateros", [[121.034, 14.496, 121.082, 14.554]]);
+  const moa = box("pasay-moa", [[120.9714, 14.5205, 121.0076, 14.5495]]);
+  it("routes a seam trip in the area whose graph holds both ends, the end's area first", () => {
+    const bgc = { area: "metro-core", lon: 121.052, lat: 14.551 };
+    const mckinley = { area: "taguig-pateros", lon: 121.051, lat: 14.534 };
+    expect(sharedArea([core, taguig, moa], bgc, mckinley)).toBe("taguig-pateros");
+    expect(sharedArea([core, taguig, moa], mckinley, bgc)).toBe("metro-core");
+  });
+  it("gives null when no graph holds both ends", () => {
+    expect(sharedArea([core, taguig, moa], { area: "pasay-moa", lon: 120.982, lat: 14.535 }, { area: "metro-core", lon: 121.052, lat: 14.551 })).toBeNull();
   });
 });

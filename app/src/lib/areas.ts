@@ -4,6 +4,22 @@ import type { AreaInfo, Place } from "../types";
 type Box = [number, number, number, number];
 const inBox = ([w, s, e, n]: Box, lon: number, lat: number) => lon >= w && lon <= e && lat >= s && lat <= n;
 
+/** True when one of the area's graph boxes holds the point. */
+export const holdsPoint = (a: AreaInfo, lon: number, lat: number) => a.graph_rects.some((r) => inBox(r, lon, lat));
+
+/**
+ * The area whose graph holds both ends of a trip, or null. Areas overlap at their edges (BGC and McKinley Hill,
+ * MOA and Aseana), so a trip across that seam still has one graph that routes it. The end's area goes first.
+ */
+export function sharedArea(areas: AreaInfo[], a: { area: string; lon: number; lat: number }, b: { area: string; lon: number; lat: number }): string | null {
+  const order = [b.area, a.area, ...areas.map((x) => x.id)];
+  for (const id of order) {
+    const x = areas.find((y) => y.id === id);
+    if (x && holdsPoint(x, a.lon, a.lat) && holdsPoint(x, b.lon, b.lat)) return x.id;
+  }
+  return null;
+}
+
 /** The short name the landing card uses, or the name from areas.json for an area the card does not list. */
 export function areaLabel(id: string, areas: AreaInfo[] | null): string {
   return AREA_LABELS.find((a) => a.id === id)?.label ?? areas?.find((a) => a.id === id)?.name ?? id;
