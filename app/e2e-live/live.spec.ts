@@ -4,7 +4,7 @@ import { expect, test, type Page } from "@playwright/test";
 const OUT = process.env.LIVE_OUT ?? "test-results/live";
 mkdirSync(OUT, { recursive: true });
 
-// One trip per area from the suggested places, plus a trip across the MOA and airport seam.
+// One trip per area, plus a trip across the MOA and airport seam.
 const TRIPS: [string, string, string][] = [
   ["metro-core", "Ayala MRT Station", "Greenbelt"],
   ["pasay-moa", "SM Mall of Asia", "SMX Convention Center"],
@@ -15,6 +15,7 @@ const TRIPS: [string, string, string][] = [
   ["north-coast", "Yamaha Monumento LRT Station", "Malabon City Hall"],
   ["marikina", "Riverbanks Center", "Marikina City Hall"],
   ["paranaque-airport", "Parañaque Integrated Terminal Exchange", "Ayala Malls Manila Bay"],
+  ["las-pinas", "Robinsons Place Las Piñas", "Las Piñas City Hall"],
   ["paranaque-bf-aguirre", "SM City BF Parañaque", "Aguirre Central Park"],
   ["taguig-pateros", "Ayala Malls Arca South", "New Taguig City Hall"],
   ["qc-commonwealth-fairview", "SM City Fairview", "Fairview Center Mall"],
