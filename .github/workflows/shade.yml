@@ -1,0 +1,174 @@
+# Builds the week of shade for every routing area once a day and publishes it as a release asset, then
+# pushes an empty commit so Vercel deploys with it. Vercel stops a build at 45 minutes, and shade for every
+# area no longer fits in that. pipeline/vercel_build.sh downloads the asset and only fetches weather and
+# the PAGASA advisory. No secrets: the release and the commit use GITHUB_TOKEN.
+#
+# Each area runs as its own job. The asset shade-YYYY-MM-DD.tar.gz holds, per area, manifest.json,
+# shade/<date>.bin for 7 dates, shade/lowconf.bin, READY.shade and graph.sha256, under <area id>/.
+# The deploy build shades an area itself when its graph.json no longer matches graph.sha256, or when the
+# asset lacks it. So one failed area does not hold back the rest: the release goes out with the areas that
+# finished, the failure opens an issue, and the deploy shades the missing area.
+
+name: shade
+
+on:
+  schedule:
+    - cron: "30 20 * * *" # 04:30 Asia/Manila
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Push the empty commit that deploys the new shade"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shade
+  cancel-in-progress: false
+
+jobs:
+  areas:
+    name: list the areas
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ids: ${{ steps.list.outputs.ids }}
+      date: ${{ steps.list.outputs.date }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout: app/public/data/areas.json
+          sparse-checkout-cone-mode: false
+      - id: list
+        run: |
+          echo "ids=$(python3 -c 'import json; print(json.dumps([a["id"] for a in json.load(open("app/public/data/areas.json"))["areas"]]))')" >> "$GITHUB_OUTPUT"
+          echo "date=$(TZ=Asia/Manila date +%F)" >> "$GITHUB_OUTPUT"
+
+  shade:
+    name: shade ${{ matrix.area }}
+    needs: areas
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        area: ${{ fromJSON(needs.areas.outputs.ids) }}
+    env:
+      UCPH_AREA: ${{ matrix.area }}
+      UCPH_DATA: ${{ github.workspace }}/app/public/data/areas/${{ matrix.area }}
+      UCPH_INPUTS: ${{ github.workspace }}/pipeline/inputs/areas/${{ matrix.area }}
+      UCPH_START_DATE: ${{ needs.areas.outputs.date }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout: |
+            pipeline
+            app/public/data/areas/${{ matrix.area }}
+          sparse-checkout-cone-mode: true
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pipeline/shade/requirements.txt
+      - name: Install the shade engine
+        run: python -m pip install --disable-pip-version-check -q -r pipeline/shade/requirements.txt
+      - name: Shade 7 dates from today
+        run: |
+          python -I pipeline/set_dates.py "$UCPH_START_DATE"
+          python pipeline/shade/shade.py
+          test -f "$UCPH_DATA/READY.shade"
+      - name: Pack the area with the hash of the graph it was cast on
+        run: |
+          sha256sum "$UCPH_DATA/graph.json" | cut -d' ' -f1 > "$UCPH_DATA/graph.sha256"
+          tar -czf "shade-$UCPH_AREA.tar.gz" -C app/public/data/areas "$UCPH_AREA/manifest.json" "$UCPH_AREA/shade" "$UCPH_AREA/READY.shade" "$UCPH_AREA/graph.sha256"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: shade-${{ matrix.area }}
+          path: shade-${{ matrix.area }}.tar.gz
+          retention-days: 2
+          if-no-files-found: error
+
+  release:
+    name: publish the release
+    needs: [areas, shade]
+    if: ${{ !cancelled() && needs.areas.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DATE: ${{ needs.areas.outputs.date }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: shade-*
+          merge-multiple: true
+      - name: Join the areas into one asset
+        env:
+          IDS: ${{ needs.areas.outputs.ids }}
+        run: |
+          mkdir out
+          shopt -s nullglob
+          parts=(shade-*.tar.gz)
+          if [ ${#parts[@]} -eq 0 ]; then echo "no area finished" >&2; exit 1; fi
+          for f in "${parts[@]}"; do tar -xzf "$f" -C out; done
+          missing="$(python3 -c 'import json, os, sys; print(" ".join(a for a in json.loads(sys.argv[1]) if not os.path.isdir("out/" + a)))' "$IDS")"
+          echo "MISSING=$missing" >> "$GITHUB_ENV"
+          echo "areas: $(find out -mindepth 1 -maxdepth 1 -type d | wc -l), missing: ${missing:-none}"
+          tar -czf "shade-$DATE.tar.gz" -C out .
+          ls -l "shade-$DATE.tar.gz"
+      - name: Replace today's release and keep the 3 newest
+        run: |
+          tag="shade-$DATE"
+          gh release delete "$tag" -R "$GITHUB_REPOSITORY" --cleanup-tag --yes 2>/dev/null || true
+          gh release create "$tag" "shade-$DATE.tar.gz" -R "$GITHUB_REPOSITORY" --target main \
+            --title "Shade data $DATE" --notes "Seven dates of shade from $DATE for every routing area${MISSING:+ except $MISSING}. Built by the shade workflow, read by the deploy build."
+          gh release list -R "$GITHUB_REPOSITORY" --limit 100 --json tagName --jq '.[].tagName' \
+            | grep '^shade-' | sort -r | tail -n +4 \
+            | while read -r old; do gh release delete "$old" -R "$GITHUB_REPOSITORY" --cleanup-tag --yes; done
+
+  deploy:
+    name: empty commit to main
+    needs: release
+    if: ${{ !cancelled() && needs.release.result == 'success' && (github.event_name == 'schedule' || inputs.deploy) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Push an empty commit so Vercel deploys the new shade
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "Daily data rebuild $(TZ=Asia/Manila date +%F)"
+          git push origin HEAD:main
+
+  report-failure:
+    name: open an issue
+    needs: [areas, shade, release, deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue with the run link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create -R "$GITHUB_REPOSITORY" \
+            --title "Shade build failed $(TZ=Asia/Manila date +%F)" \
+            --body "The shade workflow failed: $RUN_URL. The deploy build uses the newest shade release until a new one exists."

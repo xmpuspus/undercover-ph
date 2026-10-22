@@ -1,4 +1,5 @@
-# Vercel generates the dated data (7 shade dates, overlays, weather, PAGASA advisory)
+# Backup to shade.yml, which deploys after it builds the shade at 04:30. Vercel builds the dated data
+# (shade from the newest release, weather, PAGASA advisory) for every area
 # in every build (pipeline/vercel_build.sh), so the site goes stale unless main gets
 # a commit each day. This job pushes an empty commit unless main already has a commit
 # from today (Manila date). Vercel's Git integration then rebuilds and deploys.

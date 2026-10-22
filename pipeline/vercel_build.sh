@@ -19,7 +19,9 @@
 # inputs in pipeline/inputs/areas/<id>/. shade.py runs in area mode: shade/<date>.bin, shade/lowconf.bin
 # and trees.json, no overlays. Buildings and trees for the map ship as committed PMTiles.
 # Environment, all optional: UCPH_PYTHON (interpreter for the venv), UCPH_START_DATE (first shade date,
-# default today in Asia/Manila), UCPH_SKIP_TESTS=1 (skip pnpm test, for timing runs; default off).
+# default today in Asia/Manila), UCPH_SKIP_TESTS=1 (skip pnpm test, for timing runs; default off),
+# UCPH_SHADE_SOURCE (release or compute, see below), UCPH_SHADE_REPO (owner/name of the release repo),
+# UCPH_SHADE_BASE (another download base, for tests).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP="$ROOT/app"
@@ -42,36 +44,75 @@ if [ -z "$PYTHON" ]; then
   echo "vercel_build: no Python 3.12 or newer found" >&2
   exit 1
 fi
-# The venv is reused while the interpreter version and the pins stay the same.
-KEY="$("$PYTHON" -I -c 'import hashlib, sys; print("%d.%d-" % sys.version_info[:2] + hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest()[:12])' pipeline/shade/requirements.txt)"
-VENV="$APP/node_modules/.cache/ucph-venv-$KEY"
-if [ ! -f "$VENV/.ucph-ready" ] || ! "$VENV/bin/python" -V >/dev/null 2>&1; then
-  echo "creating $VENV with $("$PYTHON" --version)"
-  rm -rf "$APP"/node_modules/.cache/ucph-venv-*
-  mkdir -p "$APP/node_modules/.cache"
-  "$PYTHON" -m venv "$VENV"
-  "$VENV/bin/python" -m pip install --disable-pip-version-check --no-input -q -r pipeline/shade/requirements.txt
-  "$VENV/bin/python" -c "import numba, pvlib, rasterio, PIL" && touch "$VENV/.ucph-ready"
-else
-  echo "reusing $VENV"
-fi
-export SHADE_PY="$VENV/bin/python" PY="$VENV/bin/python"
-echo "python ready in $((SECONDS - t_all)) s"
+# The shade engine's venv, made only when an area needs shade computed here. It is reused while the
+# interpreter version and the pins stay the same.
+venv() {
+  local key
+  key="$("$PYTHON" -I -c 'import hashlib, sys; print("%d.%d-" % sys.version_info[:2] + hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest()[:12])' pipeline/shade/requirements.txt)"
+  VENV="$APP/node_modules/.cache/ucph-venv-$key"
+  if [ ! -f "$VENV/.ucph-ready" ] || ! "$VENV/bin/python" -V >/dev/null 2>&1; then
+    echo "creating $VENV with $("$PYTHON" --version)"
+    rm -rf "$APP"/node_modules/.cache/ucph-venv-*
+    mkdir -p "$APP/node_modules/.cache"
+    "$PYTHON" -m venv "$VENV"
+    "$VENV/bin/python" -m pip install --disable-pip-version-check --no-input -q -r pipeline/shade/requirements.txt
+    "$VENV/bin/python" -c "import numba, pvlib, rasterio, PIL" && touch "$VENV/.ucph-ready"
+  else
+    echo "reusing $VENV"
+  fi
+  export SHADE_PY="$VENV/bin/python"
+}
 
 START="${UCPH_START_DATE:-$(TZ=Asia/Manila date +%F)}"
 if [ ! -f "$DATA/areas.json" ]; then
   echo "vercel_build: $DATA/areas.json is missing" >&2
   exit 1
 fi
+# Weather and the advisory need only the standard library.
+export PY="$PYTHON"
 IDS="$("$PY" -I -c 'import json, sys; print(" ".join(a["id"] for a in json.load(open(sys.argv[1]))["areas"]))' "$DATA/areas.json")"
+
+# Where the shade comes from. On Vercel, from the newest shade release that .github/workflows/shade.yml
+# publishes each morning: today's, or one or two days back if this morning's run has not finished. An area
+# whose graph.json changed since that release, or that the release lacks, is shaded here, and with no
+# release at all every area is. Elsewhere the default is to shade every area here. UCPH_SHADE_SOURCE=release or compute overrides the default.
+SOURCE="${UCPH_SHADE_SOURCE:-$([ -n "${VERCEL:-}" ] && echo release || echo compute)}"
+COMPUTE="$IDS"
+if [ "$SOURCE" = "release" ]; then
+  REPO="${UCPH_SHADE_REPO:-xmpuspus/undercover-ph}"
+  got=""
+  for back in 0 1 2; do
+    day="$("$PY" -I -c 'import datetime, sys; print(datetime.date.fromisoformat(sys.argv[1]) - datetime.timedelta(days=int(sys.argv[2])))' "$START" "$back")"
+    url="${UCPH_SHADE_BASE:-https://github.com/$REPO/releases/download}/shade-$day/shade-$day.tar.gz"
+    if curl -fsSL --retry 3 -o "$ROOT/shade-release.tar.gz" "$url"; then got="$day"; break; fi
+  done
+  if [ -z "$got" ]; then
+    # The deploy still works without a release: every area is shaded here, as before the workflow existed.
+    # With many areas that can pass Vercel's 45-minute limit, and live-check.yml reports stale shade.
+    echo "vercel_build: no shade release from $START or the two days before it, so every area is shaded here" >&2
+  else
+    tar -xzf "$ROOT/shade-release.tar.gz" -C "$DATA/areas"
+    # Shade is per edge, so it must come from the same graph.json. The release stores each graph's sha256.
+    COMPUTE="$("$PY" -I "$ROOT/pipeline/stale_shade.py" "$DATA/areas" $IDS)"
+    echo "shade release $got; shaded here: ${COMPUTE:-none}"
+  fi
+  rm -f "$ROOT/shade-release.tar.gz"
+fi
+
 # One PAGASA advisory fetch, shared by every area. Weather is one call per area centre.
 "$PY" -I pipeline/fetch_weather.py --advisory-to "$DATA/advisory.json"
 export UCPH_ADVISORY_FROM="$DATA/advisory.json"
+if [ -n "$COMPUTE" ]; then venv; fi
 for id in $IDS; do
   t0=$SECONDS
-  UCPH_AREA="$id" UCPH_DATA="$DATA/areas/$id" UCPH_INPUTS="$ROOT/pipeline/inputs/areas/$id" \
+  export UCPH_AREA="$id" UCPH_DATA="$DATA/areas/$id" UCPH_INPUTS="$ROOT/pipeline/inputs/areas/$id"
+  if [[ " $COMPUTE " == *" $id "* ]]; then
     bash pipeline/refresh_dates.sh "$START"
-  echo "area $id built in $((SECONDS - t0)) s"
+    echo "area $id shaded in $((SECONDS - t0)) s"
+  else
+    "$PY" -I pipeline/fetch_weather.py
+    echo "area $id weather in $((SECONDS - t0)) s"
+  fi
 done
 echo "data step done in $((SECONDS - t_all)) s"
 

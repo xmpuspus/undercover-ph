@@ -1,7 +1,7 @@
 # The daily rebuild only proves that a commit reached main. A failed Vercel build keeps
 # the old deployment up, and its 7 shade dates run out within a week with no alert.
-# This job reads the live manifest after the rebuild window and opens an issue when the
-# first shade date is not today (Manila) or the shade marker is gone. A failed rebuild
+# This job reads every area's live manifest after the rebuild window and opens an issue when
+# an area's first shade date is not today (Manila) or its shade marker is gone. A failed rebuild
 # then shows the next morning, with about 6 days of old data left to fix it.
 
 name: live-check
@@ -36,15 +36,19 @@ jobs:
               with urllib.request.urlopen(req, timeout=30) as res:
                   return res.headers.get("content-type", ""), res.read()
 
-          _, body = get("/data/manifest.json")
-          manifest = json.loads(body)
-          dates = manifest.get("dates") or []
-          print(f"today {today}, live dates {dates[:1]} to {dates[-1:]}, generated_at {manifest.get('generated_at')}")
-          if not dates or dates[0] != today:
-              sys.exit(f"The live shade dates start {dates[:1]}, not today {today}. The last daily rebuild did not deploy.")
-          kind, _ = get("/data/READY.shade")
-          if "text/html" in kind:
-              sys.exit("READY.shade is missing on the live site.")
+          # Every area has its own manifest and shade marker since the app moved to areas on 2026-10-22.
+          _, body = get("/data/areas.json")
+          ids = [a["id"] for a in json.loads(body)["areas"]]
+          stale = []
+          for i in ids:
+              _, body = get(f"/data/areas/{i}/manifest.json")
+              dates = json.loads(body).get("dates") or []
+              kind, _ = get(f"/data/areas/{i}/READY.shade")
+              print(f"{i}: dates {dates[:1]} to {dates[-1:]}")
+              if not dates or dates[0] != today or "text/html" in kind:
+                  stale.append(f"{i} starts {dates[:1]}" if "text/html" not in kind else f"{i} has no READY.shade")
+          if stale:
+              sys.exit(f"Not today ({today}) in {len(stale)} of {len(ids)} areas: {', '.join(stale)}. The last daily rebuild did not deploy.")
           print("live data is current")
           EOF
 
