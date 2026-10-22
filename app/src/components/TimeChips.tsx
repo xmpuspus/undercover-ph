@@ -113,7 +113,14 @@ function WhenChip(p: Props) {
         data-testid="when-chip"
       >
         {p.play?.playing && <PauseIcon size={13} />}
-        <span className="whitespace-nowrap">{label}</span>
+        {/* A fixed width for the hour part keeps the row still while Play steps through the day. */}
+        {p.now.active ? (
+          <span className="whitespace-nowrap">{label}</span>
+        ) : (
+          <span className="whitespace-nowrap">
+            {date ? dateLabel(date, p.today) : "Date"} <span className="inline-block min-w-[4.4em] tabular-nums">{minute != null ? fmtMinute(minute, true) : "time"}</span>
+          </span>
+        )}
         <ChevronDown size={13} className="text-slate-500" />
       </button>
       {open && (
@@ -198,7 +205,7 @@ function TimeChipRow(p: Props) {
         </button>
         <button ref={hourBtn} type="button" className={chip} onClick={() => setMenu(menu === "hour" ? null : "hour")} aria-expanded={menu === "hour"} aria-haspopup="dialog" data-testid="hour-chip">
           <ClockIcon size={16} className="hidden md:block" />
-          {minute != null ? fmtMinute(minute, true) : "Time"}
+          <span className="inline-block min-w-[4.4em] tabular-nums">{minute != null ? fmtMinute(minute, true) : "Time"}</span>
           <ChevronDown size={14} className="text-slate-500" />
         </button>
       </div>

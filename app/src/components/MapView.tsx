@@ -599,7 +599,8 @@ export default function MapView(p: Props) {
               className={`absolute flex flex-col justify-center rounded-xl px-3 text-left shadow-card transition-colors ${
                 i === p.selected ? "bg-brand text-white" : "bg-white text-ink hover:bg-slate-50"
               }`}
-              style={{ left: r.left, top: r.top, width: BUBBLE_W, height: BUBBLE_H }}
+              // A transform moves the bubble without a layout shift as the camera or the hour changes.
+              style={{ left: 0, top: 0, transform: `translate(${r.left}px, ${r.top}px)`, width: BUBBLE_W, height: BUBBLE_H }}
             >
               <span className="flex items-center gap-1 text-[13px] font-semibold leading-tight">
                 <Icon size={13} />
