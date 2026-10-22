@@ -1,0 +1,212 @@
+{
+ "generated_at": "2026-10-22T21:20:28+08:00",
+ "osm_extract": "philippines-261020.osm.pbf, md5 941dd405ba4f1c028ca874cde38ea200, clipped to davao-city.osm.pbf with osmium extract -b 125.57,7.03,125.65,7.12 --strategy complete_ways",
+ "pilot_bbox": [
+  125.594,
+  7.056,
+  125.624,
+  7.092
+ ],
+ "graph_bbox": [
+  125.5895,
+  7.0515,
+  125.6285,
+  7.0965
+ ],
+ "building_bbox": [
+  125.5822,
+  7.0442,
+  125.6358,
+  7.1038
+ ],
+ "timezone": "Asia/Manila",
+ "dates": [
+  "2026-10-21",
+  "2026-10-22",
+  "2026-10-23",
+  "2026-10-24",
+  "2026-10-25",
+  "2026-10-26",
+  "2026-10-27"
+ ],
+ "buckets_min": [
+  360,
+  390,
+  420,
+  450,
+  480,
+  510,
+  540,
+  570,
+  600,
+  630,
+  660,
+  690,
+  720,
+  750,
+  780,
+  810,
+  840,
+  870,
+  900,
+  930,
+  960,
+  990,
+  1020,
+  1050,
+  1080,
+  1110
+ ],
+ "counts": {
+  "nodes": 5726,
+  "edges": 8771,
+  "routable_edges": 8574,
+  "buildings": 26834,
+  "places": 1397
+ },
+ "sources": [
+  {
+   "name": "OpenStreetMap",
+   "licence": "ODbL 1.0, (c) OpenStreetMap contributors",
+   "url": "https://www.openstreetmap.org/copyright",
+   "used_for": "Walk graph, access rules, places, landmarks, building outlines and parts, OSM heights and opening hours. Geofabrik extract dated 2026-10-20."
+  },
+  {
+   "name": "Google Open Buildings 2.5D Temporal",
+   "licence": "CC BY 4.0 or ODbL, at the user's choice",
+   "url": "https://sites.research.google/gr/open-buildings/temporal/",
+   "used_for": "Modelled building heights from 2023 imagery where OSM has no height or levels. Read anonymously from the public GCS tile."
+  }
+ ],
+ "limits": [
+  "Edges with unchecked access rules are not routable by default. That removes 197 of 8771 edges, or 6.2 km.",
+  "The largest routable network holds 92.2% of routable nodes and 93.6% of routable length.",
+  "Kerbs do not trigger an access check. 0 edges that cross a raised kerb carry the steps flag, so step-free routes avoid them.",
+  "Gates alone remove 146 edges and 5.5 km. Village and estate gates need a field check.",
+  "Only access, foot and opening-hours rules restrict walkers. Vehicle-only conditional tags, such as a Sunday car-free rule, do not.",
+  "Indoor corridors and building passages without cited hours stay unroutable. They remove 0 edges and 0.0 km.",
+  "The graph leaves out 351 way pieces, 7.3 km, that pass an explicitly closed node. The rest of those 349 ways stays in.",
+  "0 indoor edges with cited mall hours are routable. The router opens and closes them by those hours.",
+  "The routable graph has 0.88 km of roofed, tunnel or indoor walkway in 46 edges.",
+  "OSM maps 0 indoor, corridor or passage edges here. 0 of them carry mall hours.",
+  "Some plain footways run through mall footprints without indoor tags. They stay routable at all hours.",
+  "27 unsheltered edges, 1.1 km, run mostly inside a building footprint with no cover tag.",
+  "Those edges carry flag 1024, inside a footprint with cover unverified. They get no shelter flag, and their shade counts as low confidence.",
+  "The graph keeps each whole way that has a node in the graph area. Some edges reach 1022 m past it.",
+  "32 ways outside the graph area, 7.7 km, join walk network pieces that the area edge cut apart.",
+  "A road side edge starts half the carriageway width plus 1 m from the road centreline.",
+  "The offset shrinks in 0.5 m steps, down to 1.5 m, until no 1 m sample sits inside a ground-level footprint.",
+  "302 side edges moved closer to the road. 15 sides still inside a footprint at 1.5 m became 12 centre edges.",
+  "Carriageway width comes from the width tag, else lanes x 3.2 m, else the median lane count for that road class.",
+  "The class medians are 2 lanes for primary, 3 for secondary and 2 for tertiary roads.",
+  "Side offsets run from 1.5 m to 12.2 m, with a median of 4.2 m.",
+  "A road tagged with a sidewalk on one side gets one side edge. Roads tagged sidewalk=no or separate keep a centre edge.",
+  "Tertiary and larger roads with no sidewalk tag get two side edges without the sidewalk flag.",
+  "Both side edges share the road's nodes. Node flags mark crossings, signals, junctions and grade-separated links.",
+  "Side edge geometry starts and ends at the offset line, a few metres from its nodes.",
+  "The offset ignores real kerb lines. A dual carriageway can get a side edge on its median.",
+  "Places snap to the largest routable network within 80 m when possible. 3 places still sit on small islands.",
+  "7 named places lie more than 80 m from a routable node, so the app omits them.",
+  "OSM opening hours that the simple parser cannot read are skipped. 0 values were skipped.",
+  "Building heights come from OSM height, else OSM levels x 3.74 m, else the Google 2023 median, else a 7.5 m default.",
+  "Google fills 21721 OSM building objects with modelled 2023 heights. Google heights stop near 100 m.",
+  "2172 OSM building objects over 100 m2 use a 7.5 m default, two levels of 3.74 m. Their shade counts as low confidence.",
+  "Each default replaces a Google median under 2.5 m. The default errs low, so a taller real building casts more shade than shown.",
+  "2343 OSM building objects of 100 m2 or less have no usable height. Their height is null.",
+  "Each building part is its own feature. 16 OSM outlines that parts fully cover are left out.",
+  "An outline's Google median uses only the area outside its parts, so a tower does not raise its podium.",
+  "Google medians use no presence mask. A mask would change 1.0% of them by more than 5 m."
+ ],
+ "area": {
+  "id": "davao-city-centre",
+  "name": "Davao City centre",
+  "neighbourhoods": [
+   {
+    "id": "davao-city-downtown",
+    "name": "Davao City downtown",
+    "cities": [
+     "Davao City"
+    ],
+    "bbox": [
+     125.604,
+     7.064,
+     125.624,
+     7.08
+    ],
+    "graph_bbox": [
+     125.5995,
+     7.0595,
+     125.6285,
+     7.0845
+    ]
+   },
+   {
+    "id": "davao-city-university-belt",
+    "name": "Davao City university belt",
+    "cities": [
+     "Davao City"
+    ],
+    "bbox": [
+     125.594,
+     7.056,
+     125.614,
+     7.072
+    ],
+    "graph_bbox": [
+     125.5895,
+     7.0515,
+     125.6185,
+     7.0765
+    ]
+   },
+   {
+    "id": "davao-city-mall-transit-hub",
+    "name": "Davao City mall and transit hub",
+    "cities": [
+     "Davao City"
+    ],
+    "bbox": [
+     125.602,
+     7.076,
+     125.622,
+     7.092
+    ],
+    "graph_bbox": [
+     125.5975,
+     7.0715,
+     125.6265,
+     7.0965
+    ]
+   }
+  ]
+ },
+ "graph_rects": [
+  [
+   125.5995,
+   7.0595,
+   125.6285,
+   7.0845
+  ],
+  [
+   125.5895,
+   7.0515,
+   125.6185,
+   7.0765
+  ],
+  [
+   125.5975,
+   7.0715,
+   125.6265,
+   7.0965
+  ]
+ ],
+ "region": {
+  "id": "davao-city",
+  "name": "Davao City",
+  "advisory_url": "https://www.pagasa.dost.gov.ph/regional-forecast/minprsd",
+  "advisory_provinces": [
+   "Davao del Sur",
+   "Davao City"
+  ]
+ }
+}
