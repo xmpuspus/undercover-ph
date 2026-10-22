@@ -7,6 +7,12 @@
 
 > Walking routes in Metro Manila's busiest centres that keep you in the shade on sunny days, or under a roof when it rains. A Philippine take on Singapore's [Undercover](https://undercover.gov.sg/) prototype, built on open data. Every route runs in your browser, so no server that this project runs sees where you start or where you go.
 
+[![A screen recording of undercover.ph with a caption for each step. Shaded is picked, Greenbelt is typed as the destination and Ayala MRT Station as the start, and the time is set to tomorrow at 3 PM. Two routes show on the 3D map with their shaded share. The cover bar, the play button with moving shadows, the step list, Navigate and the Sheltered mode follow. The map then zooms out to the area outlines across Metro Manila](docs/demo/walkthrough.gif)](docs/demo/walkthrough.mp4)
+
+<sub>Real recording of the app, played 1.5 times faster. The [75-second video at 1080p](docs/demo/walkthrough.mp4) plays in real time, and a [4:5 cut of the phone layout](docs/demo/walkthrough-tall.mp4) shows the same steps on a phone. It plans a walk from Ayala MRT Station to Greenbelt for tomorrow at 3 PM. The recommended walk is 88% shaded with 2.6 minutes in sun, and the shortest walk is 72% shaded. In Sheltered mode the app picks a walk that is 25% under a roof.</sub>
+
+Try it at **[undercover.ph](https://undercover.ph)**. Pick Shaded or Sheltered, choose where you start and where you go, and pick the half hour you leave.
+
 The app covers 14 walking areas, from Caloocan to Alabang. Each area is a downtown, business district, university belt or transit hub, and none is a whole city. A trip that starts or ends outside every area gets no route. The numbers below come from the committed data. `pipeline/tools/coverage_table.py` writes this table.
 
 <!-- coverage:start -->
@@ -28,12 +34,6 @@ The app covers 14 walking areas, from Caloocan to Alabang. Each area is a downto
 | Banawe and Quezon Avenue | Quezon City | 404 | 508 | 64,510 |
 | **14 areas** | | **7,196** | **16,667** | **1,220,793** |
 <!-- coverage:end -->
-
-[![A walk from Ayala MRT Station to Greenbelt on undercover.ph. It shows the landing card, the Shaded choice, destination and start search, and tomorrow at 3 PM. Then three routes on the 3D map with their shaded share. Then the route card with minutes in sun and the roof, building, and tree split](docs/demo/hero.gif)](https://undercover.ph)
-
-<sub>Real recording of the app (via `app/scripts/demo-record.mjs`). Ayala MRT Station to Greenbelt, leaving at 3 PM. The recommended walk is 1,406 m, 88% shaded, with 2.6 minutes in sun. The shortest walk is 1,230 m, 72% shaded, with 5.2 minutes in sun.</sub>
-
-Try it at **[undercover.ph](https://undercover.ph)**. Pick Shaded or Sheltered, choose where you start and where you go, and pick the half hour you leave.
 
 ## The sidewalk on the sun's side gets more building shade
 
@@ -103,7 +103,7 @@ pnpm dev            # http://localhost:5173
 pnpm test           # unit tests: router, search, route card text, sky theme, trip links, advisory
 pnpm build          # type check and production build
 pnpm e2e            # browser tests on desktop and phone: trip flow, Back, links, Now, phone layout
-pnpm demo:record    # re-record the GIFs in docs/demo/ from a production build
+pnpm demo:record    # re-record the walkthrough MP4, the GIFs and the share images in docs/demo/ from a production build
 ```
 
 The deployed site rebuilds its shade data every day. To build it yourself, see `pipeline/NOTES.md` and `pipeline/shade/NOTES.md`.

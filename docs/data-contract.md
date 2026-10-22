@@ -23,6 +23,7 @@ Each edge carries `routable` (boolean). The pipeline sets `routable = false` whe
 On 2026-10-22 the contract added these rules.
 
 - A `barrier=kerb` node does not trigger the access check. A raised kerb sets the steps bit on its crossing edge.
+- Amendment, 2026-10-22. A `barrier=bollard` or `barrier=height_restrictor` node does not trigger the access check either. Both stop vehicles and let walkers pass. An access, foot or entrance tag on the same node still applies.
 - Vehicle-only conditional tags (`oneway`, `motor_vehicle`, `maxspeed`, and similar) do not trigger the access check.
 - An indoor, `corridor`, or building-passage edge with a cited `hours.json` row is routable. The router opens it only inside those hours.
 - A default building height is 7.5 m (2 levels). An overstated height invents shade, so the default errs low.
