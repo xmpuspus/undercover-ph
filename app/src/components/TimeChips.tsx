@@ -339,7 +339,7 @@ export function WeatherChips({
     <div ref={ref} className="pointer-events-auto relative flex flex-wrap gap-2" data-testid="weather">
       <button
         type="button"
-        className={`${small} ${band ? HEAT[band.level] : ""}`}
+        className={`${compact ? small.replace("px-3", "px-2.5") : small} ${band ? HEAT[band.level] : ""}`}
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls="weather-details"
@@ -350,7 +350,8 @@ export function WeatherChips({
         {w.feels != null ? (
           <>
             <span className={`h-2 w-2 shrink-0 rounded-full ${band ? HEAT_DOT[band.level] : "bg-slate-300"}`} aria-hidden="true" />
-            {compact ? `${Math.round(w.feels)}°C` : `Feels like ${Math.round(w.feels)}°C`}
+            {/* Feels-like runs 5 to 10 degrees above the air in Manila, so the word stays even on phones. */}
+            {compact ? `Feels ${Math.round(w.feels)}°` : `Feels like ${Math.round(w.feels)}°C`}
           </>
         ) : (
           `${Math.round(w.temp)}°C${w.condition ? `, ${w.condition}` : ""}`

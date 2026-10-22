@@ -888,7 +888,7 @@ export default function App() {
                 ) : (
                   // Phones: one row, as in map apps, so the map keeps the height. Play and the map shadows
                   // switch sit behind the when chip and the sun chip. Below 360 px the row wraps.
-                  <div className="flex flex-wrap items-start gap-2">
+                  <div className="flex flex-wrap items-start gap-1.5">
                     <TimeChips
                       compact
                       play={daySlots.length > 1 ? { playing, onToggle: togglePlay } : null}

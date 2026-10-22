@@ -3,12 +3,11 @@ import { NIGHT_ALT_DEG } from "../config";
 import { compass16, type SunDay, type SunView } from "../lib/sun";
 import { fmtMinute } from "../lib/time";
 
-const W = 56;
 const H = 30;
 const BASE = 25;
 
 // Sky arc for the day: time runs left (sunrise, east) to right (sunset, west), height is the sun's altitude.
-function Dial({ day, altitude, accent }: { day: SunDay; altitude: number; accent: string }) {
+function Dial({ day, altitude, accent, W = 56 }: { day: SunDay; altitude: number; accent: string; W?: number }) {
   const span = day.sunset - day.sunrise || 1;
   const x = (m: number) => 3 + ((W - 6) * (m - day.sunrise)) / span;
   const y = (alt: number) => BASE - (22 * Math.max(0, alt)) / 70;
@@ -87,7 +86,7 @@ export default function SunChip({
         aria-expanded={open}
         data-testid="sun-chip"
       >
-        {day && <Dial day={day} altitude={sun.altitude} accent={accent} />}
+        {day && <Dial day={day} altitude={sun.altitude} accent={accent} W={compact ? 42 : 56} />}
         {compact ? (
           <>
             {!low && <ShadowArrow deg={sun.azimuth - bearing} />}
