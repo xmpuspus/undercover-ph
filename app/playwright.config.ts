@@ -15,8 +15,9 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } }],
   webServer: {
-    // A production build, so no dev-server reload can interrupt the flow.
-    command: `pnpm exec vite build && pnpm exec vite preview --port ${PORT} --strictPort`,
+    // A production build, so no dev-server reload can interrupt the flow. It goes to its own folder,
+    // so a test run never changes app/dist while a QA pass or a preview serves it.
+    command: `pnpm exec vite build --outDir dist-e2e --emptyOutDir && pnpm exec vite preview --outDir dist-e2e --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: true,
     timeout: 120_000,

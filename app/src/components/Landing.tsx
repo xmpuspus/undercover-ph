@@ -23,9 +23,11 @@ export default function Landing({ onPick, onIntent, status, error, theme, minute
         className="pointer-events-auto w-full max-w-[400px] rounded-card border border-white/60 p-6 shadow-card backdrop-blur-md transition-colors duration-500 motion-reduce:transition-none"
         style={{ backgroundColor: rgba(theme.tint, theme.dark ? 0.86 : 0.78) }}
         aria-labelledby="landing-title"
-        onPointerEnter={onIntent}
-        onPointerDown={onIntent}
-        onFocus={onIntent}
+        // After an error, only a button retries. A retry on pointer-down hid the error block, the card
+        // shrank, and the tap then missed the button it was aimed at.
+        onPointerEnter={status === "error" ? undefined : onIntent}
+        onPointerDown={status === "error" ? undefined : onIntent}
+        onFocus={status === "error" ? undefined : onIntent}
         data-testid="landing"
       >
         <h1 id="landing-title" className="flex items-center gap-3 text-[32px] font-semibold leading-none tracking-tight text-ink">
@@ -46,9 +48,8 @@ export default function Landing({ onPick, onIntent, status, error, theme, minute
           {fmtMinute(minute)} in Makati · {phaseLabel(theme.phase, theme.morning)}
         </p>
         {status === "error" && (
-          <div className="mt-3 text-[13px] text-slate-700" role="alert" data-testid="data-error">
+          <div className="mt-3 text-[13px] text-slate-700" role="alert" title={error ?? undefined} data-testid="data-error">
             Route data could not load. Check your connection and try again.
-            {error && <span className="mt-0.5 block text-[12px] text-slate-600">{error}</span>}
             <button type="button" onClick={onIntent} className="mt-2 flex min-h-11 items-center rounded-card border border-slate-300 bg-white px-4 font-medium text-brand">
               Try again
             </button>

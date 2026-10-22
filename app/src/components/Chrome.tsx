@@ -6,12 +6,13 @@ import { AlertIcon, CloseIcon } from "./Icons";
 export function TopBanner({ onClose, onAbout }: { onClose: () => void; onAbout: () => void }) {
   return (
     <div className="flex items-center gap-1 bg-ink py-0.5 pl-4 pr-1 text-[13px] leading-snug text-white" role="note" data-testid="prototype-banner">
-      {/* One line on phones, so the map keeps its height. About says the rest. */}
-      <p className="min-w-0 flex-1 py-1.5">
-        <span className="md:hidden">Prototype. Routes can be wrong.</span>
-        <span className="hidden md:inline">Prototype. Routes and data can be wrong. Independent project, not affiliated with any government agency.</span>
-      </p>
-      <button type="button" onClick={onAbout} className="h-11 shrink-0 rounded px-2 underline underline-offset-2 hover:bg-white/10">
+      {/* One line on phones, so the map keeps its height. The name echoes Singapore's government site, so the
+          "not a government service" line stays at every size. On phones the line itself opens About. */}
+      <button type="button" onClick={onAbout} className="min-h-11 min-w-0 flex-1 py-1.5 text-left underline-offset-2 hover:underline md:hidden">
+        Not a government service. Routes can be wrong.
+      </button>
+      <p className="hidden min-w-0 flex-1 py-1.5 md:block">Prototype. Routes and data can be wrong. Independent project, not affiliated with any government agency.</p>
+      <button type="button" onClick={onAbout} className="hidden h-11 shrink-0 rounded px-2 underline underline-offset-2 hover:bg-white/10 md:block">
         About
       </button>
       <button type="button" onClick={onClose} aria-label="Close banner" className="grid h-11 w-11 shrink-0 place-items-center rounded hover:bg-white/10">

@@ -1,6 +1,7 @@
 # Dependencies and build output
 node_modules/
 dist/
+dist-e2e/
 test-results/
 playwright-report/
 app/shots/
