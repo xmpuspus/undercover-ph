@@ -53,9 +53,10 @@ export const loadWeather = (area: string) => fetchJSON<Weather>(`${areaPath(area
 // An advisory covers 2 hours, so the live function (api/advisory.js on Vercel) comes first.
 // The dev server and a failed PAGASA fetch fall back to the copy from the daily build. PAGASA writes one
 // advisory for all of Metro Manila, so any area's copy serves.
-export async function loadAdvisory(area: string): Promise<Advisory | null> {
+// prsd: the area region's PAGASA division page. The function answers for Metro Manila without one.
+export async function loadAdvisory(area: string, prsd = "ncrprsd"): Promise<Advisory | null> {
   try {
-    const res = await fetch(`${import.meta.env.BASE_URL}api/advisory`, { cache: "no-cache" });
+    const res = await fetch(`${import.meta.env.BASE_URL}api/advisory${prsd === "ncrprsd" ? "" : `?prsd=${prsd}`}`, { cache: "no-cache" });
     if (isRealFile(res)) {
       const live = (await res.json()) as Advisory;
       if (live.status === "ok") return live;

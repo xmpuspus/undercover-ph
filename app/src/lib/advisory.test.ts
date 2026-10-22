@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { advisoryCovers, advisoryLine, parseIssued } from "./advisory";
+import { advisoryCovers, advisoryLine, parseIssued, placeKey, regionPlaces } from "./advisory";
 
 const ISSUED = "10:10 PM, 21 October 2026";
 
@@ -51,3 +51,40 @@ describe("PAGASA advisory window", () => {
     expect(advisoryLine(ISSUED, ["Marikina"], core)?.listed).toBe(false);
   });
 });
+
+// The same cases as pipeline/regions/test_regions.py, so the live line and the build file agree.
+describe("regional PAGASA pages", () => {
+  const places = (text: string, cities = ["Cebu City"], provinces = ["Cebu"]) => regionPlaces(text, cities, provinces);
+
+  it("gives one key to every spelling of a city", () => {
+    for (const n of ["Cebu City", "CebuCity", "CityOfCebu", "City of Cebu"]) expect(placeKey(n)).toBe("cebu");
+  });
+
+  it("counts a listed city and no other town", () => {
+    expect(places("Thunderstorm Advisory No. 3 #VISPRSD over #Cebu(Talisay, CebuCity and Mandaue)")).toEqual(["Cebu City"]);
+    expect(places("Thunderstorm Advisory No. 3 #VISPRSD over #Cebu(Badian, Sibonga, CityOfCarcar)")).toEqual([]);
+  });
+
+  it("counts a province with no list as the whole province", () => {
+    expect(places("Thunderstorm Advisory No. 3 #VISPRSD expected over #Cebu within 2 hours")).toEqual(["Cebu"]);
+    expect(places("Thunderstorm Advisory No. 3 expected over Cebu within 2 hours")).toEqual(["Cebu"]);
+  });
+
+  it("reads a city in plain text as the city, not the province", () => {
+    expect(places("Thunderstorm Advisory No. 3 rainshowers over Cebu City and Talisay")).toEqual(["Cebu City"]);
+  });
+
+  it("reads the NCR page format with spaces and 'and'", () => {
+    const text = "Thunderstorm Advisory No. 1 #NCR_PRSD over Bataan (Dinalupihan and Hermosa), Pampanga (Lubao, and Angeles City)";
+    expect(places(text, ["Angeles"], ["Pampanga"])).toEqual(["Angeles"]);
+    expect(places(text, ["Guagua"], ["Pampanga"])).toEqual([]);
+  });
+
+  it("reads a real Visayas block from 22 October 2026", () => {
+    const block = "Thunderstorm Advisory No. 29 #VISPRSD Issued at 08:50 PM 22 October 2026 Moderate to Heavy rainshowers with lightning and strong winds are expected over #Samar(TagapulAn), #Bohol(Dimiao, Valencia, Getafe), #Antique(Anini-y)";
+    expect(places(block, ["Tagbilaran"], ["Bohol"])).toEqual([]);
+    expect(places(block, ["Valencia"], ["Bohol"])).toEqual(["Valencia"]);
+    expect(advisoryCovers("08:50 PM 22 October 2026", "2026-10-22", 21 * 60)).toBe(true);
+  });
+});
+

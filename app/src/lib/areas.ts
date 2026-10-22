@@ -69,5 +69,7 @@ export function areaList(areas: AreaInfo[] | null): string {
 export function areaCities(id: string | null, areas: AreaInfo[] | null): string[] {
   if (!areas) return ["Makati"];
   const a = id ? areas.find((x) => x.id === id) : undefined;
-  return a ? a.cities : [...new Set(areas.flatMap((x) => x.cities))];
+  // A regional advisory can name the whole province, which covers the area too.
+  if (a) return [...a.cities, ...(a.region?.provinces ?? [])];
+  return [...new Set(areas.filter((x) => regionOf(x) === NCR).flatMap((x) => x.cities))];
 }

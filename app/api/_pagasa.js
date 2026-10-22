@@ -3,6 +3,9 @@
 // Vercel does not deploy files in api/ whose name starts with "_" as functions.
 
 export const ADVISORY_URL = "https://www.pagasa.dost.gov.ph/regional-forecast/ncrprsd";
+// PAGASA's regional services divisions. An area's region in areas.json names one of these.
+export const PRSD = ["ncrprsd", "nlprsd", "slprsd", "visprsd", "minprsd"];
+export const prsdUrl = (prsd) => `https://www.pagasa.dost.gov.ph/regional-forecast/${prsd}`;
 
 const NCR_CITIES = [
   "Caloocan", "Las Piñas", "Las Pinas", "Makati", "Malabon", "Mandaluyong", "Manila", "Marikina",
@@ -35,6 +38,19 @@ export function parseAdvisory(page, fetchedAt) {
   const region = /\bMetro Manila\b|\bNCR\b|National Capital Region/.test(block.replace(/#NCR_PRSD/g, ""));
   const cities = [...new Set([...NCR_CITIES.filter((c) => cityPattern(c).test(block)), ...(region ? ["Metro Manila"] : [])])].sort();
   return { ...base, issued_at: issued ? issued[1] : null, text: block, cities };
+}
+
+// A regional page lists places as "#Cebu(Talisay, CebuCity)". The app matches its own area's cities in the
+// block (lib/advisory.ts regionPlaces), so this returns the newest advisory block and no city list.
+export function parseRegional(page, prsd, fetchedAt) {
+  const text = unescape(page.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ");
+  const m = /(Thunderstorm Advisory No\.\s*\d+.*?)(?=Thunderstorm Advisory No\.|Thunderstorm Watch|Heavy Rainfall|Rainfall Advisory|Regional Forecast|$)/.exec(text);
+  const warning = /(As of today, there is no Heavy Rainfall Warning[^.]*\.)/.exec(text);
+  const base = { status: "ok", source_url: prsdUrl(prsd), fetched_at: fetchedAt, heavy_rainfall: warning ? warning[1] : null, cities: [] };
+  if (!m) return { ...base, issued_at: null, text: null, note: "No thunderstorm advisory text found on the page at fetch time." };
+  const block = m[1].slice(0, 1500).trim();
+  const issued = /Issued at:?\s*([0-9]{1,2}:[0-9]{2}\s*[AP]M,?\s*[0-9]{1,2}\s+\w+\s+[0-9]{4})/.exec(block);
+  return { ...base, issued_at: issued ? issued[1] : null, text: block };
 }
 
 // Manila wall-clock time as ISO 8601 with +08:00, like the pipeline's fetched_at.

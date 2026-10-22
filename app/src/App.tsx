@@ -3,7 +3,8 @@ import { AREA_LABELS, CBD_CENTER, DEFAULT_AREA, NIGHT_ALT_DEG, SUGGESTED } from 
 import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, Weather } from "./types";
 import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, placeKeys, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
 import { areaBase, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
-import { NCR, areaAt, areaCities, areaLabel, areaList, placeWhere, regionOf, sharedArea } from "./lib/areas";
+import { NCR, areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea } from "./lib/areas";
+import { regionPlaces } from "./lib/advisory";
 import { clockPinned, dateLabel, dateShort, fmtDist, fmtMinute, manilaNow, type Clock } from "./lib/time";
 import { toDisplay } from "./lib/display";
 import type { Focus, Insets } from "./components/MapView";
@@ -187,9 +188,24 @@ export default function App() {
     };
   }, [mapOn]);
 
+  // Each region has its own PAGASA page. Reload when the trip moves to another region.
+  const advArea = areas?.find((a) => a.id === (areaId ?? lastArea ?? DEFAULT_AREA));
+  const prsd = advArea?.region?.prsd ?? "ncrprsd";
   useEffect(() => {
-    loadAdvisory(lastArea ?? DEFAULT_AREA).then(setAdvisory);
-  }, []);
+    let live = true;
+    loadAdvisory(areaId ?? lastArea ?? DEFAULT_AREA, prsd).then((a) => {
+      if (!live) return;
+      // A regional page lists towns per province. Match this area's own cities and provinces in its text.
+      const region = advArea?.region;
+      if (a?.status === "ok" && a.text && region && region.id !== NCR) {
+        setAdvisory({ ...a, cities: regionPlaces(a.text, advArea.cities, region.provinces ?? []) });
+      } else setAdvisory(a);
+    });
+    return () => {
+      live = false;
+    };
+    // Per region, not per area: two areas in one region share a page.
+  }, [prsd]);
   // Weather belongs to the area.
   useEffect(() => {
     if (!areaId) return;
@@ -956,9 +972,9 @@ export default function App() {
     <div className="flex h-dvh flex-col overflow-hidden bg-slate-200 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] font-sans text-ink">
       {banner && <TopBanner onClose={() => setBanner(false)} onAbout={openAbout} />}
       {/* Before an area loads there is no trip time yet, so the bar checks the advisory against the clock. */}
-      {/* The live advisory is the PAGASA Metro Manila page, so it shows only for a Metro Manila area. */}
+      {/* The advisory comes from the page of the area's own region. */}
       <AdvisoryBar
-        advisory={regionOf(areas?.find((a) => a.id === areaId)) === NCR ? advisory : null}
+        advisory={advisory}
         date={date || clock.date}
         minute={manifest ? departMin : clock.minute}
         mode={mode}

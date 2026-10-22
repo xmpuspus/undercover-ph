@@ -65,7 +65,8 @@ export interface AreaInfo {
   id: string;
   name: string;
   // Absent in data published before the regional areas: those areas are all in Metro Manila.
-  region?: { id: string; name: string };
+  // prsd: the PAGASA division page for its advisories. provinces: names an advisory can use for the whole area.
+  region?: { id: string; name: string; prsd?: string; provinces?: string[] };
   cities: string[];
   bbox: [number, number, number, number];
   graph_bbox: [number, number, number, number];

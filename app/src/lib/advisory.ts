@@ -48,3 +48,37 @@ export function advisoryLine(issuedAt: string, cities: string[], mine: string[] 
   const until = t0 === null ? "" : ` until ${clock(t0 + ADVISORY_HOURS * 3600_000)}`;
   return { listed, text: `PAGASA expects thunderstorms over ${where}${until}.` };
 }
+
+// Regional PAGASA pages list places as "#Cebu(Talisay, CebuCity and Mandaue)". Same rules as
+// pipeline/fetch_weather.py region_places, so the live line and the build file agree.
+// One key for "Cebu City", "CebuCity" and "CityOfCebu": letters only, without "city of" or "city".
+export function placeKey(name: string): string {
+  const k = name.toLowerCase().replace(/ñ/g, "n").replace(/[^a-z]/g, "");
+  return k.replace(/^cityof/, "").replace(/city$/, "") || k;
+}
+
+const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const TAG = /#?[\p{L}\p{N}_.-]+\s*\([^()]*\)/gu;
+
+/** The area cities and whole provinces that a regional advisory block names. */
+export function regionPlaces(block: string, cities: string[], provinces: string[]): string[] {
+  const cityKeys = new Map(cities.map((c) => [placeKey(c), c]));
+  const provKeys = new Map(provinces.map((p) => [placeKey(p), p]));
+  const found = new Set<string>();
+  for (const m of block.matchAll(/\(([^()]*)\)/g)) {
+    for (const item of m[1].split(/,|\band\b/)) {
+      const c = cityKeys.get(placeKey(item));
+      if (c) found.add(c);
+    }
+  }
+  const bare = block.replace(TAG, " ");
+  for (const c of cities) if (new RegExp(`\\b${esc(c)}\\b`, "u").test(bare)) found.add(c);
+  for (const m of bare.matchAll(/#([\p{L}\p{N}_.-]+)/gu)) {
+    const p = provKeys.get(placeKey(m[1]));
+    if (p) found.add(p);
+  }
+  const plain = bare.replace(/#[\p{L}\p{N}_.-]+/gu, " ");
+  for (const p of provinces) if (new RegExp(`\\b${esc(p)}\\b(?!\\s*City)`, "u").test(plain)) found.add(p);
+  return [...found].sort();
+}
+

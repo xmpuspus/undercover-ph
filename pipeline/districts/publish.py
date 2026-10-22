@@ -4,7 +4,8 @@ Usage: pipeline/.venv/bin/python -I pipeline/districts/publish.py [--no-tiles] [
 Run it after pipeline/districts/build.py has staged every area in pipeline/areas.json. It stops on an area
 whose last build.py checks failed. `--hold AREA_ID` (repeatable) leaves that area out of the app.
 Areas outside Metro Manila come from pipeline/regions/areas.json. One of them ships when it is staged, its
-checks passed and its canopy.tif exists; the report lists the others as not ready.
+checks passed, its canopy.tif exists and at least 70% of its place pairs connect (reach.py). The report lists
+the others as not ready, with the reason.
 It reads pipeline/stage/<id>/ and writes these files, all kept in git:
 
 - app/public/data/areas.json: the routing areas, their boxes, neighbourhoods and centre.
@@ -48,6 +49,9 @@ Z15_KEEP_ALL = ["--no-feature-limit", "--no-tile-size-limit", "--no-tiny-polygon
                 "--full-detail=13"]
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from reach import MIN_REACH, reach  # noqa: E402
+
 # Region names for areas.json. Metro Manila areas have no region row and get "ncr".
 REGIONS = {"ncr": {"id": "ncr", "name": "Metro Manila"}}
 if (PIPE / "regions/regions.json").exists():
@@ -73,7 +77,8 @@ def area_entry(a, m):
     return {
         "id": a["id"],
         "name": a["name"],
-        "region": {"id": region["id"], "name": region["name"]},
+        "region": {"id": region["id"], "name": region["name"], "prsd": region.get("pagasa_prsd", "ncrprsd"),
+                   "provinces": region.get("advisory_provinces") or []},
         "cities": a["cities"],
         "bbox": a["bbox"],
         "graph_bbox": a["graph_bbox"],
@@ -244,6 +249,10 @@ def regional_ready(a):
         return "checks not passed"
     if not (INPUTS / i / "canopy.tif").exists():
         return "no canopy.tif"
+    # Route checks prove a few pairs. Most trips between the area's places must find a route too.
+    r = reach(i)
+    if r < MIN_REACH:
+        return f"place-pair reach {r:.1%} is under {MIN_REACH:.0%}"
     return None
 
 
