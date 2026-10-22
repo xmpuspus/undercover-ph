@@ -1,0 +1,92 @@
+{
+ "makati-cbd": [
+  [
+   "Ayala MRT",
+   "Greenbelt"
+  ]
+ ],
+ "metro-core": [
+  [
+   "Ayala MRT",
+   "Greenbelt"
+  ],
+  [
+   "Guadalupe MRT",
+   "Power Plant Mall"
+  ],
+  [
+   "Ortigas MRT",
+   "SM Megamall"
+  ],
+  [
+   "Shaw Boulevard",
+   "Shangri-La Plaza"
+  ],
+  [
+   "Ayala MRT",
+   "Market! Market!"
+  ],
+  [
+   "Shaw Boulevard",
+   "SM Megamall"
+  ],
+  [
+   "Ortigas MRT",
+   "Greenhills Mall"
+  ],
+  [
+   "Santolan-Annapolis MRT",
+   "Greenhills Mall"
+  ],
+  [
+   "UV Expresss Terminal",
+   "Bahay na Tisa"
+  ]
+ ],
+ "qc-north": [
+  [
+   "North Avenue MRT",
+   "SM City North Edsa"
+  ],
+  [
+   "Quezon Avenue MRT",
+   "U.P. Town Center"
+  ]
+ ],
+ "pasay-moa": [
+  [
+   "EDSA LRT",
+   "SM Mall of Asia"
+  ]
+ ],
+ "cubao-eastwood": [
+  [
+   "Araneta Center - Cubao LRT",
+   "Gateway Mall 1"
+  ],
+  [
+   "Araneta Center - Cubao LRT",
+   "Eastwood Mall"
+  ]
+ ],
+ "manila": [
+  [
+   "Carriedo LRT",
+   "Lucky Chinatown"
+  ],
+  [
+   "Legarda LRT",
+   "University of Santo Tomas"
+  ],
+  [
+   "United Nations LRT",
+   "Robinsons Manila"
+  ]
+ ],
+ "alabang": [
+  [
+   "Alabang PNR",
+   "Alabang Town Center"
+  ]
+ ]
+}

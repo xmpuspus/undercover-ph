@@ -28,14 +28,15 @@ DATA BUILT FROM OPENSTREETMAP: Open Database License (ODbL) 1.0
 These files contain or derive from OpenStreetMap data, so they are released
 under the ODbL 1.0, the licence OpenStreetMap requires for derived databases:
 
-- app/public/data/graph.json (walk network, access flags, crossings)
-- app/public/data/places.json (named places)
-- app/public/data/hours.json (opening hours; OSM rows plus hours cited from a
-  public mall guide, each row with its source)
-- app/public/data/buildings_display.geojson and pipeline/inputs/buildings.geojson
+- app/public/data/areas/<area>/graph.json (walk network, access flags, crossings)
+- app/public/data/areas/<area>/places.json and app/public/data/places_index.json
+  (named places)
+- app/public/data/areas/<area>/hours.json (opening hours; OSM rows plus hours
+  cited from public mall and rail pages, each row with its source)
+- app/public/data/buildings.pmtiles and pipeline/inputs/areas/<area>/buildings.geojson.gz
   (building outlines and heights)
-- app/public/data/shade.bin and the shadow overlay images (shade computed from
-  the building data above, Google Open Buildings heights, and tree canopy)
+- app/public/data/areas/<area>/shade/ (shade computed from the building data
+  above, Google Open Buildings heights, and tree canopy)
 
 Attribution: "© OpenStreetMap contributors, undercover.ph"
 Licence text: https://opendatacommons.org/licenses/odbl/1-0/
@@ -46,16 +47,19 @@ UPSTREAM DATA (cited, not re-licensed by us):
 - OpenStreetMap: © OpenStreetMap contributors, ODbL 1.0. Geofabrik extract
   philippines-261020.
 - Google Open Buildings 2.5D Temporal (2023 heights): CC BY 4.0
-  (https://creativecommons.org/licenses/by/4.0/). Modified: clipped to the
-  Makati area and merged with OpenStreetMap footprints.
+  (https://creativecommons.org/licenses/by/4.0/). Modified: clipped to each
+  routing area and merged with OpenStreetMap footprints.
   https://sites.research.google/gr/open-buildings/temporal/
-- Tree canopy height (pipeline/inputs/canopy_height_makati.tif, a clip):
-  Meta and World Resources Institute (WRI), 2024. High Resolution Canopy
-  Height Maps (CHM). CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
-  Modified: clipped to the Makati area. Source imagery for CHM © 2016 Maxar.
-- Weather (app/public/data/weather.json): Open-Meteo, CC BY 4.0
+- Tree canopy height (pipeline/inputs/areas/<area>/canopy.tif and
+  pipeline/inputs/canopy_height_makati.tif, clips; tree crowns in
+  app/public/data/trees.pmtiles): Meta and World Resources Institute (WRI),
+  2024. High Resolution Canopy Height Maps (CHM). CC BY 4.0
+  (https://creativecommons.org/licenses/by/4.0/). Modified: clipped to each
+  routing area and segmented into crowns. Source imagery for CHM © 2016 Maxar.
+- Weather (app/public/data/areas/<area>/weather.json): Open-Meteo, CC BY 4.0
   (https://creativecommons.org/licenses/by/4.0/).
-- Thunderstorm advisory text (app/public/data/advisory.json): PAGASA, a
+- Thunderstorm advisory text (app/public/data/advisory.json and each area's
+  copy): PAGASA, a
   Philippine government work, shown with credit and a link to the source.
 - Basemap tiles at runtime: OpenFreeMap, © OpenMapTiles, © OpenStreetMap
   contributors.

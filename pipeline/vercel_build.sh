@@ -2,7 +2,7 @@
 # Vercel build for app/: generate the dated data for every walking area, run the router tests on it,
 # then build the app. app/vercel.json calls it as the buildCommand, from app/, after pnpm install.
 #
-# Generated files stay out of git: manifest.json, shade.bin, shadows/, weather.json, advisory.json, READY.*.
+# Generated files stay out of git: manifest.json, shade/, trees.json, weather.json, advisory.json, READY.*.
 # A shade failure fails the build, so the last good deployment stays live.
 # A failed weather or advisory fetch writes {"status": "unavailable"} and the build goes on.
 #
@@ -16,11 +16,10 @@
 # - A build may run 45 minutes on 4 CPUs and 8 GB. https://vercel.com/docs/limits
 #
 # Areas: every routing area in app/public/data/areas.json, each in app/public/data/areas/<id>/ with
-# inputs in pipeline/inputs/areas/<id>/. Without areas.json, the single area in app/public/data/.
-# Listed areas use shade.py's area mode (per-date shade files and trees.json, no overlays) unless
-# UCPH_AREA_OVERLAYS=1, which gives them shade.bin and overlays like the root area.
-# Environment, all optional: UCPH_PYTHON (interpreter for the venv), UCPH_OVERLAY_DATES (overlay dates per
-# area, default 7), UCPH_START_DATE (first shade date, default today in Asia/Manila), UCPH_AREA_OVERLAYS.
+# inputs in pipeline/inputs/areas/<id>/. shade.py runs in area mode: shade/<date>.bin, shade/lowconf.bin
+# and trees.json, no overlays. Buildings and trees for the map ship as committed PMTiles.
+# Environment, all optional: UCPH_PYTHON (interpreter for the venv), UCPH_START_DATE (first shade date,
+# default today in Asia/Manila), UCPH_SKIP_TESTS=1 (skip pnpm test, for timing runs; default off).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP="$ROOT/app"
@@ -60,39 +59,43 @@ export SHADE_PY="$VENV/bin/python" PY="$VENV/bin/python"
 echo "python ready in $((SECONDS - t_all)) s"
 
 START="${UCPH_START_DATE:-$(TZ=Asia/Manila date +%F)}"
-if [ -f "$DATA/areas.json" ]; then
-  IDS="$("$PY" -I -c 'import json, sys; print(" ".join(a["id"] for a in json.load(open(sys.argv[1]))["areas"]))' "$DATA/areas.json")"
-  # One PAGASA advisory fetch, shared by every area. Weather is one call per area centre.
-  "$PY" -I pipeline/fetch_weather.py --advisory-to "$DATA/advisory.json"
-  export UCPH_ADVISORY_FROM="$DATA/advisory.json"
-  for id in $IDS; do
-    t0=$SECONDS
-    area="$id"
-    if [ "${UCPH_AREA_OVERLAYS:-0}" = "1" ]; then area=""; fi
-    UCPH_AREA="$area" UCPH_DATA="$DATA/areas/$id" UCPH_INPUTS="$ROOT/pipeline/inputs/areas/$id" \
-      bash pipeline/refresh_dates.sh "$START"
-    echo "area $id built in $((SECONDS - t0)) s"
-  done
-else
-  t0=$SECONDS
-  bash pipeline/refresh_dates.sh "$START"
-  echo "area app/public/data built in $((SECONDS - t0)) s"
+if [ ! -f "$DATA/areas.json" ]; then
+  echo "vercel_build: $DATA/areas.json is missing" >&2
+  exit 1
 fi
+IDS="$("$PY" -I -c 'import json, sys; print(" ".join(a["id"] for a in json.load(open(sys.argv[1]))["areas"]))' "$DATA/areas.json")"
+# One PAGASA advisory fetch, shared by every area. Weather is one call per area centre.
+"$PY" -I pipeline/fetch_weather.py --advisory-to "$DATA/advisory.json"
+export UCPH_ADVISORY_FROM="$DATA/advisory.json"
+for id in $IDS; do
+  t0=$SECONDS
+  UCPH_AREA="$id" UCPH_DATA="$DATA/areas/$id" UCPH_INPUTS="$ROOT/pipeline/inputs/areas/$id" \
+    bash pipeline/refresh_dates.sh "$START"
+  echo "area $id built in $((SECONDS - t0)) s"
+done
+echo "data step done in $((SECONDS - t_all)) s"
 
 cd "$APP"
-pnpm test
+if [ "${UCPH_SKIP_TESTS:-0}" = "1" ]; then
+  echo "UCPH_SKIP_TESTS=1: pnpm test skipped"
+else
+  pnpm test
+fi
 pnpm run build
-# Vercel compresses only listed MIME types and application/octet-stream is not one, so shade.bin would ship
-# raw (2.29 MB, 0.54 MB as gzip). Put a gzip copy beside each shade.bin in the output; the app inflates it.
-# Written from the built output after the build, so it can never be older than the shade.bin it copies.
-"$PY" -I - "$APP/dist/data" <<'PY'
+# Vercel compresses only listed MIME types and application/octet-stream is not one, so the shade files would
+# ship raw (metro-core: 1.61 MB per date). Put a gzip copy beside each .bin in the output; the app inflates it.
+# Written from the built output after the build, so it can never be older than the file it copies.
+"$PY" -I - "$APP/dist/data/areas" <<'PY'
 import gzip
 import sys
 from pathlib import Path
 
-for f in sorted(Path(sys.argv[1]).rglob("shade.bin")):
-    gz = f.with_name("shade.bin.gz")
+raw = packed = n = 0
+for f in sorted(Path(sys.argv[1]).rglob("*.bin")):
+    gz = f.with_name(f.name + ".gz")
     gz.write_bytes(gzip.compress(f.read_bytes(), compresslevel=9, mtime=0))
+    raw, packed, n = raw + f.stat().st_size, packed + gz.stat().st_size, n + 1
     print(f"{gz}: {f.stat().st_size} -> {gz.stat().st_size} bytes")
+print(f"gzip copies: {n} files, {raw} -> {packed} bytes")
 PY
 echo "vercel_build done in $((SECONDS - t_all)) s"

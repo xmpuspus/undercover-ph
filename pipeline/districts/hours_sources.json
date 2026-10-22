@@ -1,0 +1,164 @@
+{
+ "note": "Cited web hours. Each row quotes the page text it comes from. build_hours.py stops if a saved page lacks a quoted line. Days use mon..sun; spans are [open, close] in 24 h time.",
+ "sources": [
+  {
+   "id": "beat_asia_ayala_center",
+   "name": "The Beat Asia, Ayala Center malls guide",
+   "url": "https://thebeat.asia/manila/nomads/explore/ayala-center-malls-guide",
+   "page": "pipeline/raw/beat_asia/page.html",
+   "checked": "2026-02-24",
+   "require": [
+    "Published: February 24, 2026"
+   ],
+   "licence": "Publisher copyright. Opening hours used as cited facts.",
+   "used_for": "Mall hours for Glorietta, Greenbelt 3 to 5, One Ayala, The Landmark and SM Makati. Guide dated 2026-02-24, re-read 2026-10-22.",
+   "notes": [
+    "Mall hours come from a guide dated 2026-02-24. The guide warns that hours can change.",
+    "The guide says Greenbelt 1 and 2 are closed for renovation until 2028, so they get no hours.",
+    "OSM gives Glorietta shorter Friday and Saturday hours than the guide. The guide hours apply to edges."
+   ],
+   "rows": [
+    {
+     "name": "Glorietta",
+     "match": "^Glorietta( [1-5])?$",
+     "text": "Sunday to Thursday, from 10 AM to 9 PM; Friday to Saturday, from 10 AM to 10 PM",
+     "spans": {
+      "sun,mon,tue,wed,thu": [
+       "10:00",
+       "21:00"
+      ],
+      "fri,sat": [
+       "10:00",
+       "22:00"
+      ]
+     }
+    },
+    {
+     "name": "Greenbelt",
+     "match": "^Greenbelt [3-5]$",
+     "text": "Daily, from 11 AM to 10 PM",
+     "spans": {
+      "mon,tue,wed,thu,fri,sat,sun": [
+       "11:00",
+       "22:00"
+      ]
+     }
+    },
+    {
+     "name": "One Ayala",
+     "match": "^One Ayala$",
+     "text": "Monday to Thursday, from 10 AM to 9 PM; Friday to Sunday, from 10 AM to 10 PM",
+     "spans": {
+      "mon,tue,wed,thu": [
+       "10:00",
+       "21:00"
+      ],
+      "fri,sat,sun": [
+       "10:00",
+       "22:00"
+      ]
+     }
+    },
+    {
+     "name": "The Landmark",
+     "match": "^The Landmark$",
+     "text": "Department Store: Monday to Thursday, from 10 AM to 9 PM; Friday to Sunday, from 10 AM to 9:30 PM",
+     "spans": {
+      "mon,tue,wed,thu": [
+       "10:00",
+       "21:00"
+      ],
+      "fri,sat,sun": [
+       "10:00",
+       "21:30"
+      ]
+     }
+    },
+    {
+     "name": "SM Makati",
+     "match": "^SM Makati$",
+     "text": "SM Store: Sunday to Thursday, from 10 AM to 9 PM; Friday to Saturday, from 10 AM to 10 PM",
+     "spans": {
+      "sun,mon,tue,wed,thu": [
+       "10:00",
+       "21:00"
+      ],
+      "fri,sat": [
+       "10:00",
+       "22:00"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "araneta_city_mall_hours",
+   "name": "Araneta City, Mall Hours page",
+   "url": "https://www.aranetacity.com/happening/mall-hours",
+   "page": "pipeline/raw/hours/araneta_mall_hours/page.html",
+   "checked": "2026-10-22",
+   "require": [
+    "Mall Hours · Daily at Araneta City."
+   ],
+   "licence": "Publisher copyright. Opening hours used as cited facts.",
+   "used_for": "Mall hours for Gateway Mall 1 and 2, Ali Mall and Farmers Plaza in Araneta City. The page shows no date, so checked is the read date 2026-10-22.",
+   "notes": [
+    "Araneta City mall hours come from the operator's page, read on 2026-10-22. The page shows no date of its own."
+   ],
+   "rows": [
+    {
+     "name": "Araneta City malls",
+     "match": "^(Gateway Mall [12]|Ali Mall|Farmers' Plaza|Farmers Plaza)$",
+     "text": [
+      "Sunday–Thursday: 10AM–9PM",
+      "Friday–Saturday: 10AM–10PM"
+     ],
+     "spans": {
+      "sun,mon,tue,wed,thu": [
+       "10:00",
+       "21:00"
+      ],
+      "fri,sat": [
+       "10:00",
+       "22:00"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "lrta_lrt2_station_hours",
+   "name": "Light Rail Transit Authority, LRT-2 train operating schedule",
+   "url": "https://www.lrta.gov.ph/train-operating-schedule/",
+   "page": "pipeline/raw/hours/lrta_schedule/page.html",
+   "image": "pipeline/raw/hours/lrta_closing_image/closing.jpg",
+   "image_url": "https://www.lrta.gov.ph/wp-content/uploads/2025/12/Closing-Time-of-Stations.jpg",
+   "image_md5": "a5faf1d8162f8c5f5f81aea9c4514d23",
+   "transcription": "LRT - Line 2 Closing Time of Stations. Cubao: eastbound (to Antipolo) 9:39 PM, westbound (to Recto) 9:07 PM. All stations open at exactly 4:50 AM.",
+   "checked": "2025-12-01",
+   "require": [
+    "all stations open daily at 4:50 AM"
+   ],
+   "licence": "Philippine government publication. Station hours used as cited facts.",
+   "used_for": "Hours for the passage through LRT-2 Araneta Center-Cubao station. Page modified 2025-12-01, read 2026-10-22.",
+   "notes": [
+    "The Cubao LRT-2 station passage opens at 04:50 and closes at 21:07, the earlier of its two last-train times on the LRTA schedule."
+   ],
+   "rows": [
+    {
+     "name": "LRT-2 Araneta Center-Cubao station",
+     "match": "^Araneta Center - Cubao$",
+     "text": [
+      "all stations open daily at 4:50 AM"
+     ],
+     "spans": {
+      "mon,tue,wed,thu,fri,sat,sun": [
+       "04:50",
+       "21:07"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

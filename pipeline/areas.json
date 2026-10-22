@@ -1,0 +1,266 @@
+{
+ "note": "Routing areas. Each area routes across the union of its member districts graph areas (district bbox + 500 m). Districts stay named neighbourhoods inside an area. bbox and graph_bbox are envelopes; graph_rects lists the member graph boxes. Project decision of 2026-10-22, option B.",
+ "areas": [
+  {
+   "id": "metro-core",
+   "name": "Makati, BGC, Ortigas and Shaw",
+   "districts": [
+    "makati-cbd",
+    "rockwell-poblacion",
+    "bgc",
+    "mandaluyong-shaw",
+    "ortigas",
+    "pasig-center",
+    "greenhills"
+   ],
+   "cities": [
+    "Makati",
+    "Mandaluyong",
+    "Pasig",
+    "Quezon City",
+    "San Juan",
+    "Taguig"
+   ],
+   "wave": 0,
+   "bbox": [
+    121.012,
+    14.533,
+    121.09,
+    14.608
+   ],
+   "graph_bbox": [
+    121.0074,
+    14.5285,
+    121.0946,
+    14.6125
+   ],
+   "graph_rects": [
+    [
+     121.0074,
+     14.5435,
+     121.0366,
+     14.5665
+    ],
+    [
+     121.0194,
+     14.5555,
+     121.0466,
+     14.5765
+    ],
+    [
+     121.0354,
+     14.5285,
+     121.0666,
+     14.5675
+    ],
+    [
+     121.0254,
+     14.5635,
+     121.0566,
+     14.5895
+    ],
+    [
+     121.0454,
+     14.5575,
+     121.0726,
+     14.5985
+    ],
+    [
+     121.0654,
+     14.5485,
+     121.0946,
+     14.5745
+    ],
+    [
+     121.0354,
+     14.5895,
+     121.0626,
+     14.6125
+    ]
+   ]
+  },
+  {
+   "id": "pasay-moa",
+   "name": "Bay Area and Mall of Asia",
+   "districts": [
+    "pasay-moa"
+   ],
+   "cities": [
+    "Pasay"
+   ],
+   "wave": 2,
+   "bbox": [
+    120.976,
+    14.525,
+    121.003,
+    14.545
+   ],
+   "graph_bbox": [
+    120.9714,
+    14.5205,
+    121.0076,
+    14.5495
+   ],
+   "graph_rects": [
+    [
+     120.9714,
+     14.5205,
+     121.0076,
+     14.5495
+    ]
+   ]
+  },
+  {
+   "id": "cubao-eastwood",
+   "name": "Cubao and Eastwood",
+   "districts": [
+    "cubao",
+    "eastwood"
+   ],
+   "cities": [
+    "Quezon City"
+   ],
+   "wave": 2,
+   "bbox": [
+    121.046,
+    14.602,
+    121.086,
+    14.627
+   ],
+   "graph_bbox": [
+    121.0414,
+    14.5975,
+    121.0906,
+    14.6315
+   ],
+   "graph_rects": [
+    [
+     121.0414,
+     14.6075,
+     121.0666,
+     14.6315
+    ],
+    [
+     121.0674,
+     14.5975,
+     121.0906,
+     14.6195
+    ]
+   ]
+  },
+  {
+   "id": "qc-north",
+   "name": "North Avenue, Quezon Memorial Circle and UP Diliman",
+   "districts": [
+    "qc-triangle",
+    "up-diliman"
+   ],
+   "cities": [
+    "Quezon City"
+   ],
+   "wave": 2,
+   "bbox": [
+    121.024,
+    14.64,
+    121.075,
+    14.664
+   ],
+   "graph_bbox": [
+    121.0194,
+    14.6355,
+    121.0796,
+    14.6685
+   ],
+   "graph_rects": [
+    [
+     121.0194,
+     14.6355,
+     121.0596,
+     14.6665
+    ],
+    [
+     121.0504,
+     14.6425,
+     121.0796,
+     14.6685
+    ]
+   ]
+  },
+  {
+   "id": "manila",
+   "name": "Intramuros, Ermita, Binondo and University Belt",
+   "districts": [
+    "manila-ermita",
+    "manila-ubelt",
+    "binondo"
+   ],
+   "cities": [
+    "Manila"
+   ],
+   "wave": 2,
+   "bbox": [
+    120.968,
+    14.56,
+    121.0,
+    14.614
+   ],
+   "graph_bbox": [
+    120.9634,
+    14.5555,
+    121.0046,
+    14.6185
+   ],
+   "graph_rects": [
+    [
+     120.9634,
+     14.5555,
+     121.0026,
+     14.6005
+    ],
+    [
+     120.9734,
+     14.5915,
+     121.0046,
+     14.6185
+    ],
+    [
+     120.9634,
+     14.5895,
+     120.9926,
+     14.6105
+    ]
+   ]
+  },
+  {
+   "id": "alabang",
+   "name": "Alabang and Filinvest City",
+   "districts": [
+    "alabang"
+   ],
+   "cities": [
+    "Muntinlupa"
+   ],
+   "wave": 2,
+   "bbox": [
+    121.022,
+    14.408,
+    121.05,
+    14.432
+   ],
+   "graph_bbox": [
+    121.0174,
+    14.4035,
+    121.0546,
+    14.4365
+   ],
+   "graph_rects": [
+    [
+     121.0174,
+     14.4035,
+     121.0546,
+     14.4365
+    ]
+   ]
+  }
+ ]
+}
