@@ -77,7 +77,7 @@ const link = "inline-flex min-h-8 items-center hover:underline md:min-h-11";
 export function Footer({ onAbout }: { onAbout: () => void }) {
   return (
     <footer
-      className="z-30 flex flex-wrap items-center gap-x-3 border-t border-slate-200 bg-white px-3 pb-[env(safe-area-inset-bottom)] text-[11.5px] leading-snug text-slate-600 md:text-[12px]"
+      className="z-30 flex flex-wrap items-center gap-x-3 border-t border-slate-200 bg-white px-3 pb-[env(safe-area-inset-bottom)] text-[12px] leading-snug text-slate-600 md:text-[12px]"
       data-testid="attribution"
     >
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer" className={`${link} font-medium text-ink`}>

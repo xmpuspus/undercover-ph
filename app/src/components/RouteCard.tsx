@@ -88,11 +88,13 @@ function kindLook(kind: SegKind, mode: Mode, night: boolean): { label: string; c
 }
 
 // The walk from start to end as one bar, each stretch sized by its distance and coloured by its cover.
-// Hover or tap a stretch to light it up on the map.
+// The whole bar is one 44 px control: hover, tap, or drag along it, or use the arrow keys, to light a
+// stretch up on the map. Stretches can be 2 px wide, too small to tap one by one (WCAG 2.5.8).
 function Ribbon({ d, mode, night, onHighlight }: { d: DisplayRoute; mode: Mode; night: boolean; onHighlight: (h: Highlight) => void }) {
   const parts = useMemo(() => ribbonParts(d.route.segments), [d.route.segments]);
   const [active, setActive] = useState<number | null>(null);
-  const pointer = useRef("mouse");
+  const bar = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
   const pick = (i: number | null) => {
     setActive(i);
     const x = i === null ? null : parts[i];
@@ -104,37 +106,70 @@ function Ribbon({ d, mode, night, onHighlight }: { d: DisplayRoute; mode: Mode; 
     onHighlight(null);
   }, [parts]);
   if (!parts.length) return null;
+  const indexAt = (clientX: number) => {
+    const box = bar.current?.getBoundingClientRect();
+    if (!box?.width) return null;
+    const f = Math.min(1, Math.max(0, (clientX - box.left) / box.width));
+    const i = parts.findIndex((x) => f <= x.to);
+    return i < 0 ? parts.length - 1 : i;
+  };
   const a = active === null ? null : parts[active];
+  const n = parts.length;
+  const step = (delta: number) => pick(active === null ? (delta > 0 ? 0 : n - 1) : Math.min(n - 1, Math.max(0, active + delta)));
   return (
-    <div onMouseLeave={() => pointer.current === "mouse" && pick(null)}>
-      <div className="flex h-7 items-stretch" role="group" aria-label="The walk from start to end, by cover" data-testid="route-ribbon">
-        {parts.map((x, i) => {
-          const look = kindLook(x.kind, mode, night);
-          return (
-            <button
-              key={i}
-              type="button"
-              aria-label={`${look.label}, ${fmtDist(x.metres)}`}
-              aria-pressed={active === i}
-              onPointerDown={(e) => (pointer.current = e.pointerType)}
-              onPointerEnter={(e) => e.pointerType === "mouse" && pick(i)}
-              onFocus={(e) => e.currentTarget.matches(":focus-visible") && pick(i)}
-              onClick={() => pick(pointer.current === "mouse" || active !== i ? i : null)}
-              className="flex min-w-0 items-center outline-none focus-visible:ring-2 focus-visible:ring-brand"
-              style={{ width: `${(x.to - x.from) * 100}%` }}
-              data-testid="ribbon-part"
-            >
-              <span
-                className={`w-full transition-opacity motion-reduce:transition-none ${i === 0 ? "rounded-l-full" : ""} ${i === parts.length - 1 ? "rounded-r-full" : ""} ${
-                  a && active !== i ? "opacity-35" : ""
-                } ${active === i ? "h-4 ring-2 ring-ink" : "h-3"}`}
-                style={{ background: look.color }}
-              />
-            </button>
-          );
-        })}
+    <div onMouseLeave={() => !dragging.current && pick(null)}>
+      <div
+        ref={bar}
+        role="slider"
+        tabIndex={0}
+        aria-label="The walk from start to end, by cover"
+        aria-valuemin={1}
+        aria-valuemax={n}
+        aria-valuenow={(active ?? 0) + 1}
+        aria-valuetext={a ? `${kindLook(a.kind, mode, night).label}, ${fmtDist(a.metres)}, stretch ${(active ?? 0) + 1} of ${n}` : `${n} stretches. Use the arrow keys to pick one.`}
+        onPointerDown={(e) => {
+          if (e.pointerType === "mouse") return;
+          dragging.current = true;
+          e.currentTarget.setPointerCapture(e.pointerId);
+          const i = indexAt(e.clientX);
+          pick(i === active ? null : i);
+        }}
+        onPointerMove={(e) => {
+          if (e.pointerType === "mouse" || dragging.current) {
+            const i = indexAt(e.clientX);
+            if (i !== active) pick(i);
+          }
+        }}
+        onPointerUp={() => (dragging.current = false)}
+        onPointerCancel={() => (dragging.current = false)}
+        onKeyDown={(e) => {
+          const keys: Record<string, () => void> = {
+            ArrowRight: () => step(1),
+            ArrowUp: () => step(1),
+            ArrowLeft: () => step(-1),
+            ArrowDown: () => step(-1),
+            Home: () => pick(0),
+            End: () => pick(n - 1),
+          };
+          if (!keys[e.key]) return;
+          e.preventDefault();
+          keys[e.key]();
+        }}
+        className="flex h-11 cursor-pointer touch-pan-y items-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        data-testid="route-ribbon"
+      >
+        {parts.map((x, i) => (
+          <span
+            key={i}
+            className={`transition-opacity motion-reduce:transition-none ${i === 0 ? "rounded-l-full" : ""} ${i === n - 1 ? "rounded-r-full" : ""} ${
+              a && active !== i ? "opacity-35" : ""
+            } ${active === i ? "h-4 ring-2 ring-ink" : "h-3"}`}
+            style={{ width: `${(x.to - x.from) * 100}%`, background: kindLook(x.kind, mode, night).color }}
+            data-testid="ribbon-part"
+          />
+        ))}
       </div>
-      <p className="flex justify-between text-[11.5px] leading-tight text-slate-500" aria-live="polite">
+      <p className="flex justify-between text-[12px] leading-tight text-slate-600" aria-hidden="true">
         <span>Start</span>
         {a && (
           <span className="font-medium text-ink" data-testid="ribbon-caption">
@@ -290,7 +325,12 @@ export function RouteCard(p: CardProps) {
             {warnings.map((w) => (
               <Warn key={w.text}>
                 {w.text}
-                {w.tl && <span className="text-amber-700"> {w.tl}</span>}
+                {w.tl && (
+                  <span className="text-amber-700" lang="fil">
+                    {" "}
+                    {w.tl}
+                  </span>
+                )}
               </Warn>
             ))}
           </ul>

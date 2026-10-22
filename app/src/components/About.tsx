@@ -54,10 +54,16 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
   const box = useRef<HTMLElement>(null);
   // Escape closes. Tab stays inside the dialog while it is open.
   useEffect(() => {
+    // Capture phase, and the event marked handled, so one Escape closes About and not the sheet under it.
     const k = (e: KeyboardEvent) => {
-      if (e.key === "Escape") return onClose();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        return onClose();
+      }
       if (e.key !== "Tab" || !box.current) return;
-      const els = [...box.current.querySelectorAll<HTMLElement>('a[href], button, summary, [tabindex]:not([tabindex="-1"])')];
+      // Links inside a closed <details> are not rendered, so they cannot be the first or last stop.
+      const els = [...box.current.querySelectorAll<HTMLElement>('a[href], button, summary, [tabindex]:not([tabindex="-1"])')].filter((el) => el.getClientRects().length > 0);
       if (!els.length) return;
       const [first, last] = [els[0], els[els.length - 1]];
       if (e.shiftKey && document.activeElement === first) {
@@ -68,8 +74,8 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
         first.focus();
       }
     };
-    document.addEventListener("keydown", k);
-    return () => document.removeEventListener("keydown", k);
+    document.addEventListener("keydown", k, true);
+    return () => document.removeEventListener("keydown", k, true);
   }, [onClose]);
   const dates = manifest?.dates ?? [];
   // The mall-hours guide is a manifest source; show it with the other data sources when present.

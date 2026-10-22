@@ -46,14 +46,14 @@ export function FlagChips({ step, night }: { step: Step; night: boolean }) {
   return (
     <ul className="mt-1 flex flex-wrap gap-1">
       {side && (
-        <li className="flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[11.5px] text-blue-800" data-testid="side-badge">
+        <li className="flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[12px] text-blue-800" data-testid="side-badge">
           {side.charAt(0).toUpperCase() + side.slice(1)} side
         </li>
       )}
       {side && step.sideMapped === false && (
         // OSM maps no sidewalk here, so the router assumed one from the road class.
         <li
-          className="flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11.5px] text-amber-900"
+          className="flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[12px] text-amber-900"
           title="Walang nakamapang bangketa"
           data-testid="side-unmapped"
         >
@@ -71,7 +71,7 @@ export function FlagChips({ step, night }: { step: Step; night: boolean }) {
         return (
           <li
             key={f}
-            className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11.5px] ${
+            className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[12px] ${
               f === "unchecked" || f === "hours" ? "border-amber-200 bg-amber-50 text-amber-900" : "border-slate-200 text-slate-700"
             }`}
             title={def.tl}
@@ -134,8 +134,12 @@ export function StepsList({ steps, lengthM, minutes, night, onBack, onFocus, cur
                 <CoverDot cover={s.cover} night={night} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[14px] leading-snug text-ink">{s.text}</span>
-                  {s.textTl && <span className="block text-[12px] leading-snug text-slate-500">{s.textTl}</span>}
-                  <span className="mt-0.5 block text-[12px] text-slate-500">
+                  {s.textTl && (
+                    <span className="block text-[12px] leading-snug text-slate-600" lang="fil">
+                      {s.textTl}
+                    </span>
+                  )}
+                  <span className="mt-0.5 block text-[12px] text-slate-600">
                     {fmtDist(s.distance_m)} · {s.minutes} min
                   </span>
                   <FlagChips step={s} night={night} />

@@ -116,7 +116,7 @@ export default function SunChip({
               )}
             </span>
             {!low && (
-              <span className="hidden items-center gap-1 whitespace-nowrap text-[11.5px] text-slate-600 md:flex">
+              <span className="hidden items-center gap-1 whitespace-nowrap text-[12px] text-slate-600 md:flex">
                 <ShadowArrow deg={sun.azimuth - bearing} />
                 Shadows fall {shadowWord}
               </span>
