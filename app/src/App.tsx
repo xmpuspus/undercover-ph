@@ -3,7 +3,7 @@ import { AREA_LABELS, CBD_CENTER, DEFAULT_AREA, NIGHT_ALT_DEG, SUGGESTED } from 
 import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, Weather } from "./types";
 import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, placeKeys, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
 import { areaBase, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
-import { NCR, areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea } from "./lib/areas";
+import { NCR, areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea, wellKnown } from "./lib/areas";
 import { regionPlaces } from "./lib/advisory";
 import { clockPinned, dateLabel, dateShort, fmtDist, fmtMinute, manilaNow, type Clock } from "./lib/time";
 import { toDisplay } from "./lib/display";
@@ -550,10 +550,12 @@ export default function App() {
   const suggested = useMemo(() => {
     if (!index) return [];
     const taken = new Set([from, to].map((e) => (e ? `${e.area}|${e.node}` : "")));
+    // Metro Manila areas have hand-picked lists. Regional areas take their best-known places.
     const pick = (area: string) =>
-      (SUGGESTED[area] ?? [])
-        .map((n) => index.places.find((pl) => pl.area === area && pl.name.toLowerCase() === n.toLowerCase()))
-        .filter((pl): pl is Place => !!pl && !taken.has(`${area}|${pl.node_id}`));
+      (SUGGESTED[area]
+        ? SUGGESTED[area].map((n) => index.places.find((pl) => pl.area === area && pl.name.toLowerCase() === n.toLowerCase()))
+        : wellKnown(index.places, area)
+      ).filter((pl): pl is Place => !!pl && !taken.has(`${area}|${pl.node_id}`));
     if (otherArea) return pick(otherArea).slice(0, 4);
     // Nothing picked yet: one place in each area, so the list shows where the app works.
     return AREA_LABELS.map((a) => pick(a.id)[0]).filter((pl): pl is Place => !!pl);

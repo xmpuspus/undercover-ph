@@ -872,96 +872,6 @@
    "wave": 3
   },
   {
-   "id": "mandaue-downtown",
-   "name": "Mandaue downtown",
-   "cities": [
-    "Mandaue"
-   ],
-   "region": "cebu",
-   "bbox": [
-    123.9,
-    10.314,
-    123.92,
-    10.33
-   ],
-   "wave": 3
-  },
-  {
-   "id": "mandaue-university-belt",
-   "name": "Mandaue university belt",
-   "cities": [
-    "Mandaue"
-   ],
-   "region": "cebu",
-   "bbox": [
-    123.928,
-    10.32,
-    123.948,
-    10.336
-   ],
-   "wave": 3
-  },
-  {
-   "id": "mandaue-mall-transit-hub",
-   "name": "Mandaue mall and transit hub",
-   "cities": [
-    "Mandaue"
-   ],
-   "region": "cebu",
-   "bbox": [
-    123.906,
-    10.302,
-    123.926,
-    10.318
-   ],
-   "wave": 3
-  },
-  {
-   "id": "lapu-lapu-downtown",
-   "name": "Lapu Lapu downtown",
-   "cities": [
-    "Lapu-Lapu"
-   ],
-   "region": "cebu",
-   "bbox": [
-    123.916,
-    10.312,
-    123.936,
-    10.328
-   ],
-   "wave": 3
-  },
-  {
-   "id": "lapu-lapu-university-belt",
-   "name": "Lapu Lapu university belt",
-   "cities": [
-    "Lapu-Lapu"
-   ],
-   "region": "cebu",
-   "bbox": [
-    123.93,
-    10.332,
-    123.95,
-    10.348
-   ],
-   "wave": 3
-  },
-  {
-   "id": "lapu-lapu-mall-transit-hub",
-   "name": "Lapu Lapu mall and transit hub",
-   "cities": [
-    "Lapu-Lapu"
-   ],
-   "region": "cebu",
-   "bbox": [
-    123.944,
-    10.298,
-    123.964,
-    10.314
-   ],
-   "wave": 3
-  },
-  {
    "id": "iloilo-city-downtown",
    "name": "Iloilo City downtown",
    "cities": [
@@ -1693,6 +1603,111 @@
     9.732,
     118.748,
     9.748
+   ],
+   "wave": 0
+  },
+  {
+   "id": "lapu-lapu-poblacion",
+   "name": "Lapu-Lapu poblacion",
+   "cities": [
+    "Lapu-Lapu"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.945,
+    10.302,
+    123.965,
+    10.318
+   ],
+   "wave": 3
+  },
+  {
+   "id": "lapu-lapu-airport",
+   "name": "Lapu-Lapu city hall and airport",
+   "cities": [
+    "Lapu-Lapu"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.96,
+    10.31,
+    123.98,
+    10.326
+   ],
+   "wave": 3
+  },
+  {
+   "id": "lapu-lapu-south",
+   "name": "Lapu-Lapu south",
+   "cities": [
+    "Lapu-Lapu"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.955,
+    10.284,
+    123.975,
+    10.3
+   ],
+   "wave": 3
+  },
+  {
+   "id": "mandaue-centro",
+   "name": "Mandaue centro",
+   "cities": [
+    "Mandaue"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.925,
+    10.314,
+    123.945,
+    10.33
+   ],
+   "wave": 3
+  },
+  {
+   "id": "mandaue-north",
+   "name": "Mandaue north",
+   "cities": [
+    "Mandaue"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.932,
+    10.33,
+    123.952,
+    10.346
+   ],
+   "wave": 3
+  },
+  {
+   "id": "mandaue-east",
+   "name": "Mandaue east",
+   "cities": [
+    "Mandaue"
+   ],
+   "region": "cebu",
+   "bbox": [
+    123.94,
+    10.318,
+    123.96,
+    10.334
+   ],
+   "wave": 3
+  },
+  {
+   "id": "dasmarinas-pala-pala",
+   "name": "Dasmarinas Pala-Pala and Robinsons Place",
+   "cities": [
+    "Dasmarinas"
+   ],
+   "region": "cavite",
+   "bbox": [
+    120.946,
+    14.292,
+    120.966,
+    14.308
    ],
    "wave": 0
   }

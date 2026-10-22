@@ -1,0 +1,1683 @@
+{
+ "cebu-city-centre": {
+  "cities": [
+   "Cebu City"
+  ],
+  "graph_rects": [
+   [
+    123.8844,
+    10.2865,
+    123.9166,
+    10.3385
+   ],
+   [
+    123.8594,
+    10.2915,
+    123.8886,
+    10.3165
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.996,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.996,
+    "Cebu City"
+   ],
+   [
+    0.004,
+    "Lapu-Lapu"
+   ],
+   [
+    0.0,
+    "Mandaue"
+   ]
+  ]
+ },
+ "baguio-centre": {
+  "cities": [
+   "Baguio"
+  ],
+  "graph_rects": [
+   [
+    120.5893,
+    16.4075,
+    120.6187,
+    16.4325
+   ],
+   [
+    120.5733,
+    16.4075,
+    120.6027,
+    16.4325
+   ],
+   [
+    120.5813,
+    16.3975,
+    120.6107,
+    16.4225
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.961,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.961,
+    "Baguio"
+   ],
+   [
+    0.039,
+    "La Trinidad"
+   ]
+  ]
+ },
+ "angeles-centre": {
+  "cities": [
+   "Angeles and Clark"
+  ],
+  "graph_rects": [
+   [
+    120.5693,
+    15.1495,
+    120.5987,
+    15.1745
+   ],
+   [
+    120.5773,
+    15.1595,
+    120.6067,
+    15.1845
+   ],
+   [
+    120.5733,
+    15.1275,
+    120.6027,
+    15.1525
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.807,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.807,
+    "Angeles"
+   ],
+   [
+    0.193,
+    "Mabalacat"
+   ],
+   [
+    0.001,
+    "Porac"
+   ]
+  ]
+ },
+ "san-fernando-pampanga-centre": {
+  "cities": [
+   "San Fernando (Pampanga)"
+  ],
+  "graph_rects": [
+   [
+    120.6813,
+    15.0215,
+    120.7107,
+    15.0465
+   ],
+   [
+    120.6693,
+    15.0275,
+    120.6987,
+    15.0525
+   ],
+   [
+    120.6693,
+    15.0155,
+    120.6987,
+    15.0405
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.961,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.961,
+    "San Fernando"
+   ],
+   [
+    0.033,
+    "Bacolor"
+   ],
+   [
+    0.005,
+    "Mexico"
+   ]
+  ]
+ },
+ "olongapo-centre": {
+  "cities": [
+   "Olongapo and Subic"
+  ],
+  "graph_rects": [
+   [
+    120.2674,
+    14.8255,
+    120.2966,
+    14.8505
+   ],
+   [
+    120.2674,
+    14.8135,
+    120.2966,
+    14.8385
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Olongapo"
+   ],
+   [
+    0.41,
+    "Subic Special Economic and Freeport Zone"
+   ],
+   [
+    0.0,
+    "SBMA Building 229"
+   ]
+  ]
+ },
+ "malolos-centre": {
+  "cities": [
+   "Malolos"
+  ],
+  "graph_rects": [
+   [
+    120.7994,
+    14.8295,
+    120.8286,
+    14.8545
+   ],
+   [
+    120.7994,
+    14.8415,
+    120.8286,
+    14.8665
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.977,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.977,
+    "Malolos"
+   ],
+   [
+    0.023,
+    "Paombong"
+   ]
+  ]
+ },
+ "baliwag-centre": {
+  "cities": [
+   "Baliwag"
+  ],
+  "graph_rects": [
+   [
+    120.8714,
+    14.9395,
+    120.9006,
+    14.9645
+   ],
+   [
+    120.8834,
+    14.9455,
+    120.9126,
+    14.9705
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.896,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.896,
+    "Baliwag"
+   ],
+   [
+    0.104,
+    "Bustos"
+   ]
+  ]
+ },
+ "tarlac-centre": {
+  "cities": [
+   "Tarlac City"
+  ],
+  "graph_rects": [
+   [
+    120.5813,
+    15.4815,
+    120.6107,
+    15.5065
+   ],
+   [
+    120.5773,
+    15.4695,
+    120.6067,
+    15.4945
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Tarlac City"
+   ]
+  ]
+ },
+ "balanga-centre": {
+  "cities": [
+   "Balanga"
+  ],
+  "graph_rects": [
+   [
+    120.5134,
+    14.6595,
+    120.5426,
+    14.6845
+   ],
+   [
+    120.5254,
+    14.6655,
+    120.5546,
+    14.6905
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.868,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.868,
+    "Balanga"
+   ],
+   [
+    0.132,
+    "Pilar"
+   ]
+  ]
+ },
+ "cabanatuan-centre": {
+  "cities": [
+   "Cabanatuan"
+  ],
+  "graph_rects": [
+   [
+    120.9593,
+    15.4855,
+    120.9887,
+    15.5105
+   ],
+   [
+    120.9433,
+    15.4655,
+    120.9727,
+    15.4905
+   ],
+   [
+    120.9553,
+    15.4735,
+    120.9847,
+    15.4985
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Cabanatuan"
+   ]
+  ]
+ },
+ "dagupan-centre": {
+  "cities": [
+   "Dagupan"
+  ],
+  "graph_rects": [
+   [
+    120.3233,
+    16.0275,
+    120.3527,
+    16.0525
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Dagupan"
+   ]
+  ]
+ },
+ "vigan-centre": {
+  "cities": [
+   "Vigan"
+  ],
+  "graph_rects": [
+   [
+    120.3733,
+    17.5635,
+    120.4027,
+    17.5885
+   ]
+  ],
+  "method": "place point",
+  "inside": [
+   "vigan"
+  ],
+  "verdict": "PASS",
+  "top": []
+ },
+ "laoag-centre": {
+  "cities": [
+   "Laoag"
+  ],
+  "graph_rects": [
+   [
+    120.5793,
+    18.1875,
+    120.6087,
+    18.2125
+   ]
+  ],
+  "method": "place point",
+  "inside": [
+   "laoag"
+  ],
+  "verdict": "PASS",
+  "top": []
+ },
+ "tuguegarao-centre": {
+  "cities": [
+   "Tuguegarao"
+  ],
+  "graph_rects": [
+   [
+    121.7153,
+    17.6155,
+    121.7447,
+    17.6405
+   ],
+   [
+    121.7073,
+    17.6055,
+    121.7367,
+    17.6305
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Tuguegarao"
+   ]
+  ]
+ },
+ "davao-city-centre": {
+  "cities": [
+   "Davao City"
+  ],
+  "graph_rects": [
+   [
+    125.5995,
+    7.0595,
+    125.6285,
+    7.0845
+   ],
+   [
+    125.5895,
+    7.0515,
+    125.6185,
+    7.0765
+   ],
+   [
+    125.5975,
+    7.0715,
+    125.6265,
+    7.0965
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Davao City"
+   ],
+   [
+    0.0,
+    "City Hall of Davao"
+   ]
+  ]
+ },
+ "digos-centre": {
+  "cities": [
+   "Digos"
+  ],
+  "graph_rects": [
+   [
+    125.3395,
+    6.7375,
+    125.3685,
+    6.7625
+   ],
+   [
+    125.3315,
+    6.7475,
+    125.3605,
+    6.7725
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Digos"
+   ]
+  ]
+ },
+ "tagum-centre": {
+  "cities": [
+   "Tagum"
+  ],
+  "graph_rects": [
+   [
+    125.7935,
+    7.4395,
+    125.8225,
+    7.4645
+   ],
+   [
+    125.7795,
+    7.4435,
+    125.8085,
+    7.4685
+   ],
+   [
+    125.7915,
+    7.4275,
+    125.8205,
+    7.4525
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Tagum"
+   ]
+  ]
+ },
+ "cagayan-de-oro-centre": {
+  "cities": [
+   "Cagayan de Oro"
+  ],
+  "graph_rects": [
+   [
+    124.6335,
+    8.4695,
+    124.6625,
+    8.4945
+   ],
+   [
+    124.6235,
+    8.4615,
+    124.6525,
+    8.4865
+   ],
+   [
+    124.6375,
+    8.4575,
+    124.6665,
+    8.4825
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Cagayan de Oro"
+   ]
+  ]
+ },
+ "iligan-centre": {
+  "cities": [
+   "Iligan"
+  ],
+  "graph_rects": [
+   [
+    124.2375,
+    8.2315,
+    124.2665,
+    8.2565
+   ],
+   [
+    124.2315,
+    8.2195,
+    124.2605,
+    8.2445
+   ],
+   [
+    124.2235,
+    8.2095,
+    124.2525,
+    8.2345
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Iligan"
+   ]
+  ]
+ },
+ "zamboanga-city-centre": {
+  "cities": [
+   "Zamboanga City"
+  ],
+  "graph_rects": [
+   [
+    122.0655,
+    6.8975,
+    122.0945,
+    6.9225
+   ],
+   [
+    122.0635,
+    6.9095,
+    122.0925,
+    6.9345
+   ],
+   [
+    122.0515,
+    6.9015,
+    122.0805,
+    6.9265
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Zamboanga City"
+   ]
+  ]
+ },
+ "pagadian-downtown": {
+  "cities": [
+   "Pagadian"
+  ],
+  "graph_rects": [
+   [
+    123.4215,
+    7.8135,
+    123.4505,
+    7.8385
+   ]
+  ],
+  "method": "place point",
+  "inside": [
+   "pagadian"
+  ],
+  "verdict": "PASS",
+  "top": []
+ },
+ "dipolog-downtown": {
+  "cities": [
+   "Dipolog"
+  ],
+  "graph_rects": [
+   [
+    123.3295,
+    8.5695,
+    123.3585,
+    8.5945
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Dipolog"
+   ],
+   [
+    0.227,
+    "Miputak"
+   ],
+   [
+    0.15,
+    "Turno"
+   ]
+  ]
+ },
+ "general-santos-centre": {
+  "cities": [
+   "General Santos"
+  ],
+  "graph_rects": [
+   [
+    125.1635,
+    6.1015,
+    125.1925,
+    6.1265
+   ],
+   [
+    125.1515,
+    6.1075,
+    125.1805,
+    6.1325
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "General Santos"
+   ]
+  ]
+ },
+ "koronadal-centre": {
+  "cities": [
+   "Koronadal"
+  ],
+  "graph_rects": [
+   [
+    124.8295,
+    6.4855,
+    124.8585,
+    6.5105
+   ],
+   [
+    124.8215,
+    6.4955,
+    124.8505,
+    6.5205
+   ],
+   [
+    124.8415,
+    6.4795,
+    124.8705,
+    6.5045
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Koronadal"
+   ]
+  ]
+ },
+ "cotabato-city-centre": {
+  "cities": [
+   "Cotabato City"
+  ],
+  "graph_rects": [
+   [
+    124.2255,
+    7.1915,
+    124.2545,
+    7.2165
+   ],
+   [
+    124.2315,
+    7.2055,
+    124.2605,
+    7.2305
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.927,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.927,
+    "Cotabato City"
+   ],
+   [
+    0.073,
+    "Sultan Kudarat"
+   ]
+  ]
+ },
+ "butuan-centre": {
+  "cities": [
+   "Butuan"
+  ],
+  "graph_rects": [
+   [
+    125.5195,
+    8.9335,
+    125.5485,
+    8.9585
+   ],
+   [
+    125.5295,
+    8.9415,
+    125.5585,
+    8.9665
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Butuan"
+   ]
+  ]
+ },
+ "surigao-downtown": {
+  "cities": [
+   "Surigao"
+  ],
+  "graph_rects": [
+   [
+    125.4774,
+    9.7715,
+    125.5066,
+    9.7965
+   ]
+  ],
+  "method": "place point",
+  "inside": [
+   "surigao"
+  ],
+  "verdict": "PASS",
+  "top": []
+ },
+ "mandaue": {
+  "cities": [
+   "Mandaue"
+  ],
+  "graph_rects": [
+   [
+    123.9204,
+    10.3095,
+    123.9496,
+    10.3345
+   ],
+   [
+    123.9274,
+    10.3255,
+    123.9566,
+    10.3505
+   ],
+   [
+    123.9354,
+    10.3135,
+    123.9646,
+    10.3385
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.867,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.867,
+    "Mandaue"
+   ],
+   [
+    0.113,
+    "Lapu-Lapu"
+   ],
+   [
+    0.02,
+    "Cebu City"
+   ]
+  ]
+ },
+ "lapu-lapu": {
+  "cities": [
+   "Lapu-Lapu"
+  ],
+  "graph_rects": [
+   [
+    123.9404,
+    10.2975,
+    123.9696,
+    10.3225
+   ],
+   [
+    123.9554,
+    10.3055,
+    123.9846,
+    10.3305
+   ],
+   [
+    123.9504,
+    10.2795,
+    123.9796,
+    10.3045
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.895,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.895,
+    "Lapu-Lapu"
+   ],
+   [
+    0.105,
+    "Mandaue"
+   ],
+   [
+    0.0,
+    "Cordova"
+   ]
+  ]
+ },
+ "iloilo-city": {
+  "cities": [
+   "Iloilo City"
+  ],
+  "graph_rects": [
+   [
+    122.5494,
+    10.6875,
+    122.5786,
+    10.7125
+   ],
+   [
+    122.5374,
+    10.7015,
+    122.5666,
+    10.7265
+   ],
+   [
+    122.5414,
+    10.7135,
+    122.5706,
+    10.7385
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Iloilo City"
+   ],
+   [
+    0.307,
+    "Jaro"
+   ],
+   [
+    0.264,
+    "Mandurriao"
+   ]
+  ]
+ },
+ "bacolod": {
+  "cities": [
+   "Bacolod"
+  ],
+  "graph_rects": [
+   [
+    122.9374,
+    10.6575,
+    122.9666,
+    10.6825
+   ],
+   [
+    122.9454,
+    10.6675,
+    122.9746,
+    10.6925
+   ],
+   [
+    122.9494,
+    10.6495,
+    122.9786,
+    10.6745
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Bacolod"
+   ],
+   [
+    0.664,
+    "Bacolod-1"
+   ],
+   [
+    0.198,
+    "Bacolod-2"
+   ]
+  ]
+ },
+ "talisay-negros": {
+  "cities": [
+   "Talisay (Negros Occidental)"
+  ],
+  "graph_rects": [
+   [
+    122.9594,
+    10.7295,
+    122.9886,
+    10.7545
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Talisay"
+   ]
+  ]
+ },
+ "dumaguete": {
+  "cities": [
+   "Dumaguete"
+  ],
+  "graph_rects": [
+   [
+    123.2854,
+    9.2995,
+    123.3146,
+    9.3245
+   ],
+   [
+    123.2834,
+    9.3115,
+    123.3126,
+    9.3365
+   ],
+   [
+    123.2874,
+    9.2875,
+    123.3166,
+    9.3125
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.893,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.893,
+    "Dumaguete"
+   ],
+   [
+    0.107,
+    "Sibulan"
+   ]
+  ]
+ },
+ "tagbilaran": {
+  "cities": [
+   "Tagbilaran"
+  ],
+  "graph_rects": [
+   [
+    123.8474,
+    9.6355,
+    123.8766,
+    9.6605
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.959,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.959,
+    "Tagbilaran"
+   ],
+   [
+    0.041,
+    "Dauis"
+   ]
+  ]
+ },
+ "tacloban-downtown": {
+  "cities": [
+   "Tacloban"
+  ],
+  "graph_rects": [
+   [
+    124.9834,
+    11.2295,
+    125.0126,
+    11.2545
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Tacloban"
+   ],
+   [
+    0.223,
+    "Abucay"
+   ],
+   [
+    0.071,
+    "Utap"
+   ]
+  ]
+ },
+ "tacloban-university-belt": {
+  "cities": [
+   "Tacloban"
+  ],
+  "graph_rects": [
+   [
+    124.9894,
+    11.2015,
+    125.0186,
+    11.2265
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Tacloban"
+   ],
+   [
+    0.097,
+    "Barangay 95"
+   ],
+   [
+    0.078,
+    "Barangay 77"
+   ]
+  ]
+ },
+ "ormoc": {
+  "cities": [
+   "Ormoc"
+  ],
+  "graph_rects": [
+   [
+    124.5934,
+    10.9995,
+    124.6226,
+    11.0245
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Ormoc"
+   ]
+  ]
+ },
+ "roxas-city": {
+  "cities": [
+   "Roxas City"
+  ],
+  "graph_rects": [
+   [
+    122.7394,
+    11.5695,
+    122.7686,
+    11.5945
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Roxas City"
+   ]
+  ]
+ },
+ "kalibo": {
+  "cities": [
+   "Kalibo"
+  ],
+  "graph_rects": [
+   [
+    122.3574,
+    11.6935,
+    122.3866,
+    11.7185
+   ],
+   [
+    122.3434,
+    11.6995,
+    122.3726,
+    11.7245
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.705,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.705,
+    "Kalibo"
+   ],
+   [
+    0.295,
+    "Numancia"
+   ]
+  ]
+ },
+ "dasmarinas": {
+  "cities": [
+   "Dasmarinas"
+  ],
+  "graph_rects": [
+   [
+    120.9514,
+    14.3055,
+    120.9806,
+    14.3305
+   ],
+   [
+    120.9394,
+    14.3155,
+    120.9686,
+    14.3405
+   ],
+   [
+    120.9254,
+    14.3115,
+    120.9546,
+    14.3365
+   ],
+   [
+    120.9414,
+    14.2875,
+    120.9706,
+    14.3125
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.983,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.983,
+    "Dasmariñas"
+   ],
+   [
+    0.017,
+    "General Trias"
+   ],
+   [
+    0.001,
+    "New Dasmariñas City Hall"
+   ]
+  ]
+ },
+ "tagaytay": {
+  "cities": [
+   "Tagaytay"
+  ],
+  "graph_rects": [
+   [
+    120.9454,
+    14.1075,
+    120.9746,
+    14.1325
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.979,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.979,
+    "Tagaytay"
+   ],
+   [
+    0.021,
+    "Amadeo"
+   ]
+  ]
+ },
+ "santa-rosa": {
+  "cities": [
+   "Santa Rosa",
+   "Biñan"
+  ],
+  "graph_rects": [
+   [
+    121.0714,
+    14.3195,
+    121.1006,
+    14.3445
+   ],
+   [
+    121.0894,
+    14.3055,
+    121.1186,
+    14.3305
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.986,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.551,
+    "Biñan"
+   ],
+   [
+    0.436,
+    "Santa Rosa"
+   ],
+   [
+    0.014,
+    "Carmona"
+   ]
+  ]
+ },
+ "calamba": {
+  "cities": [
+   "Calamba"
+  ],
+  "graph_rects": [
+   [
+    121.1454,
+    14.1975,
+    121.1746,
+    14.2225
+   ],
+   [
+    121.1434,
+    14.1855,
+    121.1726,
+    14.2105
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Calamba"
+   ]
+  ]
+ },
+ "los-banos": {
+  "cities": [
+   "Los Banos"
+  ],
+  "graph_rects": [
+   [
+    121.2314,
+    14.1535,
+    121.2606,
+    14.1785
+   ],
+   [
+    121.2214,
+    14.1615,
+    121.2506,
+    14.1865
+   ],
+   [
+    121.2194,
+    14.1475,
+    121.2486,
+    14.1725
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Los Baños"
+   ]
+  ]
+ },
+ "san-pablo": {
+  "cities": [
+   "San Pablo"
+  ],
+  "graph_rects": [
+   [
+    121.3074,
+    14.0575,
+    121.3366,
+    14.0825
+   ],
+   [
+    121.3194,
+    14.0515,
+    121.3486,
+    14.0765
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "San Pablo"
+   ]
+  ]
+ },
+ "lipa": {
+  "cities": [
+   "Lipa"
+  ],
+  "graph_rects": [
+   [
+    121.1434,
+    13.9295,
+    121.1726,
+    13.9545
+   ],
+   [
+    121.1574,
+    13.9335,
+    121.1866,
+    13.9585
+   ],
+   [
+    121.1554,
+    13.9215,
+    121.1846,
+    13.9465
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Lipa"
+   ]
+  ]
+ },
+ "batangas-city": {
+  "cities": [
+   "Batangas City"
+  ],
+  "graph_rects": [
+   [
+    121.0474,
+    13.7455,
+    121.0766,
+    13.7705
+   ],
+   [
+    121.0354,
+    13.7395,
+    121.0646,
+    13.7645
+   ],
+   [
+    121.0354,
+    13.7515,
+    121.0646,
+    13.7765
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Batangas City"
+   ]
+  ]
+ },
+ "antipolo": {
+  "cities": [
+   "Antipolo"
+  ],
+  "graph_rects": [
+   [
+    121.1634,
+    14.5715,
+    121.1926,
+    14.5965
+   ],
+   [
+    121.1714,
+    14.5615,
+    121.2006,
+    14.5865
+   ],
+   [
+    121.1614,
+    14.5835,
+    121.1906,
+    14.6085
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.996,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.996,
+    "Antipolo"
+   ],
+   [
+    0.004,
+    "Teresa"
+   ]
+  ]
+ },
+ "lucena": {
+  "cities": [
+   "Lucena"
+  ],
+  "graph_rects": [
+   [
+    121.6054,
+    13.9215,
+    121.6346,
+    13.9465
+   ],
+   [
+    121.5934,
+    13.9275,
+    121.6226,
+    13.9525
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Lucena"
+   ]
+  ]
+ },
+ "naga": {
+  "cities": [
+   "Naga"
+  ],
+  "graph_rects": [
+   [
+    123.1754,
+    13.6135,
+    123.2046,
+    13.6385
+   ],
+   [
+    123.1794,
+    13.6255,
+    123.2086,
+    13.6505
+   ],
+   [
+    123.1914,
+    13.6115,
+    123.2206,
+    13.6365
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.88,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.88,
+    "Naga City"
+   ],
+   [
+    0.104,
+    "Canaman"
+   ],
+   [
+    0.016,
+    "Camaligan"
+   ]
+  ]
+ },
+ "legazpi": {
+  "cities": [
+   "Legazpi"
+  ],
+  "graph_rects": [
+   [
+    123.7294,
+    13.1335,
+    123.7586,
+    13.1585
+   ],
+   [
+    123.7054,
+    13.1375,
+    123.7346,
+    13.1625
+   ],
+   [
+    123.7154,
+    13.1275,
+    123.7446,
+    13.1525
+   ]
+  ],
+  "method": "boundary",
+  "share": 0.662,
+  "verdict": "PASS",
+  "top": [
+   [
+    0.662,
+    "Legazpi"
+   ],
+   [
+    0.338,
+    "Daraga"
+   ]
+  ]
+ },
+ "calapan": {
+  "cities": [
+   "Calapan"
+  ],
+  "graph_rects": [
+   [
+    121.1634,
+    13.3955,
+    121.1926,
+    13.4205
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Calapan"
+   ]
+  ]
+ },
+ "puerto-princesa": {
+  "cities": [
+   "Puerto Princesa"
+  ],
+  "graph_rects": [
+   [
+    118.7234,
+    9.7275,
+    118.7526,
+    9.7525
+   ]
+  ],
+  "method": "boundary",
+  "share": 1.0,
+  "verdict": "PASS",
+  "top": [
+   [
+    1.0,
+    "Puerto Princesa"
+   ]
+  ]
+ }
+}

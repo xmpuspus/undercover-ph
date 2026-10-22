@@ -4,8 +4,9 @@ Usage: pipeline/.venv/bin/python -I pipeline/districts/publish.py [--no-tiles] [
 Run it after pipeline/districts/build.py has staged every area in pipeline/areas.json. It stops on an area
 whose last build.py checks failed. `--hold AREA_ID` (repeatable) leaves that area out of the app.
 Areas outside Metro Manila come from pipeline/regions/areas.json. One of them ships when it is staged, its
-checks passed, its canopy.tif exists and at least 70% of its place pairs connect (reach.py). The report lists
-the others as not ready, with the reason.
+checks passed, its canopy.tif exists, a shade run is newer than its graph (publish reads its trees.json),
+pipeline/regions/city_check.py found its boxes in its own city, and at least 70% of its place pairs connect
+(reach.py). The report lists the others as not ready, with the reason.
 It reads pipeline/stage/<id>/ and writes these files, all kept in git:
 
 - app/public/data/areas.json: the routing areas, their boxes, neighbourhoods and centre.
@@ -239,6 +240,9 @@ def build_tiles(ids):
             "trees_pmtiles_bytes": (DATA / "trees.pmtiles").stat().st_size}
 
 
+CITY_CHECK = json.load(open(PIPE / "regions/city_check.json")) if (PIPE / "regions/city_check.json").exists() else {}
+
+
 def regional_ready(a):
     """Why a regional area cannot ship yet, or None when it can."""
     i = a["id"]
@@ -249,6 +253,12 @@ def regional_ready(a):
         return "checks not passed"
     if not (INPUTS / i / "canopy.tif").exists():
         return "no canopy.tif"
+    ready = STAGE / i / "READY.shade"
+    if not ready.exists() or ready.stat().st_mtime < (STAGE / i / "graph.json").stat().st_mtime:
+        return "no shade run on this graph"
+    city = CITY_CHECK.get(i)
+    if not city or city["graph_rects"] != a["graph_rects"] or city["verdict"] != "PASS":
+        return "boxes not checked against the city, or not in it (run pipeline/regions/city_check.py)"
     # Route checks prove a few pairs. Most trips between the area's places must find a route too.
     r = reach(i)
     if r < MIN_REACH:

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { AreaInfo } from "../types";
-import { areaAt, areaCities, areaGroups, areaLabel, areaList, placeWhere, regionOf, sharedArea } from "./areas";
+import type { AreaInfo, Place } from "../types";
+import { areaAt, areaCities, areaGroups, areaLabel, areaList, placeWhere, regionOf, sharedArea, wellKnown } from "./areas";
 
 // Two areas whose graph boxes overlap, as Greenhills (metro-core) and Cubao do.
 const core: AreaInfo = {
@@ -106,3 +106,31 @@ describe("regions", () => {
   });
 });
 
+
+describe("suggested places for an area with no hand-picked list", () => {
+  const at = (name: string, category: string, area = "batangas-city"): Place => ({ name, category, lon: 121, lat: 13.7, node_id: 1, aliases: [], area });
+  const places = [
+    at("Batangas City Hall", "landmark"),
+    at("Batangas City Hall of Justice", "landmark"),
+    at("SM City Batangas", "mall"),
+    at("Bay City Mall", "mall"),
+    at("BOSS", "mall"),
+    at("Nuciti Central", "mall"),
+    at("Batangas Medical Center", "hospital"),
+    at("Grand Terminal", "bus_station"),
+    at("Grand Terminal", "bus_station"),
+    at("Lipa City Hall", "landmark", "lipa"),
+    at("Sitio Office", "office"),
+  ];
+  it("puts the city hall first, keeps two of a kind, and skips repeated, short and plain names", () => {
+    expect(wellKnown(places, "batangas-city").map((p) => p.name)).toEqual([
+      "Batangas City Hall",
+      "SM City Batangas",
+      "Nuciti Central",
+      "Batangas Medical Center",
+    ]);
+  });
+  it("only suggests places of the asked area", () => {
+    expect(wellKnown(places, "lipa").map((p) => p.name)).toEqual(["Lipa City Hall"]);
+  });
+});

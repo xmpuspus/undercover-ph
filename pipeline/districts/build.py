@@ -9,6 +9,7 @@ Steps: extract OSM features, hours, buildings, graph, places, route checks, mani
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -18,6 +19,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PY = str(ROOT / "pipeline/.venv/bin/python")
 STEPS = ["extract_features.py", "build_hours.py", "build_buildings.py", "build_graph.py", "build_places.py"]
+SHADE_OUTPUTS = ["manifest.json", "READY.shade", "trees.json"]
 
 
 def known_ids():
@@ -48,6 +50,12 @@ def build(area, checks_only=False):
     work = HERE.parents[0] / "work/districts" / area
     work.mkdir(parents=True, exist_ok=True)
     (work / "build_log.txt").write_text("")
+    if not checks_only:
+        # shade.py writes these from the old graph, and it reads manifest.json before the new template.
+        stage = HERE.parents[0] / "stage" / area
+        for name in SHADE_OUTPUTS:
+            (stage / name).unlink(missing_ok=True)
+        shutil.rmtree(stage / "shade", ignore_errors=True)
     times = {} if checks_only else {s: round(run(area, s), 1) for s in STEPS}
     (work / "route_check.json").unlink(missing_ok=True)
     pairs = json.load(open(HERE / "routes.json")).get(area, [])

@@ -141,6 +141,11 @@ def download(qk):
     return out
 
 
+def same_res(a, b):
+    """Tiles of one zoom differ in the 14th digit of their pixel size (132303332 against 132303122)."""
+    return all(math.isclose(x, y, rel_tol=1e-9) for x, y in zip(a, b))
+
+
 def canopy_window(paths, win):
     """Mosaic the tiles in EPSG:3857 and reproject them to the lattice window with average resampling."""
     dst_transform = window_transform(win)
@@ -151,7 +156,7 @@ def canopy_window(paths, win):
         try:
             crs = srcs[0].crs
             for s in srcs:
-                if s.crs != crs or s.dtypes != ("uint8",) or s.res != srcs[0].res:
+                if s.crs != crs or s.dtypes != ("uint8",) or not same_res(s.res, srcs[0].res):
                     sys.exit(f"{s.name}: unexpected CRS, type or resolution")
             mx0, my0, mx1, my1 = transform_bounds("EPSG:4326", crs, west, south, east, north, densify_pts=21)
             g = SRC_MARGIN_PX * srcs[0].res[0]

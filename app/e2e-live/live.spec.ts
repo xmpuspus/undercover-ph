@@ -1,4 +1,4 @@
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 
 const OUT = process.env.LIVE_OUT ?? "test-results/live";
@@ -23,6 +23,21 @@ const TRIPS: [string, string, string][] = [
   ["seam", "SM Mall of Asia", "Ayala Malls Manila Bay"],
 ];
 
+// One trip per area outside Metro Manila: the first route-check pair whose two names appear once in the whole
+// place list, so the search box cannot pick a same-named place in another area.
+const read = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8"));
+const areas: { id: string; region?: { id: string } }[] = read("../public/data/areas.json").areas;
+const index: { name: string }[] = read("../public/data/places_index.json");
+const pairs: Record<string, [string, string][]> = read("../../pipeline/districts/routes.json");
+const seen = new Map<string, number>();
+for (const p of index) seen.set(p.name.toLowerCase(), (seen.get(p.name.toLowerCase()) ?? 0) + 1);
+const once = (n: string) => seen.get(n.toLowerCase()) === 1;
+for (const a of areas.filter((x) => x.region && x.region.id !== "ncr")) {
+  const pair = (pairs[a.id] ?? []).find(([x, y]) => once(x) && once(y));
+  if (pair) TRIPS.push([a.id, pair[0], pair[1]]);
+  else TRIPS.push([a.id, "(no pair with unique names)", ""]);
+}
+
 async function pickPlace(page: Page, inputId: string, text: string) {
   await page.getByTestId(inputId).fill(text);
   const option = page.getByTestId("place-option").filter({ has: page.getByText(text, { exact: true }) }).first();
@@ -32,6 +47,7 @@ async function pickPlace(page: Page, inputId: string, text: string) {
 
 for (const [area, from, to] of TRIPS) {
   test(`${area}: ${from} to ${to}`, async ({ page }) => {
+    expect(to, `${area} has no route-check pair with names unique across areas`).not.toBe("");
     const errors: string[] = [];
     // A bare "Error" text says nothing, so keep each Error's message and stack top.
     page.on("console", async (m) => {

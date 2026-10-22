@@ -31,6 +31,12 @@ def test_cebu_city_centre_needs_one_canopy_tile():
     assert fetch_canopy.quadkeys((123.877, 10.279, 123.924, 10.346)) == ["132330002"]
 
 
+def test_tiles_of_one_zoom_share_a_pixel_size_despite_float_noise():
+    # Pixel sizes read from the Meta tiles 132303122 and 132303332 on 2026-10-22.
+    assert fetch_canopy.same_res((1.1943285669558747, 1.1943285669558819), (1.1943285669559032, 1.1943285669558783))
+    assert not fetch_canopy.same_res((1.1943285669558747, 1.1943285669558747), (2.3886571339117494, 2.3886571339117494))
+
+
 def test_utm_zone_follows_120_east():
     assert region.utm_epsg({"id": "cebu", "osm_bbox": [123.75, 10.2, 124.05, 10.45], "utm_epsg": 32651}) == 32651
     assert region.utm_epsg({"id": "palawan", "osm_bbox": [118.6, 9.6, 118.9, 9.9], "utm_epsg": 32650}) == 32650

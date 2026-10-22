@@ -8,6 +8,8 @@
 # The deploy build shades an area itself when its graph.json no longer matches graph.sha256, or when the
 # asset lacks it. So one failed area does not hold back the rest: the release goes out with the areas that
 # finished, the failure opens an issue, and the deploy shades the missing area.
+# A manual run on another branch (gh workflow run shade.yml --ref BRANCH) shades that branch's areas into
+# today's release and pushes no commit, so a branch that adds areas can merge with its shade ready.
 
 name: shade
 
@@ -39,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           fetch-depth: 1
           sparse-checkout: app/public/data/areas.json
           sparse-checkout-cone-mode: false
@@ -66,7 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           fetch-depth: 1
           sparse-checkout: |
             pipeline
@@ -138,7 +140,7 @@ jobs:
   deploy:
     name: empty commit to main
     needs: release
-    if: ${{ !cancelled() && needs.release.result == 'success' && (github.event_name == 'schedule' || inputs.deploy) }}
+    if: ${{ !cancelled() && needs.release.result == 'success' && github.ref_name == 'main' && (github.event_name == 'schedule' || inputs.deploy) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

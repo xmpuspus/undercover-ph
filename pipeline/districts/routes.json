@@ -239,16 +239,16 @@
  ],
  "mandaue": [
   [
-   "SM City Cebu",
-   "Gaisano Grand Mall Mandaue"
+   "Insular Square Mall",
+   "Mandaue City Hall of Justice"
   ],
   [
-   "Cebu North Bus Terminal",
-   "Parkmall"
+   "Gaisano Grand Mall Mandaue",
+   "Lapu-Lapu City Hall of Justice"
   ],
   [
-   "Mandaue City Hospital",
-   "GMall of Cebu"
+   "NorthDrive Mall",
+   "Pacific Mall Mandaue"
   ]
  ],
  "calapan": [
@@ -351,16 +351,16 @@
  ],
  "baguio-centre": [
   [
-   "456 Department Store",
-   "Baguio General Hospital & Medical Center"
+   "SM City Baguio",
+   "Baguio Cathedral"
   ],
   [
-   "Abanao Square",
-   "Cooyeesan Hotel Plaza"
+   "Porta Vaga Mall",
+   "Victory Liner Terminal"
   ],
   [
-   "Baguio Center Mall",
-   "SM City Baguio"
+   "Baguio General Hospital & Medical Center",
+   "Baguio Center Mall"
   ]
  ],
  "iloilo-city": [
@@ -379,30 +379,30 @@
  ],
  "angeles-centre": [
   [
-   "167 Shopping Center",
-   "Central Town Mall"
+   "Robinsons Angeles",
+   "Saver's Mall"
   ],
   [
-   "CityMall Dau",
-   "Clark Cityfront Mall"
+   "Holy Angel University",
+   "Jenra Mall"
   ],
   [
-   "Happy Go Shopping Center",
-   "Accumed Diagnostic Center"
+   "Angeles University Foundation Medical Center",
+   "Robinsons Angeles"
   ]
  ],
  "san-fernando-pampanga-centre": [
   [
-   "Jumbo Jenra",
-   "Dra. Gina Marie Ponio"
-  ],
-  [
-   "North Walk 1",
-   "Robinsons Starmills"
+   "San Fernando City Hall",
+   "Pampanga Provincial Capitol Building"
   ],
   [
    "SM City San Fernando Downtown",
    "Jose B. Lingad Memorial Regional Hospital"
+  ],
+  [
+   "San Fernando Cathedral",
+   "University of the Assumption"
   ]
  ],
  "legazpi": [
@@ -421,44 +421,44 @@
  ],
  "olongapo-centre": [
   [
-   "Harbor Point Mall",
-   "SM City Olongapo Central"
+   "SM City Olongapo Central",
+   "Olongapo City Hall"
+  ],
+  [
+   "Victory Liner - Olongapo Terminal",
+   "Rizal Monument"
   ],
   [
    "SM City Olongapo Downtown",
-   "SBMA Dispensary"
-  ],
-  [
-   "James Gordon Memorial Hospital",
-   "Mother and Child Hospital"
+   "Friendship Rotonda"
   ]
  ],
  "malolos-centre": [
   [
-   "Graceland Mall",
-   "Robinsons Place Malolos"
+   "Church of Barasoain",
+   "Hiyas ng Bulacan Museum"
   ],
   [
-   "Star Bright",
-   "Xentro Mall Malolos"
+   "Robinsons Place Malolos",
+   "Sacred Heart Hospital of Malolos"
   ],
   [
-   "Bulacan Medical Center",
-   "EENT Hospital"
+   "Malolos Central Transport Terminal",
+   "Church of Barasoain"
   ]
  ],
  "santa-rosa": [
   [
    "Central Mall Biñan",
-   "JAC Liner - Biñan Terminal"
+   "Perpetual Help Medical Center - Biñan"
   ],
   [
    "Robinsons Santa Rosa Market",
-   "Santa Rosa Integrated Transport Terminal"
+   "Marian Hospital"
   ],
   [
    "SM City Santa Rosa",
-   "Alabang Jeepney Terminal"
+   "Robinsons Santa Rosa Market"
   ]
  ],
  "bacolod": [
@@ -491,16 +491,464 @@
  ],
  "baliwag-centre": [
   [
-   "A. Square",
-   "SM City Baliwag"
+   "SM City Baliwag",
+   "Simbahan ng Baliwag"
   ],
   [
-   "SM City Baliwag North Expansion",
+   "Baliwag Clock Tower",
+   "De Jesus General Hospital"
+  ],
+  [
+   "A. Square",
+   "Baliuag University - College Department"
+  ]
+ ],
+ "davao-city-centre": [
+  [
+   "Abreeza Ayala Mall Davao",
+   "Ateneo de Davao University"
+  ],
+  [
+   "Gaisano Mall of Davao",
+   "University of Mindanao - Main"
+  ],
+  [
+   "Davao Doctors Hospital",
+   "Mindanao Medical Mission Hospital Emergency Bay"
+  ]
+ ],
+ "digos-centre": [
+  [
+   "Digos City Hall",
+   "Mary, Mother and Mediatrix of Grace Cathedral"
+  ],
+  [
+   "Gaisano Grand Digos",
+   "Digos City Hall"
+  ],
+  [
+   "Digos City New Bus Terminal",
+   "Gaisano Grand Digos"
+  ]
+ ],
+ "tagum-centre": [
+  [
+   "Tagum City Overland Transport Integrated Terminal",
+   "NCCC Mall of Tagum"
+  ],
+  [
+   "Christ the King Cathedral",
+   "Gaisano Mall of Tagum"
+  ],
+  [
+   "Tagum City Overland Transport Integrated Terminal",
+   "Christ the King Specialists Hospital"
+  ]
+ ],
+ "calamba": [
+  [
+   "CityMall Calamba",
+   "Pamana Medical Center"
+  ],
+  [
+   "Calamba Central Terminal",
+   "St. John The Baptist Medical Center"
+  ],
+  [
+   "268 Mall",
+   "Newstar"
+  ]
+ ],
+ "balanga-centre": [
+  [
+   "Centre Plaza Mall",
    "WalterMart"
   ],
   [
-   "Alied Care Experts Medical Center Baliuag",
-   "Baliwag Malasakit Center"
+   "Bataan Provincial Capitol Compound",
+   "Galeria Victoria"
+  ],
+  [
+   "Galleria Victoria",
+   "SM City Bataan"
+  ]
+ ],
+ "batangas-city": [
+  [
+   "Batangas City Hall of Justice",
+   "WalterMart"
+  ],
+  [
+   "Nuciti Central",
+   "SM City Batangas"
+  ],
+  [
+   "Bay City Mall",
+   "Passenger Terminal 2"
+  ]
+ ],
+ "butuan-centre": [
+  [
+   "Robinsons Place Butuan",
+   "ZCC Central Mall"
+  ],
+  [
+   "Butuan City Hall",
+   "Capitol Training Centre"
+  ],
+  [
+   "Agusan del Norte Provincial Capitol",
+   "SM City Butuan"
+  ]
+ ],
+ "cabanatuan-centre": [
+  [
+   "Nueva Ecija Old Provincial Capitol Plaza",
+   "SM City Cabanatuan"
+  ],
+  [
+   "Cabanatuan City Hall",
+   "WalterMart"
+  ],
+  [
+   "NE Mall",
+   "D Liner"
+  ]
+ ],
+ "cagayan-de-oro-centre": [
+  [
+   "Gaisano Carmen Mall",
+   "Market City"
+  ],
+  [
+   "Cagayan de Oro City Hall",
+   "Capitol University"
+  ],
+  [
+   "Limketkai Mall",
+   "SEC Mall"
+  ]
+ ],
+ "cotabato-city-centre": [
+  [
+   "CityMall Cotabato",
+   "Old Cotabato City Hall"
+  ],
+  [
+   "Cotabato Provincial Capitol",
+   "Southseas Mall"
+  ],
+  [
+   "KCC Mall of Cotabato",
+   "Notre Dame Hospital"
+  ]
+ ],
+ "dasmarinas": [
+  [
+   "CM Plaza",
+   "SM Marketmall Dasmariñas"
+  ],
+  [
+   "New Dasmariñas City Hall",
+   "Ventura Mall Dasmariñas"
+  ],
+  [
+   "City Hall Roof Deck Building",
+   "New City Hall Socio-Economic and Multi-Purpose Building"
+  ]
+ ],
+ "dipolog-downtown": [
+  [
+   "CityMall Dipolog",
+   "M&S Amigo Shopping Center"
+  ],
+  [
+   "Aetrium",
+   "Dipolog City Hall Building 3"
+  ],
+  [
+   "Lee Plaza City Central",
+   "The MGM Square"
+  ]
+ ],
+ "dumaguete": [
+  [
+   "CityMall Dumaguete",
+   "Robinsons Dumaguete"
+  ],
+  [
+   "Filinvest Mall Dumaguete",
+   "The Market Place"
+  ],
+  [
+   "Cang's Inc. Shopping Complex",
+   "Dumaguete City Hall"
+  ]
+ ],
+ "general-santos-centre": [
+  [
+   "Fit Mart Mall of GenSan",
+   "Robinsons GenSan"
+  ],
+  [
+   "General Santos City Hall",
+   "Veranza Mall of GenSan"
+  ],
+  [
+   "KCC Mall of GenSan",
+   "Suerte MotoPlaza GenSan"
+  ]
+ ],
+ "iligan-centre": [
+  [
+   "Gaisano Iligan",
+   "Pindang Building"
+  ],
+  [
+   "Iligan Capitol College",
+   "Iligan City Hall"
+  ],
+  [
+   "Gregorio T. Lluch Memorial Hospital",
+   "Mercy Community Hospital"
+  ]
+ ],
+ "kalibo": [
+  [
+   "Aklan Capitol Park",
+   "Novotel Kalibo & Department Store"
+  ],
+  [
+   "R&C Supermart, Inc.",
+   "Unitop"
+  ],
+  [
+   "FUS Shoppping Mall",
+   "Gaisano Capital Kalibo"
+  ]
+ ],
+ "koronadal-centre": [
+  [
+   "Gaisano Grand Koronadal",
+   "South Cotabato Provincial Capitol"
+  ],
+  [
+   "CityMall Koronadal",
+   "KCC Mall of Marbel"
+  ],
+  [
+   "Koronadal City Hall Park",
+   "Socomedics Medical Center"
+  ]
+ ],
+ "lipa": [
+  [
+   "Lipa City Hall of Justice",
+   "NewStar Shopping Center"
+  ],
+  [
+   "Lipa Annex",
+   "Divine Love Medical Center"
+  ],
+  [
+   "SM City Lipa",
+   "N. L. Villa Memorial Medical Center"
+  ]
+ ],
+ "los-banos": [
+  [
+   "Novo Jeans & Shirts",
+   "Vega Centre"
+  ],
+  [
+   "Robinsons Town Mall Los Baños",
+   "UPLB University Health Service"
+  ],
+  [
+   "SNODLOB UPLB - Jubileeville",
+   "St. Jude Family Hospital"
+  ]
+ ],
+ "ormoc": [
+  [
+   "Ormoc City Hall",
+   "Robinsons Supermarket"
+  ],
+  [
+   "A Mall",
+   "SM Center Ormoc"
+  ],
+  [
+   "Gaisano Riverside Mall",
+   "The Point Mall"
+  ]
+ ],
+ "pagadian-downtown": [
+  [
+   "Pagadian Capitol College",
+   "Zamboanga del Sur Provincial Capitol Compound"
+  ],
+  [
+   "Gaisano Capital",
+   "Provincial Capitol of Zamboanga del Sur"
+  ],
+  [
+   "People's Plaza",
+   "Robinsons Pagadian"
+  ]
+ ],
+ "roxas-city": [
+  [
+   "Gaisano Grand City Roxas",
+   "Gaisano Marketplace Roxas"
+  ],
+  [
+   "City Square",
+   "Terminal de Cagay"
+  ],
+  [
+   "Roxas City Hall",
+   "The Health Centrum Hospital"
+  ]
+ ],
+ "san-pablo": [
+  [
+   "Capitol of San Pablo, Laguna",
+   "San Pablo City General Hospital"
+  ],
+  [
+   "Community General Hospital",
+   "Saints Francis and Paul General Hospital"
+  ],
+  [
+   "Cathedral Mortuary Chapels",
+   "Cavite Pala-Pala UV Express Terminal"
+  ]
+ ],
+ "surigao-downtown": [
+  [
+   "City Hall Annex",
+   "Eva Macapagal Passenger Terminal"
+  ],
+  [
+   "Surigao City Hall",
+   "Miranda Family Hospital"
+  ],
+  [
+   "San Nicolas de Tolentino Cathedral",
+   "Surigao Medical Center"
+  ]
+ ],
+ "tacloban-downtown": [
+  [
+   "Tacloban City Hall Grounds",
+   "VSYS Department Store"
+  ],
+  [
+   "Metro Gaisano Tacloban",
+   "Robinsons North Tacloban"
+  ],
+  [
+   "Gaisano Capital Real",
+   "SM Savemore Tacloban"
+  ]
+ ],
+ "tacloban-university-belt": [
+  [
+   "Primark Town Center",
+   "Robinsons Mall Annex - Tacloban"
+  ],
+  [
+   "ACE Medical Center - Tacloban",
+   "RTR Medical Foundation Hospital"
+  ],
+  [
+   "Tacloban Transport Terminal Robinsons",
+   "Barangay 92 Hall"
+  ]
+ ],
+ "tagbilaran": [
+  [
+   "Alta Citta",
+   "Island City Mall"
+  ],
+  [
+   "Bohol Provincial Capitol Building",
+   "Bohol Quality Superstore"
+  ],
+  [
+   "Tagbilaran City Hall",
+   "Saint Joseph the Worker Cathedral"
+  ]
+ ],
+ "tarlac-centre": [
+  [
+   "Main Building",
+   "Palm Plaza"
+  ],
+  [
+   "Market City",
+   "SM City Tarlac"
+  ],
+  [
+   "Metro Town Mall",
+   "Tarlac Provincial Capitol"
+  ]
+ ],
+ "tuguegarao-centre": [
+  [
+   "City Mall Tuguegarao",
+   "SM Center Tuguegarao Downtown"
+  ],
+  [
+   "698 Shopping Center",
+   "SM City Tuguegarao"
+  ],
+  [
+   "Robinsons Place Tuguegarao",
+   "Dr. Domingo S. de Leon General Hospital"
+  ]
+ ],
+ "zamboanga-city-centre": [
+  [
+   "KCC Mall de Zamboanga",
+   "Shopper's Plaza"
+  ],
+  [
+   "New Young Mart Enterprises, Incorporated",
+   "SM City Zamboanga"
+  ],
+  [
+   "CityMall Tetuan",
+   "Lim Shi"
+  ]
+ ],
+ "lapu-lapu": [
+  [
+   "City Time Square - Mactan",
+   "Kaking"
+  ],
+  [
+   "Gaisano Grand Plaza Mactan",
+   "Lapu-Lapu City Hall of Justice"
+  ],
+  [
+   "Gaisano Island Mall Mactan",
+   "Island Central"
+  ]
+ ],
+ "antipolo": [
+  [
+   "The Vest Shopping Center",
+   "Vista Mall Antipolo"
+  ],
+  [
+   "Antipolo Triangle Mall",
+   "Rizal Provincial Capitol"
+  ],
+  [
+   "Lores Country Plaza",
+   "Victory Park & Shop"
   ]
  ]
 }
