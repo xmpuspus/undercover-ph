@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { APP_NAME } from "../config";
+import { APP_NAME, NIGHT_ALT_DEG } from "../config";
 import type { Manifest } from "../types";
+import { REC_MAX_DETOUR, REC_MIN_CUT } from "../lib/routerClient";
 import { fmtStamp } from "../lib/time";
 import { CloseIcon } from "./Icons";
 
@@ -110,7 +111,11 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
         <ul className="mt-1 list-disc space-y-1 pl-5">
           <li>Shade comes from building heights and tree canopy, computed every 30 minutes for each path.</li>
           <li>Each path uses the shade at the time you reach it, from your departure time and walking speed.</li>
-          <li>Roofed, indoor, and underground paths count as covered. After dark, only a roof counts.</li>
+          <li>Roofed, indoor, and underground paths count as covered. When the sun is {NIGHT_ALT_DEG} degrees up or lower, only a roof counts.</li>
+          <li data-testid="about-rule">
+            The recommended walk is at most {Math.round(REC_MAX_DETOUR * 100)}% longer than the shortest walk and has at least {Math.round(REC_MIN_CUT * 100)}% less
+            time in sun, or without a roof with Stay dry. If no walk meets both, the shortest walk is recommended.
+          </li>
           <li>Paths with unchecked access stay out of routes unless you include them.</li>
         </ul>
 

@@ -8,8 +8,10 @@ export const MAX_SNAP_M = 150;
 const MOST_KS = [8, 4, 2, 1, 0.5, 0.25];
 const MOST_MAX_DETOUR = 0.5;
 const REC_KS = [2, 1, 0.5, 0.25];
-const REC_MAX_DETOUR = 0.2;
-const REC_MIN_CUT = 0.15;
+/** The recommended route is at most this much longer than the shortest. The route card and About quote it. */
+export const REC_MAX_DETOUR = 0.2;
+/** The recommended route cuts exposure by at least this share. The route card and About quote it. */
+export const REC_MIN_CUT = 0.15;
 // The most covered route must save this much exposure over the route it sits beside, or it is the same choice.
 const MOST_MIN_GAIN_M = 5;
 const SHELTERED = 7;
@@ -227,7 +229,11 @@ function makeRoute(
   if (stairs) warnings.push("Uses stairs.");
   if (kerb) warnings.push("Has a raised kerb at a crossing.");
   if (stepFree && footbridge) warnings.push("Footbridge entrances may have stairs. Lifts are not checked.");
-  if (night && underpass) warnings.push("Uses an underpass after dark.");
+  if (night && underpass) {
+    // Router night starts at 3 degrees. Between 0 and 3 degrees the sun is up, so it is not yet dark.
+    const alt = sunAltitude(data, q.dateIdx, q.bucketIdx);
+    warnings.push(alt !== null && alt > 0 ? "Uses an underpass in low light." : "Uses an underpass after dark.");
+  }
   if (inBuilding) warnings.push("Passes through a building. Its cover is not checked.");
   for (const [hi, arrive] of hoursSeen) {
     const close = closesAtMinute(data, hi, q.dateIdx, arrive);
@@ -312,12 +318,16 @@ export function findRoutes(data: Data, q: Query): Result {
 
   const shortest = run(0);
   if (!shortest) {
-    if (!q.includeUnchecked && aStar(data, buildSpec(data, q, "roof", true, q.stepFree), q.from, q.to, 0)) {
+    // Name the cause, so the card can give the fix that matches it.
+    const reach = (d: Data, unchecked: boolean, stepFree: boolean) => aStar(d, buildSpec(d, q, "roof", unchecked, stepFree), q.from, q.to, 0) !== null;
+    if (!q.includeUnchecked && reach(data, true, q.stepFree)) {
       notes.push('A route exists on paths with unchecked access. Turn on "Include paths with unchecked access" to see it.');
-    } else if (q.stepFree && aStar(data, buildSpec(data, q, "roof", q.includeUnchecked, false), q.from, q.to, 0)) {
+    } else if (q.stepFree && reach(data, q.includeUnchecked, false)) {
       notes.push("Every route between these points uses steps.");
+    } else if (reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, q.includeUnchecked, q.stepFree)) {
+      notes.push("Every route between these points passes through a place that is closed at this time.");
     } else {
-      notes.push("No open walking route connects these points at this time.");
+      notes.push("No walking route connects these points at any hour.");
     }
     return { state: "no_route", routes: [], recommendedIsShortest: false, notes, sun };
   }
@@ -344,6 +354,14 @@ export function findRoutes(data: Data, q: Query): Result {
     return { state: "night", routes, recommendedIsShortest: true, notes, sun };
   }
 
+  // The 15% rule compares the minutes the route card shows, so it uses arrival-time shade.
+  const shortExposed = rankExposure(data, q, shortest, cover);
+  const meetsRule = (p: Path | null): p is Path =>
+    p !== null &&
+    key(p) !== key(shortest) &&
+    detour(p) <= REC_MAX_DETOUR + 1e-9 &&
+    shortExposed > 0 &&
+    1 - rankExposure(data, q, p, cover) / shortExposed >= REC_MIN_CUT - 1e-9;
   let rec: Path | null = null;
   for (const k of REC_KS) {
     const p = run(k);
@@ -352,10 +370,10 @@ export function findRoutes(data: Data, q: Query): Result {
       break;
     }
   }
-  // The 15% rule compares the minutes the route card shows, so it uses arrival-time shade.
-  const shortExposed = rankExposure(data, q, shortest, cover);
-  const cut = rec && shortExposed > 0 ? 1 - rankExposure(data, q, rec, cover) / shortExposed : 0;
-  const keepRec = rec !== null && cut >= REC_MIN_CUT - 1e-9 && key(rec) !== key(shortest);
+  // The card says the shortest is recommended because no shown route meets the rule.
+  // So when the k = 2 candidate falls short, a most covered route that meets it takes its place.
+  if (!meetsRule(rec)) rec = meetsRule(most) ? most : null;
+  const keepRec = rec !== null;
 
   const routes: Route[] = [];
   if (keepRec && rec) routes.push(mk("recommended", rec));

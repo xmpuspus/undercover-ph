@@ -10,7 +10,7 @@ import Landing from "./components/Landing";
 import { AdvisoryBar, Footer, TopBanner } from "./components/Chrome";
 import { DestinationSearch, ModeSwitch, TripFields } from "./components/Planner";
 import { TimeChips, WeatherChips } from "./components/TimeChips";
-import { ProfileToggles, RouteCard, StateMessage, type Highlight } from "./components/RouteCard";
+import { ProfileToggles, RouteCard, StateMessage, fmtDuration, noRouteText, type Highlight } from "./components/RouteCard";
 import RoutePeek from "./components/RoutePeek";
 import SunChip from "./components/SunChip";
 import { compass16, sunDay, sunPosition, type SunView } from "./lib/sun";
@@ -404,7 +404,7 @@ export default function App() {
     }
     return { comp, main: sizes.indexOf(Math.max(...sizes)) };
   }, [data]);
-  const gatedEnd = !!mainNet && !!from && !!to && [from.node, to.node].some((n) => mainNet.comp[n] !== mainNet.main);
+  const gatedEnds = mainNet && from && to ? [from, to].filter((x) => mainNet.comp[x.node] !== mainNet.main).map((x) => x.label) : [];
   const night = result?.state === "night";
   const routerSun = result?.sun ?? null;
   const sunView: SunView | null = routerSun
@@ -692,11 +692,11 @@ export default function App() {
     if (stage !== "plan" || editing || !from || !to || routing) return "";
     if (routed.error) return routed.error;
     if (!result) return "";
-    if (result.state === "no_route") return "No open walking route connects these points at this time.";
+    if (result.state === "no_route") return noRouteText(result.notes, from.label, to.label, []).title;
     if (result.state === "outside") return "This start or end is outside the covered area.";
     if (!current) return "";
     const n = display.length;
-    const sunLine = result.state === "night" ? "Shade does not apply after dark." : `${Math.round(current.route.sun_minutes * 10) / 10} min ${routeMode === "shade" ? "in sun" : "without a roof"}.`;
+    const sunLine = result.state === "night" ? ((result.sun?.altitude ?? 0) > 0 ? "The sun is too low for shade." : "Shade does not apply after dark.") : `${fmtDuration(current.route.sun_minutes)} ${routeMode === "shade" ? "in sun" : "without a roof"}.`;
     return `${n} ${n === 1 ? "route" : "routes"} found. ${current.title}: ${current.pct}% ${current.pctWord}, ${current.route.minutes} min walk. ${sunLine}`;
   }, [stage, editing, from, to, routing, routed.error, result, current, display.length, routeMode]);
 
@@ -1003,7 +1003,9 @@ export default function App() {
                         includeUnchecked={includeUnchecked}
                         onIncludeUnchecked={setIncludeUnchecked}
                         stepFree={stepFree}
-                        gatedEnd={gatedEnd}
+                        from={from.label}
+                        to={to.label}
+                        gatedEnds={gatedEnds}
                       />
                     )}
                     {routing && !result && !routed.error && view === "results" && <Pending text="Finding routes..." />}

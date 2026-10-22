@@ -44,7 +44,7 @@ The search runs in the browser, so no server sees a start or end point.
 - Cost of an edge = length x (1 + k x sun exposure). Exposure is 0 under a roof and the sunlit share elsewhere.
 - **Shortest:** k = 0.
 - **Most covered:** k = 8, lowered while the detour exceeds 50%.
-- **Recommended:** start at k = 2 and lower k until the detour is 20% or less. The app shows it only if it cuts sun exposure by at least 15%.
+- **Recommended:** start at k = 2 and lower k until the detour is 20% or less. The app shows it only if it cuts sun exposure by at least 15%. If it does not, the most covered route takes its place when it meets both limits.
 - The reported numbers use the shade at the time the walker reaches each edge, from the departure time and a walking speed of 1.1 m/s.
 - A route moves to the other side of a road only at a mapped crossing or a traffic signal. At an unmarked junction the move costs 60 m and shows a warning. Mid-block the router forbids it.
 - When the sun is 3 degrees or less above the horizon, the app says that shade does not apply.

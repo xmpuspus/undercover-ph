@@ -173,6 +173,6 @@ openAt(data: Data, hoursIdx: number, dateIdx: number, minute: number): boolean
 - Walking speed: 1.1 m/s. Report minutes rounded up.
 - Shade uses the departure bucket for the whole walk. A comment in the code says so.
 - `state: "night"` when the sun altitude at the bucket is at or below 0. Then return the shortest and the most sheltered routes, and add a note.
-- Recommended rule: start at k = 2 and lower k until the detour is 20% or less. Keep it only if it cuts sun minutes by at least 15%. Otherwise set `recommendedIsShortest`.
+- Recommended rule: start at k = 2 and lower k until the detour is 20% or less. Keep it only if it cuts sun minutes by at least 15%. If it does not, the most covered route takes its place when it meets both limits. Otherwise set `recommendedIsShortest`.
 - Most covered rule: k = 8, lowered while the detour exceeds 50%.
 - Rain mode uses the same rules with exposure = 1 for unsheltered edges and 0 for sheltered edges.

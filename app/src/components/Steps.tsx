@@ -13,6 +13,15 @@ const FLAG: Record<StepFlag, { icon: (p: { size?: number }) => JSX.Element; labe
   crossing: { icon: CrossingIcon, label: "Crossing" },
 };
 
+function HalfIcon() {
+  return (
+    <svg width={16} height={16} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth={1.8} />
+      <path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function CoverDot({ cover, night, size = 30 }: { cover: Step["cover"]; night: boolean; size?: number }) {
   const map = {
     roof: { cls: "bg-blue-50 text-brand", icon: <RoofIcon size={16} />, label: "Under a roof" },
@@ -20,10 +29,11 @@ export function CoverDot({ cover, night, size = 30 }: { cover: Step["cover"]; ni
     sun: night
       ? { cls: "bg-slate-100 text-slate-500", icon: <span className="h-2 w-2 rounded-full bg-current" />, label: "No roof" }
       : { cls: "bg-amber-50 text-amber-600", icon: <SunIcon size={16} />, label: "In sun" },
-    mixed: { cls: "bg-sky-50 text-sky-700", icon: <SunIcon size={16} />, label: "Part shade, part sun" },
+    // A half-filled circle, so a part-covered step never shows the sun icon. "Covered" holds in every mode.
+    mixed: { cls: "bg-sky-50 text-sky-700", icon: <HalfIcon />, label: "Part covered, part open" },
   }[cover];
   return (
-    <span className={`grid shrink-0 place-items-center rounded-full ${map.cls}`} style={{ width: size, height: size }} title={map.label} aria-label={map.label}>
+    <span role="img" className={`grid shrink-0 place-items-center rounded-full ${map.cls}`} style={{ width: size, height: size }} title={map.label} aria-label={map.label}>
       {map.icon}
     </span>
   );
@@ -56,7 +66,8 @@ export function FlagChips({ step, night }: { step: Step; night: boolean }) {
         const Icon = def.icon;
         let label = def.label;
         if (f === "hours" && step.closesAt) label = `Closes ${fmtHHMM(step.closesAt)}`;
-        if (f === "underpass" && night) label = "Underpass, dim at night";
+        // Router night includes a sun up to 3 degrees, so say low light, which holds at dawn and after dark.
+        if (f === "underpass" && night) label = "Underpass, low light";
         return (
           <li
             key={f}

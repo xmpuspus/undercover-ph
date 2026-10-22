@@ -69,6 +69,17 @@ describe("three routes", () => {
     expect(r.notes).toContain("No meaningfully shadier route.");
   });
 
+  it("recommends the most covered route when it meets the rule and the k = 2 route does not", () => {
+    // At k = 2 the 405 m walk with 14% shade wins, but it cuts sun by only 13%.
+    // The 440 m walk with 23% shade is 10% longer and cuts sun by 15.2%, so it is the recommended route.
+    const fx = fan([{ y: 0 }, { y: 32, building: 14 }, { y: 92, building: 23 }]);
+    const r = findRoutes(fx.data, query());
+    expect(r.recommendedIsShortest).toBe(false);
+    expect(r.routes.map((x) => x.label)).toEqual(["recommended", "shortest"]);
+    expect(uses(byLabel(r, "recommended"), fx.via[2])).toBe(true);
+    expect(r.notes).toContain("The most covered route is the recommended route.");
+  });
+
   it("keeps the most covered route within a 50% detour", () => {
     // via 1 is fully covered but 80% longer. The cap must skip it.
     const fx = fan([{ y: 0 }, { y: 300, building: 100 }, { y: 180, building: 90 }, { y: 80, building: 50 }]);
@@ -103,6 +114,19 @@ describe("access filters", () => {
     expect(s.segments.map((x) => x.kind)).toEqual(["unchecked"]);
     expect(s.warnings.some((w) => w.includes("unchecked access"))).toBe(true);
     expect(s.steps.some((x) => x.flags.includes("unchecked"))).toBe(true);
+  });
+
+  it("names a closed passage or a missing path as the cause", () => {
+    const hours = [{ name: "Glorietta", rules: { thu: ["10:00", "21:00"] }, source_url: "https://example.org/hours", checked: "2026-10-20" }];
+    const { data } = fan([{ y: 0, flags: 4, hours: 0, name: "Glorietta" }], { hours });
+    const closed = findRoutes(data, query({ departMin: 21 * 60 + 5 }));
+    expect(closed.state).toBe("no_route");
+    expect(closed.notes).toContain("Every route between these points passes through a place that is closed at this time.");
+
+    const apart = makeData({ nodes: [[0, 0], [100, 0], [300, 0], [400, 0]], edges: [{ u: 0, v: 1 }, { u: 2, v: 3 }] });
+    const none = findRoutes(apart, query({ from: 0, to: 3 }));
+    expect(none.state).toBe("no_route");
+    expect(none.notes).toContain("No walking route connects these points at any hour.");
   });
 
   it("says why when only unchecked paths connect the points", () => {
@@ -191,6 +215,24 @@ describe("night and rain", () => {
       expect(byLabel(r, "shortest").covered_pct).toBe(0);
     }
     expect(findRoutes(data, query({ bucketIdx: DAY })).state).toBe("ok");
+  });
+
+  it("words the underpass warning by the real sun", () => {
+    // Bucket 1 has the sun 2.1 degrees up: router night, but not dark. Buckets 2 and 3 are dark.
+    const fx = fan([{ y: 0, flags: 2 }], {
+      sun: [
+        [60, 90],
+        [2.1, 250],
+        [0, 260],
+        [-5, 262],
+      ],
+    });
+    const at = (bucketIdx: number) => findRoutes(fx.data, query({ bucketIdx })).routes[0].warnings;
+    expect(findRoutes(fx.data, query({ bucketIdx: 1 })).state).toBe("night");
+    expect(at(1)).toEqual(["Uses an underpass in low light."]);
+    expect(at(2)).toEqual(["Uses an underpass after dark."]);
+    expect(at(3)).toEqual(["Uses an underpass after dark."]);
+    expect(at(0)).toEqual([]);
   });
 
   it("treats a sun at 3 degrees or lower as night", () => {

@@ -48,6 +48,8 @@ interface Leg {
   sideM: Map<string, number>;
   /** The part of sideM on sidewalks that OSM maps (flag 32). The rest is assumed from the road class. */
   sideMappedM: Map<string, number>;
+  /** Per side, metres walked with that side on the left minus metres with it on the right. */
+  handM: Map<string, number>;
   /** A change of sidewalk at the start of the leg. */
   switchStart: Switch;
   /** A change of sidewalk without a marked crossing inside the leg, after folding. */
@@ -239,8 +241,12 @@ function mainText(
     if (side) {
       const street = name ?? "the street";
       const streetTl = name ?? "kalsada";
-      const where = `the ${side} side of ${street}${lm ? ` past ${lm}` : ""}`;
-      const whereTl = `${SIDE_TL[side]} bahagi ng ${streetTl}${lm ? `, lampas sa ${lm}` : ""}`;
+      // The compass word plus the walker's own hand, so nobody needs to know where north is.
+      const hand = legHand(leg, side);
+      const handEn = hand ? ` (on your ${hand})` : "";
+      const handTl = hand ? ` (sa ${hand === "left" ? "kaliwa" : "kanan"} mo)` : "";
+      const where = `the ${side} side${handEn} of ${street}${lm ? ` past ${lm}` : ""}`;
+      const whereTl = `${SIDE_TL[side]} bahagi${handTl} ng ${streetTl}${lm ? `, lampas sa ${lm}` : ""}`;
       if (leg.switchStart === Switch.Free) return [`Cross to ${where}`, `Tumawid sa ${whereTl}`];
       if (leg.switchStart === Switch.Junction) return [`${UNMARKED_EN}. Walk on ${where}`, `${UNMARKED_TL}. Sa ${whereTl}`];
       if (turn === null) return [`Head ${heading} on ${where}`, `Maglakad pa-${heading} sa ${whereTl}`];
@@ -326,6 +332,7 @@ function newLeg(data: Data, t: EdgeTrip): Leg {
   const lmName = data.edgeLandmark[e];
   const landmarks = new Map<string, number>();
   if (lmName) landmarks.set(lmName, data.edgeLen[e]);
+  const side = data.edgeSide[e] ? sideWord(data, e) : null;
   return {
     kind: kindOf(data.edgeFlags[e]),
     name: data.edgeName[e],
@@ -338,8 +345,9 @@ function newLeg(data: Data, t: EdgeTrip): Leg {
     coords: t.coords.slice(),
     mainBearing: startBearing(data, t.coords),
     inBuilding: (data.edgeFlags[e] & 1024) !== 0,
-    sideM: data.edgeSide[e] ? new Map([[sideWord(data, e), data.edgeLen[e]]]) : new Map<string, number>(),
-    sideMappedM: data.edgeSide[e] && data.edgeFlags[e] & 32 ? new Map([[sideWord(data, e), data.edgeLen[e]]]) : new Map<string, number>(),
+    sideM: side ? new Map([[side, data.edgeLen[e]]]) : new Map<string, number>(),
+    sideMappedM: side && data.edgeFlags[e] & 32 ? new Map([[side, data.edgeLen[e]]]) : new Map<string, number>(),
+    handM: side ? new Map([[side, handOf(data, e, t.coords)]]) : new Map<string, number>(),
     switchStart: t.switchIn,
     unmarked: false,
     hours: data.edgeHours[e] >= 0 ? [{ idx: data.edgeHours[e], min: t.arriveMin }] : [],
@@ -358,6 +366,7 @@ function absorb(a: Leg, b: Leg): void {
   if (b.switchStart !== Switch.None) a.flags.add("crossing");
   for (const [k, v] of b.sideM) a.sideM.set(k, (a.sideM.get(k) ?? 0) + v);
   for (const [k, v] of b.sideMappedM) a.sideMappedM.set(k, (a.sideMappedM.get(k) ?? 0) + v);
+  for (const [k, v] of b.handM) a.handM.set(k, (a.handM.get(k) ?? 0) + v);
   for (const f of b.flags) a.flags.add(f);
   for (const [k, v] of b.landmarks) a.landmarks.set(k, (a.landmarks.get(k) ?? 0) + v);
   appendLine(a.coords, b.coords);
@@ -377,6 +386,7 @@ function prepend(a: Leg, b: Leg, withLeadIn: boolean): void {
   b.switchStart = a.switchStart;
   for (const [k, v] of a.sideM) b.sideM.set(k, (b.sideM.get(k) ?? 0) + v);
   for (const [k, v] of a.sideMappedM) b.sideMappedM.set(k, (b.sideMappedM.get(k) ?? 0) + v);
+  for (const [k, v] of a.handM) b.handM.set(k, (b.handM.get(k) ?? 0) + v);
   for (const f of a.flags) b.flags.add(f);
   for (const [k, v] of a.landmarks) b.landmarks.set(k, (b.landmarks.get(k) ?? 0) + v);
   const joined = a.coords.slice();
@@ -394,6 +404,22 @@ const COMPASS8 = ["north", "northeast", "east", "southeast", "south", "southwest
 function sideWord(data: Data, e: number): string {
   const b = ((Math.atan2(data.sideX[e], data.sideY[e]) * 180) / Math.PI + 360) % 360;
   return COMPASS8[Math.round(b / 45) % 8];
+}
+
+/**
+ * Signed length of sidewalk edge e as walked: positive when its side is on the walker's left.
+ * The cross product of the walking direction and the sidewalk's offset from the road gives the hand.
+ */
+function handOf(data: Data, e: number, c: [number, number][]): number {
+  const dx = (c[c.length - 1][0] - c[0][0]) * data.mPerLon;
+  const dy = (c[c.length - 1][1] - c[0][1]) * data.mPerLat;
+  return Math.sign(dx * data.sideY[e] - dy * data.sideX[e]) * data.edgeLen[e];
+}
+
+/** "left" or "right" for the walker on the leg's side, or null when the leg's edges disagree evenly. */
+function legHand(leg: Leg, side: string): "left" | "right" | null {
+  const h = leg.handM.get(side) ?? 0;
+  return h > 0 ? "left" : h < 0 ? "right" : null;
 }
 
 /** The side that carries more than half of the leg's length, or null. */

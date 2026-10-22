@@ -1,6 +1,6 @@
 // Browser walking router for shaded and sheltered routes. docs/data-contract.md, "Router API".
 export { loadData, buildData } from "./data";
-export { findRoutes, MAX_SNAP_M } from "./route";
+export { findRoutes, MAX_SNAP_M, REC_MAX_DETOUR, REC_MIN_CUT } from "./route";
 export { snapToNode, searchPlaces } from "./search";
 export { openAt } from "./hours";
 export { WALK_M_PER_MIN } from "./astar";

@@ -49,11 +49,11 @@ describe("sidewalk side in steps", () => {
     const s = byLabel(r, "shortest");
     expect(s.steps).toHaveLength(1);
     expect(s.steps[0].side).toBe("north");
-    expect(s.steps[0].text).toBe("Head east on the north side of Ayala Avenue");
+    expect(s.steps[0].text).toBe("Head east on the north side (on your left) of Ayala Avenue");
     const rec = byLabel(r, "recommended");
     expect(rec.steps[0].side).toBe("south");
-    expect(rec.steps[0].text).toBe("Head east on the south side of Ayala Avenue");
-    expect(rec.steps[0].textTl).toBe("Maglakad pa-east sa timog na bahagi ng Ayala Avenue");
+    expect(rec.steps[0].text).toBe("Head east on the south side (on your right) of Ayala Avenue");
+    expect(rec.steps[0].textTl).toBe("Maglakad pa-east sa timog na bahagi (sa kanan mo) ng Ayala Avenue");
     expect(rec.covered_pct).toBe(100);
   });
 
@@ -72,7 +72,7 @@ describe("sidewalk side in steps", () => {
     const r = findRoutes(data, query({ from: 0, to: 2 }));
     expect(byLabel(r, "shortest").steps[0]).toMatchObject({ side: "north", sideMapped: true });
     expect(byLabel(r, "recommended").steps[0]).toMatchObject({ side: "south", sideMapped: false });
-    expect(byLabel(r, "recommended").steps[0].text).toBe("Head east on the south side of Ayala Avenue");
+    expect(byLabel(r, "recommended").steps[0].text).toBe("Head east on the south side (on your right) of Ayala Avenue");
   });
 
   it("words a turn onto a sidewalk as walk on the side", () => {
@@ -83,10 +83,27 @@ describe("sidewalk side in steps", () => {
       nodeFlags: [4, 0, 4, 0],
     });
     const steps = findRoutes(data, query({ from: 3, to: 2 })).routes[0].steps;
-    expect(steps.map((x) => x.text)).toEqual(["Head north", "Turn right, then walk on the south side of Ayala Avenue"]);
-    expect(steps[1].textTl).toBe("Kumanan, tapos sa timog na bahagi ng Ayala Avenue");
+    expect(steps.map((x) => x.text)).toEqual(["Head north", "Turn right, then walk on the south side (on your right) of Ayala Avenue"]);
+    expect(steps[1].textTl).toBe("Kumanan, tapos sa timog na bahagi (sa kanan mo) ng Ayala Avenue");
     expect(steps[1].side).toBe("south");
     expect(steps[0].side).toBeUndefined();
+  });
+});
+
+describe("the walker's own side", () => {
+  // Only the north sidewalk exists, so both directions walk on it.
+  const data = makeData({ nodes: AVENUE, edges: [north(0, 1, 0, 200), north(1, 2, 200, 400)], nodeFlags: [4, 4, 4] });
+
+  it("puts the north side on the left when walking east", () => {
+    const step = findRoutes(data, query({ from: 0, to: 2 })).routes[0].steps[0];
+    expect(step.text).toBe("Head east on the north side (on your left) of Ayala Avenue");
+    expect(step.textTl).toBe("Maglakad pa-east sa hilagang bahagi (sa kaliwa mo) ng Ayala Avenue");
+  });
+
+  it("puts the north side on the right when walking west", () => {
+    const step = findRoutes(data, query({ from: 2, to: 0 })).routes[0].steps[0];
+    expect(step.text).toBe("Head west on the north side (on your right) of Ayala Avenue");
+    expect(step.textTl).toBe("Maglakad pa-west sa hilagang bahagi (sa kanan mo) ng Ayala Avenue");
   });
 });
 
@@ -117,8 +134,8 @@ describe("side switches", () => {
       const s = byLabel(r, "shortest");
       expect(switches(s)).toBe(true);
       expect(s.length_m).toBe(400);
-      expect(s.steps[1].text).toBe("Cross to the south side of Ayala Avenue");
-      expect(s.steps[1].textTl).toBe("Tumawid sa timog na bahagi ng Ayala Avenue");
+      expect(s.steps[1].text).toBe("Cross to the south side (on your right) of Ayala Avenue");
+      expect(s.steps[1].textTl).toBe("Tumawid sa timog na bahagi (sa kanan mo) ng Ayala Avenue");
       expect(s.steps[1].flags).toContain("crossing");
       expect(s.warnings).not.toContain("Crosses a road where there is no marked crossing.");
     }
@@ -133,7 +150,7 @@ describe("side switches", () => {
     const s = byLabel(r, "shortest");
     expect(switches(s)).toBe(true);
     expect(s.length_m).toBe(400);
-    expect(s.steps[1].text).toBe("Cross where there is no marked crossing. Walk on the south side of Ayala Avenue");
+    expect(s.steps[1].text).toBe("Cross where there is no marked crossing. Walk on the south side (on your right) of Ayala Avenue");
     expect(s.steps[1].flags).toContain("crossing");
     expect(s.warnings).toContain("Crosses a road where there is no marked crossing.");
   });

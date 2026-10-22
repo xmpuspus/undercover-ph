@@ -3,6 +3,7 @@ import type { Endpoint, Mode, Result, SegKind } from "../types";
 import { COLORS } from "../config";
 import { hasUnchecked, type DisplayRoute } from "../lib/display";
 import { ribbonParts } from "../lib/ribbon";
+import { REC_MAX_DETOUR, REC_MIN_CUT } from "../lib/routerClient";
 import { fmtDist, fmtKm } from "../lib/time";
 import { AlertIcon, ArrowRight, ChevronDown, ListIcon, RainIcon, StepFreeIcon, SunIcon, WalkIcon } from "./Icons";
 
@@ -66,6 +67,13 @@ function fmtMin(m: number): string {
   if (m <= 0) return "0";
   // One decimal below 100, so the headline's difference matches the minutes shown under it.
   return m < 100 ? m.toFixed(1).replace(/\.0$/, "") : String(Math.round(m));
+}
+
+/** Minutes as text. Under a minute it gives seconds, so 0.2 min reads as the 12 seconds it is. */
+export function fmtDuration(m: number): string {
+  if (m <= 0) return "0 min";
+  if (m < 1) return `${Math.round(m * 60)} sec`;
+  return `${fmtMin(m)} min`;
 }
 
 export type Highlight = { coords: [number, number][]; color: string } | null;
@@ -138,23 +146,45 @@ function Ribbon({ d, mode, night, onHighlight }: { d: DisplayRoute; mode: Mode; 
   );
 }
 
-// The card's big figure: how much less exposure this walk has than the shortest one.
+export interface Headline {
+  big: string;
+  small: string | null;
+  /** "hero" is the big blue figure, kept for a saving of a minute or more. */
+  size: "hero" | "large" | "plain";
+}
+
+const HEAD_SIZE: Record<Headline["size"], string> = { hero: "text-[28px] text-brand", large: "text-[24px] text-ink", plain: "text-[20px] text-ink" };
+
+// The card's big figure: how this walk compares with the others on screen.
 // Shade mode counts minutes in sun; rain mode counts minutes without a roof. At night it is not shown.
-function headline(d: DisplayRoute, display: DisplayRoute[], result: Result, mode: Mode): { big: string; small: string | null; win: boolean } | null {
-  if (result.state === "night") return null;
-  const word = mode === "shade" ? "sun" : "in the rain";
-  const best = mode === "shade" ? "shadiest" : "most sheltered";
+// Every line compares numbers the card shows, so it stays true for any set of routes.
+export function headline(d: DisplayRoute, display: DisplayRoute[], result: Result, mode: Mode): Headline | null {
+  if (result.state !== "ok") return null;
   const shortest = result.routes.find((x) => x.label === "shortest");
   if (!shortest) return null;
-  if (d.labels.includes("shortest")) {
-    const better = display.filter((x) => x !== d && shortest.sun_minutes - x.route.sun_minutes >= 0.1);
-    if (result.recommendedIsShortest || !better.length) return { big: `Shortest walk is already the ${best}`, small: null, win: false };
-    const top = better.reduce((a, b) => (b.route.sun_minutes < a.route.sun_minutes ? b : a));
-    return { big: `${fmtMin(shortest.sun_minutes - top.route.sun_minutes)} min more ${word}`, small: `than the ${top.short.toLowerCase()} walk`, win: false };
+  const word = mode === "shade" ? "sun" : "without a roof";
+  // Sun minutes are multiples of 0.1. Rounding the gap drops float noise such as 0.3 - 0.2.
+  const gap = (a: number, b: number) => Math.round((a - b) * 10) / 10;
+  if (!d.labels.includes("shortest")) {
+    const saved = gap(shortest.sun_minutes, d.route.sun_minutes);
+    if (saved < 0.1) return null;
+    return { big: `${fmtDuration(saved)} less ${word}`, small: "than the shortest walk", size: saved >= 1 ? "hero" : "plain" };
   }
-  const saved = shortest.sun_minutes - d.route.sun_minutes;
-  if (saved < 0.1) return null;
-  return { big: `${fmtMin(saved)} min less ${word}`, small: "than the shortest walk", win: true };
+  const others = display.filter((x) => x !== d);
+  if (!others.length) return { big: `Shortest walk is also the ${mode === "shade" ? "shadiest" : "most sheltered"}`, small: null, size: "plain" };
+  const top = others.reduce((a, b) => (b.route.sun_minutes < a.route.sun_minutes ? b : a));
+  const more = gap(shortest.sun_minutes, top.route.sun_minutes);
+  const than = `than the ${top.short.toLowerCase()} walk`;
+  if (!result.recommendedIsShortest) {
+    return more < 0.1 ? null : { big: `${fmtDuration(more)} more ${word}`, small: than, size: more >= 1 ? "large" : "plain" };
+  }
+  // The shortest walk is recommended because no other walk on screen meets the rule.
+  // Say what the shadier walk costs, in the minutes the tabs show.
+  const walk = top.route.minutes - shortest.minutes;
+  const same = mode === "shade" ? "about the same sun" : "about the same time without a roof";
+  if (walk >= 1) return { big: `${walk} min less walking`, small: `${than}, for ${more >= 0.1 ? `${fmtDuration(more)} more ${word}` : same}`, size: "large" };
+  if (more >= 0.1) return { big: `Only ${fmtDuration(more)} more ${word}`, small: than, size: "plain" };
+  return { big: same[0].toUpperCase() + same.slice(1), small: `as the ${top.short.toLowerCase()} walk`, size: "plain" };
 }
 
 function CoverBar({ d, mode, night, onHighlight, legend }: { d: DisplayRoute; mode: Mode; night: boolean; onHighlight: (h: Highlight) => void; legend: boolean }) {
@@ -224,12 +254,29 @@ export function RouteCard(p: CardProps) {
   if (r.steps.some((s) => s.flags.includes("hours") && !s.closesAt)) {
     warnings.push({ text: "Opening hours not confirmed for a passage on this route.", tl: null });
   }
-  // The night box below already says shade does not apply after dark.
-  const notes = p.result.notes.filter((n) => !(night && /after dark|sun is down|shade does not apply/i.test(n)));
+  // The headline, the rule line, and the night box already say these router notes. Say each fact once.
+  const said = (n: string) =>
+    /^No meaningfully /.test(n) ||
+    (p.display.length === 1 && / route is the shortest route\.$/.test(n)) ||
+    (night && /after dark|sun is down|too low for shade|shade does not apply/i.test(n));
+  const notes = p.result.notes.filter((n) => !said(n));
+  const exposedWord = p.mode === "shade" ? "in sun" : "without a roof";
+  const pct = (x: number) => Math.round(x * 100);
+  const rule = `The recommended walk is at most ${pct(REC_MAX_DETOUR)}% longer than the shortest and has at least ${pct(REC_MIN_CUT)}% less time ${exposedWord}. If no walk meets both, the shortest is recommended.`;
+  // Router night starts at 3 degrees. Between 0 and 3 degrees the sun is still up.
+  const alt = p.result.sun?.altitude;
+  const nightLine = `${alt !== undefined && alt > 0 ? "The sun is too low for shade." : "Shade does not apply after dark."} ${
+    p.display.length > 1 ? "These are the shortest and the most sheltered routes." : "The shortest route is also the most sheltered."
+  }`;
   const [open, setOpen] = useState(false);
   const showDetails = !p.compact || open;
   const details = (
     <>
+        {!night && (
+          <p className="mt-2 text-[13px] text-slate-600" data-testid="rec-rule">
+            {rule}
+          </p>
+        )}
         {notes.length > 0 && (
           <ul className="mt-2 space-y-0.5 text-[13px] text-slate-600" data-testid="route-notes">
             {notes.map((n) => (
@@ -249,7 +296,6 @@ export function RouteCard(p: CardProps) {
         )}
     </>
   );
-  const exposedWord = p.mode === "shade" ? "in sun" : "without a roof";
   const head = headline(d, p.display, p.result, p.mode);
   return (
     <div className="rounded-card bg-white shadow-card" data-testid="route-card">
@@ -282,7 +328,7 @@ export function RouteCard(p: CardProps) {
         )}
         {head ? (
           <p className="mt-1 flex flex-wrap items-baseline gap-x-2" data-testid="headline">
-            <span className={`font-semibold leading-tight tracking-tight ${head.win ? "text-[28px] text-brand" : head.small ? "text-[24px] text-ink" : "text-[20px] text-ink"}`}>{head.big}</span>
+            <span className={`font-semibold leading-tight tracking-tight ${HEAD_SIZE[head.size]}`}>{head.big}</span>
             {head.small && <span className="text-[14px] text-slate-600">{head.small}</span>}
           </p>
         ) : null}
@@ -297,7 +343,7 @@ export function RouteCard(p: CardProps) {
         {!night && (
           <p className="mt-0.5 flex items-center gap-1.5 text-[14px] text-slate-700" data-testid="sun-minutes">
             {p.mode === "shade" ? <SunIcon size={15} className="text-amber-500" /> : <RainIcon size={15} className="text-brand" />}
-            {fmtMin(r.sun_minutes)} min {exposedWord}
+            {fmtDuration(r.sun_minutes)} {exposedWord}
           </p>
         )}
         {/* Phones keep the legend under Details, so the map keeps more height. The ribbon names a stretch on tap. */}
@@ -305,7 +351,7 @@ export function RouteCard(p: CardProps) {
 
         {night && (
           <p className="mt-3 rounded-xl bg-slate-100 px-3 py-2 text-[13px] text-ink" data-testid="night-note">
-            Shade does not apply after dark. These are the shortest and the most sheltered routes.
+            {nightLine}
           </p>
         )}
         {!p.compact && details}
@@ -416,29 +462,49 @@ interface StateProps {
   includeUnchecked: boolean;
   onIncludeUnchecked: (v: boolean) => void;
   stepFree: boolean;
-  // True when the start or end snaps to a node outside the largest routable network.
-  gatedEnd: boolean;
+  from: string;
+  to: string;
+  // Names of the ends that snap outside the largest routable network, such as inside a gated village.
+  gatedEnds: string[];
 }
 
-const NO_ROUTE = "No open walking route connects these points at this time.";
+// Router notes that give the cause of a no-route result (route.ts). The card turns each into its fix.
+const SAME_PLACE = "Start and end are the same place.";
+const ONLY_UNCHECKED = /^A route exists on paths with unchecked access/;
+const ONLY_STEPS = "Every route between these points uses steps.";
+const CLOSED = "Every route between these points passes through a place that is closed at this time.";
+const NO_PATH = "No walking route connects these points at any hour.";
+const isCause = (n: string) => n === SAME_PLACE || n === ONLY_STEPS || n === CLOSED || n === NO_PATH || ONLY_UNCHECKED.test(n);
 
-export function StateMessage({ result, onEdit, onAbout, includeUnchecked, onIncludeUnchecked, stepFree, gatedEnd }: StateProps) {
+const andList = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}` : (xs[0] ?? ""));
+
+/** The no-route card's title and its one fix, from the router's cause note and any gated end. */
+export function noRouteText(notes: string[], from: string, to: string, gatedEnds: string[]): { title: string; fix: string } {
+  const title = `No walking route from ${from} to ${to}.`;
+  const gate = gatedEnds.length > 0 ? `${andList(gatedEnds)} ${gatedEnds.length > 1 ? "sit" : "sits"} behind a gate or inside a gated village.` : "";
+  if (notes.includes(SAME_PLACE)) return { title: SAME_PLACE, fix: "Pick a different start or end." };
+  if (notes.includes(ONLY_STEPS)) return { title, fix: "Every route between them uses steps. Turn off Step-free to see them." };
+  if (notes.some((n) => ONLY_UNCHECKED.test(n))) {
+    return {
+      title,
+      fix: gate ? `${gate} Include paths with unchecked access, or pick a nearby street.` : "A route exists on paths with unchecked access. Include those paths to see it.",
+    };
+  }
+  if (notes.includes(CLOSED)) return { title, fix: "Every route between them passes through a place that is closed at this time. Try another time." };
+  return { title, fix: gate ? `${gate} Pick a nearby street.` : "No walking route connects them at any hour. Pick a nearby start or end." };
+}
+
+export function StateMessage({ result, onEdit, onAbout, includeUnchecked, onIncludeUnchecked, stepFree, from, to, gatedEnds }: StateProps) {
   const outside = result.state === "outside";
-  // The headline already says the router's no-route sentence; the step-free note only matters with Step-free on.
-  const notes = result.notes.filter((n) => n !== NO_ROUTE && (stepFree || !/step-free/i.test(n)));
-  // Suggest unchecked paths only when neither the gated line nor a router note already does.
-  const saysUnchecked = (gatedEnd && !outside) || notes.some((n) => /unchecked/i.test(n));
-  const tries = ["Try another time", ...(stepFree ? ["turn off Step-free"] : []), ...(includeUnchecked || saysUnchecked ? [] : ["include unchecked paths"])];
-  const hint = tries.length > 1 ? `${tries.slice(0, -1).join(", ")} or ${tries[tries.length - 1]}.` : `${tries[0]}.`;
+  const text = outside ? null : noRouteText(result.notes, from, to, gatedEnds);
+  // The fix line already says the cause note. The step-free note only matters with Step-free on.
+  const notes = result.notes.filter((n) => !(text && isCause(n)) && (stepFree || !/step-free/i.test(n)));
   return (
     <div className="rounded-card bg-white p-4 shadow-card" data-testid="route-state" data-state={result.state}>
-      <p className="text-[16px] font-medium text-ink">{outside ? "This start or end is outside the covered area." : NO_ROUTE}</p>
-      <p className="mt-1 text-[14px] text-slate-600">{outside ? "Routing works inside the dashed box, the covered area. Pick a place inside it." : hint}</p>
-      {!outside && gatedEnd && (
-        <p className="mt-2 text-[14px] text-amber-900" data-testid="gated-note">
-          One end sits behind a gate or inside a gated village. Try a nearby street or include unchecked paths.
-        </p>
-      )}
+      <p className="text-[16px] font-medium text-ink">{text ? text.title : "This start or end is outside the covered area."}</p>
+      <p className="mt-1 text-[14px] text-slate-600" data-testid="state-fix">
+        {text ? text.fix : "Routing works inside the dashed box, the covered area. Pick a place inside it."}
+      </p>
       {notes.length > 0 && (
         <ul className="mt-2 space-y-0.5 text-[12px] text-slate-500">
           {notes.map((n) => (
