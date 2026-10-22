@@ -90,14 +90,14 @@ describe("route card headline", () => {
   it("says the shortest is also the shadiest only when no other route is on screen", () => {
     const r = findRoutes(fan([{ y: 0, building: 100 }, { y: 80 }]).data, query());
     expect(r.routes.map((x) => x.label)).toEqual(["shortest"]);
-    expect(heads(r)).toEqual({ "Recommended and Shortest": { big: "Shortest walk is also the shadiest", small: null, size: "plain" } });
+    expect(heads(r)).toEqual({ "Recommended and Shortest": { big: "The shortest walk is the most shaded", small: null, size: "plain" } });
   });
 
   it("uses roof words in rain mode", () => {
     const r = findRoutes(fan([{ y: 0, building: 100 }, { y: 80, flags: 1 }]).data, query({ mode: "rain" }));
     const h = heads(r, "rain");
-    expect(h.Recommended).toEqual({ big: "6.1 min less without a roof", small: "than the shortest walk", size: "hero" });
-    expect(h.Shortest).toEqual({ big: "6.1 min more without a roof", small: "than the recommended walk", size: "large" });
+    expect(h.Recommended).toEqual({ big: "6.1 min less time without a roof", small: "than the shortest walk", size: "hero" });
+    expect(h.Shortest).toEqual({ big: "6.1 min more time without a roof", small: "than the recommended walk", size: "large" });
   });
 
   it("shows no headline at night", () => {
@@ -113,7 +113,7 @@ describe("route card text", () => {
     const text = cardText(r);
     // A note no other line says stays.
     expect(text).toContain("Crossing data is missing");
-    expect(text).toContain("Shortest walk is also the shadiest");
+    expect(text).toContain("The shortest walk is the most shaded");
     expect(text).toContain("The recommended walk is at most 20% longer than the shortest and has at least 15% less time in sun. If no walk meets both, the shortest is recommended.");
     expect(text).not.toContain("No meaningfully");
     expect(text).not.toContain("The most covered route is the shortest route.");
@@ -139,12 +139,12 @@ describe("route card text", () => {
       ]),
     );
     const low = cardText(findRoutes(data, query({ bucketIdx: 1 })));
-    expect(low).toContain("The sun is too low for shade. The shortest route is also the most sheltered.");
+    expect(low).toContain("The sun is too low for shade. The shortest route is the most sheltered.");
     expect(low).toContain("Uses an underpass in low light.");
     expect(low).not.toContain("after dark");
     expect(low).not.toContain("The recommended walk is");
     const dark = cardText(findRoutes(data, query({ bucketIdx: 3 })));
-    expect(dark).toContain("Shade does not apply after dark. The shortest route is also the most sheltered.");
+    expect(dark).toContain("Shade does not apply after dark. The shortest route is the most sheltered.");
     expect(dark).toContain("Uses an underpass after dark. Madilim pag gabi.");
     expect(dark).not.toContain("The most sheltered route is the shortest route.");
   });
@@ -163,9 +163,9 @@ describe("no-route text", () => {
     const r = findRoutes(fan([{ y: 0, routable: false }]).data, query());
     expect(noRouteText(notesOf(r), "Glorietta", "Dasmariñas Village", ["Dasmariñas Village"])).toEqual({
       title: "No walking route from Glorietta to Dasmariñas Village.",
-      fix: "Dasmariñas Village sits behind a gate or inside a gated village. Include paths with unchecked access, or pick a nearby street.",
+      fix: "Dasmariñas Village sits behind a gate or inside a gated village. Include paths that may be gated or private, or pick a nearby street.",
     });
-    expect(noRouteText(notesOf(r), "A", "B", []).fix).toBe("A route exists on paths with unchecked access. Include those paths to see it.");
+    expect(noRouteText(notesOf(r), "A", "B", []).fix).toBe("A route exists on paths that may be gated or private. Include those paths to see it.");
   });
 
   it("says try another time only when a closed place is the cause", () => {
@@ -214,7 +214,7 @@ describe.skipIf(!READY)("route card headline on real metro-core data", () => {
     const lessSun = display.filter((d) => d !== short && short.route.sun_minutes - d.route.sun_minutes >= 0.1 - 1e-9);
     console.log("D01_GLORIETTA_TRIANGLE", JSON.stringify({ head, routes: display.map((d) => [d.title, d.route.length_m, d.route.minutes, d.pct, d.route.sun_minutes]) }));
     expect(head).not.toBeNull();
-    if (lessSun.length > 0) expect(head?.big).not.toMatch(/shadiest/);
+    if (lessSun.length > 0) expect(head?.big).not.toMatch(/most shaded/);
     // The card's rule line must hold: a shown route that meets it is the recommended route.
     if (r.recommendedIsShortest) {
       for (const d of lessSun) {

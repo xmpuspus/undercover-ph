@@ -131,7 +131,7 @@ export default function SunChip({
             </p>
           )}
           <p>Shade falls on the side of the street toward the sun. In the morning that is the east side, in the afternoon the west side.</p>
-          {!low && sun.shadySide && <p className="mt-1.5 font-medium text-ink">At this hour: {sun.shadySide.replace(/\.+$/, "")}.</p>}
+          {!low && sun.shadySide && <p className="mt-1.5 font-medium text-ink">At this hour, {sun.shadySide[0].toLowerCase() + sun.shadySide.slice(1).replace(/\.+$/, "")}.</p>}
           {!low && <p className="mt-1.5 text-slate-500">The arrow points from the sun toward the shadows on the map.</p>}
           {day && (
             <p className="mt-1.5 text-slate-500">

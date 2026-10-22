@@ -345,13 +345,13 @@ export default function App() {
     }
     setNowAt(null);
     const last = manifest.buckets_min[manifest.buckets_min.length - 1];
-    const lead = todayIdx >= 0 ? `Shade data ends at ${fmtMinute(last, true)} and has no night slot.` : "There is no shade data for today.";
+    const lead = todayIdx >= 0 ? `Shade data ends at ${fmtMinute(last, true)}.` : "There is no shade data for today.";
     for (const d of dateOpts) {
       const day = bucketsFor(d.date).find((b) => !b.night);
       if (!day) continue;
       setDateIdx(d.idx);
       setBucketIdx(day.idx);
-      setNowNote({ text: `${lead} The route uses the first daylight slot, ${dateLabel(d.date, clock.date)} ${fmtMinute(day.min, true)}.`, dateIdx: d.idx, bucketIdx: day.idx });
+      setNowNote({ text: `${lead} The route uses ${dateLabel(d.date, clock.date)} ${fmtMinute(day.min, true)}, the next time with shade data.`, dateIdx: d.idx, bucketIdx: day.idx });
       return;
     }
     const first = dateOpts[0];
@@ -458,7 +458,8 @@ export default function App() {
       });
       return { result, error: null };
     } catch (e) {
-      return { result: null, error: `The router failed: ${e instanceof Error ? e.message : String(e)}` };
+      console.error(e);
+      return { result: null, error: "Could not plan this route. Change the start or end, or reload the page." };
     }
   }, [deferred]);
   // A stale result from before the start moved to another area never shows beside the one-area message.
@@ -884,7 +885,7 @@ export default function App() {
     if (routed.error) return routed.error;
     if (!result) return "";
     if (result.state === "no_route") return noRouteText(result.notes, from.label, to.label, []).title;
-    if (result.state === "outside") return "This start or end is outside the covered area.";
+    if (result.state === "outside") return "This start or end is outside the areas this app covers.";
     if (!current) return "";
     const n = display.length;
     const sunLine = result.state === "night" ? ((result.sun?.altitude ?? 0) > 0 ? "The sun is too low for shade." : "Shade does not apply after dark.") : `${fmtDuration(current.route.sun_minutes)} ${routeMode === "shade" ? "in sun" : "without a roof"}.`;
@@ -1049,7 +1050,7 @@ export default function App() {
                           type="button"
                           data-scrubber
                           onClick={togglePlay}
-                          aria-label={playing ? "Stop the hour scrubber" : "Play the day hour by hour"}
+                          aria-label={playing ? "Stop playing the day" : "Play the day hour by hour"}
                           aria-pressed={playing}
                           className={`pointer-events-auto grid h-11 w-11 shrink-0 place-items-center rounded-full border shadow-sm ${playing ? "border-brand bg-brand text-white" : "border-slate-200 bg-white text-ink hover:border-slate-300"}`}
                           data-testid="scrubber"
@@ -1191,7 +1192,7 @@ export default function App() {
                         sheetDrag.current = null;
                       }}
                       aria-expanded
-                      aria-label="Show less, more map"
+                      aria-label="Make the route card smaller"
                       className="-mb-1 flex h-7 w-full shrink-0 items-center justify-center"
                       data-testid="sheet-collapse"
                     >
@@ -1211,7 +1212,7 @@ export default function App() {
                       </div>
                     )}
                     {!crossArea && areaError && (
-                      <div className="rounded-card bg-white p-4 text-[14px] text-ink shadow-card" role="alert" title={areaError} data-testid="area-error">
+                      <div className="rounded-card bg-white p-4 text-[14px] text-ink shadow-card" role="alert" data-error={areaError} data-testid="area-error">
                         The walking map for {areaLabel(areaId!, areas)} did not load. Check your connection and try again.
                         <button type="button" onClick={() => ensureArea(areaId!)} className="mt-3 block h-11 rounded-card border border-slate-300 px-4 font-medium text-brand">
                           Try again
@@ -1314,7 +1315,7 @@ export default function App() {
             type="button"
             data-scrubber
             onClick={togglePlay}
-            aria-label={playing ? "Stop the hour scrubber" : "Play the day hour by hour"}
+            aria-label={playing ? "Stop playing the day" : "Play the day hour by hour"}
             aria-pressed={playing}
             className={`absolute right-3 z-20 grid h-12 w-12 place-items-center rounded-full border shadow-card ${playing ? "border-brand bg-brand text-white" : "border-slate-200 bg-white text-ink"}`}
             style={{ bottom: panelH + 4 }}

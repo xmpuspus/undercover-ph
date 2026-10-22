@@ -192,6 +192,6 @@ describe("loadData per-date shade", () => {
     const { "shade/lowconf.bin": _missing, ...rest } = area;
     const data = await loadData("data", server(rest).fetchImpl);
     expect(data.shade).toBeNull();
-    expect(data.loadNotes[0]).toMatch(/lowconf\.bin did not load/);
+    expect(data.loadNotes[0]).toBe("Shade data did not load. Only roofs count as cover.");
   });
 });

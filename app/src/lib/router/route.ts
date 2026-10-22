@@ -225,10 +225,10 @@ function makeRoute(
 
   const warnings: string[] = [];
   if (unmarked) warnings.push("Crosses a road where there is no marked crossing.");
-  if (uncheckedM > 0) warnings.push(`Uses ${Math.round(uncheckedM)} m of paths with unchecked access.`);
+  if (uncheckedM > 0) warnings.push(`Uses ${Math.round(uncheckedM)} m of paths that may be gated or private.`);
   if (stairs) warnings.push("Uses stairs.");
-  if (kerb) warnings.push("Has a raised kerb at a crossing.");
-  if (stepFree && footbridge) warnings.push("Footbridge entrances may have stairs. Lifts are not checked.");
+  if (kerb) warnings.push("Has a raised curb at a crossing.");
+  if (stepFree && footbridge) warnings.push("Footbridge entrances may have stairs.");
   if (night && underpass) {
     // Router night starts at 3 degrees. Between 0 and 3 degrees the sun is up, so it is not yet dark.
     const alt = sunAltitude(data, q.dateIdx, q.bucketIdx);
@@ -311,7 +311,7 @@ export function findRoutes(data: Data, q: Query): Result {
   const dayShade = !!data.shade && data.shade.loaded[q.dateIdx] === 1;
   if (data.shade && !dayShade) notes.push("Shade for this date did not load. Only roofs count as cover.");
   const cover: CoverMode = night || q.mode === "rain" || !dayShade ? "roof" : "shade";
-  if (q.stepFree) notes.push("Step-free avoids mapped steps only. Lifts and ramps are not checked.");
+  if (q.stepFree) notes.push("Step-free avoids mapped steps only. Elevators and ramps are not checked.");
   const spec = buildSpec(data, q, cover, q.includeUnchecked, q.stepFree);
   const memo = new Map<number, Path | null>();
   const run = (k: number): Path | null => {
@@ -324,16 +324,16 @@ export function findRoutes(data: Data, q: Query): Result {
     // Name the cause, so the card can give the fix that matches it.
     const reach = (d: Data, unchecked: boolean, stepFree: boolean) => aStar(d, buildSpec(d, q, "roof", unchecked, stepFree), q.from, q.to, 0) !== null;
     if (!q.includeUnchecked && reach(data, true, q.stepFree)) {
-      notes.push('A route exists on paths with unchecked access. Turn on "Include paths with unchecked access" to see it.');
+      notes.push('A route exists on paths that may be gated or private. Turn on "Include paths that may be gated or private" to see it.');
     } else if (q.stepFree && reach(data, q.includeUnchecked, false)) {
       notes.push("Every route between these points uses steps.");
     } else if (reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, q.includeUnchecked, q.stepFree)) {
       notes.push("Every route between these points passes through a place that is closed at this time.");
     } else if (reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, true, q.stepFree)) {
       // Each limit alone still blocks, but together they open a route: say so, not "no route at any hour".
-      notes.push("A route exists only at other hours or on paths with unchecked access. Try another time, or include those paths.");
+      notes.push("A route exists only at other hours or on paths that may be gated or private. Try another time, or include those paths.");
     } else if (q.stepFree && reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, true, false)) {
-      notes.push("A route exists only with steps, and only at other hours or on paths with unchecked access.");
+      notes.push("A route exists only with steps, and only at other hours or on paths that may be gated or private.");
     } else {
       notes.push("No walking route connects these points at any hour.");
     }

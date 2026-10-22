@@ -14,7 +14,7 @@ export interface DisplayRoute {
 }
 
 export function coverWord(mode: Mode, night: boolean): string {
-  if (night) return "under roof";
+  if (night) return "sheltered";
   return mode === "shade" ? "shaded" : "sheltered";
 }
 

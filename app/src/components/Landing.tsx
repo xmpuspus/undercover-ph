@@ -51,7 +51,7 @@ export default function Landing({ onPick, onIntent, status, error, theme, minute
           {fmtMinute(minute)} in Metro Manila · {phaseLabel(theme.phase, theme.morning)}
         </p>
         {status === "error" && (
-          <div className="mt-3 text-[13px] text-slate-700" role="alert" title={error ?? undefined} data-testid="data-error">
+          <div className="mt-3 text-[13px] text-slate-700" role="alert" data-error={error ?? undefined} data-testid="data-error">
             Route data could not load. Check your connection and try again.
             <button type="button" onClick={onIntent} className="mt-2 flex min-h-11 items-center rounded-card border border-slate-300 bg-white px-4 font-medium text-brand">
               Try again

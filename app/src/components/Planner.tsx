@@ -30,7 +30,7 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (m: Mode)
 }
 
 // One message for every search with no match: the list cannot tell a missing place from a place outside the areas.
-const NO_MATCH = "No place by that name in the six covered areas. Try another name, or tap the map.";
+const NO_MATCH = "No place by that name in the areas this app covers. Try another name, or tap the map.";
 
 function categoryLabel(c: string): string {
   const s = c.replace(/_/g, " ");

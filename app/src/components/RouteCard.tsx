@@ -52,7 +52,7 @@ export function ProfileToggles(p: { stepFree: boolean; onStepFree: (v: boolean) 
         ]}
       />
       <Seg
-        label="Route goal"
+        label="Route type"
         value={p.mode}
         onChange={p.onMode}
         options={[
@@ -81,7 +81,7 @@ export type Highlight = { coords: [number, number][]; color: string } | null;
 
 function kindLook(kind: SegKind, mode: Mode, night: boolean): { label: string; color: string } {
   if (kind === "roof") return { label: "Roof", color: COLORS.roof };
-  if (kind === "unchecked") return { label: "Unchecked path", color: COLORS.unchecked };
+  if (kind === "unchecked") return { label: "May be gated", color: COLORS.unchecked };
   if (kind === "building") return { label: "Building shade", color: COLORS.building };
   if (kind === "tree") return { label: "Tree shade", color: COLORS.tree };
   return mode === "shade" && !night ? { label: "Sun", color: COLORS.sun } : { label: "No roof", color: night ? COLORS.nightOpen : COLORS.sun };
@@ -198,7 +198,7 @@ export function headline(d: DisplayRoute, display: DisplayRoute[], result: Resul
   if (result.state !== "ok") return null;
   const shortest = result.routes.find((x) => x.label === "shortest");
   if (!shortest) return null;
-  const word = mode === "shade" ? "sun" : "without a roof";
+  const word = mode === "shade" ? "sun" : "time without a roof";
   // Sun minutes are multiples of 0.1. Rounding the gap drops float noise such as 0.3 - 0.2.
   const gap = (a: number, b: number) => Math.round((a - b) * 10) / 10;
   if (!d.labels.includes("shortest")) {
@@ -207,7 +207,7 @@ export function headline(d: DisplayRoute, display: DisplayRoute[], result: Resul
     return { big: `${fmtDuration(saved)} less ${word}`, small: "than the shortest walk", size: saved >= 1 ? "hero" : "plain" };
   }
   const others = display.filter((x) => x !== d);
-  if (!others.length) return { big: `Shortest walk is also the ${mode === "shade" ? "shadiest" : "most sheltered"}`, small: null, size: "plain" };
+  if (!others.length) return { big: `The shortest walk is the ${mode === "shade" ? "most shaded" : "most sheltered"}`, small: null, size: "plain" };
   const top = others.reduce((a, b) => (b.route.sun_minutes < a.route.sun_minutes ? b : a));
   const more = gap(shortest.sun_minutes, top.route.sun_minutes);
   const than = `than the ${top.short.toLowerCase()} walk`;
@@ -217,7 +217,7 @@ export function headline(d: DisplayRoute, display: DisplayRoute[], result: Resul
   // The shortest walk is recommended because no other walk on screen meets the rule.
   // Say what the shadier walk costs, in the minutes the tabs show.
   const walk = top.route.minutes - shortest.minutes;
-  const same = mode === "shade" ? "about the same sun" : "about the same time without a roof";
+  const same = mode === "shade" ? "about the same time in sun" : "about the same time without a roof";
   if (walk >= 1) return { big: `${walk} min less walking`, small: `${than}, for ${more >= 0.1 ? `${fmtDuration(more)} more ${word}` : same}`, size: "large" };
   if (more >= 0.1) return { big: `Only ${fmtDuration(more)} more ${word}`, small: than, size: "plain" };
   return { big: same[0].toUpperCase() + same.slice(1), small: `as the ${top.short.toLowerCase()} walk`, size: "plain" };
@@ -286,14 +286,15 @@ export function RouteCard(p: CardProps) {
   const d = p.display[p.selected] ?? p.display[0];
   const r = d.route;
   // The router's warnings and notes are the source. The UI adds the Taglish helper where one fits.
-  const warnings = r.warnings.map((w) => ({ text: hasUnchecked(r) && /unchecked access/i.test(w) ? `${w} Dashed on the map.` : w, tl: taglish(w) }));
+  const warnings = r.warnings.map((w) => ({ text: hasUnchecked(r) && /gated or private/i.test(w) ? `${w} Dashed on the map.` : w, tl: taglish(w) }));
   if (r.steps.some((s) => s.flags.includes("hours") && !s.closesAt)) {
     warnings.push({ text: "Opening hours not confirmed for a passage on this route.", tl: null });
   }
   // The headline, the rule line, and the night box already say these router notes. Say each fact once.
   const said = (n: string) =>
     /^No meaningfully /.test(n) ||
-    (p.display.length === 1 && / route is the shortest route\.$/.test(n)) ||
+    // The tab title already joins the labels, for example "Recommended and Most shaded".
+    / route is the (shortest|recommended) route\.$/.test(n) ||
     (night && /after dark|sun is down|too low for shade|shade does not apply/i.test(n));
   const notes = p.result.notes.filter((n) => !said(n));
   const exposedWord = p.mode === "shade" ? "in sun" : "without a roof";
@@ -302,7 +303,7 @@ export function RouteCard(p: CardProps) {
   // Router night starts at 3 degrees. Between 0 and 3 degrees the sun is still up.
   const alt = p.result.sun?.altitude;
   const nightLine = `${alt !== undefined && alt > 0 ? "The sun is too low for shade." : "Shade does not apply after dark."} ${
-    p.display.length > 1 ? "These are the shortest and the most sheltered routes." : "The shortest route is also the most sheltered."
+    p.display.length > 1 ? "These are the shortest and the most sheltered routes." : "The shortest route is the most sheltered."
   }`;
   const [open, setOpen] = useState(false);
   const showDetails = !p.compact || open;
@@ -469,7 +470,7 @@ export function RouteCard(p: CardProps) {
           <>
             <UncheckedToggle value={p.includeUnchecked} onChange={p.onIncludeUnchecked} />
             <p className="mt-2 text-[12px] text-slate-500">
-              Leaving {p.when}. Data built {p.dataDate}.{" "}
+              Leaving {p.when}. Data updated {p.dataDate}.{" "}
               <button type="button" onClick={p.onAbout} className="inline-flex min-h-11 items-center text-brand hover:underline">
                 Method and limits
               </button>
@@ -491,7 +492,7 @@ export function UncheckedToggle({ value, onChange }: { value: boolean; onChange:
         className="h-5 w-5 shrink-0 accent-brand"
         data-testid="include-unchecked"
       />
-      Include paths with unchecked access
+      Include paths that may be gated or private
     </label>
   );
 }
@@ -527,11 +528,11 @@ interface StateProps {
 
 // Router notes that give the cause of a no-route result (route.ts). The card turns each into its fix.
 const SAME_PLACE = "Start and end are the same place.";
-const ONLY_UNCHECKED = /^A route exists on paths with unchecked access/;
+const ONLY_UNCHECKED = /^A route exists on paths that may be gated or private/;
 const ONLY_STEPS = "Every route between these points uses steps.";
 const CLOSED = "Every route between these points passes through a place that is closed at this time.";
 const NO_PATH = "No walking route connects these points at any hour.";
-const COMBINED = /^A route exists only at other hours or on paths with unchecked access/;
+const COMBINED = /^A route exists only at other hours or on paths that may be gated or private/;
 const COMBINED_STEPS = /^A route exists only with steps, and only at other hours/;
 const isCause = (n: string) =>
   n === SAME_PLACE || n === ONLY_STEPS || n === CLOSED || n === NO_PATH || ONLY_UNCHECKED.test(n) || COMBINED.test(n) || COMBINED_STEPS.test(n);
@@ -547,13 +548,13 @@ export function noRouteText(notes: string[], from: string, to: string, gatedEnds
   if (notes.some((n) => ONLY_UNCHECKED.test(n))) {
     return {
       title,
-      fix: gate ? `${gate} Include paths with unchecked access, or pick a nearby street.` : "A route exists on paths with unchecked access. Include those paths to see it.",
+      fix: gate ? `${gate} Include paths that may be gated or private, or pick a nearby street.` : "A route exists on paths that may be gated or private. Include those paths to see it.",
     };
   }
   if (notes.includes(CLOSED)) return { title, fix: "Every route between them passes through a place that is closed at this time. Try another time." };
-  if (notes.some((n) => COMBINED.test(n))) return { title, fix: "A route exists only at other hours and on paths with unchecked access. Try another time, and include those paths." };
+  if (notes.some((n) => COMBINED.test(n))) return { title, fix: "A route exists only at other hours and on paths that may be gated or private. Try another time, and include those paths." };
   if (notes.some((n) => COMBINED_STEPS.test(n))) {
-    return { title, fix: "A route exists only with steps, at other hours or on paths with unchecked access. Turn off Step-free, then try another time or include those paths." };
+    return { title, fix: "A route exists only with steps, at other hours or on paths that may be gated or private. Turn off Step-free, then try another time or include those paths." };
   }
   return { title, fix: gate ? `${gate} Pick a nearby street.` : "No walking route connects them at any hour. Pick a nearby start or end." };
 }
@@ -565,9 +566,9 @@ export function StateMessage({ result, onEdit, onAbout, includeUnchecked, onIncl
   const notes = result.notes.filter((n) => !(text && isCause(n)) && (stepFree || !/step-free/i.test(n)));
   return (
     <div className="rounded-card bg-white p-4 shadow-card" data-testid="route-state" data-state={result.state}>
-      <p className="text-[16px] font-medium text-ink">{text ? text.title : "This start or end is outside the covered area."}</p>
+      <p className="text-[16px] font-medium text-ink">{text ? text.title : "This start or end is outside the areas this app covers."}</p>
       <p className="mt-1 text-[14px] text-slate-600" data-testid="state-fix">
-        {text ? text.fix : "Routing works inside the dashed box, the covered area. Pick a place inside it."}
+        {text ? text.fix : "Routes work inside the blue outlines on the map. Pick a place inside one."}
       </p>
       {notes.length > 0 && (
         <ul className="mt-2 space-y-0.5 text-[12px] text-slate-500">
@@ -582,7 +583,7 @@ export function StateMessage({ result, onEdit, onAbout, includeUnchecked, onIncl
           Change start or end
         </button>
         <button type="button" onClick={onAbout} className="h-11 rounded-card border border-slate-200 px-4 text-[14px] text-ink">
-          Method
+          Method and limits
         </button>
       </div>
     </div>

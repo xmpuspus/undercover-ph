@@ -112,7 +112,7 @@ describe("access filters", () => {
     const s = byLabel(on, "shortest");
     expect(uses(s, via[0])).toBe(true);
     expect(s.segments.map((x) => x.kind)).toEqual(["unchecked"]);
-    expect(s.warnings.some((w) => w.includes("unchecked access"))).toBe(true);
+    expect(s.warnings.some((w) => w.includes("gated or private"))).toBe(true);
     expect(s.steps.some((x) => x.flags.includes("unchecked"))).toBe(true);
   });
 
@@ -134,7 +134,7 @@ describe("access filters", () => {
     const { data } = fan([{ y: 0, flags: 4, hours: 0, routable: false, name: "Glorietta" }], { hours });
     const r = findRoutes(data, query({ departMin: 21 * 60 + 5 }));
     expect(r.state).toBe("no_route");
-    expect(r.notes.some((n) => n.startsWith("A route exists only at other hours or on paths with unchecked access"))).toBe(true);
+    expect(r.notes.some((n) => n.startsWith("A route exists only at other hours or on paths that may be gated or private"))).toBe(true);
     expect(r.notes).not.toContain("No walking route connects these points at any hour.");
   });
 
@@ -142,7 +142,7 @@ describe("access filters", () => {
     const { data } = fan([{ y: 0, flags: 16, routable: false }]);
     const r = findRoutes(data, query({ stepFree: true }));
     expect(r.state).toBe("no_route");
-    expect(r.notes.some((n) => n.startsWith("A route exists only at other hours or on paths with unchecked access"))).toBe(false);
+    expect(r.notes.some((n) => n.startsWith("A route exists only at other hours or on paths that may be gated or private"))).toBe(false);
     expect(r.notes.some((n) => n.startsWith("A route exists only with steps"))).toBe(true);
   });
 
@@ -151,7 +151,7 @@ describe("access filters", () => {
     const r = findRoutes(data, query());
     expect(r.state).toBe("no_route");
     expect(r.routes).toEqual([]);
-    expect(r.notes.some((n) => n.includes("unchecked access"))).toBe(true);
+    expect(r.notes.some((n) => n.includes("gated or private"))).toBe(true);
   });
 
   it("drops a mall passage after its closing time", () => {
@@ -205,9 +205,9 @@ describe("access filters", () => {
     const kerbFx = fan([{ y: 0, flags: 256 | 16 }, { y: 80 }]);
     const kerb = byLabel(findRoutes(kerbFx.data, query()), "shortest");
     expect(uses(kerb, kerbFx.via[0])).toBe(true);
-    expect(kerb.steps[0].text).toBe("Cross the street (kerb step)");
+    expect(kerb.steps[0].text).toBe("Cross the street (curb step)");
     expect(kerb.steps[0].flags).toEqual(expect.arrayContaining(["crossing", "stairs"]));
-    expect(kerb.warnings).toEqual(["Has a raised kerb at a crossing."]);
+    expect(kerb.warnings).toEqual(["Has a raised curb at a crossing."]);
     for (const route of findRoutes(kerbFx.data, query({ stepFree: true })).routes) expect(uses(route, kerbFx.via[0])).toBe(false);
 
     const only = findRoutes(fan([{ y: 0, flags: 16 }]).data, query({ stepFree: true }));
@@ -426,7 +426,7 @@ describe("unverified building cover (flag 1024)", () => {
     expect(s.split.roof_m).toBe(0);
     expect(s.split.building_m).toBe(320);
     expect(s.lowconf_pct).toBe(100);
-    expect(s.steps[0].text).toBe("Passes through a building (not checked)");
+    expect(s.steps[0].text).toBe("Walk through the building (cover not checked)");
     expect(s.steps[0].flags).toContain("indoor");
     expect(s.warnings).toContain("Passes through a building. Its cover is not checked.");
     expect(s.segments.map((x) => x.kind)).toEqual(["building"]);
@@ -450,7 +450,7 @@ describe("unverified building cover (flag 1024)", () => {
     });
     const steps = findRoutes(data, query({ from: 0, to: 3 })).routes[0].steps;
     expect(steps).toHaveLength(1);
-    expect(steps[0].text).toBe("Head east on Ayala Avenue. Passes through a building (not checked)");
+    expect(steps[0].text).toBe("Head east on Ayala Avenue. Walk through the building (cover not checked)");
     expect(steps[0].flags).toContain("indoor");
     expect(steps[0].distance_m).toBe(250);
   });

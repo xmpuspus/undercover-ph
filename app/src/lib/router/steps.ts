@@ -186,7 +186,7 @@ function structEn(kind: Kind, name: string | null, roofed: boolean, stairs: bool
     case "covered":
       return "Take the covered walkway";
     case "inbuilding":
-      return "Passes through a building (not checked)";
+      return "Walk through the building (cover not checked)";
     case "underpass":
       return `Go through the underpass${stairs ? " (stairs)" : ""}`;
     case "indoor":
@@ -198,7 +198,7 @@ function structEn(kind: Kind, name: string | null, roofed: boolean, stairs: bool
     case "elevator":
       return "Take the elevator";
     case "crossing":
-      return `${name ? `Cross ${name}` : "Cross the street"}${stairs ? " (kerb step)" : ""}`;
+      return `${name ? `Cross ${name}` : "Cross the street"}${stairs ? " (curb step)" : ""}`;
     case "walk":
       return name ? `Walk along ${name}` : "Walk ahead";
   }

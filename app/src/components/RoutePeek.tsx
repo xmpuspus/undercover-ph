@@ -21,9 +21,9 @@ function shortWarning(w: string): string {
   const closes = /^(.*) closes at (\S+ [AP]M)/.exec(w);
   if (closes) return `${closes[1]} closes ${closes[2]}`;
   if (/no marked crossing/i.test(w)) return "unmarked crossing";
-  if (/unchecked access/i.test(w)) return "unchecked paths";
+  if (/gated or private/i.test(w)) return "may be gated";
   if (/^Uses stairs/i.test(w)) return "stairs";
-  if (/raised kerb/i.test(w)) return "raised kerb";
+  if (/raised curb/i.test(w)) return "raised curb";
   if (/Footbridge entrances/i.test(w)) return "footbridge stairs";
   if (/underpass/i.test(w)) return "dim underpass";
   if (/through a building/i.test(w)) return "through a building";

@@ -34,7 +34,7 @@ export function loadMapLibre(): Promise<MapLibreGL> {
 
 export function mapLibre(): MapLibreGL {
   const ml = (window as unknown as { maplibregl?: MapLibreGL }).maplibregl;
-  if (!ml) throw new Error("The map library is not loaded.");
+  if (!ml) throw new Error("This browser could not load the map.");
   return ml;
 }
 

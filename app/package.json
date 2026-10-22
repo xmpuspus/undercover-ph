@@ -11,7 +11,8 @@
     "e2e": "playwright test",
     "shots": "node scripts/shots.mjs",
     "demo:record": "pnpm build && node scripts/demo-record.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "e2e:live": "playwright test -c e2e-live/live.config.ts"
   },
   "dependencies": {
     "@fontsource/jost": "5.3.0",

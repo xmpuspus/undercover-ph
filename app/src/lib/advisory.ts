@@ -29,15 +29,22 @@ export function advisoryCovers(issuedAt: string | null | undefined, date: string
 
 const joinAnd = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 
-// mine: the cities of the area being planned. listed is true when the advisory names one of them or all of Metro Manila.
-export function advisoryLine(issuedAt: string, cities: string[], mine: string[] = ["Makati"]): { text: string; listed: boolean } {
-  const time = /(\d{1,2}:\d{2}\s*[AP]M)/i.exec(issuedAt)?.[1] ?? issuedAt;
+const clock = (epoch: number) => {
+  const d = new Date(epoch + MANILA_MS);
+  const h = d.getUTCHours();
+  return `${h % 12 || 12}:${String(d.getUTCMinutes()).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+};
+
+// mine: the cities of the area being planned. listed is true when the advisory names one of them or all of Metro
+// Manila. An advisory that names no Metro Manila city (it covers only nearby provinces) gives no line: null.
+export function advisoryLine(issuedAt: string, cities: string[], mine: string[] = ["Makati"]): { text: string; listed: boolean } | null {
+  if (!cities.length) return null;
   const metro = cities.includes("Metro Manila");
-  const hit = mine.filter((c) => cities.includes(c));
-  const listed = metro || hit.length > 0;
-  const named = metro ? ["Metro Manila"] : listed ? hit : mine;
-  const list = cities.length ? cities.join(", ") : "no Metro Manila city named";
-  // A long list of cities that are not named reads worse than one short line.
-  const verdict = !listed && named.length > 2 ? "No covered city is listed." : `${joinAnd(named)} ${named.length > 1 ? "are" : "is"} ${listed ? "listed" : "not listed"}.`;
-  return { listed, text: `PAGASA thunderstorm advisory, issued ${time}: ${list}. ${verdict}` };
+  const listed = metro || mine.some((c) => cities.includes(c));
+  // The planned area's cities first, so a long list never hides them.
+  const names = [...cities.filter((c) => mine.includes(c)), ...cities.filter((c) => !mine.includes(c))];
+  const where = metro ? "Metro Manila" : names.length <= 4 ? joinAnd(names) : `${names.slice(0, 3).join(", ")} and ${names.length - 3} more cities`;
+  const t0 = parseIssued(issuedAt);
+  const until = t0 === null ? "" : ` until ${clock(t0 + ADVISORY_HOURS * 3600_000)}`;
+  return { listed, text: `PAGASA expects thunderstorms over ${where}${until}.` };
 }

@@ -133,15 +133,16 @@ function parseShade(manifest: Manifest, raw: RawFiles, edgeCount: number, notes:
   if (h.per_date) {
     const lc = raw.lowconf ?? null;
     if (!lc) {
-      notes.push("shade/lowconf.bin did not load. Only roofs count as cover.");
+      notes.push("Shade data did not load. Only roofs count as cover.");
       return null;
     }
     if (h.n_edges !== edgeCount || lc.byteLength !== h.n_edges) {
-      notes.push(`The shade files do not match the graph (${lc.byteLength} bytes for ${h.n_edges} edges, ${edgeCount} edges in the graph). Only roofs count as cover.`);
+      console.warn(`shade/lowconf.bin: ${lc.byteLength} bytes for ${h.n_edges} edges, ${edgeCount} edges in the graph`);
+      notes.push("Shade data did not load correctly. Only roofs count as cover.");
       return null;
     }
     if (h.n_dates !== manifest.dates.length || h.n_buckets !== manifest.buckets_min.length) {
-      notes.push("The shade dates or buckets do not match the manifest. Only roofs count as cover.");
+      notes.push("Shade data did not load correctly. Only roofs count as cover.");
       return null;
     }
     // A date not loaded yet reads 255, no shade value, never 0, which would claim full sun.
@@ -159,18 +160,17 @@ function parseShade(manifest: Manifest, raw: RawFiles, edgeCount: number, notes:
   }
   const bytes = raw.shade;
   if (!bytes) {
-    notes.push("shade.bin did not load. Only roofs count as cover.");
+    notes.push("Shade data did not load. Only roofs count as cover.");
     return null;
   }
   const expected = 2 * plane + h.n_edges;
   if (h.n_edges !== edgeCount || bytes.byteLength !== expected) {
-    notes.push(
-      `shade.bin does not match the graph (${bytes.byteLength} bytes for ${h.n_edges} edges, expected ${expected} bytes for ${edgeCount} edges). Only roofs count as cover.`,
-    );
+    console.warn(`shade.bin: ${bytes.byteLength} bytes for ${h.n_edges} edges, expected ${expected} bytes for ${edgeCount} edges`);
+    notes.push("Shade data did not load correctly. Only roofs count as cover.");
     return null;
   }
   if (h.n_dates !== manifest.dates.length || h.n_buckets !== manifest.buckets_min.length) {
-    notes.push("shade.bin dates or buckets do not match the manifest. Only roofs count as cover.");
+    notes.push("Shade data did not load correctly. Only roofs count as cover.");
     return null;
   }
   // Layout: uint8 building[d][b][e], then uint8 tree[d][b][e], then uint8 lowconf[e].

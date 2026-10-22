@@ -27,9 +27,9 @@ export function nowSlot(bucketsMin: number[], sunAlt: (number | undefined)[] | u
   return null;
 }
 
-// "now, 12:40 PM, shade for 1 PM". The clock minute is the real departure time; the slot is the shade data used.
+// "now, 12:40 PM, with the 1 PM shade". The clock minute is the real departure time; the slot is the shade data used.
 // sunAlt is the slot's sun height: a night slot with the sun still above the horizon is low sun, not dark.
 export function nowLabel(clockMin: number, slot: NowSlot, mode: Mode, sunAlt = -90): string {
   if (slot.night) return `now, ${fmtMinute(clockMin)}, ${sunAlt > 0 ? "sun too low for shade" : "after dark"}`;
-  return `now, ${fmtMinute(clockMin)}, ${mode === "shade" ? "shade" : "weather"} for ${fmtMinute(slot.min, true)}`;
+  return `now, ${fmtMinute(clockMin)}, with the ${fmtMinute(slot.min, true)} ${mode === "shade" ? "shade" : "forecast"}`;
 }

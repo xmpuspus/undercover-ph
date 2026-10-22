@@ -66,7 +66,7 @@ describe("Now slot", () => {
   it("uses the next slot ahead and keeps the clock as the departure time", () => {
     const s = nowSlot(buckets, alt, 760, 3);
     expect(s).toEqual({ bucketIdx: 3, min: 780, night: false });
-    expect(nowLabel(760, s!, "shade")).toBe("now, 12:40 PM, shade for 1 PM");
+    expect(nowLabel(760, s!, "shade")).toBe("now, 12:40 PM, with the 1 PM shade");
   });
   it("uses the last night slot after the day's last slot", () => {
     const s = nowSlot(buckets, alt, 1140, 3);

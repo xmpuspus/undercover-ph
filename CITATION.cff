@@ -28,4 +28,4 @@ abstract: >
   each sidewalk edge, and routes in the browser with a custom A* search that
   returns the shortest, the most covered, and a recommended route. Paths with
   unchecked access, closed mall passages, and mid-block road crossings stay out
-  of routes. The shade values are modelled and not yet checked in the field.
+  of routes. The shade values come from a model. Nobody checked them in the field yet.

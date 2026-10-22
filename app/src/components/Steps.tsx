@@ -9,7 +9,7 @@ const FLAG: Record<StepFlag, { icon: (p: { size?: number }) => JSX.Element; labe
   underpass: { icon: UnderpassIcon, label: "Underpass" },
   indoor: { icon: IndoorIcon, label: "Indoor" },
   hours: { icon: ClockIcon, label: "Hours not confirmed" },
-  unchecked: { icon: AlertIcon, label: "Access not checked" },
+  unchecked: { icon: AlertIcon, label: "May be gated or private" },
   crossing: { icon: CrossingIcon, label: "Crossing" },
 };
 
@@ -120,7 +120,7 @@ export function StepsList({ steps, lengthM, minutes, night, onBack, onFocus, cur
         </div>
       </div>
       {steps.length === 0 ? (
-        <p className="p-4 text-[14px] text-slate-600">The router returned no steps for this route.</p>
+        <p className="p-4 text-[14px] text-slate-600">No turn-by-turn steps for this route.</p>
       ) : (
         <ol className="min-h-0 flex-1 overflow-y-auto">
           {steps.map((s, i) => (

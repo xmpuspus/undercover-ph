@@ -624,7 +624,7 @@ export default function MapView(p: Props) {
       <div ref={washRef} className="pointer-events-none absolute inset-0" aria-hidden="true" />
       {failed && (
         <div className="absolute inset-0 grid place-items-center bg-slate-100 p-6 text-center text-sm text-slate-600">
-          The map needs WebGL, and this browser could not start it. {failed}
+          This browser could not start the map, which needs WebGL. Try another browser.
         </div>
       )}
       {bubbles.length > 0 && (

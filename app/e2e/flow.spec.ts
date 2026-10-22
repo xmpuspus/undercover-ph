@@ -191,7 +191,7 @@ test("Back restores the time of the earlier entry, not the latest one", async ({
 test("Now names the real time and the shade slot it uses", async ({ page }) => {
   await planTrip(page, `${manifest.dates[0]}T12:40`);
   await expect(page.getByTestId("now-chip")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByText("Leaving now, 12:40 PM, shade for 1 PM")).toBeVisible();
+  await expect(page.getByText("Leaving now, 12:40 PM, with the 1 PM shade")).toBeVisible();
 });
 
 test("Now after the last slot is a night walk today, not tomorrow morning", async ({ page }) => {

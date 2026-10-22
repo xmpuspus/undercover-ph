@@ -1,0 +1,63 @@
+import { appendFileSync, mkdirSync } from "node:fs";
+import { expect, test, type Page } from "@playwright/test";
+
+const OUT = process.env.LIVE_OUT ?? "test-results/live";
+mkdirSync(OUT, { recursive: true });
+
+// One trip per area from the suggested places, plus a trip across the MOA and airport seam.
+const TRIPS: [string, string, string][] = [
+  ["metro-core", "Ayala MRT Station", "Greenbelt"],
+  ["pasay-moa", "SM Mall of Asia", "SMX Convention Center"],
+  ["cubao-eastwood", "Gateway Mall 1", "Smart Araneta Coliseum"],
+  ["qc-north", "TriNoma", "SM City North EDSA"],
+  ["manila", "Intramuros", "Manila City Hall"],
+  ["alabang", "Alabang Town Center", "Festival Alabang"],
+  ["north-coast", "Yamaha Monumento LRT Station", "Malabon City Hall"],
+  ["marikina", "Riverbanks Center", "Marikina City Hall"],
+  ["paranaque-airport", "Parañaque Integrated Terminal Exchange", "Ayala Malls Manila Bay"],
+  ["paranaque-bf-aguirre", "SM City BF Parañaque", "Aguirre Central Park"],
+  ["taguig-pateros", "Ayala Malls Arca South", "New Taguig City Hall"],
+  ["qc-commonwealth-fairview", "SM City Fairview", "Fairview Center Mall"],
+  ["qc-banawe", "Fisher Mall Quezon Avenue", "St. Luke's Medical Center"],
+  ["seam", "SM Mall of Asia", "Ayala Malls Manila Bay"],
+];
+
+async function pickPlace(page: Page, inputId: string, text: string) {
+  await page.getByTestId(inputId).fill(text);
+  const option = page.getByTestId("place-option").filter({ has: page.getByText(text, { exact: true }) }).first();
+  await expect(option).toBeVisible();
+  await option.click();
+}
+
+for (const [area, from, to] of TRIPS) {
+  test(`${area}: ${from} to ${to}`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+    page.on("pageerror", (e) => errors.push(String(e)));
+    await page.goto("/");
+    await expect(page.getByTestId("pick-shade")).toBeEnabled({ timeout: 90_000 });
+    await page.getByTestId("pick-shade").click();
+    await pickPlace(page, "destination-input", to);
+    await pickPlace(page, "from-input", from);
+    const card = page.getByTestId("route-card");
+    const peek = page.getByTestId("route-peek");
+    const state = page.getByTestId("route-state");
+    const cross = page.getByTestId("cross-area");
+    await expect(card.or(peek).or(state).or(cross).first()).toBeVisible({ timeout: 90_000 });
+    let result = "";
+    if (await state.isVisible()) result = `state ${await state.getAttribute("data-state")}: ${(await state.innerText()).replace(/\s+/g, " ")}`;
+    else if (await cross.isVisible()) result = `cross-area: ${(await cross.innerText()).replace(/\s+/g, " ")}`;
+    else {
+      // Phones show the short route peek, wider screens the full card.
+      const shown = (await peek.isVisible()) ? peek : card;
+      result = `route: ${(await shown.innerText({ timeout: 10_000 }).catch(() => "no text")).replace(/\s+/g, " ").slice(0, 160)}`;
+      await expect(page.getByTestId("map")).toHaveAttribute("data-idle", "1", { timeout: 90_000 }).catch(() => {});
+    }
+    await page.screenshot({ path: `${OUT}/${area}.png` });
+    const line = JSON.stringify({ area, from, to, result, url: page.url().split("#")[1] ?? "", errors });
+    appendFileSync(`${OUT}/results.jsonl`, line + "\n");
+    console.log(line);
+    expect(result.startsWith("route:"), result).toBe(true);
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+}

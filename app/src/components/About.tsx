@@ -25,7 +25,7 @@ const SOURCES: { name: string; licence: string; text: string; url: string; licen
   {
     name: "Meta and WRI canopy height",
     licence: "CC BY 4.0. Source imagery for CHM © 2016 Maxar",
-    text: "Meta and World Resources Institute (WRI), 2024. High Resolution Canopy Height Maps (CHM). Clipped to the covered areas for tree shade.",
+    text: "Meta and World Resources Institute (WRI), 2024. High Resolution Canopy Height Maps (CHM). Clipped to the app's areas for tree shade.",
     url: "https://registry.opendata.aws/dataforgood-fb-forests/",
     licenceUrl: CC_BY,
   },
@@ -46,7 +46,7 @@ const SOURCES: { name: string; licence: string; text: string; url: string; licen
   {
     name: "PAGASA",
     licence: "Credited to PAGASA. No licence is stated on the page",
-    text: "NCR thunderstorm advisory text, shown with its issue time.",
+    text: "Thunderstorm advisories for Metro Manila, shown for the 2 hours they cover.",
     url: "https://www.pagasa.dost.gov.ph/",
   },
 ];
@@ -88,13 +88,13 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
   // The mall-hours guide is a manifest source; show it with the other data sources when present.
   const hoursSource = manifest?.sources?.find((s) => /hours/i.test(s.used_for) && !/openstreetmap/i.test(s.name));
   const limits = [
-    "Nobody has checked the shade on the street yet. It comes from building heights and tree data.",
+    "Nobody has checked the shade on the street yet.",
     "Building heights come from OpenStreetMap and Google's 2023 estimates. New towers can be missing.",
     "OpenStreetMap shows few covered walkways, so sheltered routes undercount real cover.",
-    "Paths behind gates and building entrances stay out of routes unless you include unchecked paths.",
+    "Paths behind gates and building entrances stay out of routes unless you include them.",
     "Mall opening hours come from a February 2026 guide. Hours can change.",
     ...(dates.length
-      ? [`Shade covers ${longDate(dates[0], false)} to ${longDate(dates[dates.length - 1], true)}. Other days need a data refresh.`]
+      ? [`Shade covers ${longDate(dates[0], false)} to ${longDate(dates[dates.length - 1], true)}. Other days have no shade data yet.`]
       : []),
   ];
   return (
@@ -134,9 +134,8 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
           <li>Roofed, indoor, and underground paths count as covered. When the sun is {NIGHT_ALT_DEG} degrees up or lower, only a roof counts.</li>
           <li data-testid="about-rule">
             The recommended walk is at most {Math.round(REC_MAX_DETOUR * 100)}% longer than the shortest walk and has at least {Math.round(REC_MIN_CUT * 100)}% less
-            time in sun, or without a roof with Sheltered. If no walk meets both, the shortest walk is recommended.
+            time in sun (with Sheltered, less time without a roof). If no walk meets both, the shortest walk is recommended.
           </li>
-          <li>Paths with unchecked access stay out of routes unless you include them.</li>
         </ul>
 
         <h3 className="mt-4 font-semibold text-ink">Privacy</h3>
@@ -151,7 +150,7 @@ export default function About({ manifest, onClose }: { manifest: Manifest | null
             <li key={l}>{l}</li>
           ))}
         </ul>
-        {manifest && <p className="mt-2">Data built {fmtStamp(manifest.generated_at)}.</p>}
+        {manifest && <p className="mt-2">Data updated {fmtStamp(manifest.generated_at)}.</p>}
 
         <h3 className="mt-4 font-semibold text-ink">Data sources</h3>
         <ul className="mt-1 space-y-2" data-testid="about-sources">

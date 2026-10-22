@@ -389,7 +389,7 @@ export function WeatherChips({
             {w.rain != null ? `. ${Math.round(w.rain)}% chance of rain` : ""}.
           </p>
           {band ? (
-            <p className="mt-1.5 text-slate-500">The bands are PAGASA heat index bands. The number is Open-Meteo&apos;s feels-like temperature, not a PAGASA reading.</p>
+            <p className="mt-1.5 text-slate-500">The number is Open-Meteo&apos;s feels-like temperature. The bands are PAGASA&apos;s heat index bands.</p>
           ) : (
             w.feels != null && <p className="mt-1.5 text-slate-500">Below the PAGASA heat index bands, which start at 27°C.</p>
           )}

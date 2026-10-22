@@ -29,20 +29,20 @@ zsh pipeline/run_all.sh
 The venv at `pipeline/.venv` uses Python 3.12 with osmium 4.3.2, shapely 2.2.0, numpy, scipy, rasterio 1.5.2 and pyproj 3.8.0. `pipeline/requirements.txt` pins them.
 The graph imports `pedestrian_access.py` and `classify()` from the research scripts. Nothing under `research/` changed.
 
-## Areas
+## Three nested boxes set the pilot, graph and building areas
 
-- Pilot box: `[121.012, 14.548, 121.032, 14.562]`.
-- Graph area: `[121.0074, 14.5435, 121.0366, 14.5665]`, from the contract.
-- Building area: `[120.9999, 14.5362, 121.0441, 14.5738]`. This is the graph area plus 800 m, rounded outward.
+- The pilot box is `[121.012, 14.548, 121.032, 14.562]`.
+- The graph area is `[121.0074, 14.5435, 121.0366, 14.5665]`, from the contract.
+- The building area is `[120.9999, 14.5362, 121.0441, 14.5738]`. This is the graph area plus 800 m, rounded outward.
 
 ## Project decisions of 2026-10-22 changed access, heights, side offsets and one flag
 
 Seven decisions of 2026-10-22 changed the build. `access_policy.py` wraps the research policy for points 1 to 3. Nothing under `research/` changed.
 
-1. A `barrier=kerb` node no longer triggers the access check. A kerb is a curb, not a gate.
+1. A `barrier=kerb` node no longer triggers the access check. A kerb is a curb and has no gate.
 2. A node with `kerb=raised` adds the steps bit (16) to the crossings that touch it. Lowered, flush and untyped kerbs pass.
 3. Only `access:conditional`, `foot:conditional` and `opening_hours` restrict walkers. Other `:conditional` keys restrict vehicles only.
-4. An indoor, corridor or building-passage edge with a cited hours row is routable. The router opens and closes it by those hours.
+4. An indoor, `corridor` or building-passage edge with a cited hours row is routable. The router opens and closes it by those hours.
 5. Every default height is now 7.5 m, two levels of 3.74 m. Overstated height invents shade, so the default errs low.
 6. A side offset shrinks in 0.5 m steps, down to 1.5 m, until no sample sits inside a footprint. Otherwise the side becomes a centre edge.
 7. An unsheltered edge mostly inside a footprint, with no cover or indoor tag, gets the new bit 10 (1024).
@@ -51,18 +51,18 @@ Gates and entrances keep the research rule. Footprints of 100 m2 or less with no
 
 ## Counts from the last run
 
-- Nodes: 3,714. Edges: 6,274, or 255.3 km. Before the side-offset fallback there were 6,280.
-- Edges by side: 2,950 centre, 1,485 left, 1,839 right.
-- Routable edges: 5,586, or 221.4 km. Before the 2026-10-22 decisions: 4,823, or 195.2 km.
-- Routable network: 103 pieces. The largest holds 3,069 of 3,499 routable nodes (87.7%) and 199.3 km (90.0%).
-- Bit 10, inside a footprint with cover unverified: 65 edges, 1.67 km. 61 of them are routable.
-- `node_flags`: 1,896 of 3,714 nodes carry at least one node bit. 1,018 carry a crossing or signal bit.
-- Sheltered length (flags & 7): 3.31 km in the graph, 2.23 km of it in 91 routable edges.
-- Buildings: 35,107 OSM objects, written as 35,124 polygon features.
-- Places: 1,141 kept. 27 were dropped for lying more than 80 m from a routable node.
-- Hours rows: 18. Five come from the Beat Asia guide and 13 from OSM.
+- The graph has 3,714 nodes and 6,274 edges, or 255.3 km. Before the side-offset fallback it had 6,280 edges.
+- By side, the edges are 2,950 centre, 1,485 left and 1,839 right.
+- 5,586 edges are routable, or 221.4 km. Before the 2026-10-22 decisions the count was 4,823, or 195.2 km.
+- The routable network has 103 pieces. The largest holds 3,069 of 3,499 routable nodes (87.7%) and 199.3 km (90.0%).
+- 65 edges, or 1.67 km, carry bit 10 (inside a footprint, cover unverified). 61 of them are routable.
+- In `node_flags`, 1,896 of 3,714 nodes carry at least one node bit. 1,018 carry a crossing or signal bit.
+- Sheltered length (flags & 7) is 3.31 km in the graph, and 2.23 km of it is in 91 routable edges.
+- The build has 35,107 OSM buildings, written as 35,124 polygon features.
+- The build kept 1,141 places and dropped 27 that lie more than 80 m from a routable node.
+- The build has 18 hours rows. Five come from the Beat Asia guide and 13 from OSM.
 
-Buildings by height source, as OSM objects:
+The next table gives buildings by height source, as OSM objects.
 
 | Source | Objects | Share of footprint area |
 | --- | ---: | ---: |
@@ -72,7 +72,7 @@ Buildings by height source, as OSM objects:
 | `default` (7.5 m) | 730 | 2.8% |
 | null | 801 | 0.5% |
 
-Places by category:
+The next table gives places by category.
 
 | Category | Places | Category | Places |
 | --- | ---: | --- | ---: |
@@ -86,10 +86,10 @@ Places by category:
 | place_of_worship | 28 | neighbourhood | 13 |
 | museum | 3 | | |
 
-## Route check: Ayala MRT to Greenbelt is 1,229.6 m, and 1,238.0 m sheltered-first
+## The Ayala MRT to Greenbelt route is 1,229.6 m, and 1,238.0 m sheltered-first
 
 `route_check.py` reads the node ids from `places.json`, so the test covers the real snap.
-Start: "Ayala MRT Station" (OSM way 27663063), node 3121. End: "Greenbelt" (OSM relation 12227982), node 749.
+The start is "Ayala MRT Station" (OSM way 27663063), node 3121. The end is "Greenbelt" (OSM relation 12227982), node 749.
 
 | Run | Length | Sheltered | Share | Minutes at 1.1 m/s |
 | --- | ---: | ---: | ---: | ---: |
@@ -99,7 +99,7 @@ Start: "Ayala MRT Station" (OSM way 27663063), node 3121. End: "Greenbelt" (OSM 
 
 - The sheltered-first cost is `len_m x (1 + 8)` on unsheltered edges and `len_m` on sheltered edges.
 - The shortest route takes 79.4 m of pedestrian underpass near 6750 Ayala Avenue and Makati Shangri-La, then Legazpi Street.
-- The sheltered-first route adds 182.7 m of One Ayala indoor corridors. Those edges open only during mall hours.
+- The sheltered-first route adds 182.7 m of One Ayala indoor passages. Those edges open only during mall hours.
 - `route_check.py` ignores hours. The "malls closed" run drops every edge with an `hours_idx`, as before 10:00.
 - Before the 2026-10-22 decisions, the shortest route was 1,375.6 m with no sheltered metre.
 
@@ -107,24 +107,24 @@ Start: "Ayala MRT Station" (OSM way 27663063), node 3121. End: "Greenbelt" (OSM 
 
 The graph copies the research extractor's whole-way node rule. A node with a gate, entrance or hours tag flags its whole way.
 
-Loss by single cause. Each row counts edges that carry that cause and no other:
+The table gives loss by single cause. Each row counts edges that carry that cause and no other.
 
 | Cause | Edges | km |
 | --- | ---: | ---: |
 | Gate node (`gate`, `lift_gate`, `swing_gate`) | 550 | 30.4 |
-| Indoor, corridor or building passage without hours | 53 | 0.8 |
+| Indoor, `corridor` or building passage without hours | 53 | 0.8 |
 | Entrance node | 34 | 0.7 |
 | Foot or access conditional on the way | 6 | 0.5 |
 | Node with hours | 4 | 0.4 |
 | Other barriers | 15 | 0.3 |
 
-- Whole ways that touch an explicitly closed node are left out of the graph. That removes 288 ways, or 5.4 km.
-- No edge is unroutable only for missing hours. Every time-restricted edge without hours also needs an access check.
+- The graph leaves out whole ways that touch an explicitly closed node. That removes 288 ways, or 5.4 km.
+- No edge is unroutable only for missing hours. Every time-restricted edge without hours needs an access check as well.
 - 299 kerb nodes no longer trigger the check. 37 raised kerbs touch the graph.
 - The raised kerbs add the steps bit to 37 crossings and 2 other edges. The 2 sit where no crossing touches the kerb.
-- 91 ways lost a vehicle-only conditional: 70 `motor_vehicle:conditional` and 21 `oneway:conditional`.
+- 91 ways lost a vehicle-only conditional. 70 were `motor_vehicle:conditional` and 21 were `oneway:conditional`.
 - Ayala Avenue, Paseo de Roxas and Makati Avenue carry `motor_vehicle:conditional=no @ (Su 06:00-10:00)`, the Sunday car-free rule.
-- 25 of the 31 One Ayala indoor edges became routable. The other 6 also touch an entrance node, so they stay unroutable.
+- 25 of the 31 One Ayala indoor edges became routable. The other 6 touch an entrance node as well, so they stay unroutable.
 - Before the 2026-10-22 decisions, the rule removed 1,457 edges, or 60.2 km. Kerbs removed 12.7 km and vehicle conditionals 13.1 km.
 
 ## Flags follow the contract bits
@@ -141,13 +141,13 @@ Loss by single cause. Each row counts edges that carry that cause and no other:
 - Bit 10 marks an unsheltered edge with over half its length inside a building footprint. It is a pipeline addition to the contract.
 - The check confirms that no edge of a non-pedestrian way carries bits 0 to 2, and no bit 10 edge carries them either.
 
-The contract table with the added bit:
+The contract table follows, with the added bit.
 
 | Bit | Value | Meaning |
 | --- | ---: | --- |
 | 0 | 1 | Covered pedestrian way (`covered` = yes, arcade, colonnade, roof) |
 | 1 | 2 | Pedestrian tunnel or underpass |
-| 2 | 4 | Indoor, corridor, or building passage |
+| 2 | 4 | Indoor, `corridor`, or building passage |
 | 3 | 8 | Footbridge or elevated walkway |
 | 4 | 16 | Steps, or a crossing over a raised kerb |
 | 5 | 32 | Sidewalk |
@@ -157,12 +157,12 @@ The contract table with the added bit:
 | 9 | 512 | Elevator |
 | 10 | 1024 | Inside a building footprint, cover unverified. Sets no shelter bit. The router shows it as low-confidence shade. |
 
-Bit 10 rules:
+Bit 10 follows these rules.
 
 - The edge carries none of bits 0 to 2. Its way has no `covered` or `indoor` tag other than `no`.
 - Over 50% of its length lies inside the union of the footprints it touches. Raised parts count, since a walker passes under them.
-- 104 unsheltered edges lie mostly inside a footprint. 39 of them have a `covered` or `indoor` tag, mostly covered driveways, so they get no bit 10.
-- All 65 bit 10 edges are centre edges: 37 footways, 16 service roads and 12 steps. No side edge qualifies after the offset fix.
+- 104 unsheltered edges lie mostly inside a footprint. 39 of them have a `covered` or `indoor` tag, mostly covered driveways. They get no bit 10.
+- All 65 bit 10 edges are centre edges. They are 37 footways, 16 service roads and 12 steps. No side edge qualifies after the offset fix.
 
 ## node_flags mark where a walker can cross between side edges
 
@@ -171,19 +171,19 @@ Both side edges of a road share its nodes, so a route could cross a busy road mi
 
 | Bit | Value | Meaning |
 | --- | ---: | --- |
-| 0 | 1 | Mapped crossing: `highway=crossing`, any `crossing=*` except `no`, `railway=crossing`, or a touching `footway=crossing` edge |
-| 1 | 2 | Traffic signals: `highway=traffic_signals` or `crossing=traffic_signals` on the node |
-| 2 | 4 | Junction: 3 or more distinct OSM highway ways meet at the node, each way counted once |
-| 3 | 8 | Grade-separated link: a footbridge, underpass or steps edge touches the node |
+| 0 | 1 | Mapped crossing, from `highway=crossing`, any `crossing=*` except `no`, `railway=crossing`, or a touching `footway=crossing` edge |
+| 1 | 2 | Traffic signals, from `highway=traffic_signals` or `crossing=traffic_signals` on the node |
+| 2 | 4 | Junction, where 3 or more distinct OSM highway ways meet at the node, each way counted once |
+| 3 | 8 | Grade-separated link, where a footbridge, underpass or steps edge touches the node |
 
-Rules and choices:
+These rules and choices apply.
 
 - `crossing=no` says that people cannot cross there. Those nodes get neither bit 1 nor bit 2. 2 graph nodes have it.
-- A `footway=crossing` way that also has `crossing=no` does not set bit 1.
+- A `footway=crossing` way with `crossing=no` does not set bit 1.
 - Junctions count every highway way with a node in the building area, walkable or not. A road closed to walkers still makes a junction.
 - Bit 8 uses the footbridge and tunnel edge bits and `highway=steps`. A crossing over a raised kerb does not set it.
 
-Counts from the last run:
+The last run gave these counts.
 
 | Node bit | Nodes |
 | --- | ---: |
@@ -192,7 +192,7 @@ Counts from the last run:
 | 4 junction | 936 |
 | 8 grade-separated | 258 |
 
-Graph nodes that lie on each named road, and those with a crossing or signal bit:
+The table gives graph nodes on each named road, and those with a crossing or signal bit.
 
 | Road (OSM name) | Graph nodes on it | Bit 1 | Bit 2 | Bit 1 or 2 |
 | --- | ---: | ---: | ---: | ---: |
@@ -213,11 +213,11 @@ Graph nodes that lie on each named road, and those with a crossing or signal bit
 - A one-sided tag gives one side edge. The first plan had two. A second edge would invent a sidewalk the data denies.
 - A tertiary or larger road with no sidewalk tag gets two side edges. They carry no bit 5, because no tag confirms a sidewalk.
 - A road tagged `sidewalk=no` or `separate` keeps one centre edge. Separately mapped sidewalks stay their own centre edges.
-- Ways: 763 have two side edges, 252 have one, 1,851 keep a centre edge.
+- 763 ways have two side edges, 252 have one, and 1,851 keep a centre edge.
 - Both sides use the road's own `u` and `v`. Left and right follow the OSM way direction.
-- Starting offset: half the carriageway width plus 1 m. Width comes from `width`, else `lanes` x 3.2 m, else the class median.
-- Width source by side-split way: 944 from `lanes`, 38 from `width`, 33 from the class median.
-- Class medians from all lane-tagged ways in the area: primary 3, secondary 3, tertiary 2, residential 2, unclassified 2, service 1.
+- The starting offset is half the carriageway width plus 1 m. Width comes from `width`, else `lanes` x 3.2 m, else the class median.
+- Among side-split ways, 944 take width from `lanes`, 38 from `width` and 33 from the class median.
+- The class medians from all lane-tagged ways in the area are primary 3, secondary 3, tertiary 2, residential 2, unclassified 2, service 1.
 - The offset then shrinks in 0.5 m steps, down to 1.5 m, until no 1 m sample sits inside a ground-level footprint.
 - Ground-level means `min_height_m` is 0. A raised part, such as a skybridge, can sit above a sidewalk.
 - The test grows each footprint by 5 cm, so rounding to 7 decimals cannot put a sample inside.
@@ -229,73 +229,73 @@ Graph nodes that lie on each named road, and those with a crossing or signal bit
 - The offset uses mitre joins capped at twice the offset. A test confirmed all 3,353 side edges sit on their stated side.
 - `len_m` is the length of the offset line. It can be shorter than the node-to-node distance on the inner side of a bend.
 
-Limits of the side model:
+The side model has these limits.
 
 - Side geometry ends at the offset line, a few metres from its nodes. Drawn routes jump between the line and the node.
 - The shade builder must sample side geometry as written. The geometry is already offset.
-- A route can change sides at any node, not only at a crossing.
+- A route changes sides only at a node with a mapped crossing or signals (flag 1 or 2). A junction (flag 4) costs 60 m x (1 + k). The router forbids a change anywhere else.
 - The offset ignores real kerb lines. A dual carriageway can get a side edge on its median.
 - Before the offset fix, 109 side edges, about 6.0 km, lay mostly inside building footprints. After it, none do.
 - A shrunken offset can still place a sidewalk line on the carriageway edge where buildings reach the road.
 
-## Graph area membership
+## The graph keeps every whole way with a node in the graph area
 
-- The graph keeps every whole way with at least one node in the graph area. No way is clipped.
+- The graph keeps every whole way with at least one node in the graph area. The build clips no way.
 - The research extractor used the mean node position. That rule could drop a long road whose middle lies inside the area.
 - The farthest node lies 513 m outside the graph area. The building area still covers it.
 
 ## Hours come only from cited rows
 
 I re-read the Beat Asia guide once on 2026-10-22 at 00:17 Manila time. The page returned HTTP 200.
-It shows "Published: February 24, 2026". The server header shows a last change on 2026-10-05. The page MD5 is `e18fee5aa7c4ec6f3e780dab74c0f39e`.
+It shows a publication date of February 24, 2026. The server header shows a last change on 2026-10-05. The page MD5 is `e18fee5aa7c4ec6f3e780dab74c0f39e`.
 
-What the page says, word for word in `work/beat_asia_extract.txt`:
+The page text, word for word, is in `work/beat_asia_extract.txt`.
 
-- Glorietta: "Sunday to Thursday, from 10 AM to 9 PM; Friday to Saturday, from 10 AM to 10 PM". This matches web_notes.
-- Greenbelt: "Daily, from 11 AM to 10 PM". This matches web_notes.
-- One Ayala: "Monday to Thursday, from 10 AM to 9 PM; Friday to Sunday, from 10 AM to 10 PM". This matches web_notes.
-- New on the page: The Landmark department store and the SM Store hours. I added both as cited rows.
-- New on the page: "Greenbelt 1 and 2 are currently undergoing major renovations and will open sometime in 2028".
+- For Glorietta the page says "Sunday to Thursday, from 10 AM to 9 PM; Friday to Saturday, from 10 AM to 10 PM". This matches web_notes.
+- For Greenbelt the page says "Daily, from 11 AM to 10 PM". This matches web_notes.
+- For One Ayala the page says "Monday to Thursday, from 10 AM to 9 PM; Friday to Sunday, from 10 AM to 10 PM". This matches web_notes.
+- The page has new rows for The Landmark department store and the SM Store hours. I added both as cited rows.
+- The page says "Greenbelt 1 and 2 are currently undergoing major renovations and will open sometime in 2028".
 
-Hours rules:
+Hours follow these rules.
 
 - `checked` holds the source's own date. That is 2026-02-24 for the guide and 2026-10-20 for OSM.
 - OSM rows come from mall, park and highway ways in the graph area with a simple `opening_hours` value.
-- The parser skipped one value: Glorietta 4 reads `Mo-Su 10:00-21:)0`.
+- The parser skipped one value. Glorietta 4 reads `Mo-Su 10:00-21:)0`.
 - Guide rows win for edge hours. OSM rows apply only to malls without a guide row, such as WalterMart Makati.
 - OSM gives Glorietta and Glorietta 5 a 21:00 close on Friday and Saturday. The guide gives 22:00.
-- Matched footprints: Glorietta and Glorietta 1 to 5, Greenbelt 3 to 5, two One Ayala areas, The Landmark, SM Makati.
-- Greenbelt 1 and 2 get no hours, because the guide says they are closed.
-- Only indoor, corridor and building-passage edges get mall hours. OSM maps these only at One Ayala, so 31 edges carry hours.
+- The matched footprints are Glorietta and Glorietta 1 to 5, Greenbelt 3 to 5, two One Ayala areas, The Landmark and SM Makati.
+- Greenbelt 1 and 2 get no hours, because the guide says they are shut.
+- Only indoor, `corridor` and building-passage edges get mall hours. OSM maps these only at One Ayala, so 31 edges carry hours.
 - 25 of those 31 edges are routable under the 2026-10-22 decisions. The router opens and closes them by the One Ayala row.
 - 44 routable plain footways, 792 m in total, run mostly inside mall footprints. They have no indoor tag and no hours.
 
 ## Places snap to the main network when they can
 
-- Places come from named OSM features whose point lies in the graph area. Bus stops, platforms and parking entrances are left out.
+- Places come from named OSM features whose point lies in the graph area. The build leaves out bus stops, platforms and parking entrances.
 - Stations take a display name from their network, such as "Ayala MRT Station". The OSM name and short forms become aliases.
-- Aliases also come from `alt_name`, `short_name`, `official_name`, `old_name`, `loc_name` and `name:en`.
+- Aliases come from `alt_name`, `short_name`, `official_name`, `old_name`, `loc_name` and `name:en` as well.
 - Places with the same name within 150 m merge into one. 21 merged.
 - The snap uses distance to the place polygon, or to its point.
 - Within 80 m, a node in the largest routable network wins over a closer node on a small island.
-- Without that rule, Ayala MRT snapped to a two-node piece of EDSA and the route test failed. 71 places moved this way.
+- Without that rule, Ayala MRT snapped to a two-node piece of EDSA. The route test failed. 71 places moved this way.
 - 36 places still snap to small islands, because no main-network node lies within 80 m.
-- Median snap distance: 12.5 m. Maximum: 79.9 m.
+- The median snap distance is 12.5 m and the greatest is 79.9 m.
 
 ## Building heights follow report 02, with a lower default
 
-- Order: OSM `height`, else `building:levels` x 3.74 m, else the Google 2023 median, else a 7.5 m default.
+- The order is OSM `height`, else `building:levels` x 3.74 m, else the Google 2023 median, else a 7.5 m default.
 - Google counts when a footprint has at least 8 pixels and a median of 2.5 m or more.
 - Google stops near 100 m. 256 OSM heights exceed 100 m. 3 Google-filled footprints read at the cap.
 - Each `building:part` is its own feature with its own height and `min_height_m`.
-- A part belongs to the outline that contains its representative point. 6 parts have no outline.
-- An outline's Google median uses only its area outside its parts. A tower part therefore does not raise the podium.
-- 16 outlines are at least 90% covered by parts. Those outlines are left out, so the parts describe the building.
+- A part belongs to the outline that holds its representative point. 6 parts have no outline.
+- An outline's Google median uses only its area outside its parts. A tower part does not raise the podium.
+- 16 outlines are at least 90% covered by parts. The build leaves those outlines out, so the parts describe the building.
 - 4 of those 16 outlines had their own OSM height.
 - `min_height_m` comes from `min_height`, else `building:min_level` x 3.74 m, else 0.
 - The default is 7.5 m, two levels of 3.74 m, for footprints over 100 m2. It applies inside and outside the pilot box.
 - The default changed on 2026-10-22. It replaces report 02's area classes of 25.5, 71.0 and 96.8 m.
-- Footprints of 100 m2 or less with no height carry a null height and a null source. There are 801.
+- Footprints of 100 m2 or less with no height carry a null height and a null source. 801 footprints qualify.
 - All 730 defaults and 801 nulls replace a Google median under 2.5 m. Google sees little or no building there.
 - The low default can understate a taller real building. Its shade still counts as low confidence.
 - Inside the pilot box, Google fills 1,106 features and 61 get a default or null. Report 02 counted 1,105 and 61.
@@ -304,7 +304,7 @@ Hours rules:
 
 ## Checks before READY.graph
 
-`build_manifest.py` stops and removes `READY.graph` if any check fails. It checks these items:
+`build_manifest.py` stops and removes `READY.graph` if any check fails. The checks cover these items.
 
 - Every edge has the contract keys, a sequential id, valid `u` and `v`, and at least two geometry points.
 - No edge of a non-pedestrian way carries bits 0 to 2.
@@ -316,7 +316,7 @@ Hours rules:
 - `node_flags` has one integer per node, and each value uses only bits 0 to 3.
 - The shortest Ayala MRT to Greenbelt route exists.
 
-The research test suite still passes: 9 tests, run with the research venv.
+The research test suite still passes with 9 tests, run with the research venv.
 
 `build_manifest.py` keeps the shade builder's `sun`, `sunrise_sunset` and `shade` keys, its sources and its limits.
 It replaces only its own limit lines, which it records in `work/graph_limits.json`.
@@ -345,7 +345,7 @@ Git keeps each area's graph, places and hours, the two PMTiles files, and `pipel
 The area builds write no shadow overlays. The app draws shadows from `buildings.pmtiles` and `trees.pmtiles`.
 `refresh_dates.sh` needs `UCPH_AREA`, `UCPH_DATA` and `UCPH_INPUTS`, and `set_dates.py` needs the last two. Neither has a root Makati mode any more.
 
-## Districts: six routing areas are staged and pass every check
+## Six routing areas are staged from sixteen districts and pass every check
 
 Sixteen districts in `pipeline/districts.json` group into six routing areas, listed in `pipeline/areas.json`.
 A route can run anywhere inside one area. Each district stays a named neighbourhood inside its area.
@@ -356,10 +356,10 @@ The staged bundles sit in `pipeline/stage/<area>/`. `publish.py` copies them int
 
 - The first rule merged every district whose graph area (box plus 500 m) touched another.
 - That rule joined ten districts into one area of about 51,500 edges. BGC and Ortigas overlap even as core boxes.
-- Option B cuts three thin links: Pasay-MOA touched Makati CBD by 22 m, and Eastwood and Cubao touched Ortigas and Greenhills.
+- Option B cuts three thin links. Pasay-MOA touched Makati CBD by 22 m, and Eastwood and Cubao touched Ortigas and Greenhills.
 - metro-core keeps makati-cbd, rockwell-poblacion, bgc, mandaluyong-shaw, ortigas, pasig-center and greenhills, at 30,894 edges.
 - Cubao and Eastwood do not touch each other. Their graph areas sit 86 m apart, but roads across the gap join them.
-- No district was dropped. All sixteen sit inside the NCR clip. Alabang's building area reaches 14.3962, inside the clip's 14.35 edge.
+- The build dropped no district. All sixteen sit inside the NCR clip. Alabang's building area reaches 14.3962, inside the clip's 14.35 edge.
 
 ### Code and run order
 
@@ -375,12 +375,12 @@ pipeline/.venv/bin/python -I pipeline/districts/publish.py                     #
 - `pipeline/districts/` holds copies of the single-area scripts. Only their import line changed, to `ctx.py`.
 - `ctx.py` reads `UC_AREA` and gives the copies the area's boxes and staging paths. A district id builds a one-district area.
 - `build.py` accepts only ids from `pipeline/areas.json` and `pipeline/districts.json`. It stops on any other id before it builds a path.
-- `build_places.py` carries the search fixes of the root script: named `landuse=commercial` sites, named `building:part` towers such as RCBC Plaza, One Ayala as a mall, `detail` for repeated names, and compact JSON.
+- `build_places.py` carries the search fixes of the root script. It adds named `landuse=commercial` sites, named `building:part` towers such as RCBC Plaza, and One Ayala as a mall. It writes `detail` for repeated names and compact JSON.
 - `route_check.py` follows the browser router's side-switch rule. A walker changes to the other side of a road only at a node with flag 1 or 2. A junction (flag 4) costs 60 m x (1 + k). Anywhere else the change is forbidden.
 - Like the browser, it never turns back along the edge just walked. Such a U-turn would dodge the side-switch rule.
 - `publish.py` needs tippecanoe and tile-join. It writes no file outside `app/public/data/`, `pipeline/inputs/areas/` and `pipeline/work/tiles/`.
 - `publish.py` stops on an area whose last checks failed. `--hold <id>` leaves that area out of the app.
-- An area's graph area is the union of its member graph boxes, not their envelope. `in_bbox()` tests the union.
+- An area's graph area is the union of its member graph boxes and never their envelope. `in_bbox()` tests the union.
 - `build_hours.py`, `build_manifest.py` and `build_display.py` are new versions for areas.
 - `hours_sources.json` lists cited web hours. `routes.json` lists the route checks. `indoor_report.py` lists indoor edges by footprint.
 - Each area writes `graph.json`, `places.json`, `hours.json`, `buildings_display.geojson`, `buildings.geojson.gz` and `manifest_template.json`.
@@ -391,37 +391,37 @@ pipeline/.venv/bin/python -I pipeline/districts/publish.py                     #
 - `fetch_gob.py` reads each district's building area from the public 2023 tiles, with no account.
 - Eight districts span two to six tiles. All tiles share one 0.5 m pixel grid, so the script pastes them with no resampling.
 - Every window has zero gap pixels and zero disagreeing overlap pixels. The 16 windows take 1.1 GB in `pipeline/raw/districts/`.
-- The buildings step reads each footprint's pixels from whichever member window covers it. No merged area raster is built.
+- The buildings step reads each footprint's pixels from whichever member window covers it. The step builds no merged area raster.
 
 ### The Makati rebuild matches the served files
 
 `pipeline/stage/makati-cbd/` is a one-district test build, compared with the root data by `report.py`.
 
-- `graph.json`, `hours.json` and `buildings_display.geojson` are byte-identical. The full building set has identical content.
+- `graph.json`, `hours.json` and `buildings_display.geojson` match byte for byte. The full building set has the same content.
 - `places.json` differs in two places. "Buendia PNR Station" is gone, because OSM tags it `disused:railway=station`.
-- "One Ayala" now snaps to a node reachable at every hour, not to a node inside the mall.
+- "One Ayala" now snaps to a node reachable at every hour, and no longer to a node inside the mall.
 - Three limit sentences now read the same for every area. They no longer name Ayala Avenue or One Ayala.
 
 ### The area scripts make four changes to the single-area method
 
-- Stations tagged as disused, abandoned, proposed or under construction are skipped. So are Metro Manila Subway stations, whose service this build cannot confirm.
+- The build skips stations tagged as disused, abandoned, proposed or under construction. It skips Metro Manila Subway stations too, because it cannot check their service.
 - Stations on LRT lines get an "LRT" name and aliases, like the MRT and PNR stations.
-- A building whose stored height is at or below its base gets a null height. There are 63: 42 in manila, 14 in metro-core, 5 in pasay-moa and 2 in qc-north.
+- A building whose stored height is at or below its base gets a null height. 63 buildings qualify. They are 42 in manila, 14 in metro-core, 5 in pasay-moa and 2 in qc-north.
 - Places prefer a node in the largest network of always-open routable edges, within 80 m.
-- Without that rule, SM Megamall had no route before 10:00. Its node sat inside a pocket reached only through mall corridors.
+- Without that rule, SM Megamall had no route before 10:00. Its node sat inside a pocket reached only through mall passages.
 - The rule has a cost. Ortigas MRT to SM Megamall grows from 755 m to 1,644 m, because the place snaps to an outside door.
 
 ### Hours come from OSM and three cited pages
 
 - OSM rows come from mall, park and highway ways with a simple `opening_hours` value, as for Makati.
 - The Beat Asia guide still gives the five Makati rows. They enter an area only when their mall footprints lie inside it.
-- Araneta City's mall-hours page gives "Sunday–Thursday: 10AM–9PM" and "Friday–Saturday: 10AM–10PM". It covers Gateway Mall 1 and 2, Ali Mall and Farmers Plaza.
+- Araneta City's mall-hours page gives Sunday to Thursday 10AM to 9PM and Friday to Saturday 10AM to 10PM. It covers Gateway Mall 1 and 2, Ali Mall and Farmers Plaza.
 - That page shows no date, so its `checked` value is the read date, 2026-10-22.
 - LRTA's schedule page says every LRT-2 station opens at 4:50 AM. Its closing times sit in an image, which I read.
 - The image gives Cubao 9:39 PM eastbound and 9:07 PM westbound. The Cubao station passage gets 04:50 to 21:07, the earlier close.
 - `hours_sources.json` keeps that transcription with the image's MD5. The build stops if the saved image changes.
 - MRT-3's site shows no hours in its page text. `greenhills.com.ph` did not resolve. Neither gave a cited row.
-- Indoor corridors at MRT-3 stations stay unroutable: Shaw Boulevard 694 m, Ayala 421 m, Buendia 260 m.
+- Indoor passages at MRT-3 stations stay unroutable. They total 694 m at Shaw Boulevard, 421 m at Ayala and 260 m at Buendia.
 
 ### Counts, sizes and neighbourhoods
 
@@ -444,7 +444,7 @@ pipeline/.venv/bin/python -I pipeline/districts/publish.py                     #
 | alabang | 1.50 MB / 0.25 MB | 0.06 MB / 0.01 MB | 3.26 MB / 0.37 MB | 0.81 MB |
 | all six | 20.92 MB / 3.57 MB | 1.34 MB / 0.27 MB | 73.01 MB / 8.31 MB | 17.93 MB |
 
-| Area | Walkable km by neighbourhood (edge midpoint in the district box; margin = outside every district box) |
+| Area | Walkable km by neighbourhood (edge midpoint in the district box, and margin means outside every district box) |
 | --- | --- |
 | metro-core | bgc 275.4, makati-cbd 121.3, margin 496.2, mandaluyong-shaw 110.9, greenhills 44.3, rockwell-poblacion 74.9, ortigas 157.7, pasig-center 102.9 |
 | pasay-moa | pasay-moa 162.1, margin 96.6 |
@@ -453,11 +453,11 @@ pipeline/.venv/bin/python -I pipeline/districts/publish.py                     #
 | manila | margin 302.7, manila-ermita 290.2, manila-ubelt 174.4, binondo 42.2 |
 | alabang | alabang 175.7, margin 85.6 |
 
-### Route checks
+### 18 route pairs run three ways, and none switches sides at an unmarked junction
 
-Each pair runs three times: shortest, sheltered-first with k = 8 on unsheltered length, and k = 8 with hours-bound edges removed.
+Each pair runs three times. The runs are shortest, sheltered-first with k = 8 on unsheltered length, and k = 8 with hours-bound edges removed.
 
-The checks follow the browser's side-switch rule since 2026-10-22. Seven of the 18 pairs grew in at least one run, by 0.1 m to 35.1 m, because a side change now needs a mapped crossing or signals. Cubao LRT to Eastwood Mall grew most, from 4,510 m to 4,545 m. No route got shorter, and none of the 54 runs switches sides at an unmarked junction.
+The checks follow the browser's side-switch rule since 2026-10-22. Seven of the 18 pairs grew in at least one run, by 0.1 m to 35.1 m. A side change now needs a mapped crossing or signals. Cubao LRT to Eastwood Mall grew most, from 4,510 m to 4,545 m. No route got shorter, and none of the 54 runs switches sides at an unmarked junction.
 
 | Area | From | To | Shortest | Straight line | Ratio | Sheltered | Sheltered-first, k = 8 | k = 8, malls closed |
 | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
@@ -481,7 +481,7 @@ The checks follow the browser's side-switch rule since 2026-10-22. Seven of the 
 | alabang | Alabang PNR Station | Alabang Town Center | 2,853 m | 2,059 m | 1.39 | 0 m | 2,853 m, 0 m sheltered | 2,853 m, 0 m sheltered |
 
 - North Avenue MRT to SM North EDSA runs 4.5 times the straight line. Unroutable edges on the EDSA side force a loop along Misamis Street.
-- Cubao LRT to Gateway Mall 1 runs 12 times the straight line. The Gateway corridor also touches an entrance node, which stays blocked.
+- Cubao LRT to Gateway Mall 1 runs 12 times the straight line. The Gateway passage touches an entrance node as well, and that node stays blocked.
 - Pasig Center has no rail station in OSM, so its check starts at a UV Express terminal.
 
 The browser router agrees with these checks. A copy of `app/src/lib/router` ran under Node on every staged area at 12:00.
@@ -529,34 +529,34 @@ All 43 pairs in the 14 staged areas gave the same shortest length within 1.5 m, 
 | qc-banawe | Fisher Mall Quezon Avenue | Capitol Medical Center | 694 m | 366 m | 1.89 | 0 m | 694 m, 0 m sheltered | 694 m, 0 m sheltered |
 
 - Las Piñas fails every check. Only 56 of its 3,134 nodes have a mapped crossing or signals, against 4,001 of 19,404 in metro-core.
-- So the side-switch rule splits the walk network: from Robinsons Place a walker reaches 972 of the 1,627 nodes the old check reached.
-- The browser router also finds no route for these pairs. It says a route exists only on paths with unchecked access.
+- So the side-switch rule splits the walk network. From Robinsons Place a walker reaches 972 of the 1,627 nodes the old check reached.
+- The browser router finds no route for these pairs either. It says a route exists only on paths with unchecked access.
 - The old check found 1,937 m to 3,188 m, because it ignored the side-switch rule. `publish.py --hold las-pinas` keeps the area out of the app.
 - Valenzuela City Medical Center to Valenzuela Town Center runs 5.75 times the straight line, 5,352 m for 930 m. The old check gave 1,753 m through mid-block side changes.
-- paranaque-bf-aguirre and north-coast pass, but their largest routable piece holds only 38.5% and 61.8% of routable nodes. Many places there may have no route.
+- paranaque-bf-aguirre and north-coast pass, but their largest routable piece holds only 38.5% and 61.8% of routable nodes. Places there can have no route.
 - The NCR builder staged these areas with the old places and route-check scripts. This build reran places, checks, display and manifest for all eight.
 
 ### Phase B moved 13 areas into the app on 2026-10-22
 
-`publish.py --hold las-pinas` reads `pipeline/areas.json` and the staged areas, and writes these files to git:
+`publish.py --hold las-pinas` reads `pipeline/areas.json` and the staged areas, and writes these files to git.
 
-- `app/public/data/areas.json`: id, name, cities, `bbox`, `graph_bbox`, `graph_rects`, neighbourhoods and `center` for each area.
-- `app/public/data/places_index.json`: 16,010 places, each once, with its area id and its node in that area. 2.10 MB, 0.39 MB as gzip.
+- `app/public/data/areas.json` holds id, name, cities, `bbox`, `graph_bbox`, `graph_rects`, neighbourhoods and `center` for each area.
+- `app/public/data/places_index.json` holds 16,010 places, each once, with its area id and its node in that area. It is 2.10 MB, or 0.39 MB as gzip.
 - `app/public/data/areas/<id>/graph.json`, `places.json` and `hours.json`, compact.
 - `pipeline/inputs/areas/<id>/manifest_template.json` and `buildings.geojson.gz`, beside the area's `canopy.tif`.
-- `app/public/data/buildings.pmtiles`: 637,936 buildings, layer `buildings`, zooms 13 to 15, 24.4 MB.
-- `app/public/data/trees.pmtiles`: 1,325,409 crowns, layer `trees`, zooms 14 and 15, 17.9 MB.
+- `app/public/data/buildings.pmtiles` holds 637,936 buildings in layer `buildings`, at zooms 13 to 15, and is 24.4 MB.
+- `app/public/data/trees.pmtiles` holds 1,325,409 crowns in layer `trees`, at zooms 14 and 15, and is 17.9 MB.
 
 - Zoom 15 keeps every building. An indexed check build found all 637,936 there.
 - The default tile grid (detail 12, about 0.29 m) lost 14 pillar parts under 0.1 m2 in Manila. Detail 13 keeps them.
 - Zooms 13 and 14 thin small footprints, with tippecanoe's defaults. The check build drew 212,830 at zoom 13 and 637,731 at zoom 14.
 - The largest building tile is 472 KB at zoom 13, 307 KB at zoom 14 and 193 KB at zoom 15.
 - Trees use drop rate 1, so both zooms keep every crown. The largest tree tile is 489 KB at zoom 14 and 227 KB at zoom 15.
-- Where areas overlap, the tiles keep one copy of a building or crown with the same heights and a centre within 1 m.
+- Where areas overlap, the tiles keep one copy of a building or crown. Copies have the same heights and a centre within 1 m.
 - That removed 55,927 building copies and 8,889 crown copies.
-- The index keeps a place once: same name within 150 m, under the area that holds its point deepest inside its `graph_rects`.
+- The index keeps a place once. Places with the same name within 150 m count as one. The copy stays under the area that holds its point deepest inside its `graph_rects`.
 - That dropped 954 copies, most of them where taguig-pateros overlaps metro-core (558) and paranaque-airport overlaps pasay-moa (171).
-- The root Makati files left git: `graph.json`, `places.json`, `hours.json`, `buildings_display.geojson` and `pipeline/inputs/manifest_template.json` and `buildings.geojson`.
+- The root Makati files left git. They are `graph.json`, `places.json`, `hours.json`, `buildings_display.geojson` and `pipeline/inputs/manifest_template.json` and `buildings.geojson`.
 - metro-core covers Makati CBD. `pipeline/inputs/canopy_height_makati.tif` stays, because `test_night_bucket_writes_255` in `shade/test_shade.py` reads it.
 - `pipeline/inputs/areas/makati-cbd/` and `pipeline/inputs/areas/las-pinas/` stay out of git.
 - The root scripts (`run_all.sh` and `pipeline/build_*.py`) still build the single Makati area into `app/public/data/`. The app no longer reads those files.
@@ -604,7 +604,7 @@ A clean `git archive` copy built in an `amazonlinux:2023` container with 4 CPUs 
 | app build and 104 gzip copies | 27 | |
 | `vercel_build.sh` in total | 464 | 292.6 |
 
-- Each area's time also holds `set_dates.py` and one Open-Meteo call. Vercel stops a build at 45 minutes.
+- Each area's time includes `set_dates.py` and one Open-Meteo call. Vercel stops a build at 45 minutes.
 - The run used `UCPH_SKIP_TESTS=1`, because the app tests wait on the app side of the area change.
 - The build cache keeps the venv, so later builds skip the 56 s step.
 - The 104 shade files take 49.0 MB, and their gzip copies 13.6 MB. `app/dist` holds 205 MB.

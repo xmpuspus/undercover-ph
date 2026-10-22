@@ -1,15 +1,15 @@
 # The pilot must pass access and exposure cases before public navigation
 
 Proposed acceptance cases for the Undercover PH design, 21 October 2026.
-These cases define expected behaviour. No product implementation or field pass
-is claimed. Use synthetic fixtures for algorithm checks, then repeat relevant
+These cases define expected behaviour. No product code or field pass
+exists. Use synthetic fixtures for algorithm checks, then repeat relevant
 cases on audited pilot routes.
 
 | Case | Input or situation | Expected result | Evidence needed |
 | --- | --- | --- | --- |
 | Private shortcut | The shortest covered connection has `access=private` and no pedestrian override. The user has no permit. | Public through-routing excludes that connection. | A graph fixture and the source tags. Check the real sign for a pilot example. |
 | Pedestrian override | A way has `access=private` and `foot=yes`, with no conflicting condition or barrier. | The access hierarchy permits pedestrians. The filter does not delete it solely because of general access. | A graph fixture that checks the specific override. |
-| Mall after closing | A corridor closes at 22:00. The user would reach its entrance at 22:05. | The route uses an open connection or reports no supported route. | A schedule fixture and a dated check of the actual passage hours. |
+| Mall after closing | A walkway closes at 22:00. The user would reach its entrance at 22:05. | The route uses an open connection or reports no supported route. | A schedule fixture and a dated check of the actual passage hours. |
 | Bridge over road | A roofed bridge crosses a road on another level without stairs or a lift at the crossing. | The graph has no transfer at the crossing point. | A graph fixture and a check of the entrances and level connections. |
 | Unroofed bridge | The bridge deck has no roof. The ground below the bridge is shaded. | Rain mode does not label the deck sheltered from the shadow below it. | An elevation-aware fixture and field photos of the deck. |
 | Stair-free request | The covered route uses stairs. Lift status is unknown. | The app does not label the route stair-free or wheelchair accessible. | A profile fixture and checks of the actual lifts, ramps, widths and entrances. |

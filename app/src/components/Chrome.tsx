@@ -22,8 +22,8 @@ export function TopBanner({ onClose, onAbout }: { onClose: () => void; onAbout: 
   );
 }
 
-// PAGASA thunderstorm advisory. It covers 2 hours from its issue time, so the app shows it only
-// when the chosen departure falls inside that window. Outside it, nothing about PAGASA appears.
+// PAGASA thunderstorm advisory. It covers 2 hours from its issue time, so the app shows it only when the chosen
+// departure falls inside that window and the advisory names a Metro Manila city.
 export function AdvisoryBar({
   advisory,
   date,
@@ -43,7 +43,9 @@ export function AdvisoryBar({
   const [hidden, setHidden] = useState(false);
   if (hidden || !advisory || advisory.status !== "ok" || !advisory.text || !advisory.issued_at) return null;
   if (!advisoryCovers(advisory.issued_at, date, minute)) return null;
-  const { text, listed } = advisoryLine(advisory.issued_at, advisory.cities, cities);
+  const line = advisoryLine(advisory.issued_at, advisory.cities, cities);
+  if (!line) return null;
+  const { text, listed } = line;
   return (
     <div
       className={`flex items-start gap-2 px-4 py-1.5 text-[12px] leading-snug ${listed ? "bg-amber-300 text-ink" : "bg-amber-50 text-amber-950"}`}
@@ -53,14 +55,11 @@ export function AdvisoryBar({
       <AlertIcon size={14} className="mt-0.5 shrink-0" />
       <p className="min-w-0 flex-1">
         {text}{" "}
-        {listed &&
-          (mode === "rain" ? (
-            <span className="font-semibold">Rain mode first.</span>
-          ) : (
-            <button type="button" onClick={onRain} className="font-semibold underline underline-offset-2">
-              Rain mode first.
-            </button>
-          ))}{" "}
+        {listed && mode !== "rain" && (
+          <button type="button" onClick={onRain} className="font-semibold underline underline-offset-2">
+            Switch to Sheltered
+          </button>
+        )}{" "}
         <a href={advisory.source_url} target="_blank" rel="noreferrer" className="underline underline-offset-2">
           Source
         </a>

@@ -27,23 +27,27 @@ describe("PAGASA advisory window", () => {
     expect(advisoryCovers("issued tonight", "2026-10-21", 22 * 60 + 30)).toBe(false);
   });
 
-  it("writes the banner line with or without Makati", () => {
+  it("names the cities and the end of the 2-hour window", () => {
     expect(advisoryLine(ISSUED, ["Marikina", "Quezon City"])).toEqual({
       listed: false,
-      text: "PAGASA thunderstorm advisory, issued 10:10 PM: Marikina, Quezon City. Makati is not listed.",
+      text: "PAGASA expects thunderstorms over Marikina and Quezon City until 12:10 AM.",
     });
-    expect(advisoryLine(ISSUED, ["Makati", "Pasig"]).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Makati, Pasig. Makati is listed.");
-    expect(advisoryLine(ISSUED, ["Metro Manila"]).listed).toBe(true);
+    expect(advisoryLine(ISSUED, ["Makati", "Pasig"])).toEqual({ listed: true, text: "PAGASA expects thunderstorms over Makati and Pasig until 12:10 AM." });
+    expect(advisoryLine(ISSUED, ["Metro Manila", "Pasig"])).toEqual({ listed: true, text: "PAGASA expects thunderstorms over Metro Manila until 12:10 AM." });
+    expect(advisoryLine("2:51 PM, 22 October 2026", ["Taguig"], ["Taguig"])?.text).toBe("PAGASA expects thunderstorms over Taguig until 4:51 PM.");
   });
 
-  it("names the cities of the area being planned", () => {
+  it("gives no line when the advisory names no Metro Manila city", () => {
+    // 22 October 2026, 2:51 PM: the advisory named only Bataan, Pampanga and Zambales towns.
+    expect(advisoryLine("2:51 PM, 22 October 2026", [], ["Makati"])).toBeNull();
+  });
+
+  it("puts the planned area's cities first and shortens a long list", () => {
     const core = ["Makati", "Mandaluyong", "Pasig", "Quezon City", "San Juan", "Taguig"];
-    expect(advisoryLine(ISSUED, ["Pasig", "Taguig", "Marikina"], core)).toEqual({
+    expect(advisoryLine(ISSUED, ["Caloocan", "Malabon", "Marikina", "Navotas", "Taguig"], core)).toEqual({
       listed: true,
-      text: "PAGASA thunderstorm advisory, issued 10:10 PM: Pasig, Taguig, Marikina. Pasig and Taguig are listed.",
+      text: "PAGASA expects thunderstorms over Taguig, Caloocan, Malabon and 2 more cities until 12:10 AM.",
     });
-    expect(advisoryLine(ISSUED, ["Marikina"], ["Pasay"]).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Marikina. Pasay is not listed.");
-    expect(advisoryLine(ISSUED, ["Marikina"], core).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Marikina. No covered city is listed.");
-    expect(advisoryLine(ISSUED, ["Metro Manila"], ["Manila"]).text).toBe("PAGASA thunderstorm advisory, issued 10:10 PM: Metro Manila. Metro Manila is listed.");
+    expect(advisoryLine(ISSUED, ["Marikina"], core)?.listed).toBe(false);
   });
 });

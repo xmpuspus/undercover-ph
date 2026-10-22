@@ -10,7 +10,7 @@ export function TurnCard({ d, idx, night, onPrev, onNext }: { d: DisplayRoute; i
   if (!s) {
     return (
       <div className="pointer-events-auto rounded-card bg-white p-4 text-[14px] text-slate-600 shadow-card" data-testid="turn-card">
-        The router returned no steps for this route. Follow the blue line.
+        No turn-by-turn steps for this route. Follow the route line on the map.
       </div>
     );
   }
@@ -50,7 +50,7 @@ export function TurnCard({ d, idx, night, onPrev, onNext }: { d: DisplayRoute; i
           className="flex min-h-11 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-brand hover:bg-blue-50 disabled:opacity-40"
           data-testid="next-step"
         >
-          I am here, next
+          Next step
           <ChevronRight size={14} />
         </button>
       </div>
