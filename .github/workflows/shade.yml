@@ -9,7 +9,10 @@
 # asset lacks it. So one failed area does not hold back the rest: the release goes out with the areas that
 # finished, the failure opens an issue, and the deploy shades the missing area.
 # A manual run on another branch (gh workflow run shade.yml --ref BRANCH) shades that branch's areas into
-# today's release and pushes no commit, so a branch that adds areas can merge with its shade ready.
+# today's release and pushes no commit, so a branch that adds areas can merge with its shade ready. The deploy
+# reads only the newest release, so merge the same Manila day and before the 04:30 run, or run this workflow on
+# main after the merge. The release then serves main too, so the branch must not change shade.py or area inputs
+# that main keeps.
 
 name: shade
 
@@ -170,7 +173,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REF: ${{ github.ref_name }}
         run: |
           gh issue create -R "$GITHUB_REPOSITORY" \
-            --title "Shade build failed $(TZ=Asia/Manila date +%F)" \
+            --title "Shade build failed $(TZ=Asia/Manila date +%F) on $REF" \
             --body "The shade workflow failed: $RUN_URL. The deploy build uses the newest shade release until a new one exists."

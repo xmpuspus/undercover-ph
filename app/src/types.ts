@@ -73,6 +73,8 @@ export interface AreaInfo {
   graph_rects: [number, number, number, number][];
   neighbourhoods: { id: string; name: string; bbox: [number, number, number, number] }[];
   center: [number, number];
+  // Share of Google's building area that has an OpenStreetMap outline. Shade comes only from outlines.
+  buildings_mapped?: number;
 }
 
 export interface Markers {

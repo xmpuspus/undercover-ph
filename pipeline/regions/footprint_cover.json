@@ -1,0 +1,270 @@
+{
+ "metro-core": {
+  "osm_share_of_google_building_area": 0.724,
+  "google_building_m2": 11116104
+ },
+ "pasay-moa": {
+  "osm_share_of_google_building_area": 0.701,
+  "google_building_m2": 1786736
+ },
+ "cubao-eastwood": {
+  "osm_share_of_google_building_area": 0.743,
+  "google_building_m2": 2126524
+ },
+ "qc-north": {
+  "osm_share_of_google_building_area": 0.717,
+  "google_building_m2": 3207208
+ },
+ "manila": {
+  "osm_share_of_google_building_area": 0.742,
+  "google_building_m2": 6541068
+ },
+ "alabang": {
+  "osm_share_of_google_building_area": 0.562,
+  "google_building_m2": 2297856
+ },
+ "north-coast": {
+  "osm_share_of_google_building_area": 0.602,
+  "google_building_m2": 8739740
+ },
+ "marikina": {
+  "osm_share_of_google_building_area": 0.653,
+  "google_building_m2": 3373308
+ },
+ "paranaque-airport": {
+  "osm_share_of_google_building_area": 0.672,
+  "google_building_m2": 2433772
+ },
+ "las-pinas": {
+  "osm_share_of_google_building_area": 0.533,
+  "google_building_m2": 3054352
+ },
+ "paranaque-bf-aguirre": {
+  "osm_share_of_google_building_area": 0.54,
+  "google_building_m2": 2469276
+ },
+ "taguig-pateros": {
+  "osm_share_of_google_building_area": 0.604,
+  "google_building_m2": 6304400
+ },
+ "qc-commonwealth-fairview": {
+  "osm_share_of_google_building_area": 0.631,
+  "google_building_m2": 6011360
+ },
+ "qc-banawe": {
+  "osm_share_of_google_building_area": 0.704,
+  "google_building_m2": 2557104
+ },
+ "cebu-city-centre": {
+  "osm_share_of_google_building_area": 0.399,
+  "google_building_m2": 5784624
+ },
+ "baguio-centre": {
+  "osm_share_of_google_building_area": 0.634,
+  "google_building_m2": 3519988
+ },
+ "angeles-centre": {
+  "osm_share_of_google_building_area": 0.698,
+  "google_building_m2": 4764376
+ },
+ "san-fernando-pampanga-centre": {
+  "osm_share_of_google_building_area": 0.69,
+  "google_building_m2": 3284296
+ },
+ "olongapo-centre": {
+  "osm_share_of_google_building_area": 0.621,
+  "google_building_m2": 2338772
+ },
+ "malolos-centre": {
+  "osm_share_of_google_building_area": 0.335,
+  "google_building_m2": 1862636
+ },
+ "baliwag-centre": {
+  "osm_share_of_google_building_area": 0.122,
+  "google_building_m2": 2084560
+ },
+ "tarlac-centre": {
+  "osm_share_of_google_building_area": 0.527,
+  "google_building_m2": 2257440
+ },
+ "balanga-centre": {
+  "osm_share_of_google_building_area": 0.6,
+  "google_building_m2": 1788408
+ },
+ "cabanatuan-centre": {
+  "osm_share_of_google_building_area": 0.125,
+  "google_building_m2": 3370028
+ },
+ "dagupan-centre": {
+  "osm_share_of_google_building_area": 0.244,
+  "google_building_m2": 1139500
+ },
+ "vigan-centre": {
+  "osm_share_of_google_building_area": 0.563,
+  "google_building_m2": 754384
+ },
+ "laoag-centre": {
+  "osm_share_of_google_building_area": 0.424,
+  "google_building_m2": 1025772
+ },
+ "tuguegarao-centre": {
+  "osm_share_of_google_building_area": 0.491,
+  "google_building_m2": 1962232
+ },
+ "davao-city-centre": {
+  "osm_share_of_google_building_area": 0.474,
+  "google_building_m2": 4984116
+ },
+ "digos-centre": {
+  "osm_share_of_google_building_area": 0.132,
+  "google_building_m2": 1902236
+ },
+ "tagum-centre": {
+  "osm_share_of_google_building_area": 0.385,
+  "google_building_m2": 3421112
+ },
+ "cagayan-de-oro-centre": {
+  "osm_share_of_google_building_area": 0.496,
+  "google_building_m2": 3610608
+ },
+ "iligan-centre": {
+  "osm_share_of_google_building_area": 0.13,
+  "google_building_m2": 3466932
+ },
+ "zamboanga-city-centre": {
+  "osm_share_of_google_building_area": 0.262,
+  "google_building_m2": 3681532
+ },
+ "pagadian-downtown": {
+  "osm_share_of_google_building_area": 0.391,
+  "google_building_m2": 1199512
+ },
+ "dipolog-downtown": {
+  "osm_share_of_google_building_area": 0.524,
+  "google_building_m2": 920036
+ },
+ "general-santos-centre": {
+  "osm_share_of_google_building_area": 0.457,
+  "google_building_m2": 2354040
+ },
+ "koronadal-centre": {
+  "osm_share_of_google_building_area": 0.458,
+  "google_building_m2": 2712308
+ },
+ "cotabato-city-centre": {
+  "osm_share_of_google_building_area": 0.263,
+  "google_building_m2": 2655200
+ },
+ "butuan-centre": {
+  "osm_share_of_google_building_area": 0.451,
+  "google_building_m2": 1938216
+ },
+ "surigao-downtown": {
+  "osm_share_of_google_building_area": 0.192,
+  "google_building_m2": 1261316
+ },
+ "mandaue": {
+  "osm_share_of_google_building_area": 0.319,
+  "google_building_m2": 3641148
+ },
+ "lapu-lapu": {
+  "osm_share_of_google_building_area": 0.252,
+  "google_building_m2": 2851520
+ },
+ "iloilo-city": {
+  "osm_share_of_google_building_area": 0.486,
+  "google_building_m2": 3376740
+ },
+ "bacolod": {
+  "osm_share_of_google_building_area": 0.236,
+  "google_building_m2": 3609320
+ },
+ "talisay-negros": {
+  "osm_share_of_google_building_area": 0.155,
+  "google_building_m2": 737660
+ },
+ "dumaguete": {
+  "osm_share_of_google_building_area": 0.228,
+  "google_building_m2": 2829252
+ },
+ "tagbilaran": {
+  "osm_share_of_google_building_area": 0.324,
+  "google_building_m2": 981328
+ },
+ "tacloban-downtown": {
+  "osm_share_of_google_building_area": 0.493,
+  "google_building_m2": 898300
+ },
+ "tacloban-university-belt": {
+  "osm_share_of_google_building_area": 0.437,
+  "google_building_m2": 822648
+ },
+ "ormoc": {
+  "osm_share_of_google_building_area": 0.335,
+  "google_building_m2": 772476
+ },
+ "roxas-city": {
+  "osm_share_of_google_building_area": 0.415,
+  "google_building_m2": 1080216
+ },
+ "kalibo": {
+  "osm_share_of_google_building_area": 0.476,
+  "google_building_m2": 1561180
+ },
+ "dasmarinas": {
+  "osm_share_of_google_building_area": 0.561,
+  "google_building_m2": 3713992
+ },
+ "tagaytay": {
+  "osm_share_of_google_building_area": 0.421,
+  "google_building_m2": 485580
+ },
+ "santa-rosa": {
+  "osm_share_of_google_building_area": 0.236,
+  "google_building_m2": 2534436
+ },
+ "calamba": {
+  "osm_share_of_google_building_area": 0.292,
+  "google_building_m2": 2103020
+ },
+ "los-banos": {
+  "osm_share_of_google_building_area": 0.467,
+  "google_building_m2": 1487564
+ },
+ "san-pablo": {
+  "osm_share_of_google_building_area": 0.313,
+  "google_building_m2": 2067704
+ },
+ "lipa": {
+  "osm_share_of_google_building_area": 0.677,
+  "google_building_m2": 2651768
+ },
+ "batangas-city": {
+  "osm_share_of_google_building_area": 0.618,
+  "google_building_m2": 2755220
+ },
+ "antipolo": {
+  "osm_share_of_google_building_area": 0.494,
+  "google_building_m2": 3130456
+ },
+ "lucena": {
+  "osm_share_of_google_building_area": 0.267,
+  "google_building_m2": 2215596
+ },
+ "naga": {
+  "osm_share_of_google_building_area": 0.373,
+  "google_building_m2": 2833976
+ },
+ "legazpi": {
+  "osm_share_of_google_building_area": 0.521,
+  "google_building_m2": 2683556
+ },
+ "calapan": {
+  "osm_share_of_google_building_area": 0.414,
+  "google_building_m2": 947608
+ },
+ "puerto-princesa": {
+  "osm_share_of_google_building_area": 0.38,
+  "google_building_m2": 945252
+ }
+}

@@ -4,7 +4,7 @@ import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, Weather 
 import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, placeKeys, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
 import { areaBase, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
 import { NCR, areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea, wellKnown } from "./lib/areas";
-import { regionPlaces } from "./lib/advisory";
+import { areaAdvisory } from "./lib/advisory";
 import { clockPinned, dateLabel, dateShort, fmtDist, fmtMinute, manilaNow, type Clock } from "./lib/time";
 import { toDisplay } from "./lib/display";
 import type { Focus, Insets } from "./components/MapView";
@@ -118,7 +118,8 @@ export default function App() {
   // Counts dates whose shade file arrived, so the routes recompute. The bundle fills its arrays in place.
   const [shadeVer, setShadeVer] = useState(0);
   const [weather, setWeather] = useState<Weather | null>(null);
-  const [advisory, setAdvisory] = useState<Advisory | null>(null);
+  // The advisory as fetched from the region's page. The cities it names for this area come from it below.
+  const [pageAdvisory, setPageAdvisory] = useState<Advisory | null>(null);
   const [buildingsLoading, setBuildingsLoading] = useState(true);
 
   // A link with a start or end in its fragment opens straight on that trip, once its area has loaded.
@@ -190,22 +191,20 @@ export default function App() {
 
   // Each region has its own PAGASA page. Reload when the trip moves to another region.
   const advArea = areas?.find((a) => a.id === (areaId ?? lastArea ?? DEFAULT_AREA));
-  const prsd = advArea?.region?.prsd ?? "ncrprsd";
+  // Data from before the regions has no region: Metro Manila. A region without a PAGASA page gets no advisory.
+  const prsd = advArea?.region ? (advArea.region.prsd ?? null) : "ncrprsd";
   useEffect(() => {
     let live = true;
-    loadAdvisory(areaId ?? lastArea ?? DEFAULT_AREA, prsd).then((a) => {
-      if (!live) return;
-      // A regional page lists towns per province. Match this area's own cities and provinces in its text.
-      const region = advArea?.region;
-      if (a?.status === "ok" && a.text && region && region.id !== NCR) {
-        setAdvisory({ ...a, cities: regionPlaces(a.text, advArea.cities, region.provinces ?? []) });
-      } else setAdvisory(a);
-    });
+    // The old region's advisory must not show while the new page loads.
+    setPageAdvisory(null);
+    if (prsd) loadAdvisory(areaId ?? lastArea ?? DEFAULT_AREA, prsd).then((a) => live && setPageAdvisory(a));
     return () => {
       live = false;
     };
-    // Per region, not per area: two areas in one region share a page.
+    // Per page, not per area: areas in one region, and the regions near Metro Manila, share a page.
   }, [prsd]);
+  // Matched again whenever the area changes, not only when the page does.
+  const advisory = useMemo(() => areaAdvisory(pageAdvisory, advArea), [pageAdvisory, advArea]);
   // Weather belongs to the area.
   useEffect(() => {
     if (!areaId) return;
@@ -550,11 +549,12 @@ export default function App() {
   const suggested = useMemo(() => {
     if (!index) return [];
     const taken = new Set([from, to].map((e) => (e ? `${e.area}|${e.node}` : "")));
-    // Metro Manila areas have hand-picked lists. Regional areas take their best-known places.
+    // Metro Manila areas have hand-picked lists. Regional areas take their best-known places, two spare
+    // for the start or end already picked.
     const pick = (area: string) =>
       (SUGGESTED[area]
         ? SUGGESTED[area].map((n) => index.places.find((pl) => pl.area === area && pl.name.toLowerCase() === n.toLowerCase()))
-        : wellKnown(index.places, area)
+        : wellKnown(index.places, area, 6)
       ).filter((pl): pl is Place => !!pl && !taken.has(`${area}|${pl.node_id}`));
     if (otherArea) return pick(otherArea).slice(0, 4);
     // Nothing picked yet: one place in each area, so the list shows where the app works.
@@ -844,7 +844,7 @@ export default function App() {
     if (stage === "navigate" && to) document.title = `Walking to ${to.label} | ${base}`;
     else if (stage === "plan" && from && to) document.title = `${from.label} to ${to.label} | ${base}`;
     else if (stage === "plan") document.title = `Plan a walk | ${base}`;
-    else document.title = `${base} | Shaded and sheltered walks in Metro Manila`;
+    else document.title = `${base} | Shaded and sheltered walks in Philippine cities`;
   }, [stage, from, to]);
 
   const refocus = (testid: string) => {

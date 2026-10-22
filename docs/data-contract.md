@@ -2,10 +2,11 @@
 
 Dated 2026-10-22. The project owns it. The pipeline in `pipeline/` writes every file below to `app/public/data/`. The app in `app/` reads them and nothing else.
 
-## Fourteen routing areas share one time zone and one date rule
+## Sixty-seven routing areas share one time zone and one date rule
 
-- `areas.json` lists 14 routing areas. Their ids are metro-core, pasay-moa, cubao-eastwood, qc-north, manila, alabang, north-coast, marikina, paranaque-airport, las-pinas and paranaque-bf-aguirre. The other three are taguig-pateros, qc-commonwealth-fairview and qc-banawe. metro-core has Makati CBD.
+- `areas.json` lists 67 routing areas. The 14 in Metro Manila have the ids metro-core, pasay-moa, cubao-eastwood, qc-north, manila, alabang, north-coast, marikina, paranaque-airport, las-pinas and paranaque-bf-aguirre. The other three are taguig-pateros, qc-commonwealth-fairview and qc-banawe. metro-core has Makati CBD.
 - las-pinas joined on 2026-10-22, after its three route checks passed.
+- 53 more areas in 44 other regions joined on 2026-10-22. Their ids and boxes are in `pipeline/regions/areas.json`.
 - A route runs inside one area. Each area joins one or more districts, and each district stays a named neighbourhood.
 - An area's `bbox` is the envelope of its district boxes. Its graph area is the union of its `graph_rects`, and each of those is a district box plus 500 m.
 - The building area is each graph box plus 800 m, so long low-sun shadows reach the edges.
@@ -47,7 +48,7 @@ These files are committed in git and built by `pipeline/districts/publish.py` fr
 
 ```text
 app/public/data/
-  areas.json             the 14 areas
+  areas.json             the 67 areas, each regional one with its region
   places_index.json      every place once, for search
   buildings.pmtiles      buildings of all areas, one file
   trees.pmtiles          tree crowns of all areas, one file
@@ -89,6 +90,10 @@ All JSON files that git keeps are compact, with no spaces or line breaks.
 - `graph_rects` are the boxes the graph really covers. A point between them is outside the area.
 - `center` is the middle of `bbox`. The weather forecast and the sun position use this point.
 - The values come from `pipeline/areas.json` and each area's manifest, and the publish step checks that they agree.
+- `region` is `{"id", "name", "prsd", "provinces"}`. `prsd` names the PAGASA regional page for the advisory, and `provinces` are the
+  provinces an advisory may name for the area. Metro Manila areas carry `{"id": "ncr", ...}`. An area without `region` is in Metro Manila.
+- Regional areas come from `pipeline/regions/areas.json`. Publish ships one only when its checks pass, a shade run is newer than its
+  graph, `pipeline/regions/city_check.py` finds its boxes in its own city, and 70% or more of its place pairs connect.
 
 ### `places_index.json`
 
@@ -198,19 +203,19 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 ### `buildings.pmtiles` (app) and `pipeline/inputs/areas/<id>/buildings.geojson.gz` (pipeline)
 
 - `buildings.geojson.gz` holds every building of one area out to the shade margin, for the shade engine. It stays in the pipeline.
-- `buildings.pmtiles` is one file for all 14 areas. Its source layer is `buildings`.
+- `buildings.pmtiles` is one file for all 67 areas. Its source layer is `buildings`.
 - Each feature is a polygon with two numbers, `height_m` and `min_height_m`. Each `building:part` is its own feature.
-- It holds every building that has a height and lies within 150 m of a walk area. That is 665,246 buildings and 25.5 MB.
-- Where two areas overlap, one copy stays when the heights match and the centres lie within 1 m. That removed 55,942 copies.
+- It holds every building that has a height and lies within 150 m of a walk area. That is 1,332,251 buildings and 52.5 MB.
+- Where two areas overlap, one copy stays when the heights match and the centres lie within 1 m. That removed 56,910 copies.
 - Zooms 13 to 15. Zoom 15 keeps every footprint, unsimplified, on a grid of about 0.15 m. The app overzooms past 15.
 - Zooms 13 and 14 thin out small footprints, with tippecanoe's defaults, to keep tiles light.
 - A check build of the 13-area file drew 212,830 of its 637,936 buildings at zoom 13 and 637,731 at zoom 14. When the count matters, draw shadows from zoom 15 data.
 
 ### `trees.pmtiles`
 
-- One file for all 14 areas, 18.4 MB. Its source layer is `trees`.
+- One file for all 67 areas, 85.8 MB. Its source layer is `trees`. GitHub refuses a file over 100 MB, so split it by region before about 10 more areas.
 - Each feature is a point at a crown centre, with three numbers in metres. They are `r_m` (crown radius), `top_m` (crown top) and `base_m` (crown base).
-- It holds 1,366,459 crowns of 3 m or taller, within 200 m of a walk area. The build removes 8,917 copies from overlapping areas.
+- It holds 6,388,481 crowns of 3 m or taller, within 200 m of a walk area. The build removes 11,214 copies from overlapping areas.
 - Zooms 14 and 15. Both zooms keep every crown, so tree shadows look the same at either zoom.
 - The crowns equal each area's deploy-time `trees.json`, which `manifest.trees` describes.
 

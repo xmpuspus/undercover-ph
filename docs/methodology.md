@@ -4,8 +4,8 @@ The data file formats are in [data-contract.md](data-contract.md). The build ste
 
 ## 1. The walk network comes from OpenStreetMap with strict access rules
 
-- The source is the Geofabrik Philippines extract of 2026-10-20, clipped to Metro Manila.
-- `app/public/data/areas.json` lists the 14 walking areas across Metro Manila. Each area joins one or more district boxes around a busy centre. Its walk network covers each box plus 500 m on each side.
+- The source is the Geofabrik Philippines extract of 2026-10-20, clipped to Metro Manila and to one box per region outside it.
+- `app/public/data/areas.json` lists the 67 walking areas: 14 across Metro Manila and 53 in 44 other regions. Each area joins one or more district boxes around a busy centre. Its walk network covers each box plus 500 m on each side.
 - Each area routes on its own network. Where two areas overlap, a trip across the seam routes in the area whose network holds both ends.
 - Every `footway`, `path`, `steps`, `corridor`, and walkable road becomes an edge between two nodes.
 - Roads of tertiary class and above get a separate edge for each sidewalk. The pipeline offsets each sidewalk line from the road centre and keeps it outside building footprints.
@@ -25,6 +25,11 @@ The pipeline gives each building one height from the first of these sources that
 4. A default of 7.5 m (two levels). A default that is too tall invents shade, so it errs low.
 
 Each `building:part` keeps its own height and base. A tower part does not raise its podium.
+
+Only buildings with an OpenStreetMap outline cast shade. Google's raster gives heights, not outlines. `pipeline/tools/footprint_cover.py`
+measures the share of Google's building area that has an outline. On 2026-10-22 the share was 53% to 74% in Metro Manila areas and
+12% to 70% in the other regions, with a median of 42%. So routes outside Metro Manila miss building shade, most in the areas with the
+lowest share. The README table gives each area's share, and the About page names each area under half.
 
 ## 3. Tree canopy comes from a canopy height raster with pixels of about 1 m
 

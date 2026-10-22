@@ -86,6 +86,7 @@ def area_entry(a, m):
         "graph_rects": a["graph_rects"],
         "neighbourhoods": [{"id": d["id"], "name": d["name"], "bbox": d["bbox"]} for d in m["area"]["neighbourhoods"]],
         "center": [round((w + e) / 2, 6), round((s + n) / 2, 6)],
+        **({"buildings_mapped": FOOTPRINT[a["id"]]["osm_share_of_google_building_area"]} if a["id"] in FOOTPRINT else {}),
     }
 
 
@@ -241,6 +242,8 @@ def build_tiles(ids):
 
 
 CITY_CHECK = json.load(open(PIPE / "regions/city_check.json")) if (PIPE / "regions/city_check.json").exists() else {}
+# Share of Google's building area with an OSM outline, from pipeline/tools/footprint_cover.py. The app shows a low one.
+FOOTPRINT = json.load(open(PIPE / "regions/footprint_cover.json")) if (PIPE / "regions/footprint_cover.json").exists() else {}
 
 
 def regional_ready(a):
@@ -249,6 +252,9 @@ def regional_ready(a):
     summary = PIPE / "work/districts" / i / "summary.json"
     if not (STAGE / i / "graph.json").exists():
         return "not built"
+    m = json.load(open(STAGE / i / "manifest_template.json"))
+    if (a["bbox"], a["graph_bbox"], a["graph_rects"]) != (m["pilot_bbox"], m["graph_bbox"], m["graph_rects"]):
+        return "staged boxes differ from pipeline/regions/areas.json; rebuild it"
     if not summary.exists() or not json.load(open(summary))["checks_passed"]:
         return "checks not passed"
     if not (INPUTS / i / "canopy.tif").exists():
@@ -275,6 +281,13 @@ def main(tiles=True, hold=()):
     not_ready = {a["id"]: why for a in regional if a["id"] not in hold and (why := regional_ready(a))}
     areas = [a for a in areas + regional if a["id"] not in hold and a["id"] not in not_ready]
     ids = [a["id"] for a in areas]
+    unknown = sorted({a["region"] for a in areas if a.get("region") and a["region"] not in REGIONS})
+    if unknown:
+        sys.exit(f"areas name unknown regions {unknown}; add them to pipeline/regions/regions.json")
+    # The tree tiles read each area's trees.json from its last shade run. Stop before writing anything.
+    no_trees = [i for i in ids if not (STAGE / i / "trees.json").exists()]
+    if tiles and no_trees:
+        sys.exit(f"no trees.json for {no_trees}: run pipeline/shade/shade.py with UCPH_AREA set, or publish with --no-tiles")
     rows, index, report = [], [], {"held_back": list(hold), "regional_not_ready": not_ready}
     for a in areas:
         i = a["id"]

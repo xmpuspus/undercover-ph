@@ -92,6 +92,11 @@ if [ "$SOURCE" = "release" ]; then
     echo "vercel_build: no shade release from $START or the two days before it, so every area is shaded here" >&2
   else
     tar -xzf "$ROOT/shade-release.tar.gz" -C "$DATA/areas"
+    # A release cast from a branch can hold areas this commit does not list. They must not ship.
+    for d in "$DATA/areas"/*/; do
+      d="${d%/}"
+      [[ " $IDS " == *" ${d##*/} "* ]] || { echo "dropping ${d##*/}: in the release, not in areas.json"; rm -rf "$d"; }
+    done
     # Shade is per edge, so it must come from the same graph.json. The release stores each graph's sha256.
     COMPUTE="$("$PY" -I "$ROOT/pipeline/stale_shade.py" "$DATA/areas" $IDS)"
     echo "shade release $got; shaded here: ${COMPUTE:-none}"

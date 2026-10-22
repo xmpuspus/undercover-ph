@@ -5,7 +5,7 @@
 [![Data: ODbL](https://img.shields.io/badge/data-ODbL%201.0-blue.svg)](LICENSE)
 [![Status: prototype](https://img.shields.io/badge/status-prototype-orange.svg)](#known-limits-and-the-work-still-to-do)
 
-> Walking routes in Metro Manila's busiest centres that keep you in the shade on sunny days, or under a roof when it rains. A Philippine take on Singapore's [Undercover](https://undercover.gov.sg/) prototype, built on open data. Every route runs in your browser, so no server that this project runs sees where you start or where you go.
+> Walking routes in 67 busy city centres across the Philippines, 14 of them in Metro Manila, that keep you in the shade on sunny days, or under a roof when it rains. A Philippine take on Singapore's [Undercover](https://undercover.gov.sg/) prototype, built on open data. Every route runs in your browser, so no server that this project runs sees where you start or where you go.
 
 [![A screen recording of undercover.ph with a caption for each step. Shaded is picked, Greenbelt is typed as the destination and Ayala MRT Station as the start, and the time is set to tomorrow at 3 PM. Two routes show on the 3D map with their shaded share. The cover bar, the play button with moving shadows, the step list, Navigate and the Sheltered mode follow. The map then zooms out to the area outlines across Metro Manila](docs/demo/walkthrough.gif)](docs/demo/walkthrough.mp4)
 
@@ -13,26 +13,79 @@
 
 Try it at **[undercover.ph](https://undercover.ph)**. Pick Shaded or Sheltered, choose where you start and where you go, and pick the half hour you leave.
 
-The app covers 14 walking areas, from Caloocan to Alabang. Each area is a downtown, business district, university belt or transit hub, and none is a whole city. A trip that starts or ends outside every area gets no route. The numbers below come from the committed data. `pipeline/tools/coverage_table.py` writes this table.
+The app covers 67 walking areas. 14 are in Metro Manila, from Caloocan to Alabang. 53 are in 44 other regions, from Laoag to General Santos. Each area is a downtown, business district, university belt or transit hub, and none is a whole city. A trip that starts or ends outside every area gets no route. The numbers below come from the committed data. `pipeline/tools/coverage_table.py` writes this table.
 
 <!-- coverage:start -->
-| Area | Cities | Walkable km in routes | Places | Buildings |
-| --- | --- | ---: | ---: | ---: |
-| Makati, BGC, Ortigas and Shaw | Makati, Mandaluyong, Pasig, Quezon City, San Juan, Taguig | 1,342 | 4,130 | 189,704 |
-| Bay Area and Mall of Asia | Pasay | 251 | 524 | 25,183 |
-| Cubao and Eastwood | Quezon City | 321 | 813 | 65,167 |
-| North Avenue, Quezon Memorial Circle and UP Diliman | Quezon City | 507 | 1,474 | 96,652 |
-| Intramuros, Ermita, Binondo and University Belt | Manila | 810 | 3,241 | 100,359 |
-| Alabang and Filinvest City | Muntinlupa | 261 | 481 | 21,701 |
-| Caloocan, Malabon, Navotas and Valenzuela | Caloocan, Malabon, Navotas, Valenzuela | 854 | 1,470 | 136,324 |
-| Marikina Centre and Riverbanks | Marikina | 391 | 819 | 82,926 |
-| Aseana, PITX and NAIA | Paranaque, Pasay | 317 | 405 | 31,350 |
-| Las Pinas and Alabang-Zapote Road | Las Pinas | 274 | 515 | 47,566 |
-| BF Homes and Aguirre Avenue | Paranaque | 222 | 321 | 29,438 |
-| McKinley Hill, Taguig Centre, Arca South and Pateros | Pateros, Taguig | 744 | 997 | 136,126 |
-| Commonwealth, Fairview and SM Fairview | Quezon City | 499 | 969 | 193,787 |
-| Banawe and Quezon Avenue | Quezon City | 404 | 508 | 64,510 |
-| **14 areas** | | **7,196** | **16,667** | **1,220,793** |
+| Area | Cities | Walkable km in routes | Places | Buildings | Buildings mapped |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Makati, BGC, Ortigas and Shaw | Makati, Mandaluyong, Pasig, Quezon City, San Juan, Taguig | 1,342 | 4,130 | 189,704 | 72% |
+| Bay Area and Mall of Asia | Pasay | 251 | 524 | 25,183 | 70% |
+| Cubao and Eastwood | Quezon City | 321 | 813 | 65,167 | 74% |
+| North Avenue, Quezon Memorial Circle and UP Diliman | Quezon City | 507 | 1,474 | 96,652 | 72% |
+| Intramuros, Ermita, Binondo and University Belt | Manila | 810 | 3,241 | 100,359 | 74% |
+| Alabang and Filinvest City | Muntinlupa | 261 | 481 | 21,701 | 56% |
+| Caloocan, Malabon, Navotas and Valenzuela | Caloocan, Malabon, Navotas, Valenzuela | 854 | 1,470 | 136,324 | 60% |
+| Marikina Centre and Riverbanks | Marikina | 391 | 819 | 82,926 | 65% |
+| Aseana, PITX and NAIA | Paranaque, Pasay | 317 | 405 | 31,350 | 67% |
+| Las Pinas and Alabang-Zapote Road | Las Pinas | 274 | 515 | 47,566 | 53% |
+| BF Homes and Aguirre Avenue | Paranaque | 222 | 321 | 29,438 | 54% |
+| McKinley Hill, Taguig Centre, Arca South and Pateros | Pateros, Taguig | 744 | 997 | 136,126 | 60% |
+| Commonwealth, Fairview and SM Fairview | Quezon City | 499 | 969 | 193,787 | 63% |
+| Banawe and Quezon Avenue | Quezon City | 404 | 508 | 64,510 | 70% |
+| Cebu City | Cebu City | 599 | 1,887 | 27,078 | 40% |
+| Baguio centre | Baguio | 398 | 1,619 | 51,973 | 63% |
+| Angeles and Clark centre | Angeles and Clark | 498 | 810 | 100,582 | 70% |
+| San Fernando (Pampanga) centre | San Fernando (Pampanga) | 362 | 583 | 54,801 | 69% |
+| Olongapo and Subic centre | Olongapo and Subic | 189 | 256 | 20,554 | 62% |
+| Malolos centre | Malolos | 215 | 328 | 6,937 | 34% |
+| Baliwag centre | Baliwag | 254 | 311 | 1,335 | 12% |
+| Tarlac City centre | Tarlac City | 324 | 348 | 32,483 | 53% |
+| Balanga centre | Balanga | 264 | 246 | 21,869 | 60% |
+| Cabanatuan centre | Cabanatuan | 379 | 440 | 4,249 | 12% |
+| Dagupan centre | Dagupan | 121 | 245 | 2,888 | 24% |
+| Vigan centre | Vigan | 150 | 265 | 13,403 | 56% |
+| Laoag centre | Laoag | 157 | 207 | 12,607 | 42% |
+| Tuguegarao centre | Tuguegarao | 219 | 260 | 27,526 | 49% |
+| Davao City centre | Davao City | 443 | 1,397 | 26,834 | 47% |
+| Digos centre | Digos | 290 | 247 | 3,203 | 13% |
+| Tagum centre | Tagum | 405 | 385 | 39,370 | 38% |
+| Cagayan de Oro centre | Cagayan de Oro | 355 | 662 | 51,606 | 50% |
+| Iligan centre | Iligan | 294 | 389 | 7,553 | 13% |
+| Zamboanga City centre | Zamboanga City | 335 | 662 | 5,374 | 26% |
+| Pagadian downtown | Pagadian | 155 | 234 | 18,434 | 39% |
+| Dipolog downtown | Dipolog | 155 | 314 | 23,035 | 52% |
+| General Santos centre | General Santos | 300 | 293 | 39,066 | 46% |
+| Koronadal centre | Koronadal | 341 | 325 | 22,853 | 46% |
+| Cotabato City centre | Cotabato City | 234 | 308 | 11,229 | 26% |
+| Butuan centre | Butuan | 260 | 319 | 23,784 | 45% |
+| Surigao downtown | Surigao | 124 | 155 | 5,653 | 19% |
+| Mandaue | Mandaue | 312 | 382 | 7,569 | 32% |
+| Lapu-Lapu | Lapu-Lapu | 269 | 322 | 5,972 | 25% |
+| Iloilo City | Iloilo City | 513 | 1,158 | 27,046 | 49% |
+| Bacolod | Bacolod | 418 | 685 | 3,506 | 24% |
+| Talisay (Negros Occidental) | Talisay (Negros Occidental) | 157 | 205 | 1,483 | 16% |
+| Dumaguete | Dumaguete | 306 | 685 | 4,317 | 23% |
+| Tagbilaran | Tagbilaran | 179 | 282 | 8,730 | 32% |
+| Tacloban downtown | Tacloban | 149 | 533 | 13,477 | 49% |
+| Tacloban university belt | Tacloban | 155 | 205 | 27,881 | 44% |
+| Ormoc | Ormoc | 125 | 198 | 9,028 | 34% |
+| Roxas City | Roxas City | 190 | 172 | 9,775 | 42% |
+| Kalibo | Kalibo | 214 | 235 | 13,264 | 48% |
+| Dasmarinas centre | Dasmarinas | 554 | 725 | 87,687 | 56% |
+| Tagaytay downtown | Tagaytay | 134 | 145 | 7,592 | 42% |
+| Santa Rosa and Biñan centre | Santa Rosa, Biñan | 319 | 410 | 11,312 | 24% |
+| Calamba centre | Calamba | 226 | 305 | 4,494 | 29% |
+| Los Banos centre | Los Banos | 213 | 580 | 10,285 | 47% |
+| San Pablo centre | San Pablo | 232 | 552 | 9,913 | 31% |
+| Lipa centre | Lipa | 321 | 423 | 39,576 | 68% |
+| Batangas City centre | Batangas City | 269 | 725 | 32,122 | 62% |
+| Antipolo centre | Antipolo | 287 | 442 | 21,809 | 49% |
+| Lucena centre | Lucena | 284 | 243 | 2,907 | 27% |
+| Naga centre | Naga | 352 | 502 | 19,936 | 37% |
+| Legazpi centre | Legazpi | 332 | 595 | 31,071 | 52% |
+| Calapan downtown | Calapan | 126 | 207 | 4,376 | 41% |
+| Puerto Princesa downtown | Puerto Princesa | 108 | 260 | 8,871 | 38% |
+| **67 areas** | | **21,765** | **41,338** | **2,301,071** | |
 <!-- coverage:end -->
 
 ## The sidewalk on the sun's side gets more building shade
@@ -137,13 +190,14 @@ Each area keeps its files in `app/public/data/areas/<id>/`. Two files cover ever
 ## Known limits and the work still to do
 
 <!-- limits:start -->
-- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds 28.7 km of sheltered path. Nobody has measured how much exists on the street.
-- **Access.** Gates and entrances that need a field check remove 321 km of paths from routes.
-- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. That covers 1,021 km of the 3,306 km of side-of-street paths. A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.
+- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds 68.0 km of sheltered path. Nobody has measured how much exists on the street.
+- **Access.** Gates and entrances that need a field check remove 596 km of paths from routes.
+- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. That covers 5,145 km of the 8,434 km of side-of-street paths. A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.
 <!-- limits:end -->
 - **Heights.** Google's heights stop at 100 m and date from 2023. OpenStreetMap supplies most tower heights.
+- **Building outlines.** Only buildings that OpenStreetMap outlines cast shade. Outlines cover 53% to 74% of Google's building area in Metro Manila areas. Outside Metro Manila they cover 12% to 70%, with a median of 42%, so routes there miss building shade. The "Buildings mapped" column gives each area's share.
 - **Taglish copy.** A native speaker has not reviewed it yet.
-- **Next.** Walk the covered networks in the field and check the shade against photos. Then add the main cities outside Metro Manila.
+- **Next.** Fill the missing building outlines outside Metro Manila from Google's building raster. Then walk the covered networks in the field and check the shade against photos.
 - **One walk network per route.** Each area has its own walk network. A trip across the seam of two areas routes in the area whose network holds both ends. Only a start and an end that no single network holds get no route, and the app says so.
 - **Map shadows.** The map draws shadows in your browser, each tree as a disc. They can differ from the shade model at tree edges.
 
@@ -165,7 +219,7 @@ Code is MIT. Data built from OpenStreetMap is ODbL 1.0. Other layers keep their 
 ```bibtex
 @software{puspus_undercover_ph_2026,
   author = {Puspus, Xavier},
-  title  = {undercover.ph: shaded and sheltered walking routes for Metro Manila},
+  title  = {undercover.ph: shaded and sheltered walking routes for Philippine cities},
   year   = {2026},
   url    = {https://github.com/xmpuspus/undercover-ph}
 }

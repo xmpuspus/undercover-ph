@@ -23,7 +23,6 @@ interface Props {
 export default function Landing({ areas, onPick, onIntent, status, error, theme, minute, picking }: Props) {
   const ncr = areas ? areas.filter((a) => regionOf(a) === NCR).length : AREA_LABELS.length;
   const others = areas ? areas.length - ncr : 0;
-  const cities = areas ? new Set(areas.filter((a) => regionOf(a) !== NCR).flatMap((a) => a.cities)).size : 0;
   return (
     <div className="pointer-events-none absolute inset-0 grid place-items-center p-4">
       <section
@@ -47,7 +46,7 @@ export default function Landing({ areas, onPick, onIntent, status, error, theme,
         {/* One line, so the buttons stay in view on a phone. About lists every area. index.html repeats this line. */}
         <p className="mt-3 text-[13px] text-slate-700" data-testid="landing-areas">
           {others > 0
-            ? `${ncr} walking areas in Metro Manila and ${others} in ${cities} more cities across the Philippines.`
+            ? `${ncr + others} walking areas: ${ncr} in Metro Manila and ${others} in other cities across the Philippines.`
             : `${ncr} walking areas in Metro Manila's busiest centres, from Caloocan to Alabang.`}
         </p>
         <div className="mt-5 grid grid-cols-2 gap-3">

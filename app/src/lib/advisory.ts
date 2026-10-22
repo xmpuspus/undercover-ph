@@ -1,3 +1,5 @@
+import type { Advisory, AreaInfo } from "../types";
+
 // PAGASA NCR thunderstorm advisories cover the next 2 hours from their issue time (Asia/Manila, UTC+8).
 export const ADVISORY_HOURS = 2;
 const MANILA_MS = 8 * 3600_000;
@@ -82,3 +84,13 @@ export function regionPlaces(block: string, cities: string[], provinces: string[
   return [...found].sort();
 }
 
+
+/**
+ * The advisory for one area. A Metro Manila area keeps the cities the page lists. Any other area matches its own
+ * cities and provinces in the text, since several regions near Metro Manila share the Metro Manila page.
+ */
+export function areaAdvisory(page: Advisory | null, area: AreaInfo | undefined): Advisory | null {
+  const region = area?.region;
+  if (page?.status !== "ok" || !page.text || !area || !region || region.id === "ncr") return page;
+  return { ...page, cities: regionPlaces(page.text, area.cities, region.provinces ?? []) };
+}

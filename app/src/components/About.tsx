@@ -47,7 +47,7 @@ const SOURCES: { name: string; licence: string; text: string; url: string; licen
   {
     name: "PAGASA",
     licence: "Credited to PAGASA. No licence is stated on the page",
-    text: "Thunderstorm advisories for Metro Manila, shown for the 2 hours they cover.",
+    text: "Thunderstorm advisories for each region, shown for the 2 hours they cover.",
     url: "https://www.pagasa.dost.gov.ph/",
   },
 ];
@@ -137,12 +137,23 @@ export default function About({ manifest, areas, onClose }: { manifest: Manifest
             <p className="font-medium text-ink">{g.name}</p>
             <ul className="mt-0.5 list-disc space-y-0.5 pl-5">
               {g.areas.map((a) => (
-                <li key={a.id}>{areaLabel(a.id, areas)}</li>
+                <li key={a.id}>
+                  {areaLabel(a.id, areas)}
+                  {a.buildings_mapped !== undefined && a.buildings_mapped < 0.5 && (
+                    <span className="text-slate-600"> ({Math.round(a.buildings_mapped * 100)}% of buildings mapped)</span>
+                  )}
+                </li>
               ))}
             </ul>
           </div>
         ))}
         <p className="mt-2">A route starts and ends in the same area.</p>
+        {groups.some((g) => g.areas.some((a) => (a.buildings_mapped ?? 1) < 0.5)) && (
+          <p className="mt-2" data-testid="about-buildings-mapped">
+            Shade comes from building outlines in OpenStreetMap. Outside Metro Manila many buildings have no outline yet, so routes there
+            miss some building shade. The share of buildings mapped follows each area where it is under half.
+          </p>
+        )}
 
         <h3 className="mt-4 font-semibold text-ink">How it works</h3>
         <ul className="mt-1 list-disc space-y-1 pl-5">

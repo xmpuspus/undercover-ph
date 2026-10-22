@@ -202,6 +202,10 @@ def shared_advisory():
         return {"status": "unavailable", "fetched_at": now(), "reason": f"shared advisory unreadable: {e}"[:300]}
     if REGION and shared.get("source_url") != ADVISORY_URL:  # another region's page
         return advisory()
+    if REGION and shared.get("status") == "ok" and shared.get("text"):
+        # A region near Metro Manila shares its page. Its cities are its own, not the Metro Manila list.
+        provinces = REGION.get("advisory_provinces") or []
+        return {**shared, "cities": region_places(shared["text"], area_cities(), provinces, REGION.get("name", ""))}
     return shared
 
 

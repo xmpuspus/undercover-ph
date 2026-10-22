@@ -5,6 +5,7 @@ The advisory strings copy the formats of the PAGASA pages read on 2026-10-22. Th
 pipeline/raw/regions/pagasa/visprsd.html; its test is skipped when that download is absent.
 """
 import html
+import json
 import re
 import sys
 from pathlib import Path
@@ -99,3 +100,15 @@ def test_saved_visayas_page_keeps_only_the_newest_advisory():
     assert "Thunderstorm Advisory No. 19" not in block
     assert places(block) == []
     assert fetch_weather.region_places(block, ["Bacolod"], ["Negros Occidental"]) == ["Bacolod"]
+
+
+def test_a_region_on_the_shared_metro_manila_page_matches_its_own_cities(tmp_path, monkeypatch):
+    text = "Thunderstorm Advisory No. 1 #NCR_PRSD over Metro Manila, Pampanga (Lubao, and Angeles City)"
+    shared = {"status": "ok", "source_url": fetch_weather.ADVISORY_URL, "fetched_at": "", "issued_at": None,
+              "text": text, "cities": ["Metro Manila"]}
+    f = tmp_path / "advisory.json"
+    f.write_text(json.dumps(shared))
+    monkeypatch.setenv("UCPH_ADVISORY_FROM", str(f))
+    monkeypatch.setattr(fetch_weather, "REGION", {"name": "Angeles", "advisory_provinces": ["Pampanga"]})
+    monkeypatch.setattr(fetch_weather, "area_cities", lambda: ["Angeles"])
+    assert fetch_weather.shared_advisory()["cities"] == ["Angeles"]

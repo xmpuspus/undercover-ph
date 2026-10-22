@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "undercover.ph: shaded and sheltered walking routes for Metro Manila"
+title: "undercover.ph: shaded and sheltered walking routes for Philippine cities"
 message: "If you use undercover.ph in research, please cite it using these metadata."
 type: software
 authors:
@@ -19,9 +19,11 @@ keywords:
   - maplibre
   - makati
   - metro manila
+  - philippines
   - civic technology
 abstract: >
-  undercover.ph finds walking routes in 14 areas of Metro Manila that cut time in
+  undercover.ph finds walking routes in 67 city areas of the Philippines, 14 of them
+  in Metro Manila, that cut time in
   the sun on sunny days and time outside cover when it rains. It is a Philippine
   take on Singapore's Undercover prototype. It casts shadows on each sidewalk edge
   every 30 minutes, from OpenStreetMap and Google Open Buildings heights and a tree

@@ -678,3 +678,31 @@ On 2026-10-22 `pipeline/access_policy.py` stopped treating `barrier=bollard` and
 - Place-pair reach moves by less than a point in most areas. Most of those paths already had another way in.
 - cubao-eastwood and taguig-pateros lost 30 and 10 connector edges, so their shade was rebuilt. The other 12 kept their edge counts.
 
+
+### 53 regional areas ship on 2026-10-22, and three needed their boxes moved first
+
+Each of the 53 areas in `pipeline/regions/areas.json` passed these checks before publish.
+
+- Build checks and three route-check pairs. `pipeline/regions/pick_routes.py` picks the pairs by kind and distance, without reading the graph. Every pair routes.
+- Place-pair reach of 70% or more. The lowest are Dasmarinas at 71.6% and Lapu-Lapu at 81.7%. Most areas reach 85% to 100%.
+- A shade run with `UCPH_START_DATE=2026-10-23`. All 53 wrote `READY.shade`, in 31 s to 91 s each.
+- `pipeline/regions/city_check.py`. At least half of each area's land lies in the cities it names, by the OSM city boundaries. Vigan, Laoag, Pagadian and Surigao have no boundary in OSM, so their city point must lie inside the boxes. All 53 pass.
+- A one-off map check found the busiest 1 km square of shops and services in each city. 52 of 53 areas hold it. Tacloban university belt does not, because Tacloban downtown holds it.
+
+Three areas had boxes in the wrong place.
+
+- Lapu-Lapu sat mostly on Mandaue, and no box held a bridge to Mactan, so reach was 56%. Its three districts moved onto Mactan: poblacion, city hall and airport, and south. Reach rose to 81.7%.
+- Mandaue had 51% of its land in Cebu City. Its districts moved east to centro, north and east. 87% now lies in Mandaue.
+- Dasmarinas missed its busiest square by 588 m: Robinsons Place, two jeepney terminals and National University at Pala-Pala. A fourth district, `dasmarinas-pala-pala`, holds it now.
+
+Four pipeline faults were fixed on the way.
+
+- `fetch_canopy.py` refused two Meta tiles whose pixel sizes differ in the 14th digit. It now compares them with a tolerance.
+- `shade.py` reads `manifest.json` before the template. A rebuilt area kept its old box in shade and canopy. `build.py` now deletes the old shade outputs.
+- `publish.py` reads `trees.json` from the shade run, so it now needs a shade run newer than the graph.
+- The Mandaue pair BR Town Square to Boardwalk Plaza found no path. Boardwalk Plaza sits behind two gates tagged `access=permissive` and a lift gate. The access rule closes every tagged gate until the gated-street decision. The picker took its next pair instead.
+
+Two limits stay open.
+
+- Only buildings with an OSM outline cast shade. `pipeline/tools/footprint_cover.py` measures the share of Google's building area with an outline. Metro Manila areas have 53% to 74%. The regional areas have 12% to 70%, with a median of 42%, and 41 of 53 are under half. Baliwag, Cabanatuan, Iligan and Digos are near 12%. The next step is to fill outlines from Google's presence band in `build_buildings.py`.
+- `trees.pmtiles` is 85.8 MB and `buildings.pmtiles` 52.5 MB. GitHub refuses a file over 100 MB. About 10 more areas of trees fill the gap, so split the tree file by region before the next wave.

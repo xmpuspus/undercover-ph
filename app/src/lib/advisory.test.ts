@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { advisoryCovers, advisoryLine, parseIssued, placeKey, regionPlaces } from "./advisory";
+import type { Advisory, AreaInfo } from "../types";
+import { advisoryCovers, advisoryLine, areaAdvisory, parseIssued, placeKey, regionPlaces } from "./advisory";
 
 const ISSUED = "10:10 PM, 21 October 2026";
 
@@ -88,3 +89,27 @@ describe("regional PAGASA pages", () => {
   });
 });
 
+
+describe("advisory for one area", () => {
+  const text = "Thunderstorm Advisory No. 1 #NCR_PRSD over Metro Manila, Bataan (Dinalupihan and Hermosa), Pampanga (Lubao, and Angeles City)";
+  const page: Advisory = { status: "ok", source_url: "", fetched_at: "", issued_at: "08:50 PM 22 October 2026", text, cities: ["Metro Manila"] };
+  const area = (id: string, region: AreaInfo["region"], cities: string[]): AreaInfo => ({
+    id, name: id, region, cities, bbox: [0, 0, 1, 1], graph_bbox: [0, 0, 1, 1], graph_rects: [[0, 0, 1, 1]], neighbourhoods: [], center: [0, 0],
+  });
+  const makati = area("metro-core", { id: "ncr", name: "Metro Manila", prsd: "ncrprsd", provinces: [] }, ["Makati"]);
+  const angeles = area("angeles-centre", { id: "angeles", name: "Angeles", prsd: "ncrprsd", provinces: ["Pampanga"] }, ["Angeles"]);
+  const malolos = area("malolos-centre", { id: "malolos", name: "Malolos", prsd: "ncrprsd", provinces: ["Bulacan"] }, ["Malolos"]);
+
+  it("keeps the page's cities for a Metro Manila area", () => {
+    expect(areaAdvisory(page, makati)).toEqual(page);
+  });
+  it("matches a regional area on the shared Metro Manila page by its own cities", () => {
+    expect((areaAdvisory(page, angeles) as { cities: string[] }).cities).toEqual(["Angeles"]);
+    expect((areaAdvisory(page, malolos) as { cities: string[] }).cities).toEqual([]);
+  });
+  it("passes an unavailable page through", () => {
+    const off: Advisory = { status: "unavailable", fetched_at: "" } as Advisory;
+    expect(areaAdvisory(off, angeles)).toBe(off);
+    expect(areaAdvisory(null, angeles)).toBeNull();
+  });
+});

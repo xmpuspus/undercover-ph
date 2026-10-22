@@ -24,17 +24,24 @@ const TRIPS: [string, string, string][] = [
 ];
 
 // One trip per area outside Metro Manila: the first route-check pair whose two names appear once in the whole
-// place list, so the search box cannot pick a same-named place in another area.
+// place list, so the search box cannot pick a same-named place in another area. The list comes from this
+// checkout, so run the test against a deploy of the same commit.
 const read = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8"));
 const areas: { id: string; region?: { id: string } }[] = read("../public/data/areas.json").areas;
 const index: { name: string }[] = read("../public/data/places_index.json");
 const pairs: Record<string, [string, string][]> = read("../../pipeline/districts/routes.json");
 const seen = new Map<string, number>();
-for (const p of index) seen.set(p.name.toLowerCase(), (seen.get(p.name.toLowerCase()) ?? 0) + 1);
+const spelling = new Map<string, string>();
+for (const p of index) {
+  seen.set(p.name.toLowerCase(), (seen.get(p.name.toLowerCase()) ?? 0) + 1);
+  spelling.set(p.name.toLowerCase(), p.name);
+}
 const once = (n: string) => seen.get(n.toLowerCase()) === 1;
+// The search option matches the exact text, so the trip uses the place list's spelling.
+const named = (n: string) => spelling.get(n.toLowerCase()) ?? n;
 for (const a of areas.filter((x) => x.region && x.region.id !== "ncr")) {
   const pair = (pairs[a.id] ?? []).find(([x, y]) => once(x) && once(y));
-  if (pair) TRIPS.push([a.id, pair[0], pair[1]]);
+  if (pair) TRIPS.push([a.id, named(pair[0]), named(pair[1])]);
   else TRIPS.push([a.id, "(no pair with unique names)", ""]);
 }
 
