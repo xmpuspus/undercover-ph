@@ -12,8 +12,8 @@ Real recording of the same walk with ground shadows on, where the play button st
 
 ## steps-phone.gif
 
-Real recording on a phone screen: the route card at 88% shaded and 22 min, then Show all steps with 12 steps that name the sidewalk side (northeast, southeast, southwest), landmarks such as One Ayala, Glorietta 5 and Rustan's, and flags for a crossing, an underpass with stairs and a passage through a building, then Navigate with the first turn, head north on the northeast side of Courtyard Drive past One Ayala, step 1 of 12.
+Real recording on a phone screen: the short route card at the bottom with 88% shaded, 22 min, 2.7 min less sun than the shortest walk and 2 warnings (stairs, through a building), with most of the screen left to the map. Then Steps with 12 steps that name the sidewalk side and the walker's own side, for example "Head north on the northeast side (on your right) of Courtyard Drive", with landmarks such as Rustan's and Greenbelt 5 and flags for a crossing, an underpass with stairs and a passage through a building. Then Navigate with that first turn, step 1 of 12, and an End button.
 
 ## rain.gif
 
-Real recording of the 3 PM walk from Ayala MRT Station to Greenbelt switching from Stay cool, 88% shaded, to Stay dry, where the router picks a different route that is 25% sheltered, 19 min and 1.2 km, with 14 min without a roof, roof 26% and no roof 74%, against 6% sheltered for the shortest route.
+Real recording of the 3 PM walk from Ayala MRT Station to Greenbelt switching from Shaded, 88% shaded, to Sheltered, where the router picks a different route that is 25% sheltered, 19 min and 1.2 km, with 14 min without a roof, roof 26% and no roof 74%, against 6% sheltered for the shortest route.

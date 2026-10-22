@@ -50,7 +50,7 @@ const PHONE = { width: 390, height: 844, mobile: true };
 
 const CLIPS = [
   { name: "hero", vp: DESKTOP, width: 900, maxMB: 5, flow: hero },
-  { name: "sun-direction", vp: DESKTOP, width: 900, maxMB: 5, flow: sunDirection },
+  { name: "sun-direction", vp: DESKTOP, width: 900, maxMB: 6.5, flow: sunDirection },
   { name: "steps-phone", vp: PHONE, width: 360, maxMB: 3, flow: stepsPhone },
   { name: "rain", vp: DESKTOP, width: 900, maxMB: 4, flow: rain },
 ];

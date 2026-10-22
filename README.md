@@ -9,7 +9,7 @@
 
 [![A walk from Ayala MRT Station to Greenbelt on undercover.ph: the landing card, the Shaded choice, the destination and start search, tomorrow at 3 PM, three routes on the 3D map with their shaded share, and the route card with minutes in sun and the roof, building, and tree split](docs/demo/hero.gif)](https://undercover.ph)
 
-<sub>Real recording of the app (via `app/scripts/demo-record.mjs`). Ayala MRT Station to Greenbelt, leaving at 3 PM: the recommended walk is 1,406 m, 87% covered, with 2.6 minutes in sun. The shortest walk is 1,230 m, 71% covered, with 5.3 minutes in sun.</sub>
+<sub>Real recording of the app (via `app/scripts/demo-record.mjs`). Ayala MRT Station to Greenbelt, leaving at 3 PM: the recommended walk is 1,406 m, 88% shaded, with 2.6 minutes in sun. The shortest walk is 1,230 m, 71% shaded, with 5.3 minutes in sun.</sub>
 
 Try it at **[undercover.ph](https://undercover.ph)**: pick Shaded or Sheltered, choose where you start and where you go, and pick the half hour you leave.
 
@@ -39,7 +39,7 @@ Like Singapore's version, the app returns three walks: the shortest, the most co
 
 <table>
 <tr>
-<td width="40%"><a href="https://undercover.ph"><img src="docs/demo/steps-phone.gif" alt="undercover.ph on a phone: the route card, the step list with sidewalk-side badges, landmarks, and stairs flags, then the Navigate view with a turn card"></a></td>
+<td width="40%"><a href="https://undercover.ph"><img src="docs/demo/steps-phone.gif" alt="undercover.ph on a phone: the short route card under a large map, the step list with sidewalk-side badges, landmarks, and stairs flags, then the Navigate view with a turn card"></a></td>
 <td width="60%"><a href="https://undercover.ph"><img src="docs/demo/rain.gif" alt="undercover.ph in rain mode: the walk changes to use covered walkways and an underpass, and the card switches to the sheltered share"></a></td>
 </tr>
 <tr>
