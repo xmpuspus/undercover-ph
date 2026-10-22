@@ -1,4 +1,3 @@
-import { AREA_LABELS } from "../config";
 import { NCR, regionOf } from "../lib/areas";
 import type { AreaInfo, Mode } from "../types";
 import { phaseLabel, rgba, type SkyTheme } from "../lib/skyTheme";
@@ -21,8 +20,9 @@ interface Props {
 }
 
 export default function Landing({ areas, onPick, onIntent, status, error, theme, minute, picking }: Props) {
-  const ncr = areas ? areas.filter((a) => regionOf(a) === NCR).length : AREA_LABELS.length;
-  const others = areas ? areas.length - ncr : 0;
+  // The area list loads on the first touch. Until then the counts come from the build.
+  const ncr = areas ? areas.filter((a) => regionOf(a) === NCR).length : __AREA_COUNTS__.ncr;
+  const others = areas ? areas.length - ncr : __AREA_COUNTS__.other;
   return (
     <div className="pointer-events-none absolute inset-0 grid place-items-center p-4">
       <section
