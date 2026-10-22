@@ -210,7 +210,19 @@ function TimeChipRow(p: Props) {
         </button>
       </div>
       {menu === "date" && (
-        <div className="absolute left-0 top-12 z-40 w-56 rounded-card border border-slate-200 bg-white p-1 shadow-card max-h-[calc(100dvh-9rem)] overflow-y-auto" role="listbox" aria-label="Date">
+        <div
+          className="absolute left-0 top-12 z-40 w-56 rounded-card border border-slate-200 bg-white p-1 shadow-card max-h-[calc(100dvh-9rem)] overflow-y-auto"
+          role="listbox"
+          aria-label="Date"
+          // Up and down arrows move between dates, as in the ARIA listbox pattern.
+          onKeyDown={(e) => {
+            if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+            e.preventDefault();
+            const opts = [...e.currentTarget.querySelectorAll<HTMLElement>('[role="option"]')];
+            const at = opts.indexOf(document.activeElement as HTMLElement);
+            opts[Math.min(opts.length - 1, Math.max(0, at + (e.key === "ArrowDown" ? 1 : -1)))]?.focus();
+          }}
+        >
           {p.dates.map((d) => (
             <button
               key={d.date}

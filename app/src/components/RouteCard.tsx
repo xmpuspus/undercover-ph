@@ -341,13 +341,28 @@ export function RouteCard(p: CardProps) {
   return (
     <div className="rounded-card bg-white shadow-card" data-testid="route-card">
       {p.display.length > 1 && (
-        <div className="flex gap-1 overflow-x-auto border-b border-slate-100 p-2" role="tablist" aria-label="Routes">
+        <div
+          className="flex gap-1 overflow-x-auto border-b border-slate-100 p-2"
+          role="tablist"
+          aria-label="Routes"
+          // Arrow keys move between route tabs, as in the ARIA tabs pattern. Only the selected tab is a Tab stop.
+          onKeyDown={(e) => {
+            const n = p.display.length;
+            const next = e.key === "ArrowRight" ? (p.selected + 1) % n : e.key === "ArrowLeft" ? (p.selected - 1 + n) % n : null;
+            if (next === null) return;
+            e.preventDefault();
+            p.onSelect(next);
+            const tabs = e.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]');
+            tabs[next]?.focus();
+          }}
+        >
           {p.display.map((x, i) => (
             <button
               key={x.key}
               type="button"
               role="tab"
               aria-selected={i === p.selected}
+              tabIndex={i === p.selected ? 0 : -1}
               onClick={() => p.onSelect(i)}
               className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[12.5px] ${
                 i === p.selected ? "border-slate-200 bg-white font-medium text-ink shadow-sm" : "border-transparent text-slate-500 hover:text-ink"
