@@ -2,9 +2,10 @@
 
 Date: 2026-10-22. Owner: the project. The pipeline in `pipeline/` writes every file below to `app/public/data/`. The app in `app/` reads them and nothing else.
 
-## Six routing areas share one time zone and one date rule
+## Thirteen routing areas share one time zone and one date rule
 
-- `areas.json` lists six routing areas: metro-core, pasay-moa, cubao-eastwood, qc-north, manila and alabang. metro-core contains Makati CBD.
+- `areas.json` lists 13 routing areas: metro-core, pasay-moa, cubao-eastwood, qc-north, manila, alabang, north-coast, marikina, paranaque-airport, paranaque-bf-aguirre, taguig-pateros, qc-commonwealth-fairview and qc-banawe. metro-core contains Makati CBD.
+- `pipeline/areas.json` also lists las-pinas. It stays out of the app until its route checks pass.
 - A route runs inside one area. Each area joins one or more districts, and each district stays a named neighbourhood.
 - An area's `bbox` is the envelope of its district boxes. Its graph area is the union of its `graph_rects`: each district box plus 500 m.
 - The building area is each graph box plus 800 m, so long low-sun shadows reach the edges.
@@ -42,10 +43,10 @@ Committed in git, built by `pipeline/districts/publish.py` from the staged areas
 
 ```text
 app/public/data/
-  areas.json             the six areas
-  places_index.json      every place of every area, for search
-  buildings.pmtiles      buildings of all six areas, one file
-  trees.pmtiles          tree crowns of all six areas, one file
+  areas.json             the 13 areas
+  places_index.json      every place once, for search
+  buildings.pmtiles      buildings of all areas, one file
+  trees.pmtiles          tree crowns of all areas, one file
   areas/<id>/graph.json
   areas/<id>/places.json
   areas/<id>/hours.json
@@ -94,10 +95,13 @@ All JSON files that git keeps are compact, with no spaces or line breaks.
   "node_id": 0, "area": "metro-core", "aliases": ["Ayala MRT"], "detail": "..."}]
 ```
 
-- One row for every place in every area's `places.json`, with the same fields plus `area`.
+- One row for each real place, with the fields of `places.json` plus `area`. 16,010 rows.
 - `node_id` is a node in that area's `graph.json`. It means nothing in another area's graph.
 - `aliases` and `detail` appear only when the place has them.
-- 73 places sit in both metro-core and cubao-eastwood, where the two areas overlap near Greenhills and Cubao. Each copy keeps its own area and node.
+- Areas overlap, for example taguig-pateros and metro-core, or paranaque-airport and pasay-moa. A place can be in both areas' `places.json`.
+- The index counts a place as the same when the name matches and the two points lie within 150 m, the radius that `build_places.py` merges a name within.
+- It keeps the copy whose point lies farthest inside its own area's `graph_rects`, so the route has the most graph around it. That drops 954 copies.
+- Each area's `places.json` keeps all its places, because the router needs them.
 
 ### `manifest.json`
 
@@ -190,19 +194,19 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 ### `buildings.pmtiles` (app) and `pipeline/inputs/areas/<id>/buildings.geojson.gz` (pipeline)
 
 - `buildings.geojson.gz` holds every building of one area out to the shade margin, for the shade engine. It stays in the pipeline.
-- `buildings.pmtiles` is one file for all six areas. Its source layer is `buildings`.
+- `buildings.pmtiles` is one file for all 13 areas. Its source layer is `buildings`.
 - Each feature is a polygon with two numbers: `height_m` and `min_height_m`. Each `building:part` is its own feature.
-- It holds every building within 150 m of a walk area that has a height: 272,948 buildings, 11.1 MB.
-- Where two areas overlap, one copy stays: same heights and a centre within 1 m. That removed 5,218 copies.
+- It holds every building within 150 m of a walk area that has a height: 637,936 buildings, 24.4 MB.
+- Where two areas overlap, one copy stays: same heights and a centre within 1 m. That removed 55,927 copies.
 - Zooms 13 to 15. Zoom 15 keeps every footprint, unsimplified, on a grid of about 0.15 m. The app overzooms past 15.
 - Zooms 13 and 14 thin out small footprints, with tippecanoe's defaults, to keep tiles light.
-- A check build drew 148,817 buildings at zoom 13 and 272,745 at zoom 14. Draw shadows from zoom 15 data when the count matters.
+- A check build drew 212,830 buildings at zoom 13 and 637,731 at zoom 14. Draw shadows from zoom 15 data when the count matters.
 
 ### `trees.pmtiles`
 
-- One file for all six areas, 8.1 MB. Its source layer is `trees`.
+- One file for all 13 areas, 17.9 MB. Its source layer is `trees`.
 - Each feature is a point at a crown centre, with three numbers: `r_m` (crown radius), `top_m` (crown top) and `base_m` (crown base), in metres.
-- It holds 589,760 crowns of 3 m or taller, within 200 m of a walk area. Copies from overlapping areas are removed, 1,955 of them.
+- It holds 1,325,409 crowns of 3 m or taller, within 200 m of a walk area. Copies from overlapping areas are removed, 8,889 of them.
 - Zooms 14 and 15. Both zooms keep every crown, so tree shadows look the same at either zoom.
 - The crowns equal each area's deploy-time `trees.json`, which `manifest.trees` describes.
 

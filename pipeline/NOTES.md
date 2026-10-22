@@ -377,7 +377,9 @@ pipeline/.venv/bin/python -I pipeline/districts/publish.py                     #
 - `build.py` accepts only ids from `pipeline/areas.json` and `pipeline/districts.json`. It stops on any other id before it builds a path.
 - `build_places.py` carries the search fixes of the root script: named `landuse=commercial` sites, named `building:part` towers such as RCBC Plaza, One Ayala as a mall, `detail` for repeated names, and compact JSON.
 - `route_check.py` follows the browser router's side-switch rule. A walker changes to the other side of a road only at a node with flag 1 or 2. A junction (flag 4) costs 60 m x (1 + k). Anywhere else the change is forbidden.
+- Like the browser, it never turns back along the edge just walked. Such a U-turn would dodge the side-switch rule.
 - `publish.py` needs tippecanoe and tile-join. It writes no file outside `app/public/data/`, `pipeline/inputs/areas/` and `pipeline/work/tiles/`.
+- `publish.py` stops on an area whose last checks failed. `--hold <id>` leaves that area out of the app.
 - An area's graph area is the union of its member graph boxes, not their envelope. `in_bbox()` tests the union.
 - `build_hours.py`, `build_manifest.py` and `build_display.py` are new versions for areas.
 - `hours_sources.json` lists cited web hours. `routes.json` lists the route checks. `indoor_report.py` lists indoor edges by footprint.
@@ -482,57 +484,129 @@ The checks follow the browser's side-switch rule since 2026-10-22. Seven of the 
 - Cubao LRT to Gateway Mall 1 runs 12 times the straight line. The Gateway corridor also touches an entrance node, which stays blocked.
 - Pasig Center has no rail station in OSM, so its check starts at a UV Express terminal.
 
-### Phase B moved the six areas into the app on 2026-10-22
+The browser router agrees with these checks. A copy of `app/src/lib/router` ran under Node on every staged area at 12:00.
+All 43 pairs in the 14 staged areas gave the same shortest length within 1.5 m, or no route in both.
 
-`publish.py` reads `pipeline/areas.json` and the staged areas, and writes these files to git:
+### Eight more Metro Manila areas were staged on 2026-10-22, and seven pass
+
+| Area | Districts | Graph area km2 | Edges | Routable km | Largest piece, nodes / km | Places (dropped) | Checks |
+| --- | --- | ---: | ---: | ---: | --- | --- | --- |
+| north-coast | caloocan-monumento, malabon-navotas-center, navotas-fishport, valenzuela-center, valenzuela-malinta | 41.2 | 15,449 | 825.1 | 61.8% / 68.2% | 1,462 (36) | pass |
+| marikina | marikina-center, marikina-riverbanks | 16.1 | 7,022 | 376.6 | 78.4% / 89.7% | 813 (58) | pass |
+| paranaque-airport | paranaque-aseana-pitx, paranaque-naia | 19.4 | 6,223 | 300.7 | 78.2% / 80.4% | 515 (45) | pass |
+| las-pinas | las-pinas-center | 13.6 | 4,301 | 243.8 | 54.1% / 55.6% | 510 (46) | fail |
+| paranaque-bf-aguirre | paranaque-bf-aguirre | 13.1 | 3,207 | 200.0 | 38.5% / 40.6% | 341 (41) | pass |
+| taguig-pateros | taguig-mckinley-hill, taguig-center, arca-south, pateros-center | 32.0 | 14,281 | 708.9 | 83.5% / 85.4% | 1,308 (70) | pass |
+| qc-commonwealth-fairview | qc-commonwealth, qc-fairview, qc-sm-fairview | 32.0 | 9,331 | 474.2 | 86.9% / 89.8% | 955 (164) | pass |
+| qc-banawe | qc-banawe | 12.3 | 5,204 | 377.5 | 89.1% / 95.3% | 556 (22) | pass |
+
+| Area | From | To | Shortest | Straight line | Ratio | Sheltered | Sheltered-first, k = 8 | k = 8, malls closed |
+| --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
+| north-coast | Yamaha Monumento LRT Station | Malabon Town Center | 3,169 m | 2,377 m | 1.33 | 0 m | 3,169 m, 0 m sheltered | 3,169 m, 0 m sheltered |
+| north-coast | Navotas City Hall | Navotas Fishport Complex | 2,150 m | 1,796 m | 1.2 | 0 m | 2,150 m, 0 m sheltered | 2,150 m, 0 m sheltered |
+| north-coast | Valenzuela City Medical Center | Valenzuela Town Center | 5,352 m | 930 m | 5.75 | 0 m | 5,352 m, 0 m sheltered | 5,352 m, 0 m sheltered |
+| north-coast | Caloocan PNR Station | Yamaha Monumento LRT Station | 2,061 m | 1,184 m | 1.74 | 0 m | 2,061 m, 0 m sheltered | 2,061 m, 0 m sheltered |
+| marikina | Santolan LRT Station | Riverbanks Center | 1,966 m | 1,092 m | 1.8 | 62 m | 1,966 m, 62 m sheltered | 1,966 m, 62 m sheltered |
+| marikina | Riverbanks Center | Marikina City Hall | 2,432 m | 1,846 m | 1.32 | 0 m | 2,432 m, 0 m sheltered | 2,432 m, 0 m sheltered |
+| marikina | Marikina-Pasig LRT Station | Marikina City Hall | 1,764 m | 1,415 m | 1.25 | 0 m | 1,764 m, 0 m sheltered | 1,764 m, 0 m sheltered |
+| paranaque-airport | PITX LRT Station | Ayala Malls Manila Bay | 2,324 m | 1,714 m | 1.36 | 0 m | 2,324 m, 0 m sheltered | 2,324 m, 0 m sheltered |
+| paranaque-airport | MIA Road LRT Station | Aseana Powerstation | 1,806 m | 1,338 m | 1.35 | 0 m | 1,807 m, 66 m sheltered | 1,807 m, 66 m sheltered |
+| paranaque-airport | Nichols PNR Station | Newport Mall | 1,319 m | 859 m | 1.53 | 0 m | 1,319 m, 0 m sheltered | 1,319 m, 0 m sheltered |
+| las-pinas | Robinsons Place Las Piñas | SM Center Las Piñas | no route | | | | no route | no route |
+| las-pinas | Robinsons Place Las Piñas | Las Piñas City Hall | no route | | | | no route | no route |
+| las-pinas | Vista Mall Las Piñas | Las Piñas Doctors Hospital | no route | | | | no route | no route |
+| paranaque-bf-aguirre | SM City BF Parañaque | Aguirre Central Park | 1,759 m | 1,502 m | 1.17 | 0 m | 1,759 m, 0 m sheltered | 1,759 m, 0 m sheltered |
+| paranaque-bf-aguirre | SM City BF Parañaque | Vista Mall Lakefront | 2,012 m | 1,360 m | 1.48 | 0 m | 2,012 m, 0 m sheltered | 2,012 m, 0 m sheltered |
+| paranaque-bf-aguirre | Aguirre Central Park | W.Mall | 4,074 m | 1,872 m | 2.18 | 0 m | 4,074 m, 0 m sheltered | 4,074 m, 0 m sheltered |
+| taguig-pateros | Venice Grand Canal Mall | New Taguig City Hall | 2,451 m | 994 m | 2.47 | 0 m | 2,451 m, 0 m sheltered | 2,451 m, 0 m sheltered |
+| taguig-pateros | Ayala Malls Arca South | Taguig-Pateros District Hospital | 1,450 m | 1,321 m | 1.1 | 0 m | 1,450 m, 0 m sheltered | 1,450 m, 0 m sheltered |
+| taguig-pateros | Pateros Municipal Hall | Taguig City Hall | 1,930 m | 1,574 m | 1.23 | 0 m | 1,930 m, 0 m sheltered | 1,930 m, 0 m sheltered |
+| qc-commonwealth-fairview | Batasan MRT Station | Ever Gotesco Commonwealth | 936 m | 773 m | 1.21 | 0 m | 936 m, 0 m sheltered | 936 m, 0 m sheltered |
+| qc-commonwealth-fairview | Regalado Avenue MRT Station | Fairview Center Mall | 227 m | 125 m | 1.82 | 0 m | 227 m, 0 m sheltered | 227 m, 0 m sheltered |
+| qc-commonwealth-fairview | Regalado Avenue MRT Station | SM City Fairview | 3,702 m | 3,171 m | 1.17 | 0 m | 3,702 m, 0 m sheltered | 3,702 m, 0 m sheltered |
+| qc-banawe | Fe Del Mundo Medical Center | St. Luke's Medical Center | 2,219 m | 1,528 m | 1.45 | 0 m | 2,219 m, 0 m sheltered | 2,219 m, 0 m sheltered |
+| qc-banawe | Z Square | Fisher Mall Quezon Avenue | 2,454 m | 2,103 m | 1.17 | 0 m | 2,454 m, 0 m sheltered | 2,454 m, 0 m sheltered |
+| qc-banawe | Fisher Mall Quezon Avenue | Capitol Medical Center | 694 m | 366 m | 1.89 | 0 m | 694 m, 0 m sheltered | 694 m, 0 m sheltered |
+
+- Las Piñas fails every check. Only 56 of its 3,134 nodes have a mapped crossing or signals, against 4,001 of 19,404 in metro-core.
+- So the side-switch rule splits the walk network: from Robinsons Place a walker reaches 972 of the 1,627 nodes the old check reached.
+- The browser router also finds no route for these pairs. It says a route exists only on paths with unchecked access.
+- The old check found 1,937 m to 3,188 m, because it ignored the side-switch rule. `publish.py --hold las-pinas` keeps the area out of the app.
+- Valenzuela City Medical Center to Valenzuela Town Center runs 5.75 times the straight line, 5,352 m for 930 m. The old check gave 1,753 m through mid-block side changes.
+- paranaque-bf-aguirre and north-coast pass, but their largest routable piece holds only 38.5% and 61.8% of routable nodes. Many places there may have no route.
+- The NCR builder staged these areas with the old places and route-check scripts. This build reran places, checks, display and manifest for all eight.
+
+### Phase B moved 13 areas into the app on 2026-10-22
+
+`publish.py --hold las-pinas` reads `pipeline/areas.json` and the staged areas, and writes these files to git:
 
 - `app/public/data/areas.json`: id, name, cities, `bbox`, `graph_bbox`, `graph_rects`, neighbourhoods and `center` for each area.
-- `app/public/data/places_index.json`: all 11,014 places, each with its area id and its node in that area. 1.42 MB, 0.27 MB as gzip.
+- `app/public/data/places_index.json`: 16,010 places, each once, with its area id and its node in that area. 2.10 MB, 0.39 MB as gzip.
 - `app/public/data/areas/<id>/graph.json`, `places.json` and `hours.json`, compact.
-- `pipeline/inputs/areas/<id>/manifest_template.json` and `buildings.geojson.gz`, beside the `canopy.tif` that was already there.
-- `app/public/data/buildings.pmtiles`: 272,948 buildings, layer `buildings`, zooms 13 to 15, 11.1 MB.
-- `app/public/data/trees.pmtiles`: 589,760 crowns, layer `trees`, zooms 14 and 15, 8.1 MB.
+- `pipeline/inputs/areas/<id>/manifest_template.json` and `buildings.geojson.gz`, beside the area's `canopy.tif`.
+- `app/public/data/buildings.pmtiles`: 637,936 buildings, layer `buildings`, zooms 13 to 15, 24.4 MB.
+- `app/public/data/trees.pmtiles`: 1,325,409 crowns, layer `trees`, zooms 14 and 15, 17.9 MB.
 
-- Zoom 15 keeps every building. An indexed check build found all 272,948 there.
-- The default tile grid (detail 12, about 0.29 m) lost 14 pillar parts under 0.1 m2 in Manila. Detail 13 keeps them and adds 0.59 MB.
-- Zooms 13 and 14 thin small footprints, with tippecanoe's defaults. The check build drew 148,817 at zoom 13 and 272,745 at zoom 14.
-- Trees use drop rate 1, so both zooms keep every crown. The largest tree tile is 271 KB at zoom 14 and 97 KB at zoom 15.
-- Areas overlap near Greenhills and Cubao. The tiles keep one copy of a building or crown with the same heights and a centre within 1 m.
-- That removed 5,218 building copies and 1,955 crown copies. 73 places sit in both metro-core and cubao-eastwood, and the index keeps both.
+- Zoom 15 keeps every building. An indexed check build found all 637,936 there.
+- The default tile grid (detail 12, about 0.29 m) lost 14 pillar parts under 0.1 m2 in Manila. Detail 13 keeps them.
+- Zooms 13 and 14 thin small footprints, with tippecanoe's defaults. The check build drew 212,830 at zoom 13 and 637,731 at zoom 14.
+- The largest building tile is 472 KB at zoom 13, 307 KB at zoom 14 and 193 KB at zoom 15.
+- Trees use drop rate 1, so both zooms keep every crown. The largest tree tile is 489 KB at zoom 14 and 227 KB at zoom 15.
+- Where areas overlap, the tiles keep one copy of a building or crown with the same heights and a centre within 1 m.
+- That removed 55,927 building copies and 8,889 crown copies.
+- The index keeps a place once: same name within 150 m, under the area that holds its point deepest inside its `graph_rects`.
+- That dropped 954 copies, most of them where taguig-pateros overlaps metro-core (558) and paranaque-airport overlaps pasay-moa (171).
 - The root Makati files left git: `graph.json`, `places.json`, `hours.json`, `buildings_display.geojson` and `pipeline/inputs/manifest_template.json` and `buildings.geojson`.
 - metro-core covers Makati CBD. `pipeline/inputs/canopy_height_makati.tif` stays, because `test_night_bucket_writes_255` in `shade/test_shade.py` reads it.
-- `pipeline/inputs/areas/makati-cbd/` stays out of git. The makati-cbd stage is only a regression build.
+- `pipeline/inputs/areas/makati-cbd/` and `pipeline/inputs/areas/las-pinas/` stay out of git.
 - The root scripts (`run_all.sh` and `pipeline/build_*.py`) still build the single Makati area into `app/public/data/`. The app no longer reads those files.
 
-| Area | Places (with detail) | canopy.tif | buildings.geojson.gz | manifest_template.json |
-| --- | --- | ---: | ---: | ---: |
-| metro-core | 4,356 (400) | 6.61 MB | 6.82 MB | 8.4 KB |
-| pasay-moa | 578 (56) | 0.82 MB | 0.92 MB | 5.8 KB |
-| cubao-eastwood | 847 (50) | 2.47 MB | 2.41 MB | 7.0 KB |
-| qc-north | 1,501 (98) | 3.30 MB | 3.42 MB | 6.1 KB |
-| manila | 3,250 (218) | 1.74 MB | 3.55 MB | 6.5 KB |
-| alabang | 482 (23) | 1.64 MB | 0.81 MB | 5.8 KB |
+| Area | Places (with detail) | In the index | canopy.tif | buildings.geojson.gz | graph.json |
+| --- | --- | ---: | ---: | ---: | ---: |
+| metro-core | 4,356 (400) | 4,080 | 6.61 MB | 6.82 MB | 8.80 MB |
+| pasay-moa | 578 (56) | 522 | 0.82 MB | 0.92 MB | 1.59 MB |
+| cubao-eastwood | 847 (50) | 808 | 2.47 MB | 2.41 MB | 1.61 MB |
+| qc-north | 1,501 (98) | 1,454 | 3.30 MB | 3.42 MB | 2.77 MB |
+| manila | 3,250 (218) | 3,234 | 1.74 MB | 3.55 MB | 4.65 MB |
+| alabang | 482 (23) | 479 | 1.64 MB | 0.81 MB | 1.50 MB |
+| north-coast | 1,462 (229) | 1,462 | 2.20 MB | 4.59 MB | 4.35 MB |
+| marikina | 813 (86) | 809 | 2.24 MB | 2.95 MB | 1.97 MB |
+| paranaque-airport | 515 (45) | 400 | 1.59 MB | 1.14 MB | 1.76 MB |
+| paranaque-bf-aguirre | 341 (27) | 316 | 1.69 MB | 1.05 MB | 0.91 MB |
+| taguig-pateros | 1,308 (118) | 990 | 3.32 MB | 4.61 MB | 4.07 MB |
+| qc-commonwealth-fairview | 955 (110) | 951 | 6.74 MB | 6.34 MB | 2.64 MB |
+| qc-banawe | 556 (54) | 505 | 1.31 MB | 2.30 MB | 1.45 MB |
 
 RCBC Plaza is in metro-core as an office, and One Ayala as a mall. Buendia PNR Station is gone.
 
-### The deploy build takes under 5 minutes
+### The deploy build for 13 areas takes about 8 minutes
 
 A clean `git archive` copy built in an `amazonlinux:2023` container with 4 CPUs and 8 GB, as on Vercel, but on arm64. Vercel runs x86_64.
 
-| Step | Seconds |
-| --- | ---: |
-| dnf, Node 22, Python 3.12, pnpm | 21 |
-| `pnpm install --frozen-lockfile` | 12 |
-| shade venv from scratch | 52 |
-| metro-core | 90 |
-| pasay-moa | 12 |
-| cubao-eastwood | 21 |
-| qc-north | 29 |
-| manila | 35 |
-| alabang | 14 |
-| app build and 48 gzip copies | 21 |
-| `vercel_build.sh` in total | 276 |
+| Step | Seconds | Of which shade.py |
+| --- | ---: | ---: |
+| dnf, Node 22, Python 3.12, pnpm | 20 | |
+| `pnpm install --frozen-lockfile` | 11 | |
+| shade venv from scratch | 56 | |
+| metro-core | 70 | 59.5 |
+| pasay-moa | 13 | 8.0 |
+| cubao-eastwood | 18 | 13.7 |
+| qc-north | 40 | 27.7 |
+| manila | 34 | 28.8 |
+| alabang | 13 | 9.0 |
+| north-coast | 40 | 33.0 |
+| marikina | 24 | 17.8 |
+| paranaque-airport | 19 | 12.1 |
+| paranaque-bf-aguirre | 13 | 7.1 |
+| taguig-pateros | 40 | 34.7 |
+| qc-commonwealth-fairview | 37 | 30.4 |
+| qc-banawe | 18 | 10.8 |
+| app build and 104 gzip copies | 27 | |
+| `vercel_build.sh` in total | 464 | 292.6 |
 
-- The run used `UCPH_SKIP_TESTS=1`, because the app tests wait on the app side of the area change. Vercel stops a build at 45 minutes.
-- The build cache keeps the venv, so later builds skip the 52 s step.
-- The 48 shade files take 26.9 MB, and their gzip copies 7.4 MB. `app/dist` holds 109 MB.
+- Each area's time also holds `set_dates.py` and one Open-Meteo call. Vercel stops a build at 45 minutes.
+- The run used `UCPH_SKIP_TESTS=1`, because the app tests wait on the app side of the area change.
+- The build cache keeps the venv, so later builds skip the 56 s step.
+- The 104 shade files take 49.0 MB, and their gzip copies 13.6 MB. `app/dist` holds 205 MB.
+- Of that, each area's `trees.json` adds 47 MB that the app does not read, because the map reads `trees.pmtiles`.
+- The six-area run before it took 276 s.
