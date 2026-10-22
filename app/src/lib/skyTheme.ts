@@ -111,12 +111,13 @@ const DUSK: Omit<Key, "alt"> = {
   blend: 0.5,
   light: "#FFD2B8",
   intensity: 0.22,
-  building: "#FDE6DA",
+  building: "#F1E4F4",
   accent: "#F97316",
   tint: "#FFF7ED",
-  wash: "#E8957A",
-  washAlpha: 0.34,
-  tone: "#F9B48C",
+  // A lavender wash keeps the map violet at dusk. The warm key light stays on the buildings.
+  wash: "#A98BD8",
+  washAlpha: 0.32,
+  tone: "#CFA3CF",
   toneAlpha: 0.12,
 };
 
