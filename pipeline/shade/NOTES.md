@@ -59,6 +59,14 @@ Inputs and settings:
 - The resampled canopy over the pilot box matches the source. 18.4% of cells read above 0 m, 6.9% read 5 m or more, and the maximum is 26 m.
 - At 200 random source pixels of 8 m or more, 99% match exactly and all match within 2 m.
 
+## Check on every shade run
+
+- `check_sun_order.py` fails a run when an area's noon shade is not below its 16:00 shade, length-weighted over open walkways.
+- A sun cast for the wrong hour, time zone or direction breaks that order. Roofed edges are left out.
+- The shade workflow runs it before publishing, and `refresh_dates.sh` runs it after each local shade run.
+- On 2026-10-23 it held in all 67 areas on every date. Swapping the real 12:00 and 16:00 planes makes it fail.
+- 08:00 against 12:00 is not checked. A low east sun runs along east-west streets, so 08:00 can be less shady than noon.
+
 ## Sun table
 
 - Sunrise runs from 05:48 to 05:50 and sunset from 17:33 to 17:30 across 21 to 27 October.

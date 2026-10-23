@@ -330,18 +330,20 @@ An earlier run on 2026-10-22 at 00:34 replaced the shade builder's 12 limits. I 
 
 ## Deploy build
 
-Git keeps each area's graph, places and hours, the two PMTiles files, and `pipeline/inputs/areas/<id>/`. The deploy makes the dated files.
+Since 2026-10-23 a GitHub data release keeps each area's graph, places and hours, `places_index.json`, the two PMTiles files, and `pipeline/inputs/areas/<id>/`. `pipeline/data-release.json` names it, with each file's sha256. Git keeps `areas.json`. The deploy makes the dated files.
+
+After a rebuild, run `python3 -I pipeline/data_release.py publish` before any `fetch`, then commit `pipeline/data-release.json`. `fetch` replaces a local file that differs from the release, so a fetch before publish puts the old graphs back.
 
 Since 2026-10-22 a GitHub workflow casts the shade and the deploy downloads it. Vercel stops a build at 45 minutes, and shade for every area no longer fits.
 
-- `.github/workflows/shade.yml` runs at 04:30 Manila. Each area is its own job: `set_dates.py`, then `shade/shade.py`. One release, `shade-YYYY-MM-DD`, holds every area's `manifest.json`, `shade/`, `READY.shade` and `graph.sha256`. The workflow keeps the 3 newest releases and pushes an empty commit to deploy.
+- `.github/workflows/shade.yml` runs at 04:30 Manila. Each area is its own job: `set_dates.py`, then `shade/shade.py`. One release, `shade-YYYY-MM-DD`, holds every area's `manifest.json`, `shade/`, `READY.shade` and `graph.sha256`. The workflow keeps the 7 newest releases and pushes an empty commit to deploy. The deploy looks back 6 days for a release, since GitHub runs scheduled jobs 2 to 3 hours late.
 - `daily-rebuild.yml` at 05:40 still pushes an empty commit if main has none from today, for a morning when the shade workflow failed.
 
 The deploy build:
 
 1. `pipeline/vercel_build.sh` runs from `app/`.
 2. It reads the area ids from `app/public/data/areas.json`, and stops if that file is missing.
-3. On Vercel it downloads the newest shade release from today or the two days before. `pipeline/stale_shade.py` lists each area whose `graph.json` hash differs from the release's `graph.sha256`. Only those areas get a venv and a shade run here. With no release, every area does. Off Vercel, every area is shaded here unless `UCPH_SHADE_SOURCE=release`.
+3. It downloads the map tiles, every area's graph, places and hours, and the search index from the data release. On Vercel it then downloads the newest shade release from today or the six days before. `pipeline/stale_shade.py` lists each area whose `graph.json` hash differs from the release's `graph.sha256`. Only those areas get a venv and a shade run here. With no release, every area does. Off Vercel, every area is shaded here unless `UCPH_SHADE_SOURCE=release`.
 4. It fetches the PAGASA advisory once, into `app/public/data/advisory.json`.
 5. For each area it shaded here, it runs `pipeline/refresh_dates.sh` with today's date in Asia/Manila. The data folder is `app/public/data/areas/<id>/` and the inputs folder is `pipeline/inputs/areas/<id>/`. For the other areas it runs only `fetch_weather.py`.
 6. `set_dates.py` copies `manifest_template.json` to `manifest.json`, sets `dates` and `generated_at`, and writes `READY.graph`.

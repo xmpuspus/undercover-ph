@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 5180;
+// Parallel task worktrees each set their own UCPH_E2E_PORT, so no run reuses another worktree's server.
+const PORT = Number(process.env.UCPH_E2E_PORT ?? 5180);
 
 export default defineConfig({
   testDir: "./e2e",

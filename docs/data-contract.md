@@ -42,22 +42,26 @@ The app builds its default adjacency only from edges with `routable == true` tha
 
 ## Files
 
-### Git keeps the slow-changing files, and every deploy builds the dated ones
+### A data release keeps the slow-changing files, and every deploy builds the dated ones
 
-These files are committed in git and built by `pipeline/districts/publish.py` from the staged areas.
+`pipeline/districts/publish.py` builds these files from the staged areas. Git keeps only `areas.json`.
+Since 2026-10-23 the others are assets of a GitHub release that `pipeline/data-release.json` names, with each
+file's sha256. `pipeline/data_release.py publish` uploads them after a rebuild, and `fetch` downloads and checks
+them. Each rebuild added about 21 MB to git before this. The area inputs in `pipeline/inputs/areas/` travel the
+same way.
 
 ```text
 app/public/data/
-  areas.json             the 67 areas, each regional one with its region
+  areas.json             the 67 areas, each regional one with its region (in git)
   places_index.json      every place once, for search
   buildings.pmtiles      buildings of all areas, one file
   trees.pmtiles          tree crowns of all areas, one file
-  areas/<id>/graph.json
-  areas/<id>/places.json
-  areas/<id>/hours.json
+  areas/<id>/graph.json  \
+  areas/<id>/places.json  > one asset per area, area-<id>.tar.gz
+  areas/<id>/hours.json  /
 ```
 
-The deploy builds these files, and git ignores them. Since 2026-10-22 the shade comes from a GitHub release that `.github/workflows/shade.yml` builds each morning at 04:30 Manila. `pipeline/vercel_build.sh` downloads it, shades only an area whose `graph.json` hash differs from the release's `graph.sha256`, and fetches the weather. With no release from the last three days, it shades every area itself.
+The deploy builds these files, and git ignores them. Since 2026-10-22 the shade comes from a GitHub release that `.github/workflows/shade.yml` builds each morning at 04:30 Manila. `pipeline/vercel_build.sh` downloads it, shades only an area whose `graph.json` hash differs from the release's `graph.sha256`, and fetches the weather. With no release from today or the six days before, it shades every area itself.
 
 ```text
 app/public/data/
@@ -72,7 +76,7 @@ app/public/data/
 ```
 
 After the app build, the script writes a gzip copy beside each `.bin` in `app/dist/data/areas/`.
-All JSON files that git keeps are compact, with no spaces or line breaks.
+All JSON files that publish.py writes are compact, with no spaces or line breaks.
 
 ### `areas.json`
 

@@ -59,7 +59,7 @@ jobs:
         run: python -m pip install -r pipeline/shade/requirements.txt
       - name: Shade tests
         working-directory: pipeline/shade
-        run: python -m pytest test_shade.py -q
+        run: python -m pytest test_shade.py test_check_sun_order.py -q
       - name: Data release script tests
         run: python -m pytest pipeline/test_data_release.py -q
 

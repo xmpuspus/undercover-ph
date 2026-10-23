@@ -69,4 +69,8 @@ app/public/data/**/graph.sha256
 
 # Large data files live in the GitHub data release named in pipeline/data-release.json (2026-10-23)
 app/public/data/*.pmtiles
+app/public/data/places_index.json
+app/public/data/areas/*/graph.json
+app/public/data/areas/*/places.json
+app/public/data/areas/*/hours.json
 pipeline/inputs/areas/

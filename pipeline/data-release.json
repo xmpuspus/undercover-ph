@@ -1,276 +1,548 @@
 {
  "assets": {
+  "area-alabang.tar.gz": {
+   "bytes": 277839,
+   "sha256": "c5e5c0f6ab8fabaaa4e029a73377471ca3fb390b38b87b1c39d83849a44e4777"
+  },
+  "area-angeles-centre.tar.gz": {
+   "bytes": 402469,
+   "sha256": "965bb87877907ee8d33ed7aae4295739ee2a2136f1c1ae2522d8431b93ff8e6d"
+  },
+  "area-antipolo.tar.gz": {
+   "bytes": 253606,
+   "sha256": "5766181e303caebfe323111c952cce55980ac0069c83a1c3a1f3250745c92913"
+  },
+  "area-bacolod.tar.gz": {
+   "bytes": 290233,
+   "sha256": "0187478d78c95b307a2306e65cce5b20a43969534a809345aa4d7cff2340e586"
+  },
+  "area-baguio-centre.tar.gz": {
+   "bytes": 678812,
+   "sha256": "95355d8a28019e8d5d1a92aac25101d21e8be32c2ffd5dd41d9ae6a1f5ab4dc9"
+  },
+  "area-balanga-centre.tar.gz": {
+   "bytes": 178707,
+   "sha256": "3ecca62df10a2469a3f0e72bd68b79250866ecaa63f8b4ee4b302867232faddb"
+  },
+  "area-baliwag-centre.tar.gz": {
+   "bytes": 175742,
+   "sha256": "019c06682c0243f9872e148f4c18f5524cd13c88ec65df593ccbd8fca4876bda"
+  },
+  "area-batangas-city.tar.gz": {
+   "bytes": 245154,
+   "sha256": "0c94c4669bc622e4e9dfef209ecb39e96f46dd130f05c20e03f07884801c92bf"
+  },
+  "area-butuan-centre.tar.gz": {
+   "bytes": 176282,
+   "sha256": "d7f5b8fb132b0efe8c4a2258126c131dedd161f9a9562354927682d4ff2d6323"
+  },
+  "area-cabanatuan-centre.tar.gz": {
+   "bytes": 208374,
+   "sha256": "2c50e4fae92dc0d56f7842cedb26c56ed300b2aeaba5dc8794399fd3908f692e"
+  },
+  "area-cagayan-de-oro-centre.tar.gz": {
+   "bytes": 319523,
+   "sha256": "6b36e5ef5521d7f9483303773d3b489151803fa4312713a959c2bc8e73266470"
+  },
+  "area-calamba.tar.gz": {
+   "bytes": 170865,
+   "sha256": "a12f0e038ce018f3460e9a4dc777ce59f033f72fe15da00dd7379bb7a2278fdc"
+  },
+  "area-calapan.tar.gz": {
+   "bytes": 77613,
+   "sha256": "ac7768d4fea7b3d2f327e078cb9fcef55fbd8b4f0b2c225c59357c6796f0dd9e"
+  },
+  "area-cebu-city-centre.tar.gz": {
+   "bytes": 731759,
+   "sha256": "fcb65cd9d1cc5efe2133dd1376b9b60a13b99dcf94702f936acbb911b4e2422c"
+  },
+  "area-cotabato-city-centre.tar.gz": {
+   "bytes": 149057,
+   "sha256": "e9c1a81fdf9d409fa1cb4ff816412e65ffe52c18eeeea5eed0e73de0e6191348"
+  },
+  "area-cubao-eastwood.tar.gz": {
+   "bytes": 328209,
+   "sha256": "a70cd03ebdd76874eb2c3e8451e8b091b4ba2712177bc676b1cf1e9e7f8579e5"
+  },
+  "area-dagupan-centre.tar.gz": {
+   "bytes": 101368,
+   "sha256": "5ed1d1613379a6b2a0c16013634323059edfe136c68539c0c396b9b9c7d04cfb"
+  },
+  "area-dasmarinas.tar.gz": {
+   "bytes": 583604,
+   "sha256": "5ee1fe8916b7de8941f41959821f9c568dcc95192b1cab4d8b366752910a6da0"
+  },
+  "area-davao-city-centre.tar.gz": {
+   "bytes": 478609,
+   "sha256": "833c7028d0c3dc7b1df9ba53b993b2e39c4a3634f943f9165f8f308dbfe19d99"
+  },
+  "area-digos-centre.tar.gz": {
+   "bytes": 184146,
+   "sha256": "97f360fb23261af4a11d46bb4b10b8dab15d4c9598d62385dd67336d76c43017"
+  },
+  "area-dipolog-downtown.tar.gz": {
+   "bytes": 101119,
+   "sha256": "bbfe1dbea9bc8a3ccb13285a854155c956f07d145e3a98829f7f83df196e00a0"
+  },
+  "area-dumaguete.tar.gz": {
+   "bytes": 254901,
+   "sha256": "c28a3441429e769c1f050d05591400c6e381238d78b57e783f6bccfa3ed22607"
+  },
+  "area-general-santos-centre.tar.gz": {
+   "bytes": 214857,
+   "sha256": "b9b02c4fc43078f3d581cec512bc1df29cfe2f060ac82e65b89efe6fe5030ed1"
+  },
+  "area-iligan-centre.tar.gz": {
+   "bytes": 202092,
+   "sha256": "ae9a5e53825873124be3f1e51b51b1a39fccb80af4a7955d132a82393000c45a"
+  },
+  "area-iloilo-city.tar.gz": {
+   "bytes": 501845,
+   "sha256": "7790392a3073a9b795ff813fad93bdb0ceb7cc91b998ebd9ea5a1581b93afaff"
+  },
+  "area-kalibo.tar.gz": {
+   "bytes": 163139,
+   "sha256": "33294b1354756512f32ec890af253d1cc31f0ce78693ee66cca62b43854e6da9"
+  },
+  "area-koronadal-centre.tar.gz": {
+   "bytes": 220570,
+   "sha256": "793930da26931ff6d11b28f477f96d61a400b7dc4979a6d7cf717a3f60bd2558"
+  },
+  "area-laoag-centre.tar.gz": {
+   "bytes": 108819,
+   "sha256": "2e2c4edca1f33f140614787e46caf58d024baf6f3fa0702837ea8e25b55927ee"
+  },
+  "area-lapu-lapu.tar.gz": {
+   "bytes": 260577,
+   "sha256": "f00ec8dc14318c8335f7ba6481b77e615a77e14d49330cc0de87c7bb43c453dc"
+  },
+  "area-las-pinas.tar.gz": {
+   "bytes": 253323,
+   "sha256": "e84172b50439117859a75bbd878ba1b0f6f469290b467388c99840e4149aeba0"
+  },
+  "area-legazpi.tar.gz": {
+   "bytes": 284124,
+   "sha256": "b16b2f0860bb7287eba7f7f4f9a00339eff3f8222c2310ee717cd4ffea2537e9"
+  },
+  "area-lipa.tar.gz": {
+   "bytes": 412890,
+   "sha256": "9596ea3a36f1d3e96ab659dc1a66332edd86a7148981541ab25690118895f1f3"
+  },
+  "area-los-banos.tar.gz": {
+   "bytes": 256287,
+   "sha256": "1a8efc28ab6874d3d6fe01f35c0e7c6edbfecf55b767219a64edaf1781af6d49"
+  },
+  "area-lucena.tar.gz": {
+   "bytes": 194740,
+   "sha256": "31b01b1a778e7edc1c1fdadb3d2dd9f8f7caf11b9288ee500c49457c0b6f6e4b"
+  },
+  "area-malolos-centre.tar.gz": {
+   "bytes": 164177,
+   "sha256": "a5e4787d3d1b4d4d0e0d362c2e020bc6342cd7b9dfe827e140b7f2f726e4c13c"
+  },
+  "area-mandaue.tar.gz": {
+   "bytes": 345421,
+   "sha256": "19bc19d7e9398af47180f7dd20387f419b93197250a75aa448fa6b05cadf4945"
+  },
+  "area-manila.tar.gz": {
+   "bytes": 951058,
+   "sha256": "23449550766d71130939b797a9b0d089122385a404d745b63317cb857f336061"
+  },
+  "area-marikina.tar.gz": {
+   "bytes": 383295,
+   "sha256": "e41fed068ac7b8bd9b449da2f94815938be4f3a009b5ac8540baeb6fd446873f"
+  },
+  "area-metro-core.tar.gz": {
+   "bytes": 1755035,
+   "sha256": "3b9013256c5dbb5ae2be7a919e6516882a559bcd7653c4e4923ea2cb104840b9"
+  },
+  "area-naga.tar.gz": {
+   "bytes": 248746,
+   "sha256": "8d61a6833908b6883c9b97f6077aa69eb30fc6e51e382e9bfa01fd878340db30"
+  },
+  "area-north-coast.tar.gz": {
+   "bytes": 830945,
+   "sha256": "e9171686dd5be9e0c1c4ba06ffb071617d33c7ef630fd0387d68cebcfb582334"
+  },
+  "area-olongapo-centre.tar.gz": {
+   "bytes": 140892,
+   "sha256": "58f34df4413cea3c36e075f0f916510666e253186678aa9b7d5c588eb08e7e56"
+  },
+  "area-ormoc.tar.gz": {
+   "bytes": 91748,
+   "sha256": "48216e396fe6d527163d43d47ba06d2ebe28cc5259657c67ac26b3be574ec5a9"
+  },
+  "area-pagadian-downtown.tar.gz": {
+   "bytes": 102436,
+   "sha256": "23e47cf6233c28a2a5869455be70ffa5c013f71f034b1003740915a603087ee8"
+  },
+  "area-paranaque-airport.tar.gz": {
+   "bytes": 348185,
+   "sha256": "fb9f96d5e9dddfc50eed3528e70dbf9e1c90d64ae1871f6e4a2ccdbb3efa3ef3"
+  },
+  "area-paranaque-bf-aguirre.tar.gz": {
+   "bytes": 188144,
+   "sha256": "fc7786b27ec8b7a4ac0cbcf5babf166388137b59647cf50cf135ac1a4110c57e"
+  },
+  "area-pasay-moa.tar.gz": {
+   "bytes": 305158,
+   "sha256": "fdaf2cc39dc134cae4dd2616d46c41a3c9e00105782973c024c42ad9169bfdf0"
+  },
+  "area-puerto-princesa.tar.gz": {
+   "bytes": 83135,
+   "sha256": "ee55560691c15f25a37b055d7e6adf7d18f12db60c6920b5ad9a4219f7fcf429"
+  },
+  "area-qc-banawe.tar.gz": {
+   "bytes": 286197,
+   "sha256": "158e0604cf70d8726d596fc8d6237f53c4bb139c71255397649aac1cb772a564"
+  },
+  "area-qc-commonwealth-fairview.tar.gz": {
+   "bytes": 519795,
+   "sha256": "b4d42319897e2f1cf981d3b7d0937da4a562e55b9253eb1329da3784500d56e9"
+  },
+  "area-qc-north.tar.gz": {
+   "bytes": 556666,
+   "sha256": "d731bf9e7a37b70c18bef517a04fc2381d6b4a4db9843d4e1fa0c3e28e428f90"
+  },
+  "area-roxas-city.tar.gz": {
+   "bytes": 113556,
+   "sha256": "8133180d5d3ab469f234ccd81ad58cf0dd274ee389901c0e64050bfc21d84dab"
+  },
+  "area-san-fernando-pampanga-centre.tar.gz": {
+   "bytes": 300349,
+   "sha256": "1028df85d2f75862d2abba5688b9eb20ef9c6ad893b5c5562fb0a8180d4f2213"
+  },
+  "area-san-pablo.tar.gz": {
+   "bytes": 205223,
+   "sha256": "f31fdfc60d5cacf50c209dcbdd7700b4d28c9dd35dd44945de8aa740ff48a5bf"
+  },
+  "area-santa-rosa.tar.gz": {
+   "bytes": 243911,
+   "sha256": "d39676b97642be7749a966cb562d319dbeed2e6153b1ad5408b141e7d8812cc6"
+  },
+  "area-surigao-downtown.tar.gz": {
+   "bytes": 85443,
+   "sha256": "03ca468ff925c37844b192fa88e0ac7e4822c7034000814120fd2495b1674f26"
+  },
+  "area-tacloban-downtown.tar.gz": {
+   "bytes": 157502,
+   "sha256": "9050fa961ea6318dcfbc59c45c7577d6a5f3de8e91e76f3d402b21438d1957dd"
+  },
+  "area-tacloban-university-belt.tar.gz": {
+   "bytes": 141258,
+   "sha256": "f51406f6518b56c6fef55f70ce9c3676487e77ccdfc7daac6702f1e2add00ef0"
+  },
+  "area-tagaytay.tar.gz": {
+   "bytes": 103229,
+   "sha256": "c4ab1bf8a44213d1e6d1e07d0880988942818d9fd420ddd9453414e1b328b9b1"
+  },
+  "area-tagbilaran.tar.gz": {
+   "bytes": 125396,
+   "sha256": "124f08a9166a2ea59a16c286d7f8003b822513f2053ade68fd059e953dde00bd"
+  },
+  "area-taguig-pateros.tar.gz": {
+   "bytes": 785205,
+   "sha256": "4c9ec2e30af4e820b25cff865abf4ef1621b783690026bfc8e22e160af2ba879"
+  },
+  "area-tagum-centre.tar.gz": {
+   "bytes": 267553,
+   "sha256": "d0ad61a053e0f0026ae6a274013e34b3b6f76573e2979c827da416398312ae51"
+  },
+  "area-talisay-negros.tar.gz": {
+   "bytes": 95722,
+   "sha256": "15fe348b5299dfa5b4cf030e3e23f9aac748e45272fe91225861fbacb67d5df3"
+  },
+  "area-tarlac-centre.tar.gz": {
+   "bytes": 235500,
+   "sha256": "ef44763f643e9551598ce9dab1f56212c87ddb80d85f6f09877786c66f76f06e"
+  },
+  "area-tuguegarao-centre.tar.gz": {
+   "bytes": 142372,
+   "sha256": "972470a8431e8c318cbccc2f2d75f20f2cf0d229c6d5734b05a4e8429721a083"
+  },
+  "area-vigan-centre.tar.gz": {
+   "bytes": 90753,
+   "sha256": "fcc7e05c81071a0663bb2913a25afdf4c31928dfa0bfb3fa06eae82566387a98"
+  },
+  "area-zamboanga-city-centre.tar.gz": {
+   "bytes": 304827,
+   "sha256": "8673e380f94df76d6fa77b67c8ddd401de0d24e856dc18cf92ddbb5f616a2bea"
+  },
   "buildings.pmtiles": {
    "bytes": 74410595,
    "sha256": "dd6adad7c09ee6863fbf694d6b2bc81138ebfcba4b452eb45809671767ed714f"
   },
   "inputs-alabang.tar.gz": {
    "bytes": 2999079,
-   "sha256": "402fcfa7d41da6c9855b615606f2b434d27d46c98056f5fb7f5206c0880c0dac"
+   "sha256": "bb3f417b70cbb8d36a75d6bb6dde8e96b1c653f853aba7e74cfb02f221e3c990"
   },
   "inputs-angeles-centre.tar.gz": {
    "bytes": 6386546,
-   "sha256": "cc4f820313720c74a858eda40a9148c76e7d13544fdfd71de1396136436ff32b"
+   "sha256": "10873606429561fa7513faff80f9d83f1ab1ac21277592f44485a31d0ef771b0"
   },
   "inputs-antipolo.tar.gz": {
    "bytes": 6821762,
-   "sha256": "fa48757c73fba88d3e57abaab6be3bfc4169624790a28de5d2fd4fcd94c94a75"
+   "sha256": "bacb57ff9e6470bea6ff9deb0e860363f76565c7384e883eba677978163caee6"
   },
   "inputs-bacolod.tar.gz": {
    "bytes": 4031341,
-   "sha256": "26aa7210d25767f4f95d4366d5648e689a17f4dba29bf2e4d87c4949c9b3a3ca"
+   "sha256": "eef72b7da336f64d8c7d801443ad43cefccdceff9c4bc55f507312805c0c64b4"
   },
   "inputs-baguio-centre.tar.gz": {
    "bytes": 6252319,
-   "sha256": "90be4b2bd1a4bcbfdf61d8169895ee4a37f0e81d3ada978707629c2a77b0ae32"
+   "sha256": "adf2ab64d8043cde05d8ada92eeb3f2187297e15daa97656a477582996b071b5"
   },
   "inputs-balanga-centre.tar.gz": {
    "bytes": 2781378,
-   "sha256": "80fa28cac0e64af4b1add73f3c5917bfd88d74983fc92e3a55de066344e6d483"
+   "sha256": "3f6f47c722db467e0c1527b3208ef2777e56037dc41938f8d82339a225b53f45"
   },
   "inputs-baliwag-centre.tar.gz": {
    "bytes": 2558358,
-   "sha256": "9319076bcc80faa5cf08db9a86e0630d030732d39899db597478674759574488"
+   "sha256": "1457cbd942b18bd1ba925842d8417464a8351a2290fc8308506cf216d7d3d9d1"
   },
   "inputs-batangas-city.tar.gz": {
    "bytes": 2927834,
-   "sha256": "601a852fc4aa79b72af9e8dfee6fbcdc12fdec87252205fd96bb74bd7c645c12"
+   "sha256": "be07ecd7af5c75874a789d6d309bd5663d7136917a980b2c38d7fd072be6c8ac"
   },
   "inputs-butuan-centre.tar.gz": {
    "bytes": 3069175,
-   "sha256": "3d459714022990d347a8a59d7bcc3229f3d4429afdaa073c4863b88c14ac7bdd"
+   "sha256": "d14d0d3b54c1154d1d67dfb3df4aa7b6da01e0ed180feef1c37710882d6b8319"
   },
   "inputs-cabanatuan-centre.tar.gz": {
    "bytes": 3587119,
-   "sha256": "fc097c09f962d1108dbab62578bae406788952706708f461195dbf6de766e2c6"
+   "sha256": "d82ebd8afdc1293976bbea3b7d1bb1b07cfd53d3dbde2dccf53e24007fe56df6"
   },
   "inputs-cagayan-de-oro-centre.tar.gz": {
    "bytes": 5467588,
-   "sha256": "35da65236b341f9f0c9eb03132246959d74b4049cad0a75c871594d98c9b6ab0"
+   "sha256": "63685d7ad8154ca89910a84b82d43ec0b5c564609b530cb09b0aa8bff167e227"
   },
   "inputs-calamba.tar.gz": {
    "bytes": 3101850,
-   "sha256": "aba2dfc27ccb4bd1edd6fe3d133db369763ed9a9639f6480c48b540471f064eb"
+   "sha256": "e31a141a2be5bfe5e8070564532f99c9f34307a865f655aac4090eda9fb72e26"
   },
   "inputs-calapan.tar.gz": {
    "bytes": 2026475,
-   "sha256": "3a27d2f87bb195dab01ba23f4faf3b122dbaf689f30a1298e4ffed6186e724fe"
+   "sha256": "7e515c268fc0cae9b16c9801597306c3b9027d72ade1ee798e475bf38077ee37"
   },
   "inputs-cebu-city-centre.tar.gz": {
    "bytes": 7293040,
-   "sha256": "4d24da78acf6d268e7c66d457f981b666daa872d222a0bb8398b62efed44dff3"
+   "sha256": "f7c4fe550a4438d6cb21e5dba7f01a9cecbda351fc58f7daabb55a91336d1b17"
   },
   "inputs-cotabato-city-centre.tar.gz": {
    "bytes": 3682110,
-   "sha256": "efa6740f1e34d7b6651fa1925b39733b61372626e6f7f2b593beeee8dfc8925a"
+   "sha256": "3b99f348df3112fed0ded13c18d9205bbe6e35950a296986c5a1f9dd16005fbf"
   },
   "inputs-cubao-eastwood.tar.gz": {
    "bytes": 5047059,
-   "sha256": "8494176d6c146b7a09da40455646de6aa9908d57a4306bb5a80ecc488d8601a4"
+   "sha256": "28fff07b7d9a480cecf0baefe8b3a52517d41dfa00520ba92783df005637d4c6"
   },
   "inputs-dagupan-centre.tar.gz": {
    "bytes": 1852342,
-   "sha256": "51f88573044157452450f49f26650df6a31fa604e5c35503c0f97df6af7c96c6"
+   "sha256": "0b200f910a1b11356b96556a3c7ef77acedfa19b877621bf01360d3a2a979540"
   },
   "inputs-dasmarinas.tar.gz": {
    "bytes": 8354024,
-   "sha256": "7556f3eaa4b7dfec5e3099ad446d337320be28553c155030a8ae5142b6bf17c1"
+   "sha256": "61a247d212518d90ce4f6244d8ed9b6ee42c1578c258c2ce4007e69ac99e97e6"
   },
   "inputs-davao-city-centre.tar.gz": {
    "bytes": 4657613,
-   "sha256": "1a66370e8b22ab6f6c477059388f7c7c25f2dd372be5339d3ee3327341fad545"
+   "sha256": "09cc2312e4af2fcba193c066d70804bd1dce5e72ef6439166014091963775040"
   },
   "inputs-digos-centre.tar.gz": {
    "bytes": 4303291,
-   "sha256": "e58c677ea161a6333eaa09953837db18e7a1ef8fc15a38daec9c0aa161647bd1"
+   "sha256": "befdad67691a1aa0673a7b949f794b80f48d2707e9274c4a1433d748e1543557"
   },
   "inputs-dipolog-downtown.tar.gz": {
    "bytes": 2335082,
-   "sha256": "100b9f8c43db0adb16c89e457c5a59031a3f9d890c00052f026f295440f62a30"
+   "sha256": "38b71cdd292d01f33f48951bdbfe6313d8129d45d4c9b5618c8ffba3dd5a73b7"
   },
   "inputs-dumaguete.tar.gz": {
    "bytes": 3854353,
-   "sha256": "10dc9f64ee88fd3c43cf511559304ffae96695b967f77effed24697dcce16d87"
+   "sha256": "614506efe00bb8cc6b258f5df3b1729c73ae44d4509800463364387f5030e26d"
   },
   "inputs-general-santos-centre.tar.gz": {
    "bytes": 3479313,
-   "sha256": "9b31ca341b8b4f617cce47d6d72109e1923646e7a8c82d3d4b5820eb49160a24"
+   "sha256": "ac6fa7b765751c9d7664555f538079ed5b491ed75b53f9af190cb25925431392"
   },
   "inputs-iligan-centre.tar.gz": {
    "bytes": 4837225,
-   "sha256": "08e3dde62e5a5b6d209fe2fb59e738e0abc41fb1dadd833681fa53943af6e962"
+   "sha256": "87f97759059bb5ef6a5108e5c84c5e9526afc7aad10cf0051d6efcf512b2b0b3"
   },
   "inputs-iloilo-city.tar.gz": {
    "bytes": 4754727,
-   "sha256": "f44e26d2c7fc524813f9ddce4f5f0fdf9cea0112452dcac2f41aaddf515706aa"
+   "sha256": "a1052101b3d5b9453efc79881b0671e63df511fa6d9f9b5f2d9d81ac448ddd4a"
   },
   "inputs-kalibo.tar.gz": {
    "bytes": 3835648,
-   "sha256": "9b1841e8a9ec82ab20fc55022c00aa5a5f93a6f53308b77c1af705ed8303c61a"
+   "sha256": "d78d22219c084bfb1abcc244fcd72dfd9860e8ace908e89e2e75b37755541028"
   },
   "inputs-koronadal-centre.tar.gz": {
    "bytes": 4084715,
-   "sha256": "07e358deca3e6dff12f6021a15c9454834701e0d86773118720336ace8dc588a"
+   "sha256": "d4eac404ed9725b578501fc2fc67ece4514edadedbad625ebf23ae692ef09aef"
   },
   "inputs-laoag-centre.tar.gz": {
    "bytes": 1812267,
-   "sha256": "ecdde2b41d32a4352638ad9e23055358a5b58c12bc77420b6cbf38988d48a7f6"
+   "sha256": "eae943b21b00bc997addba35d831368f28628e1f3c5e365242f4b04cd51fddc7"
   },
   "inputs-lapu-lapu.tar.gz": {
    "bytes": 4152577,
-   "sha256": "7e2233102b0f6722043f87781f5c1bfcadfc38579a72d3d0298c15cd75a0dfdf"
+   "sha256": "594d7009c793e1096cbe224e9bc50df1da876a999329f324a4fb93f264ac1bcc"
   },
   "inputs-las-pinas.tar.gz": {
    "bytes": 4200986,
-   "sha256": "6ec67f8360c86eaa616e6c4b97d76a029ef81b9d9950f3b533a7a2ee42157be9"
+   "sha256": "b98140a2715eb59d50ff4f416f072c2f4e3b12e8bc91a3ee0fdd4654a02e0762"
   },
   "inputs-legazpi.tar.gz": {
    "bytes": 4805720,
-   "sha256": "b89607799acf5c530dd72bc9ef323ea4e64c7dbb2c866ca5fd039661b87c6a77"
+   "sha256": "d70acc1b7ba08d0ca6c1893f081dbdd2942e8f128d93dc1acaf49e42f9692b2a"
   },
   "inputs-lipa.tar.gz": {
    "bytes": 4795663,
-   "sha256": "1c0e7a56b5f96f35da8b88a694e4ab34832ec06bcfc943d3c14ad95bef0f7555"
+   "sha256": "fc356ac81854d354cfb53b8dd42de18d5fe896c9e7e51572ed42c12fc36329fd"
   },
   "inputs-los-banos.tar.gz": {
    "bytes": 4335846,
-   "sha256": "bf9080987a16451d9143978f041374057bbbfb422be08d80e919795565711b38"
+   "sha256": "2cb6f08d95c5e2297e0d76629c9f048db77d9c7f15a87076297e7027be120e1a"
   },
   "inputs-lucena.tar.gz": {
    "bytes": 3276233,
-   "sha256": "8741ba2ce331e9955e7e4fa77d8ebe62456f84a326d26a242407060afdfd8ea0"
+   "sha256": "4bdea2041be990f53668954012b3c883c0414c6057adfc57063b3a281a7c6bc4"
   },
   "inputs-malolos-centre.tar.gz": {
    "bytes": 2459724,
-   "sha256": "cddaec03f0d8c9f15e8a6357af25ca383d36276a5b7430d2f047e0d57031221f"
+   "sha256": "6779f62f9c32c206e6ae12ea0d10b419622a83841d0ef74a3c7a3034d530b881"
   },
   "inputs-mandaue.tar.gz": {
    "bytes": 3678260,
-   "sha256": "04759204e448edc6d12e2a61c4ca63063a13cecee3c3bc0f5cdcfd8453316851"
+   "sha256": "c20f9f6e1b34d48759a994926a7d804a0086798cfdf7e43895d1b9062a8b4f99"
   },
   "inputs-manila.tar.gz": {
    "bytes": 5606656,
-   "sha256": "5fe2f63b916b977ef294d66939444c054789c16babf505e1e69615160c22ecb9"
+   "sha256": "df2ba56021fdbee1dcdc35341f6861954abd7bfdf0f0eb6d24c102d52dbf69ea"
   },
   "inputs-marikina.tar.gz": {
    "bytes": 5681121,
-   "sha256": "bf1b88f658b2fa15fc7c40e20b151dc2066c50cf7884ebd71a0ff741c327ccda"
+   "sha256": "52a0cec65fdd481492c4b1ca1589acbcc8e00316599dc312e529ad061a9e54da"
   },
   "inputs-metro-core.tar.gz": {
    "bytes": 14018572,
-   "sha256": "f2b9bb054c00547e46917f7e652f5ff2cb363049b58ad01e6590f709c5952f39"
+   "sha256": "6a1258143a6c56a7aff6b4c33ceb6fa7cc89810e2d2def1317eb77b69df6a679"
   },
   "inputs-naga.tar.gz": {
    "bytes": 3024814,
-   "sha256": "0f09446bcec3a8043f2bad1f7cafe7f2bfe46e3016c897f46ff30a9953f086f8"
+   "sha256": "5b68c5d3a20c6df17dff7ccc9a700d39e6878d28c4cdfe5f2686af228d8eff39"
   },
   "inputs-north-coast.tar.gz": {
    "bytes": 8077183,
-   "sha256": "1958f21b4785bcbc8bee3863fb419566b7e3cb2abb10b2d5c0c369f8631c59a4"
+   "sha256": "adb2de35d7ba8072dc08eb822c1033e5b4eb51bf53490d0f303195e1391a1b38"
   },
   "inputs-olongapo-centre.tar.gz": {
    "bytes": 2758868,
-   "sha256": "61a540b69207db02f29201185fd2d5e2411d5ef0740f09d61dec2dd642542f6e"
+   "sha256": "df4db4f236ce1e7c40c35dc1df791b5d050eff327e96ae3ab1aa99b6b62a1033"
   },
   "inputs-ormoc.tar.gz": {
    "bytes": 1363724,
-   "sha256": "52019cc31efc3d3a947f7ecc3308957f94c024df22676d84c94b6ee74702a1a4"
+   "sha256": "8caf3832b5e528d9340e97b098a9efddb22773803cb986b6553ef3edc159622a"
   },
   "inputs-pagadian-downtown.tar.gz": {
    "bytes": 2721141,
-   "sha256": "15fadd912ee762a5658894bce55ff5013eca9224ec6c6b0a9d473a7904911180"
+   "sha256": "e482f830ddb26d873b6d5d98cf0ea58568020273a1fab66b2a0c3bd984666ddf"
   },
   "inputs-paranaque-airport.tar.gz": {
    "bytes": 3120306,
-   "sha256": "37b951f2709dd98f37a0713c9601d6df1d11b367f0529e0f41462b95b62f7a35"
+   "sha256": "9d00f1a674f706e3a7c546b9c2b019508908f7fdba19b7e6be25250a58218d43"
   },
   "inputs-paranaque-bf-aguirre.tar.gz": {
    "bytes": 3553327,
-   "sha256": "c998248d5c4e84b9beac60283d794db93e892ac8c6d340c6f89e41984523400c"
+   "sha256": "2783832b41498d995abd7a5f4c8741709a606a5986f6fdd40dbd4d374c43515e"
   },
   "inputs-pasay-moa.tar.gz": {
    "bytes": 1923706,
-   "sha256": "52687cdd1da732a49ae5e69b512a4be4545eed7978786938264731354c762330"
+   "sha256": "b7fd2e1644eec1b43d1cd7361bd6dbfbedad4521565af5fcffd6a0757063d7f0"
   },
   "inputs-puerto-princesa.tar.gz": {
    "bytes": 1620853,
-   "sha256": "b3f48702685554231cd6f58990c444862d55d14ef25fb113a568b9ef249f628e"
+   "sha256": "812d2ff369a58a83b59bec278271538e945d2c97ab231e2b4af1af271fc512c6"
   },
   "inputs-qc-banawe.tar.gz": {
    "bytes": 3728682,
-   "sha256": "1ad6994d2ae5d030f8d4032863118abac5166bb83ecdb97e62f488b4bda6b3df"
+   "sha256": "d486f0ddba93e5c77aa953d8ea4c0088b184df153e7325c0925f64384b3aedfc"
   },
   "inputs-qc-commonwealth-fairview.tar.gz": {
    "bytes": 13778246,
-   "sha256": "5576b21de96d56b4b368d2b6ebee7a4637b03fc81333a1e540153e5df02de8e1"
+   "sha256": "40fb8a96ec265ab05fff9c852edb16530125dce4515d4b2acbb3785ff7951d72"
   },
   "inputs-qc-north.tar.gz": {
    "bytes": 6904389,
-   "sha256": "883f9dda64d4b3735d495737cc3b3e6bb807e3d86ce94e898499bb81f553df48"
+   "sha256": "5bd3ad11273aeafa2937864c1b71001e9708ac1a8935595cb28cb87a1f47152d"
   },
   "inputs-roxas-city.tar.gz": {
    "bytes": 1941914,
-   "sha256": "ba10871fc16f902c492f0fb19051da0348dadd5eae55bd75095b2860e8004c31"
+   "sha256": "24d9c55671ff12e4bed4bbef06e7817fb217dfb1dc20d388a846144c01f4c36a"
   },
   "inputs-san-fernando-pampanga-centre.tar.gz": {
    "bytes": 3464311,
-   "sha256": "4d9c728af1c91c57c446e5ae76945398774269d15c6c4d1035755e8ddca5c0a3"
+   "sha256": "069d09da9c2f3a4d6af73804ca2099752ee5db82994edbf5d25697bd382a83f0"
   },
   "inputs-san-pablo.tar.gz": {
    "bytes": 4303230,
-   "sha256": "4ddf2f2401c3b617265367ed298e028da57fdbfede38b13a365f022fdeb00380"
+   "sha256": "a171818f632bed6a5e5a5c951caed9e41c3c2b7173f25df6863102913380f31e"
   },
   "inputs-santa-rosa.tar.gz": {
    "bytes": 4196488,
-   "sha256": "6d2b423906531fba611f6eea060446d405f09191fdd87cf34fd108d65eb78280"
+   "sha256": "646eaef367c36f4adfafc9cc2c3b998ef096e0e41a88a09275eba8ff878e5b98"
   },
   "inputs-surigao-downtown.tar.gz": {
    "bytes": 1239781,
-   "sha256": "ad33f7856eea693112ef774b4fcc6b7a8232163dffedf618ca36394a1db1315a"
+   "sha256": "e4d6933c4e3510c104fb0bc1d78cc49a4f68ff20eeb3488fa721c3e474841d41"
   },
   "inputs-tacloban-downtown.tar.gz": {
    "bytes": 1485486,
-   "sha256": "8c7425d25e99f1129e6730e5bf1c43cf85b80d69948410ae6be42efdb37e3386"
+   "sha256": "dba98838d28344664a732f1dad8cd36f00d4aeb62696c084992f8d45f0249c5b"
   },
   "inputs-tacloban-university-belt.tar.gz": {
    "bytes": 2451312,
-   "sha256": "10d38982520271669c560fa3cdd96cec12298f8fb4d7547e00a06e77b9450766"
+   "sha256": "e76ce4dffe4bbe923d7255533d166a1d2db26c6c6d79b9b610b0960f413f51ea"
   },
   "inputs-tagaytay.tar.gz": {
    "bytes": 2677240,
-   "sha256": "b37a28968e08da3e2c052e48cd2b22ca2b339d22065c656aff4d5e6f40e43714"
+   "sha256": "99c41ea852aaa9f5c54adbd506d861b13bef34b885a77c178683f53e015f69ee"
   },
   "inputs-tagbilaran.tar.gz": {
    "bytes": 1937345,
-   "sha256": "2f15233c85bbf87ffa2cd30a22751e6abaa439d11e29dc983626b9609d8d3ad8"
+   "sha256": "69780af9049560ccc07f957496a164665b8710ddf14e39b7319e154e291d17bc"
   },
   "inputs-taguig-pateros.tar.gz": {
    "bytes": 8783538,
-   "sha256": "97d8632ba095f4e226fe9a199f103d0b301bab38517f2df9cf6669e05309990d"
+   "sha256": "523ec13ee2b39f5d893361822c0b28c95ee76553a6e98ccf855eee67da51cf8c"
   },
   "inputs-tagum-centre.tar.gz": {
    "bytes": 5675813,
-   "sha256": "aeb9ab65d4df4c6add7cbc3591aaf038048274d1311bd1ddea99fe3d4709bee8"
+   "sha256": "45efcfe921407f962a54dbd44f7b6e1e95fca05933f2213e8db4223a4cff2276"
   },
   "inputs-talisay-negros.tar.gz": {
    "bytes": 1192060,
-   "sha256": "e12817234df3e4e4c5fb5bda3bac6f6168d5946f1373538513c6fa97962ec25e"
+   "sha256": "814af3669e453e278efa7634330f23925734f2c22ea1ae0e2cf83d3c15747304"
   },
   "inputs-tarlac-centre.tar.gz": {
    "bytes": 2956553,
-   "sha256": "9c5cf7164c84485183b747ff20684b1e035f81a8ab6de12781e69bcda6716268"
+   "sha256": "ab84c860a5b586a04880639757d359e0f42b8ee254d7215ed4611ab169571dff"
   },
   "inputs-tuguegarao-centre.tar.gz": {
    "bytes": 2394662,
-   "sha256": "6e270b0870c4e004268c745f475f635ae161fde453b40578fbfbd68b7fb8f36f"
+   "sha256": "bd95aed3ad2d288316c7eeb2dee12a6dc62c7b26c9e80d9ccefdb8210638d579"
   },
   "inputs-vigan-centre.tar.gz": {
    "bytes": 2092462,
-   "sha256": "7290cbd6f53b8d83d0d79aefb0e070b9bb8cb2c9da0907d8176c5704708aca12"
+   "sha256": "04e39ccd93fb15f516ae39c3d0dd1ed1eee6704995f5ab203fc420c720aca77d"
   },
   "inputs-zamboanga-city-centre.tar.gz": {
    "bytes": 4345001,
-   "sha256": "fd243c52d2a22dc5a62a7f73816cb2e177387e3c88cb0e25f42a2a7fa62dd94b"
+   "sha256": "0af5f329bc766cabe6817f56f68ecd88f793a5d7bbed57c986e06c9edc7e48af"
+  },
+  "places_index.json": {
+   "bytes": 5460696,
+   "sha256": "2c025f0e4760e648cf7823b417417a6e571d1c996421c7a938bbd8475ed499ab"
   },
   "trees.pmtiles": {
    "bytes": 85005346,
@@ -278,5 +550,5 @@
   }
  },
  "repo": "xmpuspus/undercover-ph",
- "tag": "data-20261023-1733bc8b63"
+ "tag": "data-20261023-89883d3432"
 }

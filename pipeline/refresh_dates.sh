@@ -26,6 +26,7 @@ PY="${PY:-$SHADE_PY}"
 
 "$PY" -I pipeline/set_dates.py "$UCPH_START_DATE"
 "$SHADE_PY" pipeline/shade/shade.py  # area mode writes READY.shade last
+"$PY" -I pipeline/shade/check_sun_order.py "$UCPH_DATA"  # noon shade must stay below 16:00 shade
 "$PY" -I pipeline/fetch_weather.py
 # Remove per-date shade files that the manifest no longer lists.
 "$PY" -I - "$UCPH_DATA" <<'PY'

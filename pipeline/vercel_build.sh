@@ -3,7 +3,8 @@
 # then build the app. app/vercel.json calls it as the buildCommand, from app/, after pnpm install.
 #
 # Generated files stay out of git: manifest.json, shade/, trees.json, weather.json, advisory.json, READY.*.
-# The map tiles and the area inputs stay out of git too; they come from the data release.
+# The map tiles, the area graphs, places and hours, and the area inputs stay out of git too. They come from the
+# data release.
 # A shade failure fails the build, so the last good deployment stays live.
 # A failed weather or advisory fetch writes {"status": "unavailable"} and the build goes on.
 #
@@ -71,9 +72,10 @@ if [ ! -f "$DATA/areas.json" ]; then
 fi
 # Weather and the advisory need only the standard library.
 export PY="$PYTHON"
-# The map tiles and the area inputs live in the data release that pipeline/data-release.json names, not in git
-# (2026-10-23). fetch skips files that already match and checks every download's sha256.
-"$PY" -I pipeline/data_release.py fetch --tiles
+# The map tiles, each area's graph, places and hours, the search index and the area inputs live in the data
+# release that pipeline/data-release.json names, not in git (2026-10-23). fetch skips files that already match,
+# replaces files that differ and checks every download's sha256.
+"$PY" -I pipeline/data_release.py fetch --tiles --app
 IDS="$("$PY" -I -c 'import json, sys; print(" ".join(a["id"] for a in json.load(open(sys.argv[1]))["areas"]))' "$DATA/areas.json")"
 
 # Where the shade comes from. On Vercel, from the newest shade release that .github/workflows/shade.yml
