@@ -26,8 +26,8 @@ abstract: >
   in Metro Manila, that cut time in
   the sun on sunny days and time outside cover when it rains. It is a Philippine
   take on Singapore's Undercover prototype. It casts shadows on each sidewalk edge
-  every 30 minutes, from OpenStreetMap and Google Open Buildings heights and a tree
-  canopy height raster. A custom A* search in the browser returns the shortest,
+  every 30 minutes, from OpenStreetMap and Google Open Buildings outlines and
+  heights and a tree canopy height raster. A custom A* search in the browser returns the shortest,
   the most covered, and a recommended route. Paths that may be gated or private,
   closed mall passages, and mid-block road crossings stay out of routes. The shade
   values come from a model. Nobody checked them in the field yet.

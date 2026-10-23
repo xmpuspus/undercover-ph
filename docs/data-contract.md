@@ -205,17 +205,17 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 - `buildings.geojson.gz` holds every building of one area out to the shade margin, for the shade engine. It stays in the pipeline.
 - `buildings.pmtiles` is one file for all 67 areas. Its source layer is `buildings`.
 - Each feature is a polygon with two numbers, `height_m` and `min_height_m`. Each `building:part` is its own feature.
-- It holds every building that has a height and lies within 150 m of a walk area. That is 1,332,251 buildings and 52.5 MB.
-- Where two areas overlap, one copy stays when the heights match and the centres lie within 1 m. That removed 56,910 copies.
+- It holds every building that has a height and lies within 150 m of a walk area. That is 2,016,478 buildings and 74.4 MB.
+- Where two areas overlap, one copy stays when the heights match and the centres lie within 1 m. That removed 67,347 copies.
 - Zooms 13 to 15. Zoom 15 keeps every footprint, unsimplified, on a grid of about 0.15 m. The app overzooms past 15.
 - Zooms 13 and 14 thin out small footprints, with tippecanoe's defaults, to keep tiles light.
 - A check build of the 13-area file drew 212,830 of its 637,936 buildings at zoom 13 and 637,731 at zoom 14. When the count matters, draw shadows from zoom 15 data.
 
 ### `trees.pmtiles`
 
-- One file for all 67 areas, 85.8 MB. Its source layer is `trees`. GitHub refuses a file over 100 MB, so split it by region before about 10 more areas.
+- One file for all 67 areas, 85.0 MB. Its source layer is `trees`. GitHub refuses a file over 100 MB, so split it by region before about 10 more areas.
 - Each feature is a point at a crown centre, with three numbers in metres. They are `r_m` (crown radius), `top_m` (crown top) and `base_m` (crown base).
-- It holds 6,388,481 crowns of 3 m or taller, within 200 m of a walk area. The build removes 11,214 copies from overlapping areas.
+- It holds 6,323,166 crowns of 3 m or taller, within 200 m of a walk area. The build removes 11,214 copies from overlapping areas.
 - Zooms 14 and 15. Both zooms keep every crown, so tree shadows look the same at either zoom.
 - The crowns equal each area's deploy-time `trees.json`, which `manifest.trees` describes.
 

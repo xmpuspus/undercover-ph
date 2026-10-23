@@ -1,11 +1,12 @@
-"""Share of Google's building area that OSM outlines cover, per area, inside each district's own box.
+"""Share of Google's building area that a building outline covers, per area, inside each district's own box.
 
 Usage: pipeline/shade/.venv/bin/python -I -W ignore pipeline/tools/footprint_cover.py OUT_JSON [AREA_ID ...]
 publish.py copies the share into areas.json as buildings_mapped (OUT_JSON pipeline/regions/footprint_cover.json),
 and coverage_table.py prints it in the README. Run it after the areas are staged.
 Google building pixel: presence >= 0.5 and height >= 2.5 m (band 2 and band 1 of the district window),
-read at 2 m. Shade comes only from OSM outlines, with Google heights, so a low share means missing building shade.
-On 2026-10-22 Metro Manila areas measured 0.72 to 0.74 and Baliwag 0.12.
+read at 2 m. Outlines come from OSM and, since 2026-10-23, from Google Open Buildings v3 where OSM has none. Shade comes
+only from outlines, so a low share means missing building shade. With OSM alone on 2026-10-22, Metro Manila areas
+measured 0.53 to 0.74 and Baliwag 0.12. The v3 fill raised Baliwag to 0.47.
 """
 import gzip
 import json
@@ -68,6 +69,6 @@ if __name__ == "__main__":
     out = {}
     for a in want:
         share, m2 = cover(a, areas[a])
-        out[a] = {"osm_share_of_google_building_area": share, "google_building_m2": m2}
+        out[a] = {"outline_share_of_google_building_area": share, "google_building_m2": m2}
         print(a, share, m2, flush=True)
     Path(sys.argv[1]).write_text(json.dumps(out, indent=1) + "\n")

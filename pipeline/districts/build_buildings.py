@@ -11,6 +11,12 @@ Height rule (report 02): OSM height, else building:levels x 3.74 m, else the Goo
 footprints over 100 m2. Smaller footprints with no height stay null. Each building:part is
 its own feature. A part's height never flows to its outline. An outline's Google median uses only the
 outline area outside its parts, so a tower part does not raise the podium.
+
+Google Open Buildings v3 outlines (pipeline/districts/fetch_gob_v3.py) fill the buildings OSM has not drawn
+(decision 2026-10-23). One goes in only when two Google sources agree: its v3 confidence reaches the 80%-precision
+threshold of its S2 cell, and the 2023 height raster sees a building in it (at least 8 pixels with presence 0.5 or
+more, and a median height of 2.5 m or more on those pixels). It must not overlap an OSM outline or part by 10% of
+its area or more. Its height is the raster median, with no default, because a wrong outline would invent shade.
 """
 import json
 import math
@@ -28,7 +34,8 @@ from shapely.strtree import STRtree  # noqa: E402
 
 import gzip  # noqa: E402
 
-from ctx import BUILDING_BBOX, BUILDINGS, LEVEL_M, RASTERS, TO_UTM, WORK, parse_height, parse_levels  # noqa: E402
+import v3_rule  # noqa: E402
+from ctx import AREA, BUILDING_BBOX, BUILDINGS, LEVEL_M, RASTERS, TO_UTM, WORK, parse_height, parse_levels  # noqa: E402
 
 G_MIN_PX = 8
 G_MIN_M = 2.5
@@ -106,6 +113,40 @@ def zonal(geom, mr):
     hp = h[p >= 0.5]
     return int(h.size), float(np.median(h)), float(np.percentile(h, 90)), (
         float(np.median(hp)) if hp.size >= G_MIN_PX else None)
+
+
+def google_v3(bbox_poly, osm_geoms, mr):
+    """Google v3 outlines that fill OSM gaps, as rows with a raster height, and the counts behind the choice."""
+    seen, cands = set(), []
+    for d in AREA.members:
+        path = d.raw / "gob_v3/outlines.jsonl.gz"
+        if not path.exists():
+            sys.exit(f"{path} is missing; run pipeline/districts/fetch_gob_v3.py {d.id}")
+        for line in gzip.open(path, "rt"):
+            r = json.loads(line)
+            if r["plus"] not in seen:
+                seen.add(r["plus"])
+                cands.append(r)
+    log = Counter(candidates=len(cands))
+    tree = STRtree(osm_geoms)
+    rows = []
+    for r in cands:
+        if r["conf"] < r["thr"]:
+            log["below_80pct_precision"] += 1
+            continue
+        g = shapely.from_wkt(r["wkt"])
+        if g.is_empty or not g.intersects(bbox_poly):
+            log["outside_box"] += 1
+            continue
+        u = to_utm(g)
+        near = tree.query(u, predicate="intersects")
+        overlap = sum(u.intersection(osm_geoms[k]).area for k in near) / u.area if near.size and u.area else 0.0
+        p50m = zonal(u, mr)[3] if overlap < v3_rule.MAX_OSM_OVERLAP else None
+        why = v3_rule.verdict(r["conf"], r["thr"], overlap, p50m)
+        log[why] += 1
+        if why == "added":
+            rows.append({"geom": g, "height": p50m, "area": u.area, "conf": r["conf"]})
+    return rows, log
 
 
 def main():
@@ -209,6 +250,19 @@ def main():
                              "geometry": {"type": "Polygon", "coordinates": rings}})
 
     # Area inputs are stored gzipped (decision 2026-10-22). mtime=0 keeps the bytes reproducible.
+    osm_geoms = [r["utm"] for r in rows]
+    v3_rows, v3_log = google_v3(bbox_poly, osm_geoms, mr)
+    for r in v3_rows:
+        src_count["google_v3"] += 1
+        src_area["google_v3"] += r["area"]
+        props = {"height_m": round(r["height"], 1), "min_height_m": 0.0, "source": "google_v3", "name": None}
+        polys = list(r["geom"].geoms) if r["geom"].geom_type == "MultiPolygon" else [r["geom"]]
+        for poly in polys:
+            rings = [[[round(x, 7), round(y, 7)] for x, y in ring.coords]
+                     for ring in [poly.exterior, *poly.interiors]]
+            features.append({"type": "Feature", "properties": props,
+                             "geometry": {"type": "Polygon", "coordinates": rings}})
+
     tmp = BUILDINGS.with_name(BUILDINGS.name + ".gz.tmp")
     with gzip.GzipFile(tmp, "wb", compresslevel=9, mtime=0) as gz:
         gz.write(json.dumps({"type": "FeatureCollection", "features": features}, separators=(",", ":"),
@@ -235,6 +289,8 @@ def main():
         "fallback_reasons": {k: v for k, v in log_g.items() if "_because_" in k},
         "levels_factor_m": LEVEL_M, "google_rule": f">= {G_MIN_PX} px and p50 >= {G_MIN_M} m",
         "default_height_m": round(DEFAULT_LEVELS * LEVEL_M, 2), "default_min_area_m2": DEFAULT_MIN_AREA_M2,
+        "google_v3": dict(v3_log), "google_v3_rule": "confidence >= 80%-precision threshold of its S2 cell, raster presence "
+        f">= 0.5 on >= {G_MIN_PX} px with median >= {v3_rule.MIN_HEIGHT_M} m, overlap with OSM < {v3_rule.MAX_OSM_OVERLAP:.0%}",
     }
     json.dump(log, open(WORK / "buildings_log.json", "w"), indent=1)
     print(json.dumps(log, indent=1))

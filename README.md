@@ -18,74 +18,74 @@ The app covers 67 walking areas. 14 are in Metro Manila, from Caloocan to Alaban
 <!-- coverage:start -->
 | Area | Cities | Walkable km in routes | Places | Buildings | Buildings mapped |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Makati, BGC, Ortigas and Shaw | Makati, Mandaluyong, Pasig, Quezon City, San Juan, Taguig | 1,342 | 4,130 | 189,704 | 72% |
-| Bay Area and Mall of Asia | Pasay | 251 | 524 | 25,183 | 70% |
-| Cubao and Eastwood | Quezon City | 321 | 813 | 65,167 | 74% |
-| North Avenue, Quezon Memorial Circle and UP Diliman | Quezon City | 507 | 1,474 | 96,652 | 72% |
-| Intramuros, Ermita, Binondo and University Belt | Manila | 810 | 3,241 | 100,359 | 74% |
-| Alabang and Filinvest City | Muntinlupa | 261 | 481 | 21,701 | 56% |
-| Caloocan, Malabon, Navotas and Valenzuela | Caloocan, Malabon, Navotas, Valenzuela | 854 | 1,470 | 136,324 | 60% |
-| Marikina Centre and Riverbanks | Marikina | 391 | 819 | 82,926 | 65% |
-| Aseana, PITX and NAIA | Paranaque, Pasay | 317 | 405 | 31,350 | 67% |
-| Las Pinas and Alabang-Zapote Road | Las Pinas | 274 | 515 | 47,566 | 53% |
-| BF Homes and Aguirre Avenue | Paranaque | 222 | 321 | 29,438 | 54% |
-| McKinley Hill, Taguig Centre, Arca South and Pateros | Pateros, Taguig | 744 | 997 | 136,126 | 60% |
-| Commonwealth, Fairview and SM Fairview | Quezon City | 499 | 969 | 193,787 | 63% |
-| Banawe and Quezon Avenue | Quezon City | 404 | 508 | 64,510 | 70% |
-| Cebu City | Cebu City | 599 | 1,887 | 27,078 | 40% |
-| Baguio centre | Baguio | 398 | 1,619 | 51,973 | 63% |
-| Angeles and Clark centre | Angeles and Clark | 498 | 810 | 100,582 | 70% |
-| San Fernando (Pampanga) centre | San Fernando (Pampanga) | 362 | 583 | 54,801 | 69% |
-| Olongapo and Subic centre | Olongapo and Subic | 189 | 256 | 20,554 | 62% |
-| Malolos centre | Malolos | 215 | 328 | 6,937 | 34% |
-| Baliwag centre | Baliwag | 254 | 311 | 1,335 | 12% |
-| Tarlac City centre | Tarlac City | 324 | 348 | 32,483 | 53% |
-| Balanga centre | Balanga | 264 | 246 | 21,869 | 60% |
-| Cabanatuan centre | Cabanatuan | 379 | 440 | 4,249 | 12% |
-| Dagupan centre | Dagupan | 121 | 245 | 2,888 | 24% |
-| Vigan centre | Vigan | 150 | 265 | 13,403 | 56% |
-| Laoag centre | Laoag | 157 | 207 | 12,607 | 42% |
-| Tuguegarao centre | Tuguegarao | 219 | 260 | 27,526 | 49% |
-| Davao City centre | Davao City | 443 | 1,397 | 26,834 | 47% |
-| Digos centre | Digos | 290 | 247 | 3,203 | 13% |
-| Tagum centre | Tagum | 405 | 385 | 39,370 | 38% |
-| Cagayan de Oro centre | Cagayan de Oro | 355 | 662 | 51,606 | 50% |
-| Iligan centre | Iligan | 294 | 389 | 7,553 | 13% |
-| Zamboanga City centre | Zamboanga City | 335 | 662 | 5,374 | 26% |
-| Pagadian downtown | Pagadian | 155 | 234 | 18,434 | 39% |
-| Dipolog downtown | Dipolog | 155 | 314 | 23,035 | 52% |
-| General Santos centre | General Santos | 300 | 293 | 39,066 | 46% |
-| Koronadal centre | Koronadal | 341 | 325 | 22,853 | 46% |
-| Cotabato City centre | Cotabato City | 234 | 308 | 11,229 | 26% |
-| Butuan centre | Butuan | 260 | 319 | 23,784 | 45% |
-| Surigao downtown | Surigao | 124 | 155 | 5,653 | 19% |
-| Mandaue | Mandaue | 312 | 382 | 7,569 | 32% |
-| Lapu-Lapu | Lapu-Lapu | 269 | 322 | 5,972 | 25% |
-| Iloilo City | Iloilo City | 513 | 1,158 | 27,046 | 49% |
-| Bacolod | Bacolod | 418 | 685 | 3,506 | 24% |
-| Talisay (Negros Occidental) | Talisay (Negros Occidental) | 157 | 205 | 1,483 | 16% |
-| Dumaguete | Dumaguete | 306 | 685 | 4,317 | 23% |
-| Tagbilaran | Tagbilaran | 179 | 282 | 8,730 | 32% |
-| Tacloban downtown | Tacloban | 149 | 533 | 13,477 | 49% |
-| Tacloban university belt | Tacloban | 155 | 205 | 27,881 | 44% |
-| Ormoc | Ormoc | 125 | 198 | 9,028 | 34% |
-| Roxas City | Roxas City | 190 | 172 | 9,775 | 42% |
-| Kalibo | Kalibo | 214 | 235 | 13,264 | 48% |
-| Dasmarinas centre | Dasmarinas | 554 | 725 | 87,687 | 56% |
-| Tagaytay downtown | Tagaytay | 134 | 145 | 7,592 | 42% |
-| Santa Rosa and Biñan centre | Santa Rosa, Biñan | 319 | 410 | 11,312 | 24% |
-| Calamba centre | Calamba | 226 | 305 | 4,494 | 29% |
-| Los Banos centre | Los Banos | 213 | 580 | 10,285 | 47% |
-| San Pablo centre | San Pablo | 232 | 552 | 9,913 | 31% |
-| Lipa centre | Lipa | 321 | 423 | 39,576 | 68% |
-| Batangas City centre | Batangas City | 269 | 725 | 32,122 | 62% |
-| Antipolo centre | Antipolo | 287 | 442 | 21,809 | 49% |
-| Lucena centre | Lucena | 284 | 243 | 2,907 | 27% |
-| Naga centre | Naga | 352 | 502 | 19,936 | 37% |
-| Legazpi centre | Legazpi | 332 | 595 | 31,071 | 52% |
-| Calapan downtown | Calapan | 126 | 207 | 4,376 | 41% |
-| Puerto Princesa downtown | Puerto Princesa | 108 | 260 | 8,871 | 38% |
-| **67 areas** | | **21,765** | **41,338** | **2,301,071** | |
+| Makati, BGC, Ortigas and Shaw | Makati, Mandaluyong, Pasig, Quezon City, San Juan, Taguig | 1,325 | 4,130 | 205,728 | 75% |
+| Bay Area and Mall of Asia | Pasay | 250 | 524 | 30,516 | 75% |
+| Cubao and Eastwood | Quezon City | 314 | 813 | 69,286 | 76% |
+| North Avenue, Quezon Memorial Circle and UP Diliman | Quezon City | 501 | 1,474 | 101,426 | 74% |
+| Intramuros, Ermita, Binondo and University Belt | Manila | 806 | 3,241 | 108,909 | 78% |
+| Alabang and Filinvest City | Muntinlupa | 260 | 481 | 36,018 | 68% |
+| Caloocan, Malabon, Navotas and Valenzuela | Caloocan, Malabon, Navotas, Valenzuela | 853 | 1,470 | 170,739 | 70% |
+| Marikina Centre and Riverbanks | Marikina | 386 | 819 | 95,751 | 69% |
+| Aseana, PITX and NAIA | Paranaque, Pasay | 315 | 405 | 42,153 | 73% |
+| Las Pinas and Alabang-Zapote Road | Las Pinas | 274 | 515 | 71,499 | 69% |
+| BF Homes and Aguirre Avenue | Paranaque | 222 | 321 | 50,216 | 64% |
+| McKinley Hill, Taguig Centre, Arca South and Pateros | Pateros, Taguig | 733 | 997 | 159,375 | 65% |
+| Commonwealth, Fairview and SM Fairview | Quezon City | 498 | 969 | 212,883 | 65% |
+| Banawe and Quezon Avenue | Quezon City | 403 | 508 | 67,608 | 72% |
+| Cebu City | Cebu City | 598 | 1,887 | 72,155 | 56% |
+| Baguio centre | Baguio | 395 | 1,619 | 58,895 | 66% |
+| Angeles and Clark centre | Angeles and Clark | 495 | 810 | 105,607 | 71% |
+| San Fernando (Pampanga) centre | San Fernando (Pampanga) | 362 | 583 | 58,188 | 72% |
+| Olongapo and Subic centre | Olongapo and Subic | 188 | 256 | 23,543 | 66% |
+| Malolos centre | Malolos | 215 | 328 | 28,819 | 64% |
+| Baliwag centre | Baliwag | 253 | 311 | 20,577 | 47% |
+| Tarlac City centre | Tarlac City | 324 | 348 | 38,526 | 62% |
+| Balanga centre | Balanga | 264 | 246 | 26,617 | 66% |
+| Cabanatuan centre | Cabanatuan | 377 | 440 | 32,821 | 55% |
+| Dagupan centre | Dagupan | 119 | 245 | 18,649 | 56% |
+| Vigan centre | Vigan | 150 | 265 | 18,000 | 63% |
+| Laoag centre | Laoag | 156 | 207 | 16,939 | 51% |
+| Tuguegarao centre | Tuguegarao | 219 | 260 | 32,650 | 55% |
+| Davao City centre | Davao City | 443 | 1,397 | 61,354 | 62% |
+| Digos centre | Digos | 290 | 247 | 22,062 | 42% |
+| Tagum centre | Tagum | 405 | 385 | 53,986 | 48% |
+| Cagayan de Oro centre | Cagayan de Oro | 353 | 662 | 60,771 | 55% |
+| Iligan centre | Iligan | 292 | 389 | 42,003 | 54% |
+| Zamboanga City centre | Zamboanga City | 333 | 662 | 57,651 | 58% |
+| Pagadian downtown | Pagadian | 154 | 234 | 25,258 | 49% |
+| Dipolog downtown | Dipolog | 155 | 314 | 25,004 | 55% |
+| General Santos centre | General Santos | 300 | 293 | 46,280 | 53% |
+| Koronadal centre | Koronadal | 341 | 325 | 30,165 | 54% |
+| Cotabato City centre | Cotabato City | 233 | 308 | 34,974 | 47% |
+| Butuan centre | Butuan | 260 | 319 | 29,915 | 52% |
+| Surigao downtown | Surigao | 124 | 155 | 13,649 | 41% |
+| Mandaue | Mandaue | 312 | 382 | 48,536 | 61% |
+| Lapu-Lapu | Lapu-Lapu | 269 | 322 | 49,605 | 51% |
+| Iloilo City | Iloilo City | 513 | 1,158 | 52,926 | 63% |
+| Bacolod | Bacolod | 418 | 685 | 36,699 | 55% |
+| Talisay (Negros Occidental) | Talisay (Negros Occidental) | 157 | 205 | 8,800 | 50% |
+| Dumaguete | Dumaguete | 306 | 685 | 30,007 | 58% |
+| Tagbilaran | Tagbilaran | 179 | 282 | 17,692 | 48% |
+| Tacloban downtown | Tacloban | 149 | 533 | 14,878 | 51% |
+| Tacloban university belt | Tacloban | 154 | 205 | 29,518 | 45% |
+| Ormoc | Ormoc | 125 | 198 | 13,099 | 42% |
+| Roxas City | Roxas City | 188 | 172 | 16,478 | 52% |
+| Kalibo | Kalibo | 214 | 235 | 19,854 | 55% |
+| Dasmarinas centre | Dasmarinas | 554 | 725 | 104,525 | 63% |
+| Tagaytay downtown | Tagaytay | 133 | 145 | 11,465 | 57% |
+| Santa Rosa and Biñan centre | Santa Rosa, Biñan | 317 | 410 | 63,958 | 62% |
+| Calamba centre | Calamba | 225 | 305 | 30,885 | 57% |
+| Los Banos centre | Los Banos | 212 | 580 | 20,883 | 56% |
+| San Pablo centre | San Pablo | 232 | 552 | 23,721 | 48% |
+| Lipa centre | Lipa | 319 | 423 | 49,386 | 72% |
+| Batangas City centre | Batangas City | 269 | 725 | 38,245 | 66% |
+| Antipolo centre | Antipolo | 287 | 442 | 46,683 | 63% |
+| Lucena centre | Lucena | 284 | 243 | 30,310 | 56% |
+| Naga centre | Naga | 352 | 502 | 33,033 | 48% |
+| Legazpi centre | Legazpi | 332 | 595 | 36,957 | 55% |
+| Calapan downtown | Calapan | 126 | 207 | 12,160 | 60% |
+| Puerto Princesa downtown | Puerto Princesa | 108 | 260 | 16,775 | 65% |
+| **67 areas** | | **21,674** | **41,338** | **3,334,243** | |
 <!-- coverage:end -->
 
 ## The sidewalk on the sun's side gets more building shade
@@ -191,13 +191,13 @@ Each area keeps its files in `app/public/data/areas/<id>/`. Two files cover ever
 
 <!-- limits:start -->
 - **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds 68.0 km of sheltered path. Nobody has measured how much exists on the street.
-- **Access.** Gates and entrances that need a field check remove 596 km of paths from routes.
-- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. That covers 5,145 km of the 8,434 km of side-of-street paths. A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.
+- **Access.** Gates and entrances that need a field check remove 592 km of paths from routes.
+- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. That covers 4,920 km of the 8,016 km of side-of-street paths. A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.
 <!-- limits:end -->
 - **Heights.** Google's heights stop at 100 m and date from 2023. OpenStreetMap supplies most tower heights.
-- **Building outlines.** Only buildings that OpenStreetMap outlines cast shade. Outlines cover 53% to 74% of Google's building area in Metro Manila areas. Outside Metro Manila they cover 12% to 70%, with a median of 42%, so routes there miss building shade. The "Buildings mapped" column gives each area's share.
+- **Building outlines.** Only buildings with an outline cast shade. Outlines come from OpenStreetMap and, where it has none, from Google Open Buildings v3. A Google outline goes in only when its confidence reaches Google's 80%-precision cutoff and Google's 2023 height raster also sees a building there. Outlines cover 64% to 78% of Google's building area in Metro Manila areas, and 41% to 72% elsewhere, with a median of 55%. The "Buildings mapped" column gives each area's share.
 - **Taglish copy.** A native speaker has not reviewed it yet.
-- **Next.** Fill the missing building outlines outside Metro Manila from Google's building raster. Then walk the covered networks in the field and check the shade against photos.
+- **Next.** Compare Google's and OpenStreetMap's outlines building by building, for detail and coverage. Then walk the covered networks in the field and check the shade against photos.
 - **One walk network per route.** Each area has its own walk network. A trip across the seam of two areas routes in the area whose network holds both ends. Only a start and an end that no single network holds get no route, and the app says so.
 - **Map shadows.** The map draws shadows in your browser, each tree as a disc. They can differ from the shade model at tree edges.
 
@@ -208,6 +208,7 @@ Code is MIT. Data built from OpenStreetMap is ODbL 1.0. Other layers keep their 
 | Source | Used for | Licence |
 | --- | --- | --- |
 | OpenStreetMap, Geofabrik extract 2026-10-20 | Walk network, places, buildings, opening hours | ODbL 1.0, © OpenStreetMap contributors |
+| Google Open Buildings v3 | Building outlines where OSM has none | CC BY 4.0 |
 | Google Open Buildings 2.5D Temporal (2023) | Building heights where OSM has none | CC BY 4.0 |
 | Meta and WRI High Resolution Canopy Height Maps | Tree shade | CC BY 4.0, imagery © 2016 Maxar |
 | Open-Meteo | Hourly weather | CC BY 4.0 |

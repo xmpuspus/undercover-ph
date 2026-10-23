@@ -31,9 +31,9 @@ const SOURCES: { name: string; licence: string; text: string; url: string; licen
     licenceUrl: CC_BY,
   },
   {
-    name: "Google Open Buildings 2.5D",
+    name: "Google Open Buildings",
     licence: "CC BY 4.0 or ODbL",
-    text: "Modelled building heights from 2023 imagery, where OpenStreetMap has none. Clipped and merged with OpenStreetMap footprints.",
+    text: "Building outlines (v3) where OpenStreetMap has none, and modelled building heights from 2023 imagery (2.5D Temporal) where it has no height tag.",
     url: "https://sites.research.google/gr/open-buildings/",
     licenceUrl: CC_BY,
   },
@@ -150,8 +150,8 @@ export default function About({ manifest, areas, onClose }: { manifest: Manifest
         <p className="mt-2">A route starts and ends in the same area.</p>
         {groups.some((g) => g.areas.some((a) => (a.buildings_mapped ?? 1) < 0.5)) && (
           <p className="mt-2" data-testid="about-buildings-mapped">
-            Shade comes from building outlines in OpenStreetMap. Outside Metro Manila many buildings have no outline yet, so routes there
-            miss some building shade. The share of buildings mapped follows each area where it is under half.
+            Shade comes from building outlines, from OpenStreetMap and, where it has none, from Google. Some buildings still have no outline,
+            so routes miss some building shade. The share of buildings mapped follows each area where it is under half.
           </p>
         )}
 

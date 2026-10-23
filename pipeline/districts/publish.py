@@ -86,7 +86,7 @@ def area_entry(a, m):
         "graph_rects": a["graph_rects"],
         "neighbourhoods": [{"id": d["id"], "name": d["name"], "bbox": d["bbox"]} for d in m["area"]["neighbourhoods"]],
         "center": [round((w + e) / 2, 6), round((s + n) / 2, 6)],
-        **({"buildings_mapped": FOOTPRINT[a["id"]]["osm_share_of_google_building_area"]} if a["id"] in FOOTPRINT else {}),
+        **({"buildings_mapped": FOOTPRINT[a["id"]]["outline_share_of_google_building_area"]} if a["id"] in FOOTPRINT else {}),
     }
 
 
@@ -216,7 +216,7 @@ def rel(path):
 
 def build_tiles(ids):
     TILES_WORK.mkdir(parents=True, exist_ok=True)
-    attribution = ("OpenStreetMap contributors (ODbL); Google Open Buildings 2.5D Temporal (CC BY 4.0); "
+    attribution = ("OpenStreetMap contributors (ODbL); Google Open Buildings v3 and 2.5D Temporal (CC BY 4.0); "
                    "Meta and WRI Global Canopy Height (CC BY 4.0)")
     common = ["tippecanoe", "--force", "-P", "--quiet", "-n", "undercover.ph", "-A", attribution]
     b_lines = TILES_WORK / "buildings.ndjson"

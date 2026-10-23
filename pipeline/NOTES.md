@@ -706,3 +706,22 @@ Two limits stay open.
 
 - Only buildings with an OSM outline cast shade. `pipeline/tools/footprint_cover.py` measures the share of Google's building area with an outline. Metro Manila areas have 53% to 74%. The regional areas have 12% to 70%, with a median of 42%, and 41 of 53 are under half. Baliwag, Cabanatuan, Iligan and Digos are near 12%. The next step is to fill outlines from Google's presence band in `build_buildings.py`.
 - `trees.pmtiles` is 85.8 MB and `buildings.pmtiles` 52.5 MB. GitHub refuses a file over 100 MB. About 10 more areas of trees fill the gap, so split the tree file by region before the next wave.
+
+### Google Open Buildings v3 fills the outlines OSM lacks, on 2026-10-23, and adds 1.03 million outlines
+
+Only buildings with an outline cast shade, and OSM had outlines for 12% to 70% of Google's building area outside Metro Manila. `pipeline/districts/fetch_gob_v3.py` cuts Google Open Buildings v3 outlines (CC BY 4.0) into each district box. It reads 21 level-6 S2 files, 2.9 GB, kept in `pipeline/raw/gob_v3/`. `build_buildings.py` adds an outline only when all four rules hold.
+
+- Its confidence reaches the 80%-precision threshold Google gives for its level-4 S2 cell (0.716 to 0.763 for the Philippine cells).
+- The 2023 height raster sees a building in it: 8 or more pixels with presence 0.5 or more, and a median height of 2.5 m or more on those pixels.
+- It overlaps OSM outlines and parts by less than 10% of its own area.
+- Its height is that raster median. No default height applies, so a wrong outline gets no invented height.
+
+Results across the 67 areas:
+
+- 1,033,164 outlines added (997,898 in 65 areas, plus 19,242 in Baliwag and 16,024 in metro-core). In metro-core, 147,068 of 300,923 candidates overlapped OSM and 129,012 fell below the threshold.
+- Outline share of Google's building area: Metro Manila 64% to 78%, was 53% to 74%. Other regions 41% to 72% (median 55%), was 12% to 70% (median 42%). Areas under half: 11, was 41. Baliwag went from 12% to 47%.
+- Place-pair reach did not change in any area. Walkable km fell 0% to 2%, because sidewalk offsets now keep clear of the new outlines.
+- `buildings.pmtiles` holds 2,016,478 buildings in 74.4 MB, up from 1,332,251 in 52.5 MB.
+- An overlay on Esri imagery in Baliwag, Makati, Cebu and Davao showed the added outlines on real roofs and none on open ground. Dense low-rise blocks still miss many houses, so the fill errs low. In Cebu's Colon district OSM was already complete, and Google added 2 outlines.
+
+Next, per Xavier on 2026-10-23: compare Google and OSM outlines building by building, for detail and coverage, before the next release.

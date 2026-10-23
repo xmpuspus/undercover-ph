@@ -85,7 +85,7 @@ def main():
         tpl = ROOT / "pipeline/inputs/areas" / a["id"] / "manifest_template.json"
         b = json.loads(tpl.read_text())["counts"]["buildings"] if tpl.exists() else 0
         n = places.get(a["id"], 0)
-        share = cover.get(a["id"], {}).get("osm_share_of_google_building_area")
+        share = cover.get(a["id"], {}).get("outline_share_of_google_building_area")
         mapped = f"{share:.0%}" if share is not None else "not measured"
         rows.append(
             f"| {a['name']} | {', '.join(a['cities'])} | {rkm:,.0f} | {n:,} | {b:,} | {mapped} |"

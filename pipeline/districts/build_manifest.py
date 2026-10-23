@@ -23,7 +23,7 @@ from pedestrian_access import PEDESTRIAN  # noqa: E402
 
 MANILA = timezone(timedelta(hours=8))
 SIDES = {"left", "right", "centre"}
-SOURCES = {"osm", "osm_levels", "google_2023", "default", None}
+SOURCES = {"osm", "osm_levels", "google_2023", "google_v3", "default", None}
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 EDGE_KEYS = ["id", "u", "v", "len_m", "geom", "flags", "routable", "side", "way_id", "name", "landmark",
              "hours_idx", "level"]
@@ -231,6 +231,7 @@ def make_limits(g, p, b, h):
          else f"OSM opening hours that the simple parser cannot read are skipped. {n_unparsed} values were skipped."),
         "Building heights come from OSM height, else OSM levels x 3.74 m, else the Google 2023 median, else a 7.5 m default.",
         f"Google fills {bsrc.get('google_2023', 0)} OSM building objects with modelled 2023 heights. Google heights stop near 100 m.",
+        f"Google Open Buildings v3 adds {bsrc.get('google_v3', 0)} outlines that OSM does not have, each one also seen by the 2023 height raster.",
         f"{bsrc.get('default', 0)} OSM building objects over 100 m2 use a 7.5 m default, two levels of 3.74 m. Their shade counts as low confidence.",
         "Each default replaces a Google median under 2.5 m. The default errs low, so a taller real building casts more shade than shown.",
         (f"{b['null_height_objects']} OSM building objects of 100 m2 or less have no usable height. Their height is null."

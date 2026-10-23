@@ -26,10 +26,14 @@ The pipeline gives each building one height from the first of these sources that
 
 Each `building:part` keeps its own height and base. A tower part does not raise its podium.
 
-Only buildings with an OpenStreetMap outline cast shade. Google's raster gives heights, not outlines. `pipeline/tools/footprint_cover.py`
-measures the share of Google's building area that has an outline. On 2026-10-22 the share was 53% to 74% in Metro Manila areas and
-12% to 70% in the other regions, with a median of 42%. So routes outside Metro Manila miss building shade, most in the areas with the
-lowest share. The README table gives each area's share, and the About page names each area under half.
+Only buildings with an outline cast shade. Outlines come from OpenStreetMap first. Where it has none, Google Open Buildings v3 adds
+an outline traced from 50 cm imagery. A Google outline goes in only when two Google sources agree: its confidence reaches the
+80%-precision cutoff Google gives for its S2 cell, and the 2023 height raster sees a building of 2.5 m or more inside it. It must not
+overlap an OpenStreetMap building by 10% of its area or more. Its height is the raster median, with no default, so a wrong outline
+never gets an invented height. `pipeline/tools/footprint_cover.py` measures the share of Google's building area that has an outline.
+On 2026-10-23 the share was 64% to 78% in Metro Manila areas and 41% to 72% in the other regions, with a median of 55%. With
+OpenStreetMap alone, the other regions had 12% to 70%, with a median of 42%. The README table gives each area's share, and the About
+page names each area under half.
 
 ## 3. Tree canopy comes from a canopy height raster with pixels of about 1 m
 
