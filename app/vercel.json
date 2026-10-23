@@ -5,6 +5,7 @@
   "buildCommand": "bash ../pipeline/vercel_build.sh",
   "outputDirectory": "dist",
   "git": { "deploymentEnabled": { "**": false, "main": true } },
+  "redirects": [{ "source": "/code", "destination": "https://github.com/xmpuspus/undercover-ph", "permanent": false }],
   "headers": [
     {
       "source": "/(.*)",
