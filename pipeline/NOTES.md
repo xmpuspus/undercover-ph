@@ -749,6 +749,8 @@ Imagery check on Esri World Imagery at zoom 19, by eye, rule and every verdict i
 
 - 96 random added outlines: 78 real, 9 not buildings, 9 unclear (cloud or blur). That is 10% of the clear ones (95% interval 6% to 19%), about 107,000 of the 1,033,164 added. The 9 are tree canopy, a pool, bare soil, a grass strip, a court and an alley. Three are doubtful. The lead read page 1 (0 of 22) and an agent read pages 2 to 4 (9 of 65) more strictly.
 - 48 random outlines the height raster check turned away: 18 real, 25 not buildings, 5 unclear. That is 58% of the clear ones. So the check removes outlines about six times as likely to be wrong, but also about 2 real roofs for every 3 fakes it removes.
-- Tree canopy is the most common miss in both samples (2 of 9 added, 9 of 25 turned away). The next step is to drop an added outline that sits mostly under the Meta canopy raster's tree crowns, then measure the same two samples again.
+- Two more filters were tested on the same samples (`tmp/outline-compare-20261023/canopy-eval.json` and `confidence-eval.json`). Neither helps, so the rule stays as built.
+  - Tree canopy: only 1 of the 9 added fakes has half or more of its pixels at 3 m or taller in the Meta canopy raster, and 2 of 75 real roofs do. A canopy rule would drop 2 real roofs to remove 1 fake. Most added fakes are pools, soil, grass, a court or an alley, which the canopy raster does not mark.
+  - Confidence: the 9 added fakes sit 0.012 to 0.155 above the cutoff (median 0.062), and the 75 real roofs 0.003 to 0.192 (median 0.059). A higher cutoff removes both at about the same rate.
 
 Decision: keep OSM first and fill from v3, as built. In Metro Manila areas, v3 alone would cover 9 to 32 points less than the two together, and it would drop every OSM height tag.
