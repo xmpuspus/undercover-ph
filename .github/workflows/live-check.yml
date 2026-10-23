@@ -1,8 +1,9 @@
 # The daily rebuild only proves that a commit reached main. A failed Vercel build keeps
 # the old deployment up, and its 7 shade dates run out within a week with no alert.
 # This job reads every area's live manifest after the rebuild window and opens an issue when
-# an area's first shade date is not today (Manila) or its shade marker is gone. A failed rebuild
-# then shows the next morning, with about 6 days of old data left to fix it.
+# an area's shade dates do not cover today (Manila) with 4 or more days left, or its shade marker
+# is gone. GitHub starts scheduled runs late (2 to 3 hours on 2026-10-23), so a first date of
+# yesterday is normal before the morning run lands; 4 days left still gives time to fix a failure.
 
 name: live-check
 
@@ -16,7 +17,7 @@ permissions:
 
 jobs:
   check:
-    name: the live shade dates start today
+    name: the live shade dates cover today
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -29,7 +30,8 @@ jobs:
           from datetime import datetime, timedelta, timezone
 
           site = os.environ["SITE"]
-          today = datetime.now(timezone(timedelta(hours=8))).date().isoformat()
+          now = datetime.now(timezone(timedelta(hours=8))).date()
+          today, last_ok = now.isoformat(), (now + timedelta(days=3)).isoformat()
 
           def get(path):
               req = urllib.request.Request(f"{site}{path}?cb={int(time.time())}", headers={"Cache-Control": "no-cache"})
@@ -45,10 +47,12 @@ jobs:
               dates = json.loads(body).get("dates") or []
               kind, _ = get(f"/data/areas/{i}/READY.shade")
               print(f"{i}: dates {dates[:1]} to {dates[-1:]}")
-              if not dates or dates[0] != today or "text/html" in kind:
-                  stale.append(f"{i} starts {dates[:1]}" if "text/html" not in kind else f"{i} has no READY.shade")
+              if "text/html" in kind:
+                  stale.append(f"{i} has no READY.shade")
+              elif not dates or today not in dates or dates[-1] < last_ok:
+                  stale.append(f"{i} covers {dates[:1]} to {dates[-1:]}")
           if stale:
-              sys.exit(f"Not today ({today}) in {len(stale)} of {len(ids)} areas: {', '.join(stale)}. The last daily rebuild did not deploy.")
+              sys.exit(f"Shade for {today} with 4 days left is missing in {len(stale)} of {len(ids)} areas: {', '.join(stale)}. The daily rebuilds did not deploy.")
           print("live data is current")
           EOF
 

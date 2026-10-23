@@ -149,8 +149,10 @@ The page address holds the trip after the # sign, which browsers never send to a
 ## Run it locally
 
 ```bash
-git clone https://github.com/xmpuspus/undercover-ph
-cd undercover-ph/app
+git clone --depth 1 https://github.com/xmpuspus/undercover-ph   # --depth 1 skips old copies of the data
+cd undercover-ph
+python3 pipeline/data_release.py fetch --tiles   # the map tiles, about 160 MB, from the data release (Python 3.12+)
+cd app
 pnpm install
 pnpm dev            # http://localhost:5173
 pnpm test           # unit tests: router, search, route card text, sky theme, trip links, advisory
@@ -159,7 +161,7 @@ pnpm e2e            # browser tests on desktop and phone: trip flow, Back, links
 pnpm demo:record    # re-record the walkthrough MP4, the GIFs and the share images in docs/demo/ from a production build
 ```
 
-The deployed site rebuilds its shade data every day. To build it yourself, see `pipeline/NOTES.md` and `pipeline/shade/NOTES.md`.
+The deployed site rebuilds its shade data every day. The map tiles and each area's shade inputs are not in git. They are in a GitHub release that `pipeline/data-release.json` names, and `pipeline/data_release.py` downloads and checks them. To build the data yourself, see `pipeline/NOTES.md` and `pipeline/shade/NOTES.md`.
 
 ## Each route weighs length against sun exposure from a shade model cast every 30 minutes
 

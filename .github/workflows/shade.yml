@@ -14,6 +14,9 @@
 # main after the merge. The release then serves main too, so the branch must not change shade.py or area inputs
 # that main keeps.
 
+# Area inputs (canopy, buildings, manifest template) come from the data release that
+# pipeline/data-release.json names, not from git (2026-10-23).
+
 name: shade
 
 on:
@@ -84,6 +87,8 @@ jobs:
           cache-dependency-path: pipeline/shade/requirements.txt
       - name: Install the shade engine
         run: python -m pip install --disable-pip-version-check -q -r pipeline/shade/requirements.txt
+      - name: Get this area's inputs from the data release
+        run: python -I pipeline/data_release.py fetch --inputs "$UCPH_AREA"
       - name: Shade 7 dates from today
         run: |
           python -I pipeline/set_dates.py "$UCPH_START_DATE"
@@ -130,14 +135,14 @@ jobs:
           echo "areas: $(find out -mindepth 1 -maxdepth 1 -type d | wc -l), missing: ${missing:-none}"
           tar -czf "shade-$DATE.tar.gz" -C out .
           ls -l "shade-$DATE.tar.gz"
-      - name: Replace today's release and keep the 3 newest
+      - name: Replace today's release and keep the 7 newest
         run: |
           tag="shade-$DATE"
           gh release delete "$tag" -R "$GITHUB_REPOSITORY" --cleanup-tag --yes 2>/dev/null || true
           gh release create "$tag" "shade-$DATE.tar.gz" -R "$GITHUB_REPOSITORY" --target main \
             --title "Shade data $DATE" --notes "Seven dates of shade from $DATE for every routing area${MISSING:+ except $MISSING}. Built by the shade workflow, read by the deploy build."
           gh release list -R "$GITHUB_REPOSITORY" --limit 100 --json tagName --jq '.[].tagName' \
-            | grep '^shade-' | sort -r | tail -n +4 \
+            | grep '^shade-' | sort -r | tail -n +8 \
             | while read -r old; do gh release delete "$old" -R "$GITHUB_REPOSITORY" --cleanup-tag --yes; done
 
   deploy:

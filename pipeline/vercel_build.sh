@@ -3,6 +3,7 @@
 # then build the app. app/vercel.json calls it as the buildCommand, from app/, after pnpm install.
 #
 # Generated files stay out of git: manifest.json, shade/, trees.json, weather.json, advisory.json, READY.*.
+# The map tiles and the area inputs stay out of git too; they come from the data release.
 # A shade failure fails the build, so the last good deployment stays live.
 # A failed weather or advisory fetch writes {"status": "unavailable"} and the build goes on.
 #
@@ -17,7 +18,7 @@
 #
 # Areas: every routing area in app/public/data/areas.json, each in app/public/data/areas/<id>/ with
 # inputs in pipeline/inputs/areas/<id>/. shade.py runs in area mode: shade/<date>.bin, shade/lowconf.bin
-# and trees.json, no overlays. Buildings and trees for the map ship as committed PMTiles.
+# and trees.json, no overlays. Buildings and trees for the map ship as PMTiles from the data release.
 # Environment, all optional: UCPH_PYTHON (interpreter for the venv), UCPH_START_DATE (first shade date,
 # default today in Asia/Manila), UCPH_SKIP_TESTS=1 (skip pnpm test, for timing runs; default off),
 # UCPH_SHADE_SOURCE (release or compute, see below), UCPH_SHADE_REPO (owner/name of the release repo),
@@ -70,10 +71,13 @@ if [ ! -f "$DATA/areas.json" ]; then
 fi
 # Weather and the advisory need only the standard library.
 export PY="$PYTHON"
+# The map tiles and the area inputs live in the data release that pipeline/data-release.json names, not in git
+# (2026-10-23). fetch skips files that already match and checks every download's sha256.
+"$PY" -I pipeline/data_release.py fetch --tiles
 IDS="$("$PY" -I -c 'import json, sys; print(" ".join(a["id"] for a in json.load(open(sys.argv[1]))["areas"]))' "$DATA/areas.json")"
 
 # Where the shade comes from. On Vercel, from the newest shade release that .github/workflows/shade.yml
-# publishes each morning: today's, or one or two days back if this morning's run has not finished. An area
+# publishes each morning: today's, or up to six days back if the morning runs have not finished. An area
 # whose graph.json changed since that release, or that the release lacks, is shaded here, and with no
 # release at all every area is. Elsewhere the default is to shade every area here. UCPH_SHADE_SOURCE=release or compute overrides the default.
 SOURCE="${UCPH_SHADE_SOURCE:-$([ -n "${VERCEL:-}" ] && echo release || echo compute)}"
@@ -81,7 +85,7 @@ COMPUTE="$IDS"
 if [ "$SOURCE" = "release" ]; then
   REPO="${UCPH_SHADE_REPO:-xmpuspus/undercover-ph}"
   got=""
-  for back in 0 1 2; do
+  for back in 0 1 2 3 4 5 6; do
     day="$("$PY" -I -c 'import datetime, sys; print(datetime.date.fromisoformat(sys.argv[1]) - datetime.timedelta(days=int(sys.argv[2])))' "$START" "$back")"
     url="${UCPH_SHADE_BASE:-https://github.com/$REPO/releases/download}/shade-$day/shade-$day.tar.gz"
     if curl -fsSL --retry 3 -o "$ROOT/shade-release.tar.gz" "$url"; then got="$day"; break; fi
@@ -89,7 +93,7 @@ if [ "$SOURCE" = "release" ]; then
   if [ -z "$got" ]; then
     # The deploy still works without a release: every area is shaded here, as before the workflow existed.
     # With many areas that can pass Vercel's 45-minute limit, and live-check.yml reports stale shade.
-    echo "vercel_build: no shade release from $START or the two days before it, so every area is shaded here" >&2
+    echo "vercel_build: no shade release from $START or the six days before it, so every area is shaded here" >&2
   else
     tar -xzf "$ROOT/shade-release.tar.gz" -C "$DATA/areas"
     # A release cast from a branch can hold areas this commit does not list. They must not ship.
@@ -107,7 +111,10 @@ fi
 # One PAGASA advisory fetch, shared by every area. Weather is one call per area centre.
 "$PY" -I pipeline/fetch_weather.py --advisory-to "$DATA/advisory.json"
 export UCPH_ADVISORY_FROM="$DATA/advisory.json"
-if [ -n "$COMPUTE" ]; then venv; fi
+if [ -n "$COMPUTE" ]; then
+  "$PY" -I pipeline/data_release.py fetch --inputs $COMPUTE
+  venv
+fi
 for id in $IDS; do
   t0=$SECONDS
   export UCPH_AREA="$id" UCPH_DATA="$DATA/areas/$id" UCPH_INPUTS="$ROOT/pipeline/inputs/areas/$id"

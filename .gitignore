@@ -66,3 +66,7 @@ pipeline/regions/scout/cache/
 
 # Written by the shade workflow and read by the deploy build
 app/public/data/**/graph.sha256
+
+# Large data files live in the GitHub data release named in pipeline/data-release.json (2026-10-23)
+app/public/data/*.pmtiles
+pipeline/inputs/areas/
