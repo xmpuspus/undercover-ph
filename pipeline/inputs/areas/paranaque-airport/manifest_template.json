@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T19:19:48+08:00",
+ "generated_at": "2026-10-23T09:04:39+08:00",
  "osm_extract": "philippines-261020.osm.pbf, md5 941dd405ba4f1c028ca874cde38ea200, clipped to ncr.osm.pbf with osmium extract -b 120.90,14.35,121.20,14.80",
  "pilot_bbox": [
   120.98,
@@ -59,9 +59,9 @@
  ],
  "counts": {
   "nodes": 4738,
-  "edges": 6957,
-  "routable_edges": 6527,
-  "buildings": 31350,
+  "edges": 6939,
+  "routable_edges": 6509,
+  "buildings": 42153,
   "places": 520
  },
  "sources": [
@@ -79,8 +79,8 @@
   }
  ],
  "limits": [
-  "Edges with unchecked access rules are not routable by default. That removes 430 of 6957 edges, or 15.6 km.",
-  "The largest routable network holds 86.3% of routable nodes and 87.2% of routable length.",
+  "Edges with unchecked access rules are not routable by default. That removes 430 of 6939 edges, or 15.6 km.",
+  "The largest routable network holds 86.3% of routable nodes and 87.1% of routable length.",
   "Kerbs do not trigger an access check. 2 edges that cross a raised kerb carry the steps flag, so step-free routes avoid them.",
   "Gates alone remove 215 edges and 10.6 km. Village and estate gates need a field check.",
   "Only access, foot and opening-hours rules restrict walkers. Vehicle-only conditional tags, such as a Sunday car-free rule, do not.",
@@ -90,13 +90,13 @@
   "The routable graph has 2.13 km of roofed, tunnel or indoor walkway in 133 edges.",
   "OSM maps 122 indoor, corridor or passage edges here. 6 of them carry mall hours.",
   "Some plain footways run through mall footprints without indoor tags. They stay routable at all hours.",
-  "41 unsheltered edges, 2.3 km, run mostly inside a building footprint with no cover tag.",
+  "112 unsheltered edges, 4.2 km, run mostly inside a building footprint with no cover tag.",
   "Those edges carry flag 1024, inside a footprint with cover unverified. They get no shelter flag, and their shade counts as low confidence.",
   "The graph keeps each whole way that has a node in the graph area. Some edges reach 1333 m past it.",
   "48 ways outside the graph area, 2.1 km, join walk network pieces that the area edge cut apart.",
   "A road side edge starts half the carriageway width plus 1 m from the road centreline.",
   "The offset shrinks in 0.5 m steps, down to 1.5 m, until no 1 m sample sits inside a ground-level footprint.",
-  "195 side edges moved closer to the road. 66 sides still inside a footprint at 1.5 m became 52 centre edges.",
+  "212 side edges moved closer to the road. 166 sides still inside a footprint at 1.5 m became 134 centre edges.",
   "Carriageway width comes from the width tag, else lanes x 3.2 m, else the median lane count for that road class.",
   "The class medians are 3 lanes for primary, 4 for secondary and 3 for tertiary roads.",
   "Side offsets run from 1.5 m to 12.2 m, with a median of 5.8 m.",
@@ -110,6 +110,7 @@
   "OSM opening hours that the simple parser cannot read are skipped. 0 values were skipped.",
   "Building heights come from OSM height, else OSM levels x 3.74 m, else the Google 2023 median, else a 7.5 m default.",
   "Google fills 28587 OSM building objects with modelled 2023 heights. Google heights stop near 100 m.",
+  "Google Open Buildings v3 adds 10803 outlines that OSM does not have, each one also seen by the 2023 height raster.",
   "717 OSM building objects over 100 m2 use a 7.5 m default, two levels of 3.74 m. Their shade counts as low confidence.",
   "Each default replaces a Google median under 2.5 m. The default errs low, so a taller real building casts more shade than shown.",
   "1468 OSM building objects of 100 m2 or less, and 5 with a roof at or below their base, have null heights.",

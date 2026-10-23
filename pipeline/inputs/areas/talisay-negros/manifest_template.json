@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T21:22:00+08:00",
+ "generated_at": "2026-10-23T09:10:58+08:00",
  "osm_extract": "philippines-261020.osm.pbf, md5 941dd405ba4f1c028ca874cde38ea200, clipped to bacolod.osm.pbf with osmium extract -b 122.85,10.55,123.10,10.85 --strategy complete_ways",
  "pilot_bbox": [
   122.964,
@@ -61,7 +61,7 @@
   "nodes": 1312,
   "edges": 2016,
   "routable_edges": 2000,
-  "buildings": 1483,
+  "buildings": 8800,
   "places": 205
  },
  "sources": [
@@ -90,16 +90,16 @@
   "The routable graph has 0.82 km of roofed, tunnel or indoor walkway in 6 edges.",
   "OSM maps 0 indoor, corridor or passage edges here. 0 of them carry mall hours.",
   "Some plain footways run through mall footprints without indoor tags. They stay routable at all hours.",
-  "1 unsheltered edges, 0.1 km, run mostly inside a building footprint with no cover tag.",
+  "21 unsheltered edges, 1.3 km, run mostly inside a building footprint with no cover tag.",
   "Those edges carry flag 1024, inside a footprint with cover unverified. They get no shelter flag, and their shade counts as low confidence.",
   "The graph keeps each whole way that has a node in the graph area. Some edges reach 1512 m past it.",
   "1 ways outside the graph area, 0.1 km, join walk network pieces that the area edge cut apart.",
   "A road side edge starts half the carriageway width plus 1 m from the road centreline.",
   "The offset shrinks in 0.5 m steps, down to 1.5 m, until no 1 m sample sits inside a ground-level footprint.",
-  "5 side edges moved closer to the road. 1 sides still inside a footprint at 1.5 m became 1 centre edges.",
+  "40 side edges moved closer to the road. 12 sides still inside a footprint at 1.5 m became 12 centre edges.",
   "Carriageway width comes from the width tag, else lanes x 3.2 m, else the median lane count for that road class.",
   "The class medians are 3 lanes for primary, 2 for secondary and 2 for tertiary roads.",
-  "Side offsets run from 1.7 m to 7.4 m, with a median of 4.2 m.",
+  "Side offsets run from 1.5 m to 7.4 m, with a median of 4.2 m.",
   "A road tagged with a sidewalk on one side gets one side edge. Roads tagged sidewalk=no or separate keep a centre edge.",
   "Tertiary and larger roads with no sidewalk tag get two side edges without the sidewalk flag.",
   "Both side edges share the road's nodes. Node flags mark crossings, signals, junctions and grade-separated links.",
@@ -110,6 +110,7 @@
   "OSM opening hours that the simple parser cannot read are skipped. 0 values were skipped.",
   "Building heights come from OSM height, else OSM levels x 3.74 m, else the Google 2023 median, else a 7.5 m default.",
   "Google fills 955 OSM building objects with modelled 2023 heights. Google heights stop near 100 m.",
+  "Google Open Buildings v3 adds 7317 outlines that OSM does not have, each one also seen by the 2023 height raster.",
   "229 OSM building objects over 100 m2 use a 7.5 m default, two levels of 3.74 m. Their shade counts as low confidence.",
   "Each default replaces a Google median under 2.5 m. The default errs low, so a taller real building casts more shade than shown.",
   "261 OSM building objects of 100 m2 or less have no usable height. Their height is null.",
