@@ -137,11 +137,24 @@ function nightLabels(map: maplibregl.Map, layers: maplibregl.LayerSpecification[
   }
 }
 
+// The ground when OpenFreeMap cannot serve its style: no streets or labels, but the walking areas, buildings,
+// trees and routes still draw, since they come from this site. PLAN.md item 17 (2026-10-23).
+const FALLBACK_STYLE = "fallback";
+const FALLBACK_GROUND = { day: "#E2E8F0", night: "#0F172A" };
+function fallbackStyle(dark: boolean): maplibregl.StyleSpecification {
+  return {
+    version: 8,
+    sources: {},
+    layers: [{ id: "hb-ground", type: "background", paint: { "background-color": dark ? FALLBACK_GROUND.night : FALLBACK_GROUND.day } }],
+  };
+}
+
 export default function MapView(p: Props) {
   const box = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const ready = useRef(false);
   const styleUrl = useRef("");
+  const fallback = useRef(false);
   const props = useRef(p);
   props.current = p;
   const markers = useRef<{ from?: maplibregl.Marker; to?: maplibregl.Marker }>({});
@@ -405,6 +418,15 @@ export default function MapView(p: Props) {
     // MapLibre logs every failed tile fetch with console.error. A dropped basemap or 3D tile on a weak phone
     // signal is routine: the map retries on the next move, and routing does not use these tiles.
     map.on("error", (e) => {
+      // An error before any style loaded that names no source is the basemap style itself failing.
+      if (!ready.current && !fallback.current && !(e as { sourceId?: string }).sourceId) {
+        console.warn("basemap style failed, so the map uses a plain ground:", e.error?.message ?? e);
+        fallback.current = true;
+        styleUrl.current = FALLBACK_STYLE;
+        el.dataset.basemap = "fallback";
+        map.setStyle(fallbackStyle(props.current.theme.dark), { diff: false });
+        return;
+      }
       const msg = e.error?.message ?? "";
       if (/Failed to fetch|NetworkError|Load failed|AbortError/i.test(msg)) console.warn("map tile:", msg);
       else console.error(e.error ?? e);
@@ -459,6 +481,10 @@ export default function MapView(p: Props) {
   // Switch between the light and dark basemap. Only night uses the dark one.
   useEffect(() => {
     const map = mapRef.current;
+    if (map && fallback.current) {
+      if (map.getLayer("hb-ground")) map.setPaintProperty("hb-ground", "background-color", p.theme.dark ? FALLBACK_GROUND.night : FALLBACK_GROUND.day);
+      return;
+    }
     const url = p.theme.dark ? STYLE_NIGHT : STYLE_DAY;
     if (!map || styleUrl.current === url) return;
     styleUrl.current = url;
@@ -630,7 +656,7 @@ export default function MapView(p: Props) {
       <div ref={toneRef} className="pointer-events-none absolute inset-0 mix-blend-multiply" aria-hidden="true" data-testid="map-tone" />
       <div ref={washRef} className="pointer-events-none absolute inset-0" aria-hidden="true" />
       {failed && (
-        <div className="absolute inset-0 grid place-items-center bg-slate-100 p-6 text-center text-sm text-slate-600">
+        <div className="absolute inset-0 grid place-items-center bg-slate-100 p-6 text-center text-sm text-slate-600" data-testid="map-failed">
           This browser could not start the map, which needs WebGL. Try another browser.
         </div>
       )}

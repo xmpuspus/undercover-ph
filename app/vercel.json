@@ -29,6 +29,10 @@
       ]
     },
     {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
       "source": "/data/(.*).geojson",
       "headers": [
         { "key": "Content-Type", "value": "application/geo+json; charset=utf-8" },

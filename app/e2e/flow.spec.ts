@@ -272,3 +272,19 @@ test("a second missing file within a minute shows a Reload card, not a blank pag
   await expect(page.getByTestId("app-error")).toBeVisible();
   await expect(page.getByTestId("app-error")).toContainText("Reload");
 });
+
+// PLAN.md item 17 (2026-10-23): the basemap comes from one outside server, OpenFreeMap. When it fails, the map
+// falls back to a plain ground and still draws the buildings, the trees and the route.
+test("the map still draws the route on a plain ground when OpenFreeMap fails", async ({ page }) => {
+  let blocked = 0;
+  await page.route("https://tiles.openfreemap.org/**", (r) => {
+    blocked++;
+    return r.abort("failed");
+  });
+  await planTrip(page);
+  expect(blocked).toBeGreaterThan(0);
+  await expect(page.getByTestId("map")).toHaveAttribute("data-basemap", "fallback", { timeout: 30_000 });
+  await mapIdle(page);
+  await expect(page.getByTestId("map-failed")).toHaveCount(0);
+  await expect(page.getByTestId("route-card").first()).toBeVisible();
+});
