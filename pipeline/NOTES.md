@@ -730,3 +730,25 @@ The raster check removes more, but nobody has counted what remains.
 
 Only main deploys on Vercel (`git.deploymentEnabled` in `app/vercel.json`, 2026-10-23). A branch preview has no shade release for its graphs,
 so it shaded every area itself, ran past 20 minutes, and held the one build slot while a production build waited.
+
+### OSM and Google v3 outlines compared on 2026-10-23: keep both, OSM first; about 1 in 10 added outlines is not a building
+
+`pipeline/tools/compare_outlines.py` compares the two sets in every area, using only outlines whose centre lies in the graph boxes and v3 outlines at the 80%-precision cutoff. Coverage counts the share of the Google 2023 raster's building area that each set covers. That raster is Google's too, so it may favour v3. The imagery check below does not.
+
+| Group | OSM coverage | v3 coverage | Both together | OSM outlines | v3 outlines |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Metro Manila, 14 areas (median) | 67% | 61% | 83% | 666,419 | 634,626 |
+| Other regions, 53 areas (median) | 42% | 55% | 65% | 717,854 | 1,233,443 |
+
+- Both sets together cover more than either one in all 67 areas. OSM covers more than v3 in 23 areas, most of them in Metro Manila (metro-core by 20 points). v3 covers more in the rest, by up to 42 points (Cabanatuan, Iligan).
+- Neither set is clearly more detailed. One OSM outline holds 2 or more v3 outlines for 4.9% of OSM outlines in Metro Manila and 5.9% elsewhere. One v3 outline holds 2 or more OSM outlines for 3.2% and 2.1% of v3 outlines. Median footprints are 95 and 89 m2 in Metro Manila, 90 and 76 m2 elsewhere.
+- Only 14% (Metro Manila) and 22% (elsewhere) of OSM outlines match a v3 outline one to one (intersection over union 0.5 or more). Most overlap partly, so the two sets draw the same buildings with different shapes and offsets.
+- Only OSM carries heights and building parts. 1.8% (Metro Manila) and 1.2% (elsewhere) of OSM outlines have a height or levels tag. Those are mostly the towers, which cast the longest shadows.
+
+Imagery check on Esri World Imagery at zoom 19, by eye, rule and every verdict in `tmp/outline-compare-20261023/sample-notes.md`:
+
+- 96 random added outlines: 78 real, 9 not buildings, 9 unclear (cloud or blur). That is 10% of the clear ones (95% interval 6% to 19%), about 107,000 of the 1,033,164 added. The 9 are tree canopy, a pool, bare soil, a grass strip, a court and an alley. Three are doubtful. The lead read page 1 (0 of 22) and an agent read pages 2 to 4 (9 of 65) more strictly.
+- 48 random outlines the height raster check turned away: 18 real, 25 not buildings, 5 unclear. That is 58% of the clear ones. So the check removes outlines about six times as likely to be wrong, but also about 2 real roofs for every 3 fakes it removes.
+- Tree canopy is the most common miss in both samples (2 of 9 added, 9 of 25 turned away). The next step is to drop an added outline that sits mostly under the Meta canopy raster's tree crowns, then measure the same two samples again.
+
+Decision: keep OSM first and fill from v3, as built. Switching to v3 alone would lose 6 to 20 points of coverage in Metro Manila areas and every OSM height tag.
