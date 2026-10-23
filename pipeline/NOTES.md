@@ -740,7 +740,7 @@ so it shaded every area itself, ran past 20 minutes, and held the one build slot
 | Metro Manila, 14 areas (median) | 67% | 61% | 83% | 666,419 | 634,626 |
 | Other regions, 53 areas (median) | 42% | 55% | 65% | 717,854 | 1,233,443 |
 
-- Both sets together cover more than either one in all 67 areas. OSM covers more than v3 in 23 areas, most of them in Metro Manila (metro-core by 20 points). v3 covers more in the rest, by up to 42 points (Cabanatuan, Iligan).
+- Both sets together cover more than either one in all 67 areas. OSM covers more than v3 in 23 areas, including 10 of the 14 in Metro Manila (metro-core by 20 points). v3 covers more in Las Pinas, BF Homes, Alabang and north-coast. v3 covers more in the rest, by up to 42 points (Cabanatuan, Iligan).
 - Neither set is clearly more detailed. One OSM outline holds 2 or more v3 outlines for 4.9% of OSM outlines in Metro Manila and 5.9% elsewhere. One v3 outline holds 2 or more OSM outlines for 3.2% and 2.1% of v3 outlines. Median footprints are 95 and 89 m2 in Metro Manila, 90 and 76 m2 elsewhere.
 - Only 14% (Metro Manila) and 22% (elsewhere) of OSM outlines match a v3 outline one to one (intersection over union 0.5 or more). Most overlap partly, so the two sets draw the same buildings with different shapes and offsets.
 - Only OSM carries heights and building parts. 1.8% (Metro Manila) and 1.2% (elsewhere) of OSM outlines have a height or levels tag. Those are mostly the towers, which cast the longest shadows.
@@ -751,4 +751,4 @@ Imagery check on Esri World Imagery at zoom 19, by eye, rule and every verdict i
 - 48 random outlines the height raster check turned away: 18 real, 25 not buildings, 5 unclear. That is 58% of the clear ones. So the check removes outlines about six times as likely to be wrong, but also about 2 real roofs for every 3 fakes it removes.
 - Tree canopy is the most common miss in both samples (2 of 9 added, 9 of 25 turned away). The next step is to drop an added outline that sits mostly under the Meta canopy raster's tree crowns, then measure the same two samples again.
 
-Decision: keep OSM first and fill from v3, as built. Switching to v3 alone would lose 6 to 20 points of coverage in Metro Manila areas and every OSM height tag.
+Decision: keep OSM first and fill from v3, as built. In Metro Manila areas, v3 alone would cover 9 to 32 points less than the two together, and it would drop every OSM height tag.
