@@ -4,6 +4,7 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "bash ../pipeline/vercel_build.sh",
   "outputDirectory": "dist",
+  "git": { "deploymentEnabled": { "**": false, "main": true } },
   "headers": [
     {
       "source": "/(.*)",

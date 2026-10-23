@@ -725,3 +725,8 @@ Results across the 67 areas:
 - An overlay on Esri imagery in Baliwag, Makati, Cebu and Davao showed the added outlines on real roofs and none on open ground. Dense low-rise blocks still miss many houses, so the fill errs low. In Cebu's Colon district OSM was already complete, and Google added 2 outlines.
 
 Next, per Xavier on 2026-10-23: compare Google and OSM outlines building by building, for detail and coverage, before the next release.
+That pass also counts fake outlines in a random sample of added ones against imagery. Google's own figure at this cutoff is 80% precision.
+The raster check removes more, but nobody has counted what remains.
+
+Only main deploys on Vercel (`git.deploymentEnabled` in `app/vercel.json`, 2026-10-23). A branch preview has no shade release for its graphs,
+so it shaded every area itself, ran past 20 minutes, and held the one build slot while a production build waited.
