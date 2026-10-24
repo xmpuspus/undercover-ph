@@ -1,16 +1,20 @@
-"""Write an area's canopy.tif from the Meta and WRI High Resolution Canopy Height tiles on AWS, with no account.
+"""Write an area's canopy.tif from the Meta and WRI CHMv2 canopy height tiles on AWS, with no account.
 
 Usage:
   pipeline/shade/.venv/bin/python pipeline/regions/fetch_canopy.py AREA_ID [--force]
   pipeline/shade/.venv/bin/python pipeline/regions/fetch_canopy.py --check [AREA_ID]
 
 Run it after pipeline/districts/build.py has staged the area, because the shade grid comes from the
-area's manifest_template.json. The script downloads each zoom-9 quadkey tile that touches the area's
-canopy window to pipeline/raw/regions/canopy_meta/<quadkey>.tif, once. The tiles are strip TIFFs with
-one-row strips, so window reads over HTTP would fetch thousands of strips; a whole tile is one request.
+area's manifest_template.json. CHMv2 tiles are zoom-10 quadkey COGs with 512 px blocks and overviews,
+so the script reads only the blocks under the area's canopy window over HTTP: 1.3 to 13.5 MB per area,
+273 MB for all 67 areas, against 140 to 430 MB per whole v1 tile. Only a HEAD record per tile is kept,
+in pipeline/raw/regions/canopy_meta/v2_<quadkey>.json.
 
-The output copies the Metro Manila raster from leaves-ph (canopy_height_ncr.tif):
-- the same tiles (s3://dataforgood-fb-data/forests/v1/alsgedi_global_v6_float/chm/), uint8 metres;
+CHMv2 uses the same Maxar Vivid2 imagery as v1 (Brandt et al. 2026, section 2.2). In the Philippines the
+per-tile acquisition windows run from 2010 to 2019-11-18, so the switch brings a better model, not newer trees.
+
+The output keeps the grid of the Metro Manila raster from leaves-ph (canopy_height_ncr.tif):
+- CHMv2 tiles (s3://dataforgood-fb-data/forests/v2/global/dinov3_global_chm_v2_ml3/chm/), uint8 metres;
 - a mosaic in EPSG:3857, reprojected to EPSG:4326 with average resampling into a zero-filled array;
 - the leaves-ph pixel lattice (origin 120.9 E, 14.8 N, 1.0476e-5 degrees), extended past Metro Manila;
 - the window that shade.clip_canopy_to() cuts: the building grid corners, a 0.0005 degree pad, 16 pixels more;
@@ -18,11 +22,11 @@ The output copies the Metro Manila raster from leaves-ph (canopy_height_ncr.tif)
 shade.py then reads pipeline/inputs/areas/<id>/canopy.tif as it does for every area.
 
 --check compares this method with the leaves-ph raster on one Metro Manila window (default makati-cbd),
-reading the remote tile through /vsicurl/ so nothing large is downloaded. It also checks that the
+reading the remote v1 tile through /vsicurl/ so nothing large is downloaded. It still tests v1, because
+leaves-ph holds v1; it proves the mosaic and resampling that build() applies to CHMv2. It also checks that the
 area window equals the grid of that area's existing canopy.tif. Results go to
 pipeline/raw/regions/canopy_meta/check_<area>.json.
 """
-import hashlib
 import json
 import math
 import os
@@ -43,14 +47,18 @@ from rasterio.transform import Affine, array_bounds  # noqa: E402
 from rasterio.warp import Resampling, reproject, transform_bounds  # noqa: E402
 from rasterio.windows import Window, from_bounds  # noqa: E402
 
-TILE_URL = "https://dataforgood-fb-data.s3.amazonaws.com/forests/v1/alsgedi_global_v6_float/chm/{}.tif"
-ZOOM = 9
+TILE_URL = "https://dataforgood-fb-data.s3.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/{}.tif"
+V1_TILE_URL = "https://dataforgood-fb-data.s3.amazonaws.com/forests/v1/alsgedi_global_v6_float/chm/{}.tif"
+ZOOM = 9  # v1 quadkeys, for --check and the leaves-ph tile tests
+V2_ZOOM = 10  # CHMv2 quadkeys
 RES = 1.0476288264454186e-05  # leaves-ph canopy_height_ncr.tif
 LATTICE = Affine(RES, 0.0, 120.9, 0.0, -RES, 14.800000000000008)
 PAD_DEG = 0.0005  # shade.load_canopy() and clip_canopy_to()
 MARGIN_PX = 16  # shade.clip_canopy_to()
 SRC_MARGIN_PX = 8  # source pixels read past the window, so edge averages see every source pixel
-SOURCE = "Meta and WRI Global Canopy Height, CC-BY-4.0"
+SOURCE = "Meta and WRI High Resolution Canopy Height Maps v2 (CHMv2), CC-BY-4.0"
+ATTRIBUTION = ("Meta and World Resources Institute (WRI), 2026. Version 2 High Resolution Canopy Height Maps (CHMv2), "
+               "CC BY 4.0, https://registry.opendata.aws/dataforgood-fb-forestsv2. Source imagery for CHM (c) 2016 Vantor.")
 NCR_RASTER = region.ROOT.parent / "leaves-ph/data/meta/canopy_height_ncr.tif"
 ENV = dict(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", GDAL_HTTP_MAX_RETRY="5", GDAL_HTTP_RETRY_DELAY="2",
            CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif")
@@ -83,23 +91,23 @@ def window_transform(win):
     return Affine(RES, 0.0, LATTICE.c + win.col_off * RES, 0.0, -RES, LATTICE.f - win.row_off * RES)
 
 
-def tile_xy(lon, lat):
+def tile_xy(lon, lat, zoom=ZOOM):
     s = math.sin(math.radians(lat))
-    x = (lon + 180) / 360 * (1 << ZOOM)
-    y = (0.5 - math.log((1 + s) / (1 - s)) / (4 * math.pi)) * (1 << ZOOM)
+    x = (lon + 180) / 360 * (1 << zoom)
+    y = (0.5 - math.log((1 + s) / (1 - s)) / (4 * math.pi)) * (1 << zoom)
     return int(x), int(y)
 
 
-def quadkey(tx, ty):
-    return "".join(str((1 if tx & (1 << i) else 0) + (2 if ty & (1 << i) else 0)) for i in range(ZOOM - 1, -1, -1))
+def quadkey(tx, ty, zoom=ZOOM):
+    return "".join(str((1 if tx & (1 << i) else 0) + (2 if ty & (1 << i) else 0)) for i in range(zoom - 1, -1, -1))
 
 
-def quadkeys(bounds):
-    """Every zoom-9 quadkey that touches a lon/lat box (west, south, east, north)."""
+def quadkeys(bounds, zoom=ZOOM):
+    """Every quadkey of one zoom that touches a lon/lat box (west, south, east, north)."""
     w, s, e, n = bounds
-    x0, y0 = tile_xy(w, n)
-    x1, y1 = tile_xy(e, s)
-    return [quadkey(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+    x0, y0 = tile_xy(w, n, zoom)
+    x1, y1 = tile_xy(e, s, zoom)
+    return [quadkey(x, y, zoom) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
 
 
 def head(url):
@@ -113,32 +121,16 @@ def head(url):
     return h
 
 
-def download(qk):
-    """One whole tile into pipeline/raw/regions/canopy_meta/, kept for later areas."""
-    region.CANOPY_TILES.mkdir(parents=True, exist_ok=True)
-    out = region.CANOPY_TILES / f"{qk}.tif"
-    meta = out.with_suffix(".json")
+def remote(qk):
+    """The /vsicurl/ path of one CHMv2 COG. The tile's HEAD goes to canopy_meta/v2_<quadkey>.json for provenance."""
     url = TILE_URL.format(qk)
     h = head(url)
-    size = int(h["content-length"])
-    if out.exists() and meta.exists() and out.stat().st_size == size:
-        return out
-    tmp = out.with_suffix(".tif.part")
-    t0 = time.time()
-    subprocess.run(["curl", "-sS", "-L", "--fail", "--retry", "3", "--max-time", "3600", "-o", str(tmp), url],
-                   check=True)
-    if tmp.stat().st_size != size:
-        sys.exit(f"{qk}: got {tmp.stat().st_size} bytes, the server says {size}")
-    md5 = hashlib.md5()
-    with open(tmp, "rb") as fh:
-        for chunk in iter(lambda: fh.read(1 << 22), b""):
-            md5.update(chunk)
-    os.replace(tmp, out)
-    meta.write_text(json.dumps({"quadkey": qk, "url": url, "bytes": size, "etag": h.get("etag"),
-                                "last_modified": h.get("last-modified"), "md5": md5.hexdigest(),
-                                "seconds": round(time.time() - t0, 1),
-                                "downloaded_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, indent=1))
-    return out
+    region.CANOPY_TILES.mkdir(parents=True, exist_ok=True)
+    (region.CANOPY_TILES / f"v2_{qk}.json").write_text(json.dumps(
+        {"quadkey": qk, "url": url, "bytes": int(h["content-length"]), "etag": h.get("etag"),
+         "last_modified": h.get("last-modified"),
+         "checked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, indent=1))
+    return "/vsicurl/" + url
 
 
 def same_res(a, b):
@@ -179,7 +171,7 @@ def write_canopy(out, arr, transform, qks):
     tmp = out.with_suffix(".tif.tmp")
     with rasterio.open(tmp, "w", **profile) as dst:
         dst.write(arr, 1)
-        dst.update_tags(SOURCE=SOURCE, CLIPPED_FROM=" ".join(f"{q}.tif" for q in qks),
+        dst.update_tags(SOURCE=SOURCE, ATTRIBUTION=ATTRIBUTION, CLIPPED_FROM=" ".join(f"{q}.tif" for q in qks),
                         METHOD="EPSG:3857 tile mosaic, average resampling to EPSG:4326 on the leaves-ph lattice")
     os.replace(tmp, out)
 
@@ -194,17 +186,17 @@ def build(area_id, force=False):
     win = area_window(shade)
     tr = window_transform(win)
     bounds = array_bounds(int(win.height), int(win.width), tr)
-    qks = quadkeys(bounds)
-    paths = [download(q) for q in qks]
+    qks = quadkeys(bounds, V2_ZOOM)
+    paths = [remote(q) for q in qks]
     t1 = time.time()
-    arr, transform, tags = canopy_window(paths, win)
+    arr, transform, _ = canopy_window(paths, win)
     write_canopy(out, arr, transform, qks)
-    log = {"area": area_id, "output": str(out.relative_to(region.ROOT)), "quadkeys": qks,
+    log = {"area": area_id, "output": str(out.relative_to(region.ROOT)), "source": SOURCE, "quadkeys": qks,
            "window": [int(win.col_off), int(win.row_off), int(win.width), int(win.height)],
-           "bounds": [round(v, 6) for v in bounds], "tile_units": tags.get("UNITS"),
+           "bounds": [round(v, 6) for v in bounds],
            "max_m": int(arr.max()), "share_ge_3m": round(float((arr >= 3).mean()), 4),
            "pixels_255": int((arr == 255).sum()), "bytes": out.stat().st_size,
-           "download_s": round(t1 - t0, 1), "mosaic_s": round(time.time() - t1, 1)}
+           "head_s": round(t1 - t0, 1), "read_and_mosaic_s": round(time.time() - t1, 1)}
     (region.CANOPY_TILES / f"canopy_{area_id}.json").write_text(json.dumps(log, indent=1))
     print(json.dumps(log))
 
@@ -227,7 +219,7 @@ def check(area_id="makati-cbd"):
     bounds = array_bounds(600, 600, window_transform(cw))
     qks = quadkeys(bounds)
     t0 = time.time()
-    got, _, tags = canopy_window(["/vsicurl/" + TILE_URL.format(q) for q in qks], cw)
+    got, _, tags = canopy_window(["/vsicurl/" + V1_TILE_URL.format(q) for q in qks], cw)
     diff = got.astype(int) - ref.astype(int)
     rng = np.random.default_rng(20261022)
     # Four random pixels and four where leaves-ph has a tree of 5 m or more.

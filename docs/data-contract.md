@@ -1,6 +1,6 @@
-# The app reads four shared files and one folder per routing area
+# Search starts with a small index and routing loads one area at a time
 
-Dated 2026-10-22. The project owns it. The pipeline in `pipeline/` writes every file below to `app/public/data/`. The app in `app/` reads them and nothing else.
+Dated 2026-10-23. The project owns it. The pipeline writes source data to `app/public/data/`. The app build derives the search files and column graphs described below.
 
 ## Sixty-seven routing areas share one time zone and one date rule
 
@@ -53,12 +53,13 @@ same way.
 ```text
 app/public/data/
   areas.json             the 67 areas, each regional one with its region (in git)
-  places_index.json      every place once, for search
+  places_index.json      every place once, input to the app build
   buildings.pmtiles      buildings of all areas, one file
   trees.pmtiles          tree crowns of all areas, one file
-  areas/<id>/graph.json  \
-  areas/<id>/places.json  > one asset per area, area-<id>.tar.gz
-  areas/<id>/hours.json  /
+  areas/<id>/graph.json   \
+  areas/<id>/places.json   | one asset per area, area-<id>.tar.gz
+  areas/<id>/hours.json    |
+  areas/<id>/jog.json     / optional in areas and releases built before jog data
 ```
 
 The deploy builds these files, and git ignores them. Since 2026-10-22 the shade comes from a GitHub release that `.github/workflows/shade.yml` builds each morning at 04:30 Manila. `pipeline/vercel_build.sh` downloads it, shades only an area whose `graph.json` hash differs from the release's `graph.sha256`, and fetches the weather. With no release from today or the six days before, it shades every area itself.
@@ -77,6 +78,46 @@ app/public/data/
 
 After the app build, the script writes a gzip copy beside each `.bin` in `app/dist/data/areas/`.
 All JSON files that publish.py writes are compact, with no spaces or line breaks.
+
+### The app build creates search files without changing pipeline data
+
+`app/scripts/build-data.ts` runs as a Vite plugin on every build, including direct `vite build` commands. It serves the same derived files from memory during development. It never writes `app/public/data/`, and leaves `graph.json`, its hash, and the shade workflow unchanged.
+
+The plugin copies the full public directory to the selected build output with eight concurrent file copies. Filesystems that support copy-on-write clones can reuse disk blocks; other filesystems use normal copies. Output files stay independent of their sources. The copy preserves generated bundle files, including the worker with its build-specific shell list. Development still serves the original public directory.
+
+- `data/search/top.json` contains every station, mall, bus terminal, hospital and landmark, plus the app's suggested names and each area's six `wellKnown` suggestions. The build rejects a file over 300,000 decoded bytes.
+- The landing screen starts one shared request for `top.json`. Service-worker registration waits for this request to settle, so shell precaching follows the critical search download. Failure still allows worker installation and clears the shared request for Retry.
+- `top.json` names the remaining files as `area-<id>.json`. These files start on search intent, with three downloads at a time. Search works as soon as the area list and `top.json` arrive. Each later file adds its places without holding up input.
+- The app never fetches `places_index.json`. The plugin reads it on the build host.
+- Search files use version 1 column arrays. `order` is the original index position. Names, categories, node ids, aliases and details retain their values. Coordinates use integer offsets at seven decimals from an origin per area. This preserves the source values.
+- The app prepares search keys once per new place. It publishes the first results immediately, then batches background arrivals at 200 ms intervals and on completion. The merge sorts by `order` only when publishing. Stable ties and ranking match the full index after all files arrive, regardless of arrival order.
+- A failed background file leaves the available results usable. A later visit retries it. A failed top file shows the existing retry state.
+
+### `graph.cols.json` keeps edge order and shade alignment
+
+Every build emits `data/areas/<id>/graph.cols.json` beside the original graph in its output. The app requests it only after a place, point or trip link selects that area.
+
+Version 1 contains two node coordinate columns, one column per edge field, and flat geometry longitude and latitude arrays. Geometry offsets mark each edge's slice. Node and geometry coordinates have six decimal places. Optional `absent` indexes preserve omitted edge fields, and `node_flags` stays in node order.
+
+Rounding nodes alone changes A* decisions between paths with equal costs. Two integer `routing_node_offsets` columns retain the seventh decimal as a residual from the rounded node. The decoder restores those node values for routing. Display geometry stays at six decimals. Edge ids, order, lengths, flags and access rules retain their values, so the shade arrays keep the same edge indexes.
+
+The app's router loader selects the column file explicitly. The default `loadData` still reads `graph.json` for existing disk readers. Unit tests check decoded equality against rounded source graphs, compressed size below 80%, and the same route edges and metrics for sampled place pairs in metro-core and Cebu City Centre.
+
+While an area's initial files load, the trip panel shows a `Loading` status line. It counts streamed bytes and shows a percentage when all current responses provide usable lengths. A compressed HTTP length cannot measure decoded stream bytes, so that case shows KB. The line disappears on success or failure. Later date changes use the existing shade loading state.
+
+### The installed app caches its shell and the last area's trip data
+
+`manifest.webmanifest` declares a standalone app with 192 and 512 PNG icons. Their artwork fits inside the maskable safe circle. `index.html` links a 180 PNG Apple touch icon. `app/scripts/make-icons.mjs` regenerates these from the umbrella logo.
+
+Production builds register `sw.js`; development uses Vite directly. The worker claims the open page after installation. Its shell list contains the entry and its static dependencies, the map required to reopen a trip, the Latin WOFF2 fonts, the document, shell script, manifest and icons. Other views and font subsets are cached on use. A JSON or image opened in a tab keeps its own cache key; only an HTML response at the app root or `index.html` can replace the canonical app document.
+
+Documents, data JSON, shade `.bin` and `.bin.gz` files, and `/api/` use the network first with HTTP cache revalidation. Cached responses serve only when the network fails. HTTP errors still reach the app. Hashed `/assets/` use the cache first. Cross-origin map tiles and PMTiles range requests pass through without caching.
+
+On first use of a lazy component, the app imports it and checks its exact build URL with HEAD in parallel. A confirmed 404 or 410 uses the existing one-reload deployment recovery, followed by the Reload card if it fails again within a minute. The worker leaves HEAD requests to the network. Offline connections, a three-second timeout and servers without HEAD support still allow the cached import. Map, steps, navigation, About and rain components share this check; navigation's two components reuse one promise. Hashed asset GETs remain cache-first.
+
+`browserLoad.test.ts` adds browser coverage without changing the protected acceptance specs. It verifies that a named place absent from the built top index joins the visible results after held shards arrive, without another keystroke. It checks the Loading line's bounds and visibility at desktop and narrow phone widths in light and dark modes. Test captures remain in memory. Saved screenshots under `app/scripts/review-evidence/` remain available for rendered inspection. A regression checks their names, contents and modification times before and after the browser tests, so verification cannot rewrite source evidence.
+
+Successful area downloads retain their fetched data for offline use. Once the selected bundle is ready, the worker retains the areas still in app memory, at most two, and protects pending downloads. It removes other areas' data. Returning to a bundle in memory therefore keeps offline routing available. If the first trip loads before the worker claims the page, the app sends its fetched file list after control starts, and the worker fills any missing cache entries. Shared search data stays cached. A cached trip link restores routing without a connection; external basemap tiles remain dependent on the map provider. `sw.js` has `Cache-Control: no-cache`, and the existing Content-Security-Policy is unchanged.
 
 ### `areas.json`
 
@@ -180,6 +221,86 @@ One per area, in `areas/<id>/graph.json`. Node and edge ids count from 0 in each
 | 9 | 512 | Elevator |
 
 Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways and vehicle tunnels never do.
+
+### `jog.json` adds jogging attributes in graph edge order
+
+One per area, beside `graph.json`. `pipeline/districts/build_jog.py` reads the graph, the area's OSM extract,
+and the committed `pipeline/districts/wikidata_heritage.json` snapshot. It never reads the network or changes
+the graph. The snapshot records its query and fetch date. A missing or malformed snapshot produces a warning
+and leaves the OSM sights available. Invalid snapshot rows are skipped.
+
+The top-level fields are:
+
+| Field | Meaning |
+| --- | --- |
+| `version` | Integer `1` |
+| `graph_sha256` | Lowercase SHA-256 of the exact `graph.json` bytes read |
+| `edges` | Six integer arrays, each with one entry per graph edge, in the graph's array order |
+| `sights` | Sight points, each with `name`, `kind`, `lon`, `lat` and `src` |
+| `counts` | `edges`, `walk_m`, `lit_tagged_m`, `lit_share` and `sights` |
+| `sources` | Objects with `name`, `licence` and `url`: OpenStreetMap under ODbL and Wikidata under CC0 |
+
+Consumers must check `graph_sha256` before using the arrays. Sidewalk edges inherit the tags of their
+`way_id`, including the road class. Link roads use their parent class. A missing OSM way keeps the default
+tag codes. An empty or invalid edge geometry keeps its tag codes and has park 0, water 0 and sight -1.
+
+| Array | Codes |
+| --- | --- |
+| `edges.road` | 0 path, footway, pedestrian, steps or cycleway; 1 service or living_street; 2 residential or unclassified; 3 tertiary; 4 secondary; 5 primary; 6 trunk. Unmatched classes use 0. |
+| `edges.lit` | 0 unknown; 1 `lit=yes`, `24/7`, `automatic` or `sunset-sunrise`; 2 `lit=no` |
+| `edges.surface` | 0 unknown; 1 paved; 2 unpaved |
+| `edges.park` | 1 when the edge midpoint lies in or on the boundary of a park area, else 0 |
+| `edges.water` | 1 when the midpoint lies within 50 m of water geometry, else 0 |
+| `edges.sight` | Index of the nearest sight point within 40 m of the midpoint, or -1. Equal distances use the lower index. |
+
+Paved surfaces are `paved`, `asphalt`, `concrete`, `concrete:lanes`, `concrete:plates`, `paving_stones`, `sett`,
+`cobblestone`, `unhewn_cobblestone`, `metal`, `wood`, `rubber` and `bricks`. Unpaved surfaces are `unpaved`,
+`compacted`, `fine_gravel`, `gravel`, `pebblestone`, `ground`, `dirt`, `earth`, `grass`, `grass_paver`, `sand`,
+`mud`, `clay`, `rock`, `stone`, `woodchips`, `snow`, `ice` and `salt`. Other surface values stay unknown.
+
+Park areas carry `leisure=park`, `leisure=garden`, `leisure=nature_reserve` or `landuse=recreation_ground`.
+Water geometry comes from `natural=water`, `waterway=river`, `canal` or `stream`, or `natural=coastline`.
+Water polygons include their interiors. Coastlines stay boundary lines, including closed island outlines.
+Multipolygon holes remain excluded. Midpoints follow half the
+edge's line length in a local UTM projection. All proximity limits use metres in that projection.
+
+Sights include named OSM historic features except `historic=no`, `tomb` and `boundary_stone`; named tourism
+features with `artwork`, `museum`, `attraction`, `viewpoint`, `gallery`, `zoo`, `aquarium` or `theme_park`;
+and named park areas. Each OSM object appears once, even when it has several qualifying tags.
+`kind` is its historic, tourism or park tag value, in that priority order. Nodes use their own coordinates.
+Areas use an interior representative point. If that point falls outside the graph box, the area portion
+inside the box supplies the point. Linear ways, including closed ways tagged `area=no` or with no assembled
+area, use their line midpoint. If needed, their portion inside the box supplies the midpoint.
+Source ids are `osm:n123`, `osm:w123`
+or `osm:r123`, using the original object id. Only points in the graph box are kept.
+
+Every valid Wikidata snapshot item in the graph box contributes its point, name and kind (`nhcp_marker`
+or `heritage`), with `src` such as `wikidata:Q123`. Repeated source ids contribute one row. An OSM sight's
+`wikidata` tag identifies matching OSM objects and snapshot items. These contribute one sight, with the first
+OSM source in sorted order supplying its point and name. Unlinked objects keep their separate source ids.
+The sight list sorts by `src`, so indexes are deterministic.
+
+`counts.edges` is the graph edge count. `counts.walk_m` sums graph `len_m`, including both sidewalks and
+edges whose access needs a check. `counts.lit_tagged_m` sums the lengths with light code 1 or 2.
+`counts.lit_share` divides those tagged metres by `walk_m`, or is 0 when the graph has no length.
+Unknown light does not mean unlit. `counts.sights` is the length of `sights`.
+
+Run `pipeline/.venv/bin/python -I pipeline/districts/build_jog.py --area qc-north` to add the file to an
+already published area. A positional area id is accepted too. `--graph`, `--pbf`, `--wikidata` and `--out`
+select explicit paths. Without an area argument, `UC_AREA` selects staged input and output under
+`pipeline/stage/<area>/`. Area mode uses `ctx` for its OSM extract and the union of its graph rectangles.
+It keeps this boundary when combined with explicit paths. With no area argument or area context,
+explicit paths derive a box from the graph's nodes and valid edge geometry, with a 50 m margin for nearby
+sights. Graph bytes do not record the area's boundary. Pass `--area` with explicit paths to reuse it.
+
+`build.py` runs this step after `build_graph.py` and stops if it fails. `publish.py` copies graph and jog
+bytes together, preserving their hash alignment. Before writing any area, publish checks every staged
+`jog.json` and its hash against the staged graph. Backfilling a published area with `--area` leaves staged
+inputs unchanged. To prepare an existing staged graph for publish, run
+`UC_AREA=qc-north pipeline/.venv/bin/python -I pipeline/districts/build_jog.py` for each staged area.
+Data releases pack and fetch `jog.json` when present.
+Areas and older releases without it remain valid. Fetch preserves local rebuilds and removes a previously
+fetched jog file when restoring a legacy archive. Adding jog data alone leaves shade hashes unchanged.
 
 ### `shade/<date>.bin`, `shade/lowconf.bin` and their header in `manifest.shade`
 

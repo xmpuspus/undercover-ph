@@ -1,5 +1,6 @@
 import { dayOfWeek, parseHours } from "./hours";
 import { normalize } from "./search";
+import { decodeGraph } from "./columns";
 import type { Data, FetchLike, FetchResponseLike, HoursRow, Manifest, Place, RawFiles, RawGraph, Shade } from "./types";
 
 const EARTH_R = 6371008.8;
@@ -64,18 +65,19 @@ function dayFile(m: Manifest, dateIdx: number): string {
 }
 
 /**
- * Fetch manifest.json, graph.json, places.json, hours.json, and the shade files (when manifest.shade exists).
+ * Fetch manifest.json, a graph, places.json, hours.json, and the shade files (when manifest.shade exists).
+ * The app passes graphFile: "graph.cols.json". The default keeps the disk/pipeline reader compatible.
  * Pass the UI's data URL for one area as base, for example `${import.meta.env.BASE_URL}data/areas/metro-core/`.
  * A per-date manifest (shade.per_date) keeps one shade file per date, so only shade/lowconf.bin and one date's file
  * load here: opts.date when the manifest has it, else opts.dateIdx, else the first date. loadShadeDate fetches
  * another date when the walker picks it. An older manifest without per_date loads the single shade.bin.
  * A missing or mismatched shade file does not throw. data.shade is then null and data.loadNotes says why.
  */
-export async function loadData(base = "data", fetchImpl?: FetchLike, opts: { dateIdx?: number; date?: string } = {}): Promise<Data> {
+export async function loadData(base = "data", fetchImpl?: FetchLike, opts: { dateIdx?: number; date?: string; graphFile?: "graph.cols.json" } = {}): Promise<Data> {
   const f: FetchLike = fetchImpl ?? ((url: string) => fetch(url, { cache: "no-cache" }));
   const [manifest, graph, places, hours] = await Promise.all([
     getJson(f, base, "manifest.json"),
-    getJson(f, base, "graph.json"),
+    getJson(f, base, opts.graphFile ?? "graph.json"),
     getJson(f, base, "places.json"),
     getJson(f, base, "hours.json"),
   ]);
@@ -94,7 +96,7 @@ export async function loadData(base = "data", fetchImpl?: FetchLike, opts: { dat
   } else if (h) {
     shade = await getShade(f, base, 2 * h.n_dates * h.n_buckets * h.n_edges + h.n_edges);
   }
-  const data = buildData({ manifest: m, graph: graph as RawGraph, places: places as Place[], hours: hours as HoursRow[], shade, lowconf, days });
+  const data = buildData({ manifest: m, graph: opts.graphFile ? decodeGraph(graph, { routing: true }) : graph as RawGraph, places: places as Place[], hours: hours as HoursRow[], shade, lowconf, days });
   data.source = { base, fetchImpl: f };
   return data;
 }

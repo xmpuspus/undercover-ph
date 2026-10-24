@@ -2,6 +2,8 @@
 import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { compactData } from "./scripts/build-data";
+import { lazyChunks } from "./scripts/lazy-chunks";
 
 // The landing line shows the area counts before the area list loads, so the build bakes them in from the
 // same areas.json it ships.
@@ -9,7 +11,7 @@ const areas: { region?: { id: string } }[] = JSON.parse(readFileSync(new URL("./
 const ncr = areas.filter((a) => (a.region?.id ?? "ncr") === "ncr").length;
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), lazyChunks(), compactData()],
   base: "./",
   build: { chunkSizeWarningLimit: 1500 },
   define: { __AREA_COUNTS__: JSON.stringify({ ncr, other: areas.length - ncr }) },

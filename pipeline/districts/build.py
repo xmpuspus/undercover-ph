@@ -5,7 +5,7 @@ An AREA_ID is an id from pipeline/areas.json or pipeline/regions/areas.json, or 
 one-district area. Any other id stops the build before it touches a path.
 Each step runs as its own process with UC_AREA set, so the copied scripts read that area's context.
 Every member district needs its Google window first (fetch_gob.py).
-Steps: extract OSM features, hours, buildings, graph, places, route checks, manifest checks, display file.
+Steps: extract OSM features, hours, buildings, graph, jog attributes, places, route checks, manifest checks, display file.
 """
 import json
 import os
@@ -18,7 +18,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PY = str(ROOT / "pipeline/.venv/bin/python")
-STEPS = ["extract_features.py", "build_hours.py", "build_buildings.py", "build_graph.py", "build_places.py"]
+STEPS = ["extract_features.py", "build_hours.py", "build_buildings.py", "build_graph.py", "build_jog.py", "build_places.py"]
 SHADE_OUTPUTS = ["manifest.json", "READY.shade", "trees.json"]
 
 

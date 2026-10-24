@@ -514,6 +514,38 @@ export function buildSteps(data: Data, trips: EdgeTrip[], dateIdx: number): Step
     }
   }
 
+  // Rejoin a street before folding short walking links changes its end bearing or compass side.
+  const ordinary = (l: Leg) => l.kind === "walk" || l.kind === "covered";
+  for (let i = 0; i < legs.length - 2; i++) {
+    const a = legs[i];
+    if (!ordinary(a) || a.name === null) continue;
+    let linkM = 0;
+    for (let j = i + 1; j < legs.length; j++) {
+      const b = legs[j];
+      if (!ordinary(b) || b.switchStart !== Switch.None || b.flags.has("crossing")) break;
+      if (j > i + 1 && b.name === a.name) {
+        const sideA = legSide(a);
+        const sideB = legSide(b);
+        const handA = sideA ? legHand(a, sideA) : null;
+        const handB = sideB ? legHand(b, sideB) : null;
+        const sameSide = (!sideA && !sideB) || (handA !== null && handA === handB);
+        if (sameSide && Math.abs(delta(endBearing(data, a.coords), b.mainBearing)) < 45) {
+          // A cover change does not end the street. Use street wording for a mixed leg;
+          // absorb retains the measured cover instead of describing the whole leg as roofed.
+          if (a.kind !== b.kind) a.kind = "walk";
+          for (let k = i + 1; k <= j; k++) absorb(a, legs[k]);
+          legs.splice(i + 1, j - i);
+          j = i;
+          linkM = 0;
+          continue;
+        }
+        break;
+      }
+      linkM += b.dist;
+      if (linkM >= MIN_STEP_M) break;
+    }
+  }
+
   for (;;) {
     if (legs.length < 2) break;
     const i = legs.findIndex((l) => l.dist < MIN_STEP_M);

@@ -1,5 +1,9 @@
 import { DATA_BASE } from "../config";
 import type { Advisory, AreaInfo, Manifest, Markers, Place, Weather } from "../types";
+import { decodeSearch, type SearchEntry } from "./searchIndex";
+import { placeKeys, type Data } from "./routerClient";
+
+let firstSearch: Promise<ReturnType<typeof decodeSearch>> | null = null;
 
 // The dev server answers a missing file with index.html, so a 200 alone does not prove the file exists.
 function isRealFile(res: Response): boolean {
@@ -38,15 +42,66 @@ export async function readMarkers(area: string): Promise<Markers> {
   return { graph, shade, weather };
 }
 
-// areas.json lists the areas; places_index.json holds every place of every area, so search covers them all.
-// Both throw on failure, so the app can show its retry state.
+// The area list and the small search file throw on failure, so the app can show its retry state.
 async function mustJSON<T>(name: string): Promise<T> {
   const v = await fetchJSON<T>(name);
   if (v === null) throw new Error(`Cannot load ${name}.`);
   return v;
 }
 export const loadAreas = async () => (await mustJSON<{ areas: AreaInfo[] }>("areas.json")).areas;
-export const loadPlaceIndex = () => mustJSON<Place[]>("places_index.json");
+// Start only the small file with the landing screen. Intent reuses this request before starting any shards.
+export function primePlaceIndex(): Promise<ReturnType<typeof decodeSearch>> {
+  firstSearch ??= mustJSON<unknown>("search/top.json").then(decodeSearch).catch((error: unknown) => {
+    firstSearch = null;
+    throw error;
+  });
+  return firstSearch;
+}
+
+export async function loadPlaceIndex(onUpdate: (index: Pick<Data, "places" | "placeKeys">) => void): Promise<void> {
+  const top = await primePlaceIndex();
+  const entries = new Map<number, { place: Place; key: Data["placeKeys"][number] }>();
+  const add = (more: SearchEntry[]) => {
+    const fresh = more.filter((e) => !entries.has(e.order));
+    const keys = placeKeys(fresh.map((e) => e.place));
+    fresh.forEach(({ order, place }, i) => entries.set(order, { place, key: keys[i] }));
+    return fresh.length > 0;
+  };
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let dirty = false;
+  const publish = () => {
+    clearTimeout(timer);
+    timer = undefined;
+    if (!dirty) return;
+    dirty = false;
+    // Sort only when publishing a batch. Keys are prepared once, for new entries alone.
+    const ordered = [...entries.entries()].sort((a, b) => a[0] - b[0]).map((e) => e[1]);
+    onUpdate({ places: ordered.map((e) => e.place), placeKeys: ordered.map((e) => e.key) });
+  };
+  add(top.entries);
+  // Even an empty valid top file must release the initial loading state.
+  dirty = true;
+  publish();
+  // Bound concurrent downloads. A slow or failed shard never holds up top.json or another shard.
+  const pending = [...top.chunks];
+  const worker = async () => {
+    while (pending.length) {
+      const file = pending.shift()!;
+      try {
+        const more = decodeSearch(await mustJSON<unknown>(`search/${file}`));
+        if (add(more.entries)) {
+          dirty = true;
+          // A burst of downloads causes one render/search rather than one per file. Slow downloads
+          // still join the results within 200 ms; this timer never postpones the initial suggestions.
+          timer ??= setTimeout(publish, 200);
+        }
+      } catch {
+        // Keep the places already available. A new visit retries missing shards.
+      }
+    }
+  };
+  void Promise.all(Array.from({ length: 3 }, worker)).then(publish);
+}
 
 export const loadManifest = (area: string) => fetchJSON<Manifest>(`${areaPath(area)}manifest.json`);
 export const loadWeather = (area: string) => fetchJSON<Weather>(`${areaPath(area)}weather.json`);

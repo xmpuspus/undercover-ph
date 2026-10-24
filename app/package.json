@@ -12,7 +12,8 @@
     "shots": "node scripts/shots.mjs",
     "demo:record": "pnpm build && node scripts/demo-record.mjs",
     "test": "vitest run",
-    "e2e:live": "playwright test -c e2e-live/live.config.ts"
+    "e2e:live": "playwright test -c e2e-live/live.config.ts",
+    "e2e:quality": "LIVE_QUALITY=1 playwright test -c e2e-live/live.config.ts quality"
   },
   "dependencies": {
     "@fontsource/jost": "5.3.0",

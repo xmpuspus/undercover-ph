@@ -13,7 +13,8 @@ A move between opposite side edges of one road is free at a node with flag 1 or 
 At a node with flag 4 (junction) it costs 60 m x (1 + K). Anywhere else it is forbidden.
 Two side edges are on opposite sidewalks when the walker has them on different hands, from each edge's
 side and the direction walked, or on the same hand after a U-turn between the same two nodes.
-So each search state is a directed edge, as in the browser, not a node. As in the browser, a walk never
+Same-road centre runs retain the incoming hand and best permission at their entry, interior and exit nodes.
+So each search state is a directed edge with at most seven centre contexts, as in the browser. A walk never
 turns back along the edge it just walked, because that U-turn would dodge the side-switch rule.
 """
 import heapq
@@ -24,8 +25,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np  # noqa: E402
-
-from ctx import OUT, WORK, haversine  # noqa: E402
 
 # Same values as app/src/lib/router/astar.ts.
 JUNCTION_PENALTY_M = 60.0
@@ -54,6 +53,12 @@ def same_road(a, b):
     return {a["u"], a["v"]} == {b["u"], b["v"]}
 
 
+def crossing_at(node_flags, x):
+    if node_flags is None or node_flags[x] & (NODE_CROSSING | NODE_SIGNALS):
+        return FREE
+    return JUNCTION if node_flags[x] & NODE_JUNCTION else FORBIDDEN
+
+
 def side_switch(edges, node_flags, a, b, x):
     """The browser's sideSwitch: the kind of move from edge a to edge b at node x."""
     ea, eb = edges[a], edges[b]
@@ -67,18 +72,44 @@ def side_switch(edges, node_flags, a, b, x):
     same_arm = {ea["u"], ea["v"]} == {eb["u"], eb["v"]}
     if (hand_a != hand_b) if same_arm else (hand_a == hand_b):
         return NONE
-    if node_flags is None:
-        return FREE
-    f = node_flags[x]
-    if f & (NODE_CROSSING | NODE_SIGNALS):
-        return FREE
-    if f & NODE_JUNCTION:
-        return JUNCTION
-    return FORBIDDEN
+    return crossing_at(node_flags, x)
+
+
+def advance_side(edges, node_flags, a, b, x, context):
+    """Carry (hand, best permission) through a same-road centre run, as in astar.advanceSide."""
+    if a is None:
+        return None, NONE
+    ea, eb = edges[a], edges[b]
+    if ea["side"] not in OTHER_HAND and context is None:
+        return None, NONE
+    if ea["side"] in OTHER_HAND and eb["side"] in OTHER_HAND:
+        return None, side_switch(edges, node_flags, a, b, x)
+    if not same_road(ea, eb):
+        return None, NONE
+    if ea["side"] in OTHER_HAND:
+        hand = OTHER_HAND[ea["side"]] if ea["u"] == x else ea["side"]
+        best = FORBIDDEN
+    elif context is not None:
+        hand, best = context
+    else:
+        return None, NONE
+    if {ea["u"], ea["v"]} == {eb["u"], eb["v"]}:
+        hand = OTHER_HAND[hand]
+    here = crossing_at(node_flags, x)
+    if best == FREE or here == FREE:
+        best = FREE
+    elif best == JUNCTION or here == JUNCTION:
+        best = JUNCTION
+    if eb["side"] not in OTHER_HAND:
+        return (hand, best), NONE
+    hand_b = OTHER_HAND[eb["side"]] if eb["v"] == x else eb["side"]
+    return None, NONE if hand == hand_b else best
 
 
 def search(graph, src, dst, k, closed):
-    """Dijkstra over directed edges. State 2e walks edge e from u to v, 2e + 1 from v to u."""
+    """Dijkstra over (directed edge, centre context); at most seven contexts per directed edge."""
+    if src == dst:
+        return [], 0
     edges = graph["edges"]
     nf = graph.get("node_flags")
     node_flags = nf if isinstance(nf, list) and len(nf) == len(graph["nodes"]) else None
@@ -89,37 +120,43 @@ def search(graph, src, dst, k, closed):
             adj.setdefault(e["u"], []).append(e["id"])
             adj.setdefault(e["v"], []).append(e["id"])
     penalty = JUNCTION_PENALTY_M * (1 + k)
-    dist, prev, heap = {}, {}, []
+    dist, prev, moves, heap = {}, {}, {}, []
+    serial = 0
 
     def relax(frm, x, e, g):
+        nonlocal serial
         c = g + cost(edges[e], k)
-        if frm is not None:
-            sw = side_switch(edges, node_flags, frm >> 1, e, x)
-            if sw == FORBIDDEN:
-                return
-            if sw == JUNCTION:
-                c += penalty
+        context, sw = advance_side(edges, node_flags, None if frm is None else frm[0] >> 1,
+                                   e, x, None if frm is None else frm[1])
+        if sw == FORBIDDEN:
+            return
+        if sw == JUNCTION:
+            c += penalty
         d = 2 * e if edges[e]["u"] == x else 2 * e + 1
-        if c < dist.get(d, math.inf):
-            dist[d] = c
-            prev[d] = frm
-            heapq.heappush(heap, (c, d))
+        state = (d, context)
+        if c < dist.get(state, math.inf):
+            dist[state] = c
+            prev[state] = frm
+            moves[state] = sw
+            serial += 1  # avoid comparing None with context tuples when costs tie
+            heapq.heappush(heap, (c, serial, state))
 
     for e in adj.get(src, []):
         relax(None, src, e, 0.0)
     goal = None
     while heap:
-        g, d = heapq.heappop(heap)
-        if g > dist[d]:
+        g, _, state = heapq.heappop(heap)
+        if g > dist[state]:
             continue
+        d = state[0]
         e = d >> 1
         x = edges[e]["u"] if d & 1 else edges[e]["v"]
         if x == dst:
-            goal = d
+            goal = state
             break
         for e2 in adj.get(x, []):
             if e2 != e:  # as in the browser: no turning back along the edge just walked
-                relax(d, x, e2, g)
+                relax(state, x, e2, g)
     if goal is None:
         return None, 0
     states, d = [], goal
@@ -127,14 +164,14 @@ def search(graph, src, dst, k, closed):
         states.append(d)
         d = prev[d]
     states.reverse()
-    # A state's tail node is where the walker entered its edge: u for 2e, v for 2e + 1.
-    tail = [edges[d >> 1]["v"] if d & 1 else edges[d >> 1]["u"] for d in states]
-    junctions = sum(side_switch(edges, node_flags, states[i - 1] >> 1, states[i] >> 1, tail[i]) == JUNCTION
-                    for i in range(1, len(states)))
-    return [edges[d >> 1] for d in states], junctions
+    junctions = sum(moves[state] == JUNCTION for state in states)
+    return [edges[state[0] >> 1] for state in states], junctions
 
 
 def main(a, b, k=0.0, closed=False):
+    # Import area context only for district I/O. The legacy checker shares the pure search above.
+    from ctx import OUT, WORK, haversine
+
     graph = json.load(open(OUT / "graph.json"))
     places = json.load(open(OUT / "places.json"))
     src, src_hits = find_place(places, a)

@@ -4,6 +4,20 @@ Built 2026-10-22 (Asia/Manila). These scripts write `graph.json`, `places.json`,
 
 ## Run order
 
+For routing areas, `districts/build.py` runs `districts/build_jog.py` immediately after the graph step.
+It builds `jog.json` from the OSM extract and the committed Wikidata snapshot, without changing graph bytes.
+`districts/publish.py` copies graph and jog bytes together, and `data_release.py` includes jog data when present.
+An area or an older data archive without jog data still packs and fetches.
+See `docs/data-contract.md` for the arrays, sight rules, source licences and length-weighted light coverage.
+
+To add jog data to an existing published graph, run
+`pipeline/.venv/bin/python -I pipeline/districts/build_jog.py --area qc-north`.
+Before publishing an existing staged graph, run
+`UC_AREA=qc-north pipeline/.venv/bin/python -I pipeline/districts/build_jog.py` for each staged area.
+Publish checks all staged jog files and their graph hashes before writing any area.
+The script accepts explicit `--graph`, `--pbf`, `--wikidata` and `--out` paths for offline checks.
+With only `UC_AREA` set, it reads and writes `pipeline/stage/<area>/` for the build driver.
+
 ```sh
 cd .
 # Network reads, run once. Each download sits in its own directory under pipeline/raw/.
@@ -754,5 +768,7 @@ Imagery check on Esri World Imagery at zoom 19, by eye, rule and every verdict i
 - Two more filters were tested on the same samples (`tmp/outline-compare-20261023/canopy-eval.json` and `confidence-eval.json`). Neither helps, so the rule stays as built.
   - Tree canopy: only 1 of the 9 added fakes has half or more of its pixels at 3 m or taller in the Meta canopy raster, and 2 of 75 real roofs do. A canopy rule would drop 2 real roofs to remove 1 fake. Most added fakes are pools, soil, grass, a court or an alley, which the canopy raster does not mark.
   - Confidence: the 9 added fakes sit 0.012 to 0.155 above the cutoff (median 0.062), and the 75 real roofs 0.003 to 0.192 (median 0.059). A higher cutoff removes both at about the same rate.
+  - These two evals read added samples 1 to 3 and rejected sample 1 as unclear. sample-notes.md gives all four as real, so they counted 75 real added roofs, not 78. They were not re-run.
+  - Microsoft footprints as a second vote, tested 2026-10-23 on the 130 clear labels. Dropping each added outline that no Microsoft outline touches removes 16 real roofs for 3 fakes. A rescue at IoU 0.5 gains no real roof, because Microsoft draws a row of houses as one block (median 1.97 times the Google outline). Microsoft's 2026 global set has no Philippine outline newer than its legacy set. The rule stays.
 
 Decision: keep OSM first and fill from v3, as built. In Metro Manila areas, v3 alone would cover 9 to 32 points less than the two together, and it would drop every OSM height tag.

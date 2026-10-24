@@ -1,8 +1,12 @@
 import { Component, Suspense, lazy, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AREA_LABELS, CBD_CENTER, DEFAULT_AREA, NIGHT_ALT_DEG, SUGGESTED } from "./config";
 import type { Advisory, AreaInfo, Endpoint, Mode, Place, Result, Route, Weather } from "./types";
-import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, placeKeys, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
+import { MAX_SNAP_M, findRoutes, loadData, loadShadeDate, searchPlaces, snapToNode, type Data } from "./lib/routerClient";
 import { areaBase, loadAdvisory, loadAreas, loadPlaceIndex, loadWeather } from "./lib/data";
+import { progressFetch, progressLabel, type LoadProgress } from "./lib/loadProgress";
+import { keepOfflineArea } from "./lib/offline";
+import { lazyChunk } from "./lib/lazyChunk";
+import chunkUrls from "virtual:lazy-chunks";
 import { areaAt, areaCities, areaLabel, areaList, placeWhere, sharedArea, wellKnown } from "./lib/areas";
 import { areaAdvisory } from "./lib/advisory";
 import { clockPinned, dateLabel, dateShort, fmtDist, fmtMinute, manilaNow, type Clock } from "./lib/time";
@@ -24,12 +28,15 @@ import { nowLabel, nowSlot } from "./lib/nowSlot";
 import { decodeEndpoint, encodeEndpoint, hashFor, hhmmToMinute, minuteToHHMM, MY_LOCATION, tripFromHash, type TripParams } from "./lib/tripUrl";
 
 // The first screen needs only the landing card. The map, steps, navigation, About and rain load as separate chunks.
-const MapView = lazy(() => loadMapLibre().then(() => import("./components/MapView")));
-const StepsList = lazy(() => import("./components/Steps").then((m) => ({ default: m.StepsList })));
-const TurnCard = lazy(() => import("./components/Navigate").then((m) => ({ default: m.TurnCard })));
-const NavSheet = lazy(() => import("./components/Navigate").then((m) => ({ default: m.NavSheet })));
-const About = lazy(() => import("./components/About"));
-const RainLayer = lazy(() => import("./components/RainLayer"));
+const loadMapView = lazyChunk(chunkUrls.MapView, () => import("./components/MapView"));
+const loadSteps = lazyChunk(chunkUrls.Steps, () => import("./components/Steps"));
+const loadNavigate = lazyChunk(chunkUrls.Navigate, () => import("./components/Navigate"));
+const MapView = lazy(() => loadMapLibre().then(loadMapView));
+const StepsList = lazy(() => loadSteps().then((m) => ({ default: m.StepsList })));
+const TurnCard = lazy(() => loadNavigate().then((m) => ({ default: m.TurnCard })));
+const NavSheet = lazy(() => loadNavigate().then((m) => ({ default: m.NavSheet })));
+const About = lazy(lazyChunk(chunkUrls.About, () => import("./components/About")));
+const RainLayer = lazy(lazyChunk(chunkUrls.RainLayer, () => import("./components/RainLayer")));
 
 type Stage = "landing" | "plan" | "navigate";
 type Field = "from" | "to";
@@ -105,8 +112,7 @@ type Bundles = Record<string, Data>;
 
 export default function App() {
   const clock = useManilaClock();
-  // Search covers every area: areas.json and places_index.json (about 1.3 MB) load on the first sign of intent,
-  // hovering, focusing or tapping a route type. status follows them.
+  // The small search index becomes usable first. Background shards expand it without blocking input.
   const [areas, setAreas] = useState<AreaInfo[] | null>(null);
   const [index, setIndex] = useState<Pick<Data, "places" | "placeKeys"> | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -115,6 +121,7 @@ export default function App() {
   // area's stay in memory, since one area's graph is up to 9 MB.
   const [bundles, setBundles] = useState<Bundles>({});
   const [areaFailed, setAreaFailed] = useState<Record<string, string>>({});
+  const [areaProgress, setAreaProgress] = useState<Record<string, LoadProgress>>({});
   // Counts dates whose shade file arrived, so the routes recompute. The bundle fills its arrays in place.
   const [shadeVer, setShadeVer] = useState(0);
   const [weather, setWeather] = useState<Weather | null>(null);
@@ -250,11 +257,9 @@ export default function App() {
     loading.current = true;
     setStatus("loading");
     setLoadError(null);
-    Promise.all([loadAreas(), loadPlaceIndex()])
-      .then(([list, raw]) => {
-        const places = raw.map((pl) => ({ ...pl, aliases: Array.isArray(pl.aliases) ? pl.aliases : [] }));
+    Promise.all([loadAreas(), loadPlaceIndex(setIndex)])
+      .then(([list]) => {
         setAreas(list);
-        setIndex({ places, placeKeys: placeKeys(places) });
         setStatus("ready");
       })
       .catch((e: unknown) => {
@@ -267,23 +272,42 @@ export default function App() {
   // The date whose shade loads with a new area: the chosen date, or today before any time is set.
   const wantDate = useRef(clock.date);
   const areaLoading = useRef(new Set<string>());
+  const areaFiles = useRef(new Map<string, string[]>());
   const ensureArea = useCallback((id: string) => {
     if (bundlesRef.current[id] || areaLoading.current.has(id)) return;
     areaLoading.current.add(id);
     setAreaFailed(({ [id]: _, ...rest }) => rest);
-    loadData(areaBase(id), undefined, { date: wantDate.current })
-      .then((d) =>
+    setAreaProgress((p) => ({ ...p, [id]: { loaded: 0 } }));
+    let tracking = true;
+    const fetching = progressFetch((progress) => {
+      if (tracking) setAreaProgress((p) => ({ ...p, [id]: progress }));
+    });
+    const files: string[] = [];
+    areaFiles.current.set(id, files);
+    loadData(areaBase(id), async (url) => {
+      const res = await fetching(url);
+      if (res.ok && !res.headers.get("content-type")?.includes("text/html") && !files.includes(url)) files.push(url);
+      return res;
+    }, { date: wantDate.current, graphFile: "graph.cols.json" })
+      .then((d) => {
         setBundles((prev) => {
           const cur = areaRef.current;
           return cur && cur !== id && prev[cur] ? { [cur]: prev[cur], [id]: d } : { [id]: d };
-        }),
-      )
+        });
+      })
       .catch((e: unknown) => setAreaFailed((f) => ({ ...f, [id]: e instanceof Error ? e.message : String(e) })))
-      .finally(() => areaLoading.current.delete(id));
+      .finally(() => {
+        tracking = false;
+        areaLoading.current.delete(id);
+        setAreaProgress(({ [id]: _, ...rest }) => rest);
+      });
   }, []);
   useEffect(() => {
     if (areaId) ensureArea(areaId);
   }, [areaId, ensureArea]);
+  useEffect(() => {
+    if (areaId && bundles[areaId]) keepOfflineArea(areaId, Object.keys(bundles), areaFiles.current.get(areaId) ?? []);
+  }, [areaId, bundles]);
   const areaError = areaId ? (areaFailed[areaId] ?? null) : null;
 
   const manifest = data?.manifest ?? null;
@@ -1155,6 +1179,11 @@ export default function App() {
                 </p>
               )}
               {restoring && <Pending text="Restoring your trip..." />}
+              {areaId && areaProgress[areaId] && (
+                <p role="status" aria-live="polite" className="shrink-0 rounded-card bg-white px-3 py-2 text-[13px] text-slate-700 shadow-card" data-testid="load-progress">
+                  Loading {areaLabel(areaId, areas)} · {progressLabel(areaProgress[areaId])}
+                </p>
+              )}
               {view === "dest" && !restoring && (
                 <>
                   <ModeSwitch mode={mode} onChange={setMode} />

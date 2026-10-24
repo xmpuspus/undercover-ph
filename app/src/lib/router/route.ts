@@ -1,4 +1,4 @@
-import { aStar, sideSwitch, Switch, WALK_M_PER_MIN, type Path, type SearchSpec } from "./astar";
+import { advanceSide, aStar, Switch, WALK_M_PER_MIN, type Path, type SearchSpec } from "./astar";
 import { clock12, closesAtMinute, openAt } from "./hours";
 import { appendLine, buildSteps, type EdgeTrip } from "./steps";
 import type { Data, Query, Result, Route, SegKind, SunInfo } from "./types";
@@ -61,7 +61,7 @@ function shadeAt(data: Data, dateIdx: number, bucketIdx: number, e: number): [nu
   return [bb, Math.min(100 - bb, t)];
 }
 
-function buildSpec(data: Data, q: Query, cover: CoverMode, includeUnchecked: boolean, stepFree: boolean): SearchSpec {
+function buildSpec(data: Data, q: Query, cover: CoverMode, includeUnchecked: boolean, stepFree: boolean, ignoreHours = false): SearchSpec {
   const E = data.edgeCount;
   const allowed = new Uint8Array(E);
   const exposure = new Float32Array(E);
@@ -69,7 +69,7 @@ function buildSpec(data: Data, q: Query, cover: CoverMode, includeUnchecked: boo
     const f = data.edgeFlags[e];
     const hi = data.edgeHours[e];
     allowed[e] =
-      (data.edgeRoutable[e] || includeUnchecked) && !(stepFree && f & STEPS) && (hi < 0 || openAt(data, hi, q.dateIdx, q.departMin))
+      (data.edgeRoutable[e] || includeUnchecked) && !(stepFree && f & STEPS) && (ignoreHours || hi < 0 || openAt(data, hi, q.dateIdx, q.departMin))
         ? 1
         : 0;
     if (f & SHELTERED) {
@@ -83,7 +83,7 @@ function buildSpec(data: Data, q: Query, cover: CoverMode, includeUnchecked: boo
       exposure[e] = s ? 1 - (s[0] + s[1]) / 100 : 1;
     }
   }
-  return { allowed, exposure, departMin: q.departMin, dateIdx: q.dateIdx };
+  return { allowed, exposure, departMin: q.departMin, dateIdx: q.dateIdx, ignoreHours };
 }
 
 function edgeCoords(data: Data, e: number, forward: boolean): [number, number][] {
@@ -170,6 +170,7 @@ function makeRoute(
   let footbridge = false;
   let underpass = false;
   let unmarked = false;
+  let sideContext = 0;
   const hoursSeen = new Map<number, number>();
 
   path.edges.forEach((e, i) => {
@@ -194,7 +195,9 @@ function makeRoute(
     if (f & IN_BUILDING) inBuilding = true;
     const hi = data.edgeHours[e];
     if (hi >= 0 && !hoursSeen.has(hi)) hoursSeen.set(hi, arriveMin);
-    const sw = i > 0 ? sideSwitch(data, path.edges[i - 1], e, path.nodes[i]) : Switch.None;
+    const move = advanceSide(data, i > 0 ? path.edges[i - 1] : -1, e, path.nodes[i], sideContext);
+    sideContext = move.context;
+    const sw = move.switchIn;
     if (sw === Switch.Junction) unmarked = true;
 
     const shadeM = cover === "shade" && !cv.dark ? cv.building + cv.tree : 0;
@@ -322,17 +325,18 @@ export function findRoutes(data: Data, q: Query): Result {
   const shortest = run(0);
   if (!shortest) {
     // Name the cause, so the card can give the fix that matches it.
-    const reach = (d: Data, unchecked: boolean, stepFree: boolean) => aStar(d, buildSpec(d, q, "roof", unchecked, stepFree), q.from, q.to, 0) !== null;
-    if (!q.includeUnchecked && reach(data, true, q.stepFree)) {
+    const reach = (unchecked: boolean, stepFree: boolean, ignoreHours = false) =>
+      aStar(data, buildSpec(data, q, "roof", unchecked, stepFree, ignoreHours), q.from, q.to, 0) !== null;
+    if (!q.includeUnchecked && reach(true, q.stepFree)) {
       notes.push('A route exists on paths that may be gated or private. Turn on "Include paths that may be gated or private" to see it.');
-    } else if (q.stepFree && reach(data, q.includeUnchecked, false)) {
+    } else if (q.stepFree && reach(q.includeUnchecked, false)) {
       notes.push("Every route between these points uses steps.");
-    } else if (reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, q.includeUnchecked, q.stepFree)) {
+    } else if (reach(q.includeUnchecked, q.stepFree, true)) {
       notes.push("Every route between these points passes through a place that is closed at this time.");
-    } else if (reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, true, q.stepFree)) {
+    } else if (reach(true, q.stepFree, true)) {
       // Each limit alone still blocks, but together they open a route: say so, not "no route at any hour".
       notes.push("A route exists only at other hours or on paths that may be gated or private. Try another time, or include those paths.");
-    } else if (q.stepFree && reach({ ...data, edgeHours: new Int32Array(data.edgeCount).fill(-1) }, true, false)) {
+    } else if (q.stepFree && reach(true, false, true)) {
       notes.push("A route exists only with steps, and only at other hours or on paths that may be gated or private.");
     } else {
       notes.push("No walking route connects these points at any hour.");

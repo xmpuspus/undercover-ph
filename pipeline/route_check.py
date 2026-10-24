@@ -12,22 +12,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np  # noqa: E402
-from scipy.sparse import csr_matrix  # noqa: E402
-from scipy.sparse.csgraph import dijkstra  # noqa: E402
 
 from common import OUT, WORK  # noqa: E402
-
-
-def find_place(places, q):
-    q = q.strip().lower()
-    hits = [p for p in places if p["name"].lower() == q or q in (a.lower() for a in p["aliases"])]
-    if not hits:
-        sys.exit(f"no place named {q!r}")
-    return hits[0], [h["name"] for h in hits]
-
-
-def cost(e, k):
-    return e["len_m"] * (1 + (0 if e["flags"] & 7 else k))
+from districts.route_check import cost, find_place, search  # noqa: E402,F401
 
 
 def main(a, b, k=0.0, closed=False):
@@ -35,36 +22,19 @@ def main(a, b, k=0.0, closed=False):
     places = json.load(open(OUT / "places.json"))
     src, src_hits = find_place(places, a)
     dst, dst_hits = find_place(places, b)
-    best = {}
-    for e in graph["edges"]:
-        if not e["routable"] or (closed and e["hours_idx"] is not None):
-            continue
-        for key in ((e["u"], e["v"]), (e["v"], e["u"])):
-            if key not in best or cost(e, k) < cost(best[key], k):
-                best[key] = e
-    n = len(graph["nodes"])
-    rows, cols = zip(*best)
-    w = np.array([cost(best[key], k) for key in best]) + 1e-6  # keep zero-length links as real arcs
-    mat = csr_matrix((w, (rows, cols)), shape=(n, n))
-    dist, pred = dijkstra(mat, directed=True, indices=src["node_id"], return_predecessors=True)
-    d = dist[dst["node_id"]]
-    out = {"k_unsheltered": k, "hours_edges_dropped": closed, "from": src["name"], "from_matches": src_hits, "from_node": src["node_id"],
+    path, junctions = search(graph, src["node_id"], dst["node_id"], k, closed)
+    out = {"k_unsheltered": k, "hours_edges_dropped": closed, "side_switch_rule": "browser",
+           "from": src["name"], "from_matches": src_hits, "from_node": src["node_id"],
            "to": dst["name"], "to_matches": dst_hits, "to_node": dst["node_id"]}
-    if not np.isfinite(d):
+    if path is None:
         out["length_m"] = None
         out["result"] = "no routable path"
     else:
-        path, cur = [], dst["node_id"]
-        while cur != src["node_id"]:
-            prev = pred[cur]
-            path.append(best[(prev, cur)])
-            cur = prev
-        path.reverse()
         sheltered = sum(e["len_m"] for e in path if e["flags"] & 7)
         length = float(sum(e["len_m"] for e in path))
         out.update(length_m=round(length, 1), edges=len(path), sheltered_m=round(sheltered, 1),
                    sheltered_share=round(sheltered / length, 4) if length else None,
-                   minutes_at_1_1_m_s=int(np.ceil(length / 1.1 / 60)),
+                   minutes_at_1_1_m_s=int(np.ceil(length / 1.1 / 60)), junction_side_switches=junctions,
                    steps=[{"id": e["id"], "len_m": e["len_m"], "name": e["name"], "side": e["side"],
                            "landmark": e["landmark"], "flags": e["flags"]} for e in path])
     path_out = WORK / "route_check.json"

@@ -12,7 +12,7 @@ It reads pipeline/stage/<id>/ and writes these files, all kept in git:
 - app/public/data/areas.json: the routing areas, their boxes, neighbourhoods and centre.
 - app/public/data/places_index.json: every place once, with its area id and node in that area. A place in two
   overlapping areas stays under the area whose graph_rects hold it farthest from their edge.
-- app/public/data/areas/<id>/graph.json, places.json and hours.json, compact.
+- app/public/data/areas/<id>/graph.json, jog.json, places.json and hours.json, compact.
 - pipeline/inputs/areas/<id>/manifest_template.json and buildings.geojson.gz, for the deploy build.
 - app/public/data/buildings.pmtiles: layer "buildings", zooms 13 to 15, every building at zoom 15.
 - app/public/data/trees.pmtiles: layer "trees", zooms 14 to 15, every crown at both zooms.
@@ -22,6 +22,7 @@ Where two areas share a building or a tree, the tiles keep one copy: same height
 within 1 m.
 """
 import gzip
+import hashlib
 import json
 import math
 import re
@@ -272,6 +273,21 @@ def regional_ready(a):
     return None
 
 
+def check_jog(ids):
+    """Check every staged graph/jog pair before publication writes any area."""
+    for area in ids:
+        stage = STAGE / area
+        try:
+            jog = json.loads((stage / "jog.json").read_bytes())
+            graph_sha = hashlib.sha256((stage / "graph.json").read_bytes()).hexdigest()
+        except (OSError, ValueError) as ex:
+            sys.exit(f"{area}: staged jog.json or graph.json is missing or invalid: {ex}; "
+                     f"run UC_AREA={area} pipeline/.venv/bin/python -I pipeline/districts/build_jog.py")
+        if not isinstance(jog, dict) or jog.get("graph_sha256") != graph_sha:
+            sys.exit(f"{area}: staged jog.json does not match graph.json; "
+                     f"run UC_AREA={area} pipeline/.venv/bin/python -I pipeline/districts/build_jog.py")
+
+
 def main(tiles=True, hold=()):
     areas = json.load(open(PIPE / "areas.json"))["areas"]
     regional = json.load(open(PIPE / "regions/areas.json"))["areas"] if (PIPE / "regions/areas.json").exists() else []
@@ -284,6 +300,7 @@ def main(tiles=True, hold=()):
     unknown = sorted({a["region"] for a in areas if a.get("region") and a["region"] not in REGIONS})
     if unknown:
         sys.exit(f"areas name unknown regions {unknown}; add them to pipeline/regions/regions.json")
+    check_jog(ids)
     # The tree tiles read each area's trees.json from its last shade run. Stop before writing anything.
     no_trees = [i for i in ids if not (STAGE / i / "trees.json").exists()]
     if tiles and no_trees:
@@ -304,7 +321,10 @@ def main(tiles=True, hold=()):
             sys.exit(f"{i}: the manifest template counts do not match the staged files; rerun build.py --checks {i}")
         rows.append(area_entry(a, m))
         out = DATA / "areas" / i
-        dump(out / "graph.json", graph)
+        out.mkdir(parents=True, exist_ok=True)
+        # jog.json hashes these exact graph bytes, so publishing must preserve them.
+        shutil.copyfile(stage / "graph.json", out / "graph.json")
+        shutil.copyfile(stage / "jog.json", out / "jog.json")
         dump(out / "places.json", places)
         dump(out / "hours.json", hours)
         index += [index_row(p, i) for p in places]

@@ -6,6 +6,13 @@ import "@fontsource/jost/500.css";
 import "@fontsource/jost/600.css";
 import "./index.css";
 import App from "./App";
+import { registerOffline } from "./lib/offline";
+import { primePlaceIndex } from "./lib/data";
+
+const searchReady = primePlaceIndex();
+// The error is retried by the search UI. It must not prevent mounting when offline support is unavailable.
+void searchReady.catch(() => {});
+registerOffline(searchReady);
 
 // Each deploy renames the code files, and the daily rebuild deploys every morning. A tab opened before a deploy
 // asks for the old Navigate, Steps or About file, gets a 404, and React drops the page. Reload once to get the

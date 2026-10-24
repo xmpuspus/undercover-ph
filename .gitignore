@@ -73,4 +73,11 @@ app/public/data/places_index.json
 app/public/data/areas/*/graph.json
 app/public/data/areas/*/places.json
 app/public/data/areas/*/hours.json
+app/public/data/areas/*/jog.json
 pipeline/inputs/areas/
+
+# Blank field-check sheets from pipeline/tools/field_kit.py; filled ones go to docs/field-checks/
+field/
+
+# What pipeline/data_release.py fetch last left in place
+pipeline/.data-fetched.json
