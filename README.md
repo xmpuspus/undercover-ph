@@ -7,9 +7,9 @@
 
 > undercover.ph plans walking routes in 67 busy city centres across the Philippines, 14 of them in Metro Manila. The routes favour shade on sunny days and roof cover when it rains. It is a Philippine version of Singapore's [Undercover](https://undercover.gov.sg/) prototype, built on open data. Your browser computes every route, so no server that this project runs gets your start or end point.
 
-[![A screen recording of undercover.ph with a caption for each step. Shaded is picked. Greenbelt is typed as the destination and Ayala MRT Station as the start. The time is set to tomorrow at 3 PM. Two routes show on the 3D map with their shaded share. The cover bar, the play button with moving shadows, the step list, Navigate and the Sheltered mode follow. The map then zooms out to the area outlines across Metro Manila](docs/demo/walkthrough.gif)](docs/demo/walkthrough.mp4)
+[![A screen recording of undercover.ph with a caption for each step. Shaded is tapped. Greenbelt is typed as the destination and Ayala MRT Station as the start. The time is set to tomorrow at 3 PM. Three routes show on the 3D map with their shaded share. The bar that shows what covers each part of the route, the play button with moving shadows, the step list, Navigate and Sheltered mode follow. The map then zooms out to the area outlines](docs/demo/walkthrough.gif)](docs/demo/walkthrough.mp4)
 
-<sub>The GIF is a screen recording of the app, played 1.5 times faster. The [75-second video at 1080p](docs/demo/walkthrough.mp4) plays in real time, and a [4:5 cut of the phone layout](docs/demo/walkthrough-tall.mp4) shows the same steps on a phone. In the recording, the app plans a walk from Ayala MRT Station to Greenbelt for tomorrow at 3 PM. The recommended walk is 88% shaded with 2.6 minutes in sun, and the shortest walk is 72% shaded. In Sheltered mode the app picks a walk that is 25% under a roof.</sub>
+<sub>The GIF is a screen recording of the app, played 1.5 times faster. The [75-second video at 1080p](docs/demo/walkthrough.mp4) plays in real time, and a [full-screen phone version](docs/demo/walkthrough-tall.mp4) shows the same steps on a phone. In the recording, the app plans a walk from Ayala MRT Station to Greenbelt for tomorrow at 3 PM. The recommended walk is 83% shaded with 3.3 minutes in sun, and the shortest walk is 72% shaded. In Sheltered mode the app picks a walk that is 25% under a roof.</sub>
 
 Try it at **[undercover.ph](https://undercover.ph)**. Pick Shaded or Sheltered, choose where you start and where you go, and pick the half hour you leave.
 
@@ -121,12 +121,18 @@ Like Singapore's version, the app returns three walks. They are the shortest wal
 
 <table>
 <tr>
-<td width="40%"><a href="https://undercover.ph"><img src="docs/demo/steps-phone.gif" alt="undercover.ph on a phone. The short route card is below a large map. The step list has sidewalk-side badges, landmarks, and stairs flags. Then the Navigate view shows a turn card"></a></td>
+<td width="40%"><a href="https://undercover.ph"><img src="docs/demo/steps-phone.gif" alt="undercover.ph on a phone, full screen. The route card shows an 83% shaded walk. The step list names the sidewalk side of each step. Then the Navigate view shows a turn card"></a></td>
 <td width="60%"><a href="https://undercover.ph"><img src="docs/demo/rain.gif" alt="undercover.ph in Sheltered mode. The app picks a walk on covered walkways and an underpass. The card then shows the sheltered share"></a></td>
 </tr>
 <tr>
 <td><sub>Steps and Navigate on a phone.</sub></td>
 <td><sub>Sheltered mode. The router gives paths with no roof a higher cost.</sub></td>
+</tr>
+<tr>
+<td colspan="2"><a href="docs/demo/run-loop.mp4"><img src="docs/demo/run-loop.gif" width="360" alt="Run a loop on a phone, full screen, with 3 km loops from Ayala Triangle Gardens at 9 AM and at 5 AM, a saved run, and a loop on 89% new streets"></a></td>
+</tr>
+<tr>
+<td colspan="2"><sub>Run a loop on a phone, with a smoother <a href="docs/demo/run-loop.mp4">MP4 version</a>.</sub></td>
 </tr>
 </table>
 

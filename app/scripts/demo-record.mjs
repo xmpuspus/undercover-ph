@@ -61,7 +61,7 @@ const CLIPS = [
   { name: "sun-direction", vp: DESKTOP, width: 900, maxMB: 6.5, flow: sunDirection },
   { name: "steps-phone", vp: CINE, width: 400, maxMB: 6, dither: "none", lossy: 80, flow: stepsPhone, story: "steps-phone" },
   { name: "rain", vp: DESKTOP, width: 900, maxMB: 4, flow: rain },
-  { name: "run-loop", vp: CINE, width: 450, maxMB: 9.5, speed: 1.4, dither: "none", lossy: 80, flow: runLoop, mp4: { width: 1080, speed: 1.2 }, story: "run-loop" },
+  { name: "run-loop", vp: CINE, width: 450, maxMB: 10, speed: 1.4, dither: "none", lossy: 80, flow: runLoop, mp4: { width: 1080, speed: 1.2 }, story: "run-loop" },
   // Phone takes of the two desktop clips, for Instagram Stories only.
   { name: "sun-direction-phone", vp: CINE, gif: false, flow: sunPhone, story: "sun-direction" },
   { name: "rain-phone", vp: CINE, gif: false, flow: rainPhone, story: "rain" },
@@ -664,7 +664,8 @@ async function stepsPhone(page, m) {
   await c.wide();
   await c.tap(f.getByTestId("steps-back"), 500);
 
-  await c.caption("Navigate shows one turn at a time");
+  // The turn card is at the top of the Navigate view, so this caption goes to the bottom.
+  await c.caption("Navigate shows one turn at a time", "bottom");
   await c.zoom(f.getByTestId("peek-navigate"), 1.6, 0.62);
   await c.tap(f.getByTestId("peek-navigate"), 500);
   await c.wide();
@@ -731,10 +732,9 @@ async function walkthroughTall(page, m) {
     await page.waitForTimeout(1400);
   }
   m.note("ribbon", { caption: (await f.getByTestId("ribbon-caption").innerText().catch(() => "none")).trim() });
+  await c.caption("Tap play to see the shadows move through the day");
   await c.wide();
   await c.tap(f.getByTestId("sheet-collapse"), 600);
-
-  await c.caption("Tap play to see the shadows move through the day");
   // Play runs from the trip time to the last daylight slot and stops by itself. Then set the trip back to 3 PM.
   await c.tap(f.getByTestId("map-play"), 4300);
   m.note("after-play", { when: await flat(f.getByTestId("when-chip")) });
@@ -751,7 +751,7 @@ async function walkthroughTall(page, m) {
   await c.wide();
   await c.tap(f.getByTestId("steps-back"), 500);
 
-  await c.caption("Navigate shows one turn at a time");
+  await c.caption("Navigate shows one turn at a time", "bottom");
   await c.tap(f.getByTestId("peek-navigate"), 800);
   await c.zoom(f.getByTestId("turn-card"), 1.5, 0.42);
   await c.tap(f.getByTestId("next-step"), 1200);
@@ -800,6 +800,7 @@ async function runLoop(page, m) {
   await c.caption("Pick a distance and a start point");
   await c.zoom(f.getByTestId("jog-km-3"), 1.6, 0.6, 650, true);
   await c.tap(f.getByTestId("jog-km-3"), 350);
+  await c.wide();
   await c.type("jog-start-input", RUN_FROM);
   await cards.first().waitFor({ timeout: 90000 });
   await c.wide();
@@ -821,6 +822,7 @@ async function runLoop(page, m) {
   await c.zoom(f.getByTestId("when-chip"), 1.9, 0.28);
   await c.tap(f.getByTestId("when-chip"), 450);
   await c.tap(f.locator('[data-testid="date-option"][data-label="Tomorrow"]'), 450);
+  await c.zoom(f.getByTestId("hour-option-300"), 1.6, 0.4);
   await c.tap(f.getByTestId("hour-option-300"), 300);
   await c.wide();
   await cards.first().filter({ hasText: DARK_LINE }).waitFor({ timeout: 90000 });
