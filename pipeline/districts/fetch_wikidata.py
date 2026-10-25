@@ -32,7 +32,7 @@ POINT = re.compile(r"Point\(([-\d.]+) ([-\d.]+)\)")
 
 
 def sparql(query):
-    # curl, not urllib: Python's TLS store fails on some macOS installs.
+    # curl instead of urllib, because Python's TLS store fails on some macOS installs.
     r = subprocess.run(["curl", "-sS", "--fail", "--max-time", "120", "-G", ENDPOINT, "--data-urlencode", f"query={query}",
                         "--data-urlencode", "format=json", "-H", f"User-Agent: {AGENT}",
                         "-H", "Accept: application/sparql-results+json"], capture_output=True, text=True)
@@ -50,7 +50,7 @@ def main():
             name = (row.get("en") or row.get("tl") or {}).get("value")
             if not m or not name:
                 continue
-            # A marker that is also designated heritage keeps the marker kind, the narrower one.
+            # A marker with a heritage designation keeps the marker kind, the narrower one.
             if qid in items and items[qid]["kind"] == "nhcp_marker":
                 continue
             items[qid] = {"qid": qid, "name": name, "kind": kind,

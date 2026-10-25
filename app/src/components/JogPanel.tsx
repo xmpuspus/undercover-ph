@@ -46,7 +46,7 @@ export default function JogPanel(p: Props) {
     readRuns().then(({ runs, skipped, count }) => {
       if (!live) return;
       setRuns(runs); setHistoryCount(count); lastSearch.current = runs; firstSave.current = count > 0;
-      if (skipped) setHistoryNote("Some saved runs could not be read, or the history is too large. Export or clear it to manage the saved runs.");
+      if (skipped) setHistoryNote("Some saved runs could not be read, or the history is too large. Export or clear the history.");
     }).catch((e: Error) => live && setStorageError(e.message)).finally(() => live && setHistoryReady(true));
     return () => { live = false; client.current?.close(); client.current = null; };
   }, []);
@@ -171,7 +171,7 @@ export default function JogPanel(p: Props) {
     {list.length > 0 && <PlaceList id="jog-places" places={list} onPick={p.onPick} active={combo.active} testid="jog-results" where={p.where} />}
     {p.query.trim() && !list.length && <p className="mt-2 text-sm text-slate-600">No place by that name in the areas this app covers. Try another name.</p>}
     {p.placesState.status !== "ready" && <p role="status" className="mt-2 text-sm">Loading places... <button className={btn} onClick={p.placesState.onRetry}>Try again</button></p>}
-    <button className={`${btn} mt-2`} type="button" onClick={p.onLocate} disabled={p.locating} data-testid="jog-use-location">{p.locating ? "Finding you..." : "Use my location"}</button>
+    <button className={`${btn} mt-2`} type="button" onClick={p.onLocate} disabled={p.locating} data-testid="jog-use-location">{p.locating ? "Finding your location..." : "Use my location"}</button>
     {p.notice && <p role="status" className="mt-2 text-sm text-amber-900">{p.notice}</p>}
     <fieldset className="mt-3"><legend className="text-sm font-medium">Distance</legend>
       <div className="mt-1 flex flex-wrap gap-1.5">{[3, 5, 10].map((n) => <button key={n} type="button" className={`${btn} ${!custom && km === String(n) ? "border-brand bg-blue-50" : ""}`} aria-pressed={!custom && km === String(n)}

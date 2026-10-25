@@ -4,9 +4,9 @@ Usage: pipeline/.venv/bin/python -I pipeline/districts/fetch_gob_v3.py [DISTRICT
 Source: https://sites.research.google/open-buildings/ (CC BY 4.0 and ODbL), one gzipped CSV per level-6 S2 cell at
 https://storage.googleapis.com/open-buildings-data/v3/polygons_s2_level_6_gzip_no_header/<token>_buildings.csv.gz
 Columns: latitude, longitude, area_in_meters, confidence, geometry (WKT), full_plus_code.
-Downloads land in pipeline/raw/gob_v3/ and are reused. Each district gets pipeline/raw/districts/<id>/gob_v3/outlines.jsonl.gz,
+Downloads go to pipeline/raw/gob_v3/ and are reused. Each district gets pipeline/raw/districts/<id>/gob_v3/outlines.jsonl.gz,
 one row per outline whose centre lies in its building box, with the confidence that gives 80% precision in that
-outline's level-4 cell (Google's score_thresholds_s2_level_4.csv). build_buildings.py decides which outlines to keep.
+outline's level-4 cell (Google's score_thresholds_s2_level_4.csv). build_buildings.py selects the outlines to keep.
 """
 import csv
 import gzip

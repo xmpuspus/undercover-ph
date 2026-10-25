@@ -6,7 +6,7 @@ import { REC_MAX_DETOUR, REC_MIN_CUT } from "../lib/routerClient";
 import { fmtStamp } from "../lib/time";
 import { CloseIcon } from "./Icons";
 
-// CC BY 4.0 asks for a link to the licence and a note when the data was changed (section 3(a)(1)).
+// CC BY 4.0 requires a link to the licence and a note when the data was changed (section 3(a)(1)).
 const CC_BY = "https://creativecommons.org/licenses/by/4.0/";
 
 const SOURCES: { name: string; licence: string; text: string; url: string; licenceUrl?: string }[] = [
@@ -46,7 +46,7 @@ const SOURCES: { name: string; licence: string; text: string; url: string; licen
   },
   {
     name: "PAGASA",
-    licence: "Credited to PAGASA. No licence is stated on the page",
+    licence: "Credited to PAGASA. The page states no licence",
     text: "Thunderstorm advisories for each region, shown for the 2 hours they cover.",
     url: "https://www.pagasa.dost.gov.ph/",
   },
@@ -94,11 +94,11 @@ export default function About({ manifest, areas, onClose }: { manifest: Manifest
   const limits = [
     "Nobody has checked the shade on the street yet.",
     "Building heights come from OpenStreetMap and Google's 2023 estimates. New towers can be missing.",
-    "OpenStreetMap shows few covered walkways, so sheltered routes undercount real cover.",
-    "Paths behind gates and building entrances stay out of routes unless you include them.",
+    "OpenStreetMap maps few covered walkways, so Sheltered routes can miss roof cover that exists on the street.",
+    "The app does not use paths behind gates and building entrances unless you include them.",
     "Mall opening hours come from a February 2026 guide. Hours can change.",
     ...(dates.length
-      ? [`Shade covers ${longDate(dates[0], false)} to ${longDate(dates[dates.length - 1], true)}. Other days have no shade data yet.`]
+      ? [`Shade data covers ${longDate(dates[0], false)} to ${longDate(dates[dates.length - 1], true)}. Other days have no shade data yet.`]
       : []),
   ];
   return (
@@ -120,12 +120,12 @@ export default function About({ manifest, areas, onClose }: { manifest: Manifest
           </button>
         </div>
         <p className="mt-2">
-          {APP_NAME} finds walking routes that stay in shade or under a roof. It is a prototype by an independent developer. It is not affiliated with any
+          {APP_NAME} finds walking routes in the shade or under a roof. It is a prototype by an independent developer. It is not affiliated with any
           government agency.
         </p>
         <p className="mt-2">
-          It covers {total} walking areas{groups.length ? ", in Metro Manila and other cities" : " around Metro Manila's busiest centres"}. A trip that
-          starts or ends outside them gets no route:
+          It covers the {total} walking areas below{groups.length ? ", in Metro Manila and other cities" : ", around Metro Manila's busiest centres"}. A
+          trip that starts or ends outside them gets no route.
         </p>
         <ul className="mt-1 list-disc space-y-0.5 pl-5" data-testid="about-areas">
           {AREA_LABELS.map((a) => (
@@ -151,25 +151,25 @@ export default function About({ manifest, areas, onClose }: { manifest: Manifest
         {groups.some((g) => g.areas.some((a) => (a.buildings_mapped ?? 1) < 0.5)) && (
           <p className="mt-2" data-testid="about-buildings-mapped">
             Shade comes from building outlines, from OpenStreetMap and, where it has none, from Google. Some buildings still have no outline,
-            so routes miss some building shade. The share of buildings mapped follows each area where it is under half.
+            so routes miss some building shade. If outlines cover less than half of an area's building area, the list shows that share after its name.
           </p>
         )}
 
         <h3 className="mt-4 font-semibold text-ink">How it works</h3>
         <ul className="mt-1 list-disc space-y-1 pl-5">
           <li>Shade comes from building heights and tree canopy, computed every 30 minutes for each path.</li>
-          <li>Each path uses the shade at the time you reach it, from your departure time and walking speed.</li>
+          <li>For each path, the app uses the shade at the time you reach it. It calculates that time from your departure time and walking speed.</li>
           <li>Roofed, indoor, and underground paths count as covered. When the sun is {NIGHT_ALT_DEG} degrees up or lower, only a roof counts.</li>
           <li data-testid="about-rule">
-            The recommended walk is at most {Math.round(REC_MAX_DETOUR * 100)}% longer than the shortest walk and has at least {Math.round(REC_MIN_CUT * 100)}% less
-            time in sun (with Sheltered, less time without a roof). If no walk meets both, the shortest walk is recommended.
+            The recommended walk is at most {Math.round(REC_MAX_DETOUR * 100)}% longer than the shortest walk. It has at least {Math.round(REC_MIN_CUT * 100)}% less
+            time in sun (with Sheltered, less time without a roof). If no walk meets both rules, the app recommends the shortest walk.
           </li>
         </ul>
 
         <h3 className="mt-4 font-semibold text-ink">Privacy</h3>
         <p className="mt-1">
-          Routes are computed in your browser. Your start and end points are not sent to a server. Map tiles come from OpenFreeMap, which receives the map area you
-          view. The app asks for your location only when you tap Use my location. No analytics or trackers.
+          Your browser computes the routes. The app does not send your start and end points to a server. Map tiles come from OpenFreeMap, which receives the map area you
+          view. The app asks for your location only when you tap Use my location. It uses no analytics or trackers.
         </p>
 
         <h3 className="mt-4 font-semibold text-ink">Limits</h3>

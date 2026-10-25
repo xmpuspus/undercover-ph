@@ -119,7 +119,7 @@ it("does not describe failed light data as zero mapped lights or sparse mapping"
   expect(text.join(" ")).not.toMatch(/mapped as lit|Few sights/);
 });
 
-// SPEC J-N4: a run is dark whenever walking's slot rule says night, and also at any minute before sunrise or from
+// SPEC J-N4: a run is dark whenever walking's slot rule says night, and at any minute before sunrise or from
 // sunset on. Walking keeps its slot rule (tmp/latent-bugs records the pre-6 AM walking case).
 describe("running darkness covers walking's night rule and adds sunrise and sunset", () => {
   const walk = (data: ReturnType<typeof makeData>, bucketIdx: number, departMin: number) =>

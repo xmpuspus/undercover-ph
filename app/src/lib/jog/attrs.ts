@@ -33,7 +33,7 @@ export function parseJog(raw: unknown, edgeCount: number, graphHash?: string): J
   return { graph_sha256: raw.graph_sha256, sights, litShare: share, edges: {
     road: Uint8Array.from(col.road), lit: Uint8Array.from(col.lit), surface: Uint8Array.from(col.surface),
     park: Uint8Array.from(col.park), water: Uint8Array.from(col.water),
-    // An unnamed row stays in the table, but no edge treats it as a named sight.
+    // An unnamed row stays in the table, but edges that point to it get -1 (no sight).
     sight: Int32Array.from(col.sight, (i) => i >= 0 && !sights[i].name ? -1 : i),
     // Preserve large indexes so an absent hours row cannot wrap around to a real one.
     hours: hours === undefined ? new Float64Array(edgeCount).fill(-1) : Float64Array.from(col.hours),

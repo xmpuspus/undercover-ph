@@ -2,7 +2,7 @@
 
 Usage: pipeline/.venv/bin/python -I pipeline/build_manifest.py
 Keeps keys, sources and limits that other builders add (sun, sunrise_sunset, shade) when manifest.json exists.
-When every check passes, it also writes pipeline/inputs/manifest_template.json with only this script's keys,
+When every check passes, it writes pipeline/inputs/manifest_template.json with only this script's keys,
 sources and limits. The deploy build starts each manifest from that template (pipeline/set_dates.py).
 """
 import json

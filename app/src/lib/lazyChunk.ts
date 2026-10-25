@@ -13,7 +13,7 @@ export function lazyChunk<T>(url: string, importModule: () => Promise<T>): () =>
         // An offline connection, timeout or unsupported HEAD request still allows the cached import.
       }
       if (response?.status === 404 || response?.status === 410) {
-        const error = new Error("An app file was removed by a deploy.");
+        const error = new Error("A new release of the app removed this file.");
         const event = new Event("vite:preloadError", { cancelable: true });
         Object.assign(event, { payload: error });
         window.dispatchEvent(event);

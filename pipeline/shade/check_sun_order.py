@@ -5,9 +5,9 @@ AREA_DIR is app/public/data/areas/<id> with manifest.json, graph.json and shade/
 
 At noon the sun is high, so shadows are short. At 16:00 it is low in the west, so they are long. Over a whole
 area the length-weighted shade at 12:00 is therefore lower than at 16:00 on every date. A walk sample of 22
-trips held this without exception (tmp/improve-plan-20261023/behaviour.md, P2). A sun cast for the wrong hour,
+trips held this without exception (tmp/improve-plan-20261023/behaviour.md, P2). Shade cast for the wrong hour,
 time zone or azimuth breaks it. 08:00 against 12:00 is not checked: on east-west streets a low east sun shades
-less than the noon sun (item 22a), so that order is real, not an error. PLAN.md item 20 (2026-10-23).
+less than the noon sun (item 22a), so that order is correct. PLAN.md item 20 (2026-10-23).
 Standard library only.
 """
 import json
@@ -43,7 +43,7 @@ def check(area_dir):
     graph = json.loads((d / "graph.json").read_text())
     if len(graph["edges"]) != n_edges:
         return [f"{d.name}: graph.json has {len(graph['edges'])} edges, the shade header {n_edges}"]
-    # Roofed edges count as full cover in the app, whatever the sun does, so they say nothing about the sun.
+    # Roofed edges count as full cover in the app at every sun position, so the order check leaves them out.
     lengths = [(i, e["len_m"]) for i, e in enumerate(graph["edges"]) if not (e.get("flags", 0) & 7) and e["len_m"] > 0]
     fails = []
     for date, name in zip(m["dates"], s["files"]):

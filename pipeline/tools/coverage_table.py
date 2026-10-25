@@ -3,7 +3,7 @@
 Usage: python3 pipeline/tools/coverage_table.py
 Counts: walkable km and routable km from each area's graph.json, places from places_index.json (each place once),
 buildings from the area's manifest template, the mapped share from pipeline/regions/footprint_cover.json.
-It also writes the area counts into app/index.html, whose landing line and descriptions repeat them.
+The same run writes the area counts into app/index.html, whose landing line and descriptions repeat them.
 Rerun after an area is added or rebuilt.
 """
 
@@ -37,11 +37,11 @@ def write_limits(s, areas):
                     assumed += km
     text = "\n".join(
         [
-            f"- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the routable graph holds {sheltered:,.1f} km "
-            "of sheltered path. Nobody has measured how much exists on the street.",
-            f"- **Access.** Gates and entrances that need a field check remove {gated:,.0f} km of paths from routes.",
+            f"- **Cover data.** OpenStreetMap marks few covered walkways. Across all areas the walk network holds {sheltered:,.1f} km "
+            "of sheltered path. Nobody measured how much exists on the street.",
+            f"- **Access.** The router leaves out {gated:,.0f} km of paths behind gates and entrances that need a field check.",
             "- **Sidewalks.** Where OpenStreetMap has no sidewalk data, the pipeline assumes one on each side of larger roads. "
-            f"That covers {assumed:,.0f} km of the {side:,.0f} km of side-of-street paths. "
+            f"Assumed sidewalks make up {assumed:,.0f} km of the {side:,.0f} km of side-of-street paths. "
             'A step on an assumed sidewalk carries a "Sidewalk not mapped" badge.',
         ]
     )
@@ -56,12 +56,12 @@ def write_index(areas):
     path = ROOT / "app/index.html"
     s = path.read_text()
     for pattern, text in (
-        (r">\d+ walking areas: \d+ in Metro Manila and \d+ in other cities", f">{n} walking areas: {ncr} in Metro Manila and {other} in other cities"),
-        (r"in \d+ city areas across the Philippines, (?:from Laoag to General Santos, )?\d+ of them", None),
+        (r">\d+ walking areas, \d+ in Metro Manila and \d+ in other cities", f">{n} walking areas, {ncr} in Metro Manila and {other} in other cities"),
+        (r"in \d+ city areas across the Philippines(?:, from Laoag to General Santos)?\. \d+ of the areas", None),
     ):
         if text is None:
-            s, k = re.subn(r"in \d+ city areas across the Philippines, ((?:from \S+ to [^,]+, )?)\d+ of them",
-                           lambda m: f"in {n} city areas across the Philippines, {m.group(1)}{ncr} of them", s)
+            s, k = re.subn(r"in \d+ city areas across the Philippines((?:, from \S+ to [^.]+)?)\. \d+ of the areas",
+                           lambda m: f"in {n} city areas across the Philippines{m.group(1)}. {ncr} of the areas", s)
             assert k == 2, f"index.html: {k} descriptions matched, expected 2"
         else:
             s, k = re.subn(pattern, text, s)
@@ -96,7 +96,7 @@ def main():
         tot["buildings"] += b
     table = "\n".join(
         [
-            "| Area | Cities | Walkable km in routes | Places | Buildings | Buildings mapped |",
+            "| Area | Cities | Walkable km in routes | Places | Buildings in the area | Building area with outlines |",
             "| --- | --- | ---: | ---: | ---: | ---: |",
             *rows,
             f"| **{len(areas)} areas** | | **{tot['rkm']:,.0f}** | **{tot['places']:,}** | **{tot['buildings']:,}** | |",

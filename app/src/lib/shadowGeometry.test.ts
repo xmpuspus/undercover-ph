@@ -113,7 +113,7 @@ describe("traceRing", () => {
   it("an L-shaped footprint shades its inner corner", () => {
     const { sink, paths } = recorder();
     const ell = [0, 0, 20, 0, 20, 5, 5, 5, 5, 20, 0, 20];
-    // Sun due south, so the shadow falls north; the short wing's shadow lands in the corner.
+    // Sun due south, so the shadow falls north; the short wing's shadow falls in the corner.
     const [dx, dy] = shadowStep(45, 180);
     traceRing(sink, ell, 0, 6, 1, 0, 8, dx, dy, false);
     expect(inShadow(paths, 12, 9)).toBe(true);

@@ -27,7 +27,7 @@ interface Props {
   play?: { playing: boolean; onToggle: () => void } | null;
 }
 
-// Close on a tap outside, or on Escape (which also returns focus to the chip that opened the menu).
+// Close on a tap outside, or on Escape. Escape returns focus to the chip that opened the menu.
 function useOutside(open: boolean, close: (refocus: boolean) => void) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -382,7 +382,7 @@ export function WeatherChips({
         >
           {w.feels != null && (
             <p className="font-medium text-ink">
-              Feels like {Math.round(w.feels)}°C{band ? `: ${band.name} (${band.range})` : ""}
+              Feels like {Math.round(w.feels)}°C{band ? `, ${band.name} (${band.range})` : ""}
             </p>
           )}
           <p className="mt-1">

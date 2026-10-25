@@ -504,7 +504,7 @@ def test_prune_orders_by_publish_time_and_keeps_the_named_release():
 
 def test_a_release_gzipped_by_another_zlib_still_matches_local_files(world, capsys):
     tmp, data, inputs, rel = world
-    # Python 3.9 and 3.12 gzip the same tar to different bytes. Only the tar bytes may decide.
+    # Python 3.9 and 3.12 gzip the same tar to different bytes. Only the tar bytes identify the files.
     raw = data_release.pack_tar("area", "a1")
     (rel / "area-a1.tar.gz").write_bytes(gzip.compress(raw, compresslevel=1, mtime=0))
     m = json.loads((tmp / "data-release.json").read_text())

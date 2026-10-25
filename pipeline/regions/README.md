@@ -4,7 +4,7 @@ The district pipeline builds a walking area in any Philippine city from public s
 No source needs an account. Cebu City centre is the first area built this way.
 
 Metro Manila builds do not read the settings files in this folder. Their districts have no `region` key, so they keep the paths and text in `pipeline/common.py`.
-One link remains: `fetch_gob.py` imports `region.py` and loads every manifest in `pipeline/raw/regions/gob_manifests/`. It then keeps only zone 51 tiles for a Metro Manila district, so the tiles it picks do not change.
+Only `fetch_gob.py` connects Metro Manila builds to this folder. It imports `region.py` and loads every manifest in `pipeline/raw/regions/gob_manifests/`. It then keeps only zone 51 tiles for a Metro Manila district, so the tiles it picks do not change.
 A Makati CBD rebuild with this code wrote byte-identical `graph.json`, `places.json`, `hours.json` and `buildings_display.geojson`, and the same building set.
 
 ## The sources are public files
@@ -19,9 +19,9 @@ A Makati CBD rebuild with this code wrote byte-identical `graph.json`, `places.j
 ## Steps
 
 Run every command from the repo root.
-`pipeline/.venv` runs the graph scripts. `pipeline/shade/.venv` runs the canopy and shade scripts, because it has numba.
+Use `pipeline/.venv` for the graph scripts. Use `pipeline/shade/.venv` for the canopy and shade scripts, because it has numba.
 
-1. Add a region to `regions.json` if the city has none yet.
+1. If the city has no region in `regions.json` yet, add one.
    Give it an `id`, a `name` and an `osm_bbox` that holds the whole metro area with some margin.
    Set `utm_epsg` to 32651 for a city east of 120 E, and to 32650 west of it.
    Set `pagasa_prsd` and `advisory_provinces` from the table below. Use `null` when no page fits.
@@ -40,8 +40,8 @@ Run every command from the repo root.
    A box of about 2 to 5 km per side matches the Metro Manila districts.
 
 4. Add the district to `districts.json` in this folder. Use the same fields as `pipeline/districts.json`, plus `region`.
-   To join several districts into one routing area, add a row to `areas.json` in this folder, in the shape of `pipeline/areas.json`.
-   A district id alone also works as a one-district area.
+   To join two or more districts into one routing area, add a row to `areas.json` in this folder, in the shape of `pipeline/areas.json`.
+   You can use a district id alone as a one-district area.
 
 5. Check that Google heights cover the district.
 
@@ -58,7 +58,7 @@ Run every command from the repo root.
    pipeline/.venv/bin/python -I pipeline/districts/fetch_gob.py cebu-city-centre
    ```
 
-   Open `pipeline/raw/districts/<id>/gob_2023/window_log.json`. `nodata_px` should be 0.
+   Open `pipeline/raw/districts/<id>/gob_2023/window_log.json`. Make sure that `nodata_px` is 0.
 
 7. Build the area. Cebu took 20 to 35 seconds.
 
@@ -98,9 +98,9 @@ Run every command from the repo root.
     UCPH_DATA=pipeline/stage/cebu-city-centre UCPH_START_DATE=2026-10-22 pipeline/.venv/bin/python -I pipeline/fetch_weather.py
     ```
 
-    The area reads its own PAGASA page. It ignores a shared Metro Manila advisory from `UCPH_ADVISORY_FROM`.
+    `fetch_weather.py` reads the area's own PAGASA page. It ignores a shared Metro Manila advisory from `UCPH_ADVISORY_FROM`.
 
-## What the settings change
+## Region settings choose the OSM extract, the UTM zone and the PAGASA page
 
 | Setting | Effect |
 | --- | --- |
@@ -112,7 +112,7 @@ Run every command from the repo root.
 
 ## Every target city has Google heights in one manifest
 
-The bucket holds 1,174 manifests. Three of them are 2023 manifests in the Philippine UTM zones:
+The bucket holds 1,174 manifests. Three of them are 2023 manifests in the Philippine UTM zones.
 
 - `33_EPSG_32651_2023_06_30.json`, 9,301 tiles, zone 51. https://storage.googleapis.com/open-buildings-temporal-data/v1/manifests/33_EPSG_32651_2023_06_30.json
 - `35_EPSG_32651_2023_06_30.json`, 622 tiles, zone 51. https://storage.googleapis.com/open-buildings-temporal-data/v1/manifests/35_EPSG_32651_2023_06_30.json
@@ -148,14 +148,14 @@ It compared the block with the leaves-ph raster that Metro Manila areas use.
 - Both are uint8 heights in metres. The tile tags say `UNITS=METERS`. Neither has a 255 nodata pixel in the block.
 - 97.98% of pixels are equal and 99.9994% are within 1 m. The largest difference is 2 m.
 - The mean is 0.755 m in both, the tallest pixel 20 m in both, and the zero share 82.66% against 82.65%.
-- The 1 m differences come from where the average resampling meets pixel edges. leaves-ph reprojected one mosaic of all of Metro Manila.
+- The 1 m differences come from where the average resampling meets pixel edges. The leaves-ph raster is one reprojected mosaic of all of Metro Manila.
 - The area window for makati-cbd equals the grid of its existing `canopy.tif`, so the clip uses the same grid as `shade.clip_canopy_to()`.
 
 The full result is in `pipeline/raw/regions/canopy_meta/check_makati-cbd.json`.
 
 ## Cebu City centre builds and passes every check
 
-Built on 2026-10-22 with `UCPH_START_DATE=2026-10-22`. The district box holds Ayala Center Cebu, Cebu IT Park, Fuente Osmeña and Colon Street.
+The build ran on 2026-10-22 with `UCPH_START_DATE=2026-10-22`. The district box holds Ayala Center Cebu, Cebu IT Park, Fuente Osmeña and Colon Street.
 The numbers come from `pipeline/work/districts/cebu-city-centre/summary.json` and `pipeline/shade/run_log.cebu-city-centre.json`.
 
 | Measure | Value |
@@ -175,7 +175,7 @@ The numbers come from `pipeline/work/districts/cebu-city-centre/summary.json` an
 | Tree crowns | 82,814; tallest canopy 33 m |
 | Tallest building | 185 m, an OSM height |
 
-Shade on 2026-10-23 covers this share of edge length:
+Shade on 2026-10-23 covers this share of edge length.
 
 | Time | Building shade | Tree shade |
 | --- | ---: | ---: |
@@ -204,7 +204,7 @@ The weather step read Visayas advisory No. 21, issued 03:24 PM on 2026-10-22. It
 ## Some parts still assume Metro Manila
 
 - The app reads its live advisory from `app/api/_pagasa.js`, which fetches the Metro Manila page. `app/src/lib/advisory.ts` checks for "Makati" or "Metro Manila".
-- `build_places.py` names rail stations MRT, LRT and PNR and skips Metro Manila Subway stations. Cebu has no rail, so its places are unaffected.
+- `build_places.py` names rail stations MRT, LRT and PNR and skips Metro Manila Subway stations. Cebu has no rail, so this rule does not change its places.
 - Cebu has no cited web hours. Its 4 hours rows come from OSM `opening_hours` only.
-- Zone 50 support is wired and tested on names, but no area west of 120 E has been built.
+- The code supports zone 50, and unit tests check it on manifest names and region settings. Nobody built an area west of 120 E yet.
 - Region areas sit in `pipeline/regions/areas.json`. A release step that reads only `pipeline/areas.json` does not ship them.

@@ -65,7 +65,7 @@ interface Props {
   onBearing: (deg: number) => void;
   // The chosen hour's sun as [altitude, azimuth] in degrees, for the ground shadows. Default: the sun in theme.light.
   sun?: [number, number] | null;
-  // The Shadows switch. Shadows also hide when the sun is at or below NIGHT_ALT_DEG.
+  // The Shadows switch. With the switch on, shadows still hide when the sun is at or below NIGHT_ALT_DEG.
   shadowsOn?: boolean;
   // Replaced by shadowsOn and sun: the pipeline's shadow PNG. Only shadow={null}, which meant off, still counts.
   shadow?: { url: string; coords: ShadowOverlay["coords"] } | null;
@@ -366,7 +366,7 @@ export default function MapView(p: Props) {
     map.addLayer({ id: "hb-hl-line", type: "line", source: "hb-hl", layout: round, paint: { "line-color": ["get", "color"], "line-width": zw(10) } });
   }
 
-  // Create the map once.
+  // Runs on mount only, so the component keeps one map. The effects below apply later prop changes.
   useEffect(() => {
     if (!box.current) return;
     let map: maplibregl.Map;
@@ -396,12 +396,12 @@ export default function MapView(p: Props) {
     map.on("sourcedata", (e) => {
       if (e.sourceId === BUILDINGS_SOURCE && e.tile && e.isSourceLoaded) props.current.onBuildings();
     });
-    // The basemap asks for sprite icons it does not ship; a transparent pixel keeps the console clean.
+    // The basemap style requests sprite icons it does not ship; a transparent pixel keeps the console clean.
     map.on("styleimagemissing", (e) => {
       if (!map.hasImage(e.id)) map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) });
     });
-    // The poster can go once the basemap under the landing view has drawn. The first idle also waits for
-    // the building tiles, later on a phone; the "Loading 3D buildings..." note covers that wait.
+    // The poster can go once the basemap under the landing view has drawn. The first idle waits for the
+    // building tiles too, and on a phone they come later; the "Loading 3D buildings..." note covers that wait.
     let basemap: string[] = [];
     const onRender = () => {
       if (!basemap.length || !basemap.every((id) => map.getSource(id) && map.isSourceLoaded(id))) return;
@@ -610,7 +610,8 @@ export default function MapView(p: Props) {
 
   // The map keeps the panel insets as its own padding, so centring and fitting use the visible area.
   // fitBounds subtracts this padding and its own, so the fit passes only a small margin.
-  // An instant setPadding would cancel a running move to a step, so with a focus the padding rides on that move.
+  // An instant setPadding would cancel a running move to a step, so with a focus, moveToFocus passes the
+  // padding as part of that move.
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;

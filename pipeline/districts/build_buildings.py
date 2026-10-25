@@ -14,7 +14,7 @@ outline area outside its parts, so a tower part does not raise the podium.
 
 Google Open Buildings v3 outlines (pipeline/districts/fetch_gob_v3.py) fill the buildings OSM has not drawn
 (decision 2026-10-23). One goes in only when two Google sources agree: its v3 confidence reaches the 80%-precision
-threshold of its S2 cell, and the 2023 height raster sees a building in it (at least 8 pixels with presence 0.5 or
+threshold of its S2 cell, and the 2023 height raster shows a building in it (at least 8 pixels with presence 0.5 or
 more, and a median height of 2.5 m or more on those pixels). It must not overlap an OSM outline or part by 10% of
 its area or more. Its height is the raster median, with no default, because a wrong outline would invent shade.
 """

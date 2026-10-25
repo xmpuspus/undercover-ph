@@ -1,20 +1,20 @@
 # Build a shade and shelter walking router for Makati CBD first, then add one district at a time
 
-Written 2026-10-21 and updated 2026-10-22. On 2026-10-22 the app is live at https://undercover.ph for 14 walking areas across Metro Manila, and the regional release adds 53 areas in 44 other regions (see the README). The Makati-first plan below is the history of how it started. The field sprint and partner outreach are still open.
+Written 2026-10-21 and updated 2026-10-22. On 2026-10-22 the app is live at https://undercover.ph for 14 walking areas across Metro Manila. The regional release adds 53 areas in or around 44 cities and provinces outside Metro Manila (see the README). The Makati-first plan below is the history of how it started. The field sprint and partner outreach are still open.
 
 The evidence is 12 research reports in `research/20261021T120813Z/`. Each claim names its report number in brackets, for example [02].
 
 [VERIFIED] means a person or script read the source or ran the code. [UNVERIFIED] means a snippet, recall, or estimate.
 
-The [access and research corrections](research-corrections.md) replace the original public-network totals and qualify the shade, privacy, cost and legal claims. The rebuilt graphs explicitly declare `routing_ready: false`.
+The [access and research corrections](research-corrections.md) replace the original public-network totals and add limits to the shade, privacy, cost and legal claims. The rebuilt graphs explicitly set `routing_ready: false`.
 
 ## Build a free Makati prototype that routes in the browser, and gate launch on field checks
 
-1. Build a Makati research prototype. The bounded prior-art search found no comparable Philippine product. Demand still needs user tests [06].
+1. Build a Makati research prototype. A limited search for earlier similar products found none in the Philippines. Demand still needs user tests [06].
 2. Treat Makati CBD as the provisional pilot. Compare audited routes with Ortigas before expanding.
 3. Add shade and shelter modes in v1. Show a PAGASA advisory banner in rain mode.
-4. OSM plus Google 2.5D assigns a heuristic height to 1,537 of 1,598 Makati CBD outlines (96.2%). Shade accuracy remains untested [02].
-5. Tree shade comes from the leaves-ph canopy raster, with pixels of about 1.19 m [00]. Singapore's 2026 project page lists trees as future work.
+4. OSM plus Google 2.5D assigns a heuristic height to 1,537 of 1,598 Makati CBD outlines (96.2%). Shade accuracy is still untested [02].
+5. Tree shade comes from the leaves-ph canopy raster, with pixels of about 1.19 m [00].
 6. Shelter data is incomplete. OSM marks cover on 4 of 53 inventoried Makati footbridge ways [03]. Partner data and a field survey can close the gaps.
 7. Route in the browser over a precomputed graph. Check hosting, tile, search and weather requests before making a trip-privacy claim [05, 08].
 8. Keep the app free and keep trips out of project storage. Publish the annotated graph and field overlay under ODbL [08].
@@ -22,7 +22,7 @@ The [access and research corrections](research-corrections.md) replace the origi
 
 ## Singapore shows the product, but its covered-linkway dataset has no Manila equivalent
 
-Singapore's Undercover runs on the Silverfox engine from Open Government Products. It applies any cost function to a pedestrian network. For each query it returns three routes. They are the shortest, the most shaded, and the recommended one. The recommended route is "meaningfully shadier without being unreasonably longer". In its first week, more than 300 users computed more than 750 routes, and about 95% chose the recommended route.
+Singapore's Undercover runs on the Silverfox engine from Open Government Products. It applies any cost function to a pedestrian network. For each query it returns three routes. They are the shortest, the most shaded, and the recommended one. The recommended route is "meaningfully shadier without being unreasonably longer". In its first week, more than 300 users computed more than 750 routes, and about 95% chose the recommended route [06].
 
 Its data layer has three parts.
 
@@ -40,7 +40,7 @@ Three things transfer to Manila.
 
 The partner search found no ready-to-use public Philippine covered-walkway layer [11]. Check what MaCEA and LGUs hold before estimating the collection work.
 
-Manila adds a tree layer that exists today, opening hours for mall passages, stair flags for footbridges, and Taglish landmark steps.
+The Manila version adds a tree layer that exists today, opening hours for mall passages, stair flags for footbridges, and Taglish landmark steps.
 
 ## Makati CBD is a provisional pilot pending access and demand checks
 
@@ -60,13 +60,13 @@ The original ranking used an access-blind graph and subjective weights. Withdraw
 | Public partner contact found | MaCEA | none found | none found | [11] |
 | Claimed shelter stock | 2 km elevated, 4 km covered, 7 underpasses | not found | not found | [03, 11] |
 
-The shelter rows inventory mapped structures, including restricted ones. They do not measure available public shelter. Similar total lengths between OSM and MaCEA do not show matched geometry, connectivity or access. Survey entrances, crossings, levels and hours before deciding whether missing tags or missing links dominate.
+The shelter rows count mapped structures, including restricted ones. They do not measure available public shelter. Similar total lengths between OSM and MaCEA do not show matched geometry, connectivity or access. Survey entrances, crossings, levels and hours before you decide whether missing tags or missing links are the bigger cause.
 
-MaCEA's reported 2019 usage suggests a place to recruit walkers (`raw/03/web_notes.md`). It does not show demand for this product. A public contact address does not constitute a partnership either.
+MaCEA reported walkway usage for 2019 (`raw/03/web_notes.md`). Those walkways are a place to recruit walkers for tests. The usage does not show demand for this product. A public contact address is not a partnership either.
 
-Picking Makati depends on its shelter stock, and the footpath rows show the cost. In OSM, Makati's footpaths split into 91 pieces, and the largest holds 43.1% of footpath nodes. Ortigas holds 81.0% in its largest piece. Covered walks are footpaths, so Makati needs more new links than Ortigas.
+Makati is the pick because of its shelter stock. The footpath rows in the table show what that choice costs. In OSM, Makati's footpaths split into 91 pieces, and the largest holds 43.1% of footpath nodes. Ortigas holds 81.0% in its largest piece. Covered walks are footpaths, so Makati needs more new links than Ortigas.
 
-One field day on the Ayala MRT, Glorietta, Greenbelt, and Ayala Triangle spine settles the choice. Record each missing covered link as a missing tag or as missing geometry. Then apply the first rule that matches.
+Decide the pilot with one field day on the walkways that link Ayala MRT, Glorietta, Greenbelt, and Ayala Triangle. Record each missing covered link as a missing tag or as missing geometry. Then apply the first rule that matches.
 
 1. If missing geometry makes up more than half of the missing covered length, move the pilot to Ortigas.
 2. If the covered walks run past the CBD box, grow the box to the walked network first.
@@ -86,13 +86,13 @@ These rules follow from the audit [02].
 
 - Google caps heights at 100 m. Makati has 123 buildings that some source puts above 100 m.
 - OSM tags almost all of those towers. Only 1 tall footprint has no OSM height at all.
-- Cast each `building:part` using its own geometry and height. PBCom Tower reads 36 m on its outline and 258 m on its part. Do not apply 258 m to the whole podium.
+- Cast each `building:part` using its own geometry and height. PBCom Tower has a height of 36 m on its outline and 258 m on its building part. Do not apply 258 m to the whole podium.
 - Podium outlines like that cover 25.9% of the area of buildings over 500 m2.
 - Keep the last 61 footprints (2.0% of area) as unknown height until a documented estimate is available. Show the effect of unknown heights on route scores.
 - Label Google heights "modelled, 2023". New towers after mid-2023 need OSM tags.
 - OSM and Google agree within a median of 8.6 m on 178 matched buildings up to 100 m.
 
-The Google median currently lacks a building-presence mask. Its 0.5 m output pixels have an effective resolution of about 4 m. Revisit the eight-pixel usability threshold, presence masking, source age and height uncertainty before treating this coverage as usable shade evidence. See the [height corrections](research-corrections.md).
+The Google median has no building-presence mask. Its 0.5 m output pixels have an effective resolution of about 4 m. Revisit the eight-pixel usability threshold, presence masking, source age and height uncertainty before you treat this coverage as usable shade evidence. See the [height corrections](research-corrections.md).
 
 Three sources are dead ends [02].
 
@@ -102,7 +102,7 @@ Three sources are dead ends [02].
 
 ## The 111 days of overhead noon sun apply to one 30 m building and a 4 m sidewalk offset
 
-Manila sits at 14.6 N, so the noon sun passes almost overhead twice a year. A 30 m building stops shading a sidewalk 4 m from its facade when the sun climbs above 82.4 degrees.
+Manila is at 14.6 N, so the noon sun passes almost overhead twice a year. A 30 m building stops shading a sidewalk 4 m from its facade when the sun climbs above 82.4 degrees.
 
 A rerun of the sun script finds 111 such days in 2026, from 9 April to 2 June and from 12 July to 5 September. For a 20 m building the window grows to 170 days, 30 March to 15 September. The source is `research/20261021T120813Z/raw/04/noon_windows.txt`. This corrects report 04, which estimated two to three weeks.
 
@@ -125,49 +125,49 @@ OSM holds this shelter stock in the Makati CBD box [03].
 - 7 underpass structures, 0.797 km. None carries a name.
 - 0 mall-link ways with `opening_hours`, across all 184 in Metro Manila.
 
-MaCEA claimed about 4 km of covered walks, 2 km of elevated walks, and 7 underpasses in 2019 [03]. Report 09 adds a 2 km underpass network from a TopGear article that cites a Facebook page. That 2 km figure is [UNVERIFIED]. Dates, boundaries, definitions and possible overlap prevent these totals from establishing a current percentage mapping gap.
+MaCEA claimed about 4 km of covered walks, 2 km of elevated walks, and 7 underpasses in 2019 [03]. Report 09 adds a 2 km underpass network from a TopGear article that cites a Facebook page. That 2 km figure is [UNVERIFIED]. The totals use different dates, boundaries and definitions, and they can overlap. So they cannot give the current percentage of shelter that OSM is missing.
 
-The corrected strict-cover graph has 41 components touching the Makati box. Its station reach calculation gives 0.544 km from Ayala node 5397307754, after a 27.6 m nearest-node snap. No survey checked that snap as a legal entrance connection. Keep these structural results internal until the survey checks missing tags, levels and access.
+The corrected strict-cover graph has 41 separate pieces (components) that touch the Makati box. Its station reach calculation gives 0.544 km from Ayala node 5397307754, after a 27.6 m nearest-node snap. No survey checked that snap as a legal entrance connection. Keep these structural results internal until the survey checks missing tags, levels and access.
 
-Four moves close the gap.
+Four steps can close the gap.
 
 1. Email MaCEA for a segment list or map, with opening hours [11]. Offer credit and a correction channel.
 2. Post a notice to OSM Philippines (`talk-ph`, the `osmph` Telegram group) before the first edit [09].
 3. Walk the network on Saturdays. Tag cover, layer, bridge, tunnel, level, and opening hours [09].
 4. Keep a hand-built hours table for malls and passages. OSM holds none.
 
-Report 09 models 1.43 km per hour and about 17 field hours. No survey measured that yield. Historic shelter totals can overlap. Waits, revisits, heat, and access checks change the effort. Time the first survey, deduplicate its segment list and re-estimate the remaining work. 
+Report 09 models 1.43 km per hour and about 17 field hours. No survey measured that yield. Historic shelter totals can overlap. Waits, revisits, heat, and access checks change the effort. Time the first survey, deduplicate its segment list and re-estimate the remaining work.
 
 Four-hour sessions are a schedule choice. This research gives no measured heat-safety limit.
 
 The field work follows these data rules.
 
-- Keep field edits in a local overlay file keyed by OSM way id. The overlay wins at graph build.
-- Upload the same tags to OSM afterwards, so the community map gains too.
+- Keep field edits in a local overlay file keyed by OSM way id. At graph build, the overlay tags replace the OSM tags.
+- Upload the same tags to OSM afterwards, so the OSM map gets the same fixes.
 - Use Mapillary and KartaView images by eye only. Mapillary's terms ban use with route guidance [08].
 - Never trace from Google Street View or Google Maps [08].
 - Before you use MaCEA data, ask MaCEA in writing for permission to publish it openly under ODbL.
 - If MaCEA refuses open use, use its map only to plan field walks. Put none of its rows in the graph.
 
-### The shelter map becomes public, so the edge over Google comes from upkeep
+### The shelter map becomes public, so the advantage over Google is the district work a large map company does not do
 
-The field tags go to OSM, and the annotated graph ships as an ODbL download [08]. So anyone, Google included, can reuse the shelter map. Secrecy cannot be the advantage.
+The field tags go to OSM, and the annotated graph ships as an ODbL download [08]. So anyone, Google included, can reuse the shelter map.
 
-The advantage is the work that a large map company does not do for one district.
+That work has four parts.
 
 - Walked checks of each covered link, with dates.
 - Opening hours, gates, and closures, kept current through user reports.
 - Taglish landmark steps with photos.
 - Working contact with MaCEA, building managers, and the OSM Philippines community.
 
-Open data helps the project too. The tags improve OSM for every app in Manila, and they give the work public credit.
+Open data helps the project too. The tags improve OSM for every app in Manila, and the project gets public credit for them.
 
 ## Rain mode routes under cover and warns, but never claims that a street is flooded or dry
 
 The weather audit found no public live feed of street flooding in Metro Manila [07].
 
-- The heat trigger is conditional. The PAGASA heat-index JSON has one NCR station, Science Garden in Quezon City.
-- The rain trigger is conditional. PAGASA NCR thunderstorm advisories name cities for the next 2 hours.
+- The heat trigger is usable only with limits. The PAGASA heat-index JSON has one NCR station, Science Garden in Quezon City.
+- The rain trigger is usable only with limits. PAGASA NCR thunderstorm advisories name cities for the next 2 hours.
 - Street flood status has no usable source. NOAH serves static hazard layers, and MMDA blocks automated access.
 
 So v1 lets the user pick the mode. The app suggests a mode from two signals.
@@ -177,9 +177,9 @@ So v1 lets the user pick the mode. The app suggests a mode from two signals.
 
 Flood flags show history only. Seed them from the 17 August 2026 Makati records in `rainbank-ph` [00]. Label them "flooded here before". This follows the flood-status-ph rule, "A high river does not prove the condition of a named street."
 
-Check Open-Meteo and RainViewer terms against the actual operator, funding and use [07]. A free price alone does not show non-commercial eligibility. Keep the source terms and any needed permission before launch.
+Check Open-Meteo and RainViewer terms against the actual operator, funding and use [07]. A free price alone does not show non-commercial eligibility. Before launch, keep a copy of the source terms and of any permission that they need.
 
-## The app returns three routes and landmark steps, as Singapore's testers asked
+## The app returns three routes, and its steps name landmarks, which Singapore's testers liked
 
 Route output follows these rules.
 
@@ -198,7 +198,7 @@ Segment flags follow these rules [10].
 - For opening hours, show "Closes at 10 PM". Warn 30 minutes before close. Drop the passage after close.
 - For unknown hours on controlled passages, show "Hours not confirmed". Exclude these passages from public recommendations until a survey checks access. Treat closure as an access constraint before shade scoring.
 - For stairs, flag footbridges and steps. A step-free profile avoids them.
-- At night, flag underpasses and dim passages after dark.
+- At night, flag underpasses and dim passages.
 
 The interface follows these rules.
 
@@ -211,7 +211,7 @@ The interface follows these rules.
 
 The proposed build precomputes shade for every edge and time bucket. Browser routing can keep explicit origin and destination values local. Hosting, tile, geocoding and weather services can still receive IP addresses, map extents or queries. Check actual requests and retention before making a privacy claim [05, 08].
 
-The corrected centroid-based candidate graph has 2,276 nodes, 2,931 undirected edges and 91.7 km in Makati. NCR has 139,449 nodes, 176,586 undirected edges and 9,154.8 km. Makati has 833 edges needing access evaluation. NCR has 19,172. These outputs keep rule text and declare `routing_ready: false`. They do not include schedule evaluation.
+The corrected candidate graph assigns each whole way by its mean node position ([05/graph_counts.json](../research/20261021T120813Z/raw/access-correction-20261021/05/graph_counts.json)). It has 2,265 nodes, 2,903 undirected edges and 90.7 km in Makati CBD. NCR has 139,237 nodes, 176,122 undirected edges and 9,134.0 km. Makati CBD has 809 edges that need access evaluation, and NCR has 18,834. These outputs keep rule text and declare `routing_ready: false`. They do not include schedule evaluation.
 
 This historical benchmark ran on the original access-blind graph, an Apple M5 and synthetic shade, with 100 random pairs per run [05]. Nobody reproduced these figures on the corrected graph.
 
@@ -246,13 +246,13 @@ Check frozen-bucket searches against a reference solver, and check the state mod
 - The recommended route starts at k = 2. Lower k until the detour is 20% or less.
 - Show the recommended route only if it cuts sun exposure by at least 15%. Otherwise say "No meaningfully shadier route."
 
-On 20 historical Makati pairs at 08:30, the synthetic shade experiment gave a recommended route for 14 pairs. Its noon result cannot check real noon geometry. Repeat this experiment on the corrected graph and actual shade before drawing product conclusions [05].
+On 20 historical Makati pairs at 08:30, the synthetic shade experiment gave a recommended route for 14 pairs. At noon it gave one for only 3 of 20 pairs, and synthetic shade cannot test real noon geometry. Repeat this experiment on the corrected graph and actual shade before you draw product conclusions [05].
 
-The original shelter-weight experiment reported shares of 4.8%, 13.3% and 18.0% [05]. Restricted paths and unconfirmed hours prevent treating them as available public routes. Repeat it after access and field validation.
+In the original shelter-weight experiment, the median shortest route was 4.8% sheltered. With a rain penalty of r = 3 on uncovered edges, the route was 13.3% sheltered, and with r = 9 it was 18.0% [05]. The routes behind these shares can use restricted paths and passages with unconfirmed hours. So the shares do not describe available public routes. Repeat it after access and field validation.
 
-### Shade comes from a raster ray march per time bucket
+### The plan was to compute shade with a raster ray march per time bucket
 
-The build has six steps [04].
+The plan had six steps [04]. The [method page](methodology.md) describes the method that shipped.
 
 1. Burn outlines and building parts into a 1 m surface using each part's geometry. A 1 m output does not increase the source height resolution.
 2. Take the canopy surface from the leaves-ph raster, with roof pixels set to 0.
@@ -270,24 +270,24 @@ Structures need their own shade rules, because a ground raster scores them wrong
 
 The area edges follow three rules.
 
-- Build the walk graph 500 m past the pilot box. Ayala MRT sits only about 90 to 170 m inside the south edge.
+- Build the walk graph 500 m past the pilot box. Ayala MRT is only about 90 to 170 m inside the south edge.
 - Load buildings out to the shadow margin from step 4.
 - If a start or end point falls outside the pilot area, say so and offer the shortest route only.
 
-Buckets are 30 minutes from 06:30 to 08:30 and from 15:30 to 17:30, and hourly between. Shade changes fastest at those hours. A 20 m building shadow shrinks 31 m between 07:00 and 07:30 on 20 March [05].
+The plan was 30-minute buckets from 06:30 to 08:30 and from 15:30 to 17:30, with hourly buckets between. Shade changes fastest at those hours. The app ships 26 half-hour buckets from 06:00 to 18:30, as the [method page](methodology.md) describes. A 20 m building shadow shrinks 31 m between 07:00 and 07:30 on 20 March [05].
 
-Compute time for Makati CBD is a few minutes. For all of NCR, report 04 estimates 2 to 10 hours on 8 cores. Nobody timed either yet [04].
+Report 04 estimates a few minutes of compute for Makati CBD. For all of NCR, it estimates 2 to 10 hours on 8 cores. Nobody timed either yet [04].
 
-### The v1 stack has six parts, and two small jobs run outside the browser
+### The planned v1 stack had six parts, and two small jobs ran outside the browser
 
 1. Pyosmium reads the Geofabrik extract to build the graph. CI rebuilds it each week.
 2. The pipeline precomputes shade per edge and bucket and ships it as 4-bit arrays per month. Recompute it only when heights or edge geometry change.
 3. The router is a custom A* in TypeScript, in the browser.
 4. The map uses MapLibre GL JS with PMTiles, a walk overlay from tippecanoe, and a self-hosted Protomaps basemap.
-5. The host is static files on GitHub Pages or Cloudflare Pages.
+5. The plan was static files on GitHub Pages or Cloudflare Pages. The app ships on Vercel (see the [data contract](data-contract.md)).
 6. A scheduled job writes the PAGASA advisory and the Open-Meteo hour as one JSON file. A form service takes closure reports.
 
-The browser cannot read the PAGASA advisory directly, because the text sits inside an HTML page on another site [07]. The scheduled job solves that. The report form stores the segment id and the message only, with no location trace.
+The browser cannot read the PAGASA advisory directly, because the text is inside an HTML page on another site [07]. The scheduled job reads the page instead. The report form stores the segment id and the message only, with no location trace.
 
 Report 05 models zero hosting charges for selected static plans at 1,000 and 50,000 queries. It excludes basemap traffic and is not a live bill. Its 705 KB empty-cache load uses the old graph and synthetic shade. Measure the complete load and recheck current limits before choosing hosting.
 
@@ -302,7 +302,7 @@ To scale to Metro Manila, split the graph and shade into tiles. Each query fetch
 
 | Sibling | What it gives | Source |
 | --- | --- | --- |
-| leaves-ph | 1 m canopy height raster for NCR, 242,810 tree crowns, Earth Engine init pattern | [00] |
+| leaves-ph | Canopy height raster for NCR with pixels of about 1.19 m, 242,810 tree crowns, Earth Engine init pattern | [00] |
 | flood-status-ph | The rule against street flood claims, and a PAGASA river-level reader | [00] |
 | rainbank-ph | 17 August 2026 Makati flood depths and 43 road observations | [00] |
 | ph-civic-data-mcp | PAGASA forecast and alert tools, NASA POWER, Open-Meteo air quality | [00] |
@@ -374,7 +374,7 @@ Step 3 is growth.
 | Night routes through underpasses feel unsafe | Add a night flag and an option to avoid underpasses after dark |
 | A user trusts a flood flag as live | Show flood flags as history only, with the date |
 | One person cannot keep data fresh | Rebuild the graph weekly in CI and diff the shelter overlay |
-| Licence breach | Publish the ODbL graph, retain source attribution and distinguish open Google Open Buildings data from restricted Maps and Street View inputs |
+| Licence breach | Publish the ODbL graph, keep source attribution and distinguish open Google Open Buildings data from restricted Maps and Street View inputs |
 
 ## The first public post waits for the pilot's own numbers after the field sprint
 
@@ -386,14 +386,14 @@ There are three candidates, each filled only from the tool's own output [10].
 
 A sun-geometry illustration can show the model's inputs and limits. Any claim about Makati's actual route shade or covered reach needs real geometry, access checks and field evidence. Keep historical reach figures internal.
 
-## Six decisions are open
+## Five decisions are open, and the owner chose the domain on 2026-10-22
 
 1. Choose the pilot, Makati CBD with the one-day test above or Ortigas now. Ortigas has the better footpath and cover data today.
-2. Domain. The owner chose the product name undercover.ph on 2026-10-22. The site went live on https://undercover.ph the same day.
-3. Whether to email MaCEA and post to OSM Philippines now.
-4. Whether to get a free Mapillary token with a personal account, to count street imagery in the pilot [09].
-5. Free forever, or a paid tier later. A paid tier changes the weather terms and the RA 8293 position [07, 08].
-6. Open data. The design publishes the shelter map through OSM and an ODbL download. Agree to that before you email MaCEA, and ask MaCEA for open-use permission.
+2. The owner chose the product name undercover.ph on 2026-10-22. The site went live on https://undercover.ph the same day.
+3. Decide whether to email MaCEA and post to OSM Philippines now.
+4. Decide whether to get a free Mapillary token with a personal account, to count street imagery in the pilot [09].
+5. Decide whether the app stays free or gets a paid tier later. A paid tier changes the weather terms and the RA 8293 position [07, 08].
+6. Decide on open data. The design publishes the shelter map through OSM and an ODbL download. Agree to that before you email MaCEA, and ask MaCEA for open-use permission.
 
 ## Evidence index
 
@@ -404,7 +404,7 @@ A sun-geometry illustration can show the model's inputs and limits. Any claim ab
 | 02-building-heights.md | OSM plus Google 2.5D gives heights for 96.2% of Makati CBD footprints |
 | 03-sheltered-infrastructure.md | OSM marks cover on 4 of 53 Makati footbridge ways |
 | 04-shadow-methods.md | Raster ray marching handles buildings and trees together |
-| 05-routing-architecture.md | Historical desktop benchmark with synthetic shade. corrected graph and phone checks pending |
+| 05-routing-architecture.md | Historical desktop benchmark with synthetic shade. Corrected-graph and phone checks are pending |
 | 06-ph-prior-art-demand.md | Bounded search found no comparable PH router. Product demand needs testing |
 | 07-weather-feeds.md | No public live street-flood feed exists for Metro Manila |
 | 08-licensing-privacy.md | Source obligations and open legal questions. Free pricing gives no blanket clearance |

@@ -1,6 +1,6 @@
 """Field check kit: points to visit on foot, and a score of what walkers saw against the shade model.
 
-PLAN.md item 32 (2026-10-23). Nobody has checked the shade on the street yet, and imagery decides only 1 of 16
+PLAN.md item 32 (2026-10-23). Nobody has checked the shade on the street yet, and imagery settles only 1 of 16
 covered-walkway checks. This kit picks walkway points from an area's graph, spread across the model's shade
 values, and scores the sun or shade that a walker records at each point at 08:00, 12:00 and 16:00.
 
@@ -14,7 +14,7 @@ Usage, from the repository root (standard library only):
 
 Observed values: obs_0800, obs_1200, obs_1600 take sun, shade or partial, read at the point on that side of the
 street. obs_covered takes yes or no: a roof or deck over the walkway. Leave a cell blank when not seen.
-The model says shade at 60% or more of the edge in shadow, sun at 40% or less, and partial between.
+The model class is shade at 60% or more of the edge in shadow, sun at 40% or less, and partial between.
 """
 import csv
 import json
@@ -157,7 +157,7 @@ def score(path):
             want = model_class(int(mod))
             n += 1
             agree += obs == want
-            # Partial on one side and a full call on the other is a near miss, not a flip.
+            # Partial on one side and a full call on the other is a near miss.
             near += obs == want or "partial" in (obs, want)
             confusion[f"model {want} / seen {obs}"] = confusion.get(f"model {want} / seen {obs}", 0) + 1
             if obs != want:

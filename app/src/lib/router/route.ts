@@ -12,7 +12,8 @@ const REC_KS = [2, 1, 0.5, 0.25];
 export const REC_MAX_DETOUR = 0.2;
 /** The recommended route cuts exposure by at least this share. The route card and About quote it. */
 export const REC_MIN_CUT = 0.15;
-// The most covered route must save this much exposure over the route it sits beside, or it is the same choice.
+// The most covered route must save this much exposure over the shortest route and over any
+// recommended route. Otherwise it is the same choice.
 const MOST_MIN_GAIN_M = 5;
 const SHELTERED = 7;
 const STEPS = 16;
@@ -302,10 +303,10 @@ export function findRoutes(data: Data, q: Query): Result {
   if (!validNode(data, q.from)) return empty("outside", "The start point is not on the walking map.");
   if (!validNode(data, q.to)) return empty("outside", "The end point is not on the walking map.");
   if ((q.from_snap_m ?? 0) > MAX_SNAP_M) {
-    return empty("outside", `The start point is ${Math.round(q.from_snap_m ?? 0)} m from the nearest mapped path. Routes need a start near a street or path.`);
+    return empty("outside", `The start point is ${Math.round(q.from_snap_m ?? 0)} m from the nearest mapped path. Choose a start near a street or path.`);
   }
   if ((q.to_snap_m ?? 0) > MAX_SNAP_M) {
-    return empty("outside", `The end point is ${Math.round(q.to_snap_m ?? 0)} m from the nearest mapped path. Routes need an end near a street or path.`);
+    return empty("outside", `The end point is ${Math.round(q.to_snap_m ?? 0)} m from the nearest mapped path. Choose an end near a street or path.`);
   }
   if (q.from === q.to) return empty("no_route", "Start and end are the same place.");
 
@@ -334,7 +335,7 @@ export function findRoutes(data: Data, q: Query): Result {
     } else if (reach(q.includeUnchecked, q.stepFree, true)) {
       notes.push("Every route between these points passes through a place that is closed at this time.");
     } else if (reach(true, q.stepFree, true)) {
-      // Each limit alone still blocks, but together they open a route: say so, not "no route at any hour".
+      // Lifting either limit alone finds no route, but lifting both finds one, so the note names both limits.
       notes.push("A route exists only at other hours or on paths that may be gated or private. Try another time, or include those paths.");
     } else if (q.stepFree && reach(true, false, true)) {
       notes.push("A route exists only with steps, and only at other hours or on paths that may be gated or private.");

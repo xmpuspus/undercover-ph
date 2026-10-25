@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 
 // Acceptance for SPEC J-U8 (app/src/lib/jog/SPEC.md). Most races and many club runs start before sunrise or after
-// sunset, but the hour picker lists only the shade slots, 6:00 AM to 6:30 PM. In Run a loop it also offers 4:00 to
+// sunset, but the hour picker lists only the shade slots, 6:00 AM to 6:30 PM. In Run a loop it adds 4:00 to
 // 5:30 AM and 7:00 to 9:00 PM, so a runner can plan a dark run ahead. Walking keeps its slots as they are.
 
 const manifest = JSON.parse(readFileSync(new URL("../public/data/areas/metro-core/manifest.json", import.meta.url), "utf8")) as { dates: string[] };

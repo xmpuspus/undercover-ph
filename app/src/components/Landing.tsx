@@ -8,7 +8,7 @@ interface Props {
   // The routing areas, once areas.json has loaded. The area line counts them.
   areas: AreaInfo[] | null;
   onPick: (m: Mode) => void;
-  // Hover, focus or touch on the card starts loading route data before the tap lands.
+  // Hover, focus or touch on the card starts loading route data before the tap ends.
   onIntent: () => void;
   status: "idle" | "loading" | "ready" | "error";
   error: string | null;
@@ -42,11 +42,11 @@ export default function Landing({ areas, onPick, onIntent, status, error, theme,
             undercover<span className="text-brand">.ph</span>
           </span>
         </h1>
-        <p className="mt-2 text-[16px] font-light leading-relaxed text-slate-700">Walk in the shade on sunny days, or under cover when it rains.</p>
+        <p className="mt-2 text-[16px] font-light leading-relaxed text-slate-700">Plan a walk in the shade on sunny days, or under a roof when it rains.</p>
         {/* One line, so the buttons stay in view on a phone. About lists every area. index.html repeats this line. */}
         <p className="mt-3 text-[13px] text-slate-700" data-testid="landing-areas">
           {others > 0
-            ? `${ncr + others} walking areas: ${ncr} in Metro Manila and ${others} in other cities across the Philippines.`
+            ? `${ncr + others} walking areas, ${ncr} in Metro Manila and ${others} in other cities across the Philippines.`
             : `${ncr} walking areas in Metro Manila's busiest centres, from Caloocan to Alabang.`}
         </p>
         <div className="mt-5 grid grid-cols-2 gap-3">

@@ -286,9 +286,9 @@ export function RouteCard(p: CardProps) {
   const d = p.display[p.selected] ?? p.display[0];
   const r = d.route;
   // The router's warnings and notes are the source. The UI adds the Taglish helper where one fits.
-  const warnings = r.warnings.map((w) => ({ text: hasUnchecked(r) && /gated or private/i.test(w) ? `${w} Dashed on the map.` : w, tl: taglish(w) }));
+  const warnings = r.warnings.map((w) => ({ text: hasUnchecked(r) && /gated or private/i.test(w) ? `${w} The map shows these paths as dashed lines.` : w, tl: taglish(w) }));
   if (r.steps.some((s) => s.flags.includes("hours") && !s.closesAt)) {
-    warnings.push({ text: "Opening hours not confirmed for a passage on this route.", tl: null });
+    warnings.push({ text: "At least one passage on this route has no confirmed opening hours.", tl: null });
   }
   // The headline, the rule line, and the night box already say these router notes. Say each fact once.
   const said = (n: string) =>
@@ -299,7 +299,7 @@ export function RouteCard(p: CardProps) {
   const notes = p.result.notes.filter((n) => !said(n));
   const exposedWord = p.mode === "shade" ? "in sun" : "without a roof";
   const pct = (x: number) => Math.round(x * 100);
-  const rule = `The recommended walk is at most ${pct(REC_MAX_DETOUR)}% longer than the shortest and has at least ${pct(REC_MIN_CUT)}% less time ${exposedWord}. If no walk meets both, the shortest is recommended.`;
+  const rule = `The recommended walk is at most ${pct(REC_MAX_DETOUR)}% longer than the shortest and has at least ${pct(REC_MIN_CUT)}% less time ${exposedWord}. If no walk meets both rules, the app recommends the shortest.`;
   // Router night starts at 3 degrees. Between 0 and 3 degrees the sun is still up.
   const alt = p.result.sun?.altitude;
   const nightLine = `${alt !== undefined && alt > 0 ? "The sun is too low for shade." : "Shade does not apply after dark."} ${
@@ -542,7 +542,7 @@ const andList = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")
 /** The no-route card's title and its one fix, from the router's cause note and any gated end. */
 export function noRouteText(notes: string[], from: string, to: string, gatedEnds: string[]): { title: string; fix: string } {
   const title = `No walking route from ${from} to ${to}.`;
-  const gate = gatedEnds.length > 0 ? `${andList(gatedEnds)} ${gatedEnds.length > 1 ? "sit" : "sits"} behind a gate or inside a gated village.` : "";
+  const gate = gatedEnds.length > 0 ? `${andList(gatedEnds)} ${gatedEnds.length > 1 ? "are" : "is"} behind a gate or inside a gated village.` : "";
   if (notes.includes(SAME_PLACE)) return { title: SAME_PLACE, fix: "Pick a different start or end." };
   if (notes.includes(ONLY_STEPS)) return { title, fix: "Every route between them uses steps. Turn off Step-free to see them." };
   if (notes.some((n) => ONLY_UNCHECKED.test(n))) {
@@ -568,7 +568,7 @@ export function StateMessage({ result, onEdit, onAbout, includeUnchecked, onIncl
     <div className="rounded-card bg-white p-4 shadow-card" data-testid="route-state" data-state={result.state}>
       <p className="text-[16px] font-medium text-ink">{text ? text.title : "This start or end is outside the areas this app covers."}</p>
       <p className="mt-1 text-[14px] text-slate-600" data-testid="state-fix">
-        {text ? text.fix : "Routes work inside the blue outlines on the map. Pick a place inside one."}
+        {text ? text.fix : "The app finds routes only inside the blue outlines on the map. Pick a place inside one."}
       </p>
       {notes.length > 0 && (
         <ul className="mt-2 space-y-0.5 text-[12px] text-slate-500">

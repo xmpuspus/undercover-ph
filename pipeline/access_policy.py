@@ -32,7 +32,7 @@ def way_requires_evaluation(tags):
     return requires_access_evaluation(walker_tags(tags))
 
 
-# Barriers that stop vehicles, not walkers.
+# Barriers that stop vehicles and let walkers through.
 WALKER_PASSES = {"kerb", "bollard", "height_restrictor"}
 
 

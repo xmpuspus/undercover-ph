@@ -1,6 +1,6 @@
 import type { Mode } from "../types";
 
-// The trip lives in the URL fragment, so a reload or a shared link restores it. Browsers never send the
+// The trip is kept in the URL fragment, so a reload or a shared link restores it. Browsers never send the
 // fragment to a server, so no start or end reaches a request log.
 // #area=metro-core&start=Ayala%20MRT%20Station&end=Greenbelt&date=2026-10-23&time=1500&mode=shade&step-free=1
 // area names the routing area; start and end resolve inside it. A link without area predates the other areas
@@ -27,7 +27,7 @@ const TRIP_KEYS = new Set(["area", "start", "end", "date", "time", "mode", "step
 const AREA_ID = /^[a-z0-9-]+$/;
 const POINT = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/;
 const NODE = /^n(\d+)$/;
-// "Muji~n3557": a repeated name with the node that tells its copies apart. Several places can share one node,
+// "Muji~n3557": a repeated name with the node that distinguishes its copies. Several places can share one node,
 // so the name travels too.
 const NAMED_NODE = /^(.+)~n(\d+)$/;
 
@@ -35,7 +35,7 @@ const round5 = (n: number) => String(Math.round(n * 1e5) / 1e5);
 export const MY_LOCATION = "My location";
 
 // A GPS fix never goes into the link: links get shared and kept in history, and the spot is often a home.
-// Such an end is left out, and a restored link asks for it again.
+// Such an end is left out, so the user picks it again after a restore.
 export function encodeEndpoint(ep: { label: string; node: number; lon: number; lat: number; snap_m: number | null }, places: { name: string }[]): string | null {
   if (ep.label === MY_LOCATION) return null;
   if (ep.snap_m != null) return `${round5(ep.lon)},${round5(ep.lat)}`;

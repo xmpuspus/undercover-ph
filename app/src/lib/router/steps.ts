@@ -198,7 +198,7 @@ function structEn(kind: Kind, name: string | null, roofed: boolean, stairs: bool
     case "elevator":
       return "Take the elevator";
     case "crossing":
-      return `${name ? `Cross ${name}` : "Cross the street"}${stairs ? " (curb step)" : ""}`;
+      return `${name ? `Cross ${name}` : "Cross the street"}${stairs ? " (raised curb)" : ""}`;
     case "walk":
       return name ? `Walk along ${name}` : "Walk ahead";
   }
@@ -278,7 +278,7 @@ function mainText(
     ];
   }
   if (leg.kind === "inbuilding") {
-    // A statement, not an instruction, so a turn comes as its own sentence.
+    // Unlike other legs, a turn here gets its own sentence before the in-building text.
     const en = structEn(leg.kind, leg.name, false, false);
     const tl = structTl(leg.kind, leg.name, false, false);
     return turn !== null && turn !== "straight" ? [`${TURN_EN[turn]}. ${en}`, `${TURN_TL[turn]}. ${tl}`] : [en, tl];
@@ -474,9 +474,9 @@ function bestLandmark(leg: Leg): string | null {
 
 /**
  * Turn a route into landmark steps.
- * 1. Merge consecutive edges with the same name and cover kind, unless the path turns 45 degrees or more.
- * 2. Fold steps under 25 m into a neighbour. Stairs, crossings, and bridges fold forward and keep their phrase.
- * 3. Word the turn from the bearing change, then add the landmark, cover words, and closing time.
+ * First, merge consecutive edges with the same name and cover kind, unless the path turns 45 degrees or more.
+ * Then fold steps under 25 m into a neighbour. Stairs, crossings, and bridges fold forward and keep their phrase.
+ * Last, word the turn from the bearing change and add the landmark, cover words, and closing time.
  */
 export function buildSteps(data: Data, trips: EdgeTrip[], dateIdx: number, mPerMin = WALK_M_PER_MIN): Step[] {
   if (trips.length === 0) return [];

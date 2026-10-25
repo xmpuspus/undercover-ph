@@ -15,7 +15,7 @@ export function TurnCard({ d, idx, night, onPrev, onNext }: { d: DisplayRoute; i
     );
   }
   return (
-    // tabIndex -1: focus lands here when navigation starts. aria-live reads each new step aloud.
+    // tabIndex -1: focus moves here when navigation starts. aria-live reads each new step aloud.
     <div className="pointer-events-auto rounded-card bg-white p-3 shadow-card outline-none" tabIndex={-1} aria-live="polite" data-testid="turn-card">
       <div className="flex items-start gap-3">
         <div className="flex flex-col items-center gap-1">

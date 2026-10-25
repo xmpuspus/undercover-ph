@@ -205,7 +205,7 @@ describe("access filters", () => {
     const kerbFx = fan([{ y: 0, flags: 256 | 16 }, { y: 80 }]);
     const kerb = byLabel(findRoutes(kerbFx.data, query()), "shortest");
     expect(uses(kerb, kerbFx.via[0])).toBe(true);
-    expect(kerb.steps[0].text).toBe("Cross the street (curb step)");
+    expect(kerb.steps[0].text).toBe("Cross the street (raised curb)");
     expect(kerb.steps[0].flags).toEqual(expect.arrayContaining(["crossing", "stairs"]));
     expect(kerb.warnings).toEqual(["Has a raised curb at a crossing."]);
     for (const route of findRoutes(kerbFx.data, query({ stepFree: true })).routes) expect(uses(route, kerbFx.via[0])).toBe(false);

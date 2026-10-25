@@ -1,7 +1,7 @@
 {
   "name": "undercover.ph",
   "short_name": "undercover.ph",
-  "description": "Shaded and sheltered walking routes in Philippine cities.",
+  "description": "Find shaded and sheltered walking routes in Philippine cities.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

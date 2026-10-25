@@ -1,4 +1,4 @@
-"""City list for the scout. Seeds are approximate centres (lon, lat) from general knowledge, not from the extract.
+"""City list for the scout. Seeds are approximate centres (lon, lat) from general knowledge. None comes from the extract.
 The search window around each seed is radius_km wide. Province and region are the administrative ones."""
 
 # (city, province, region, [(seed label, lon, lat)], radius_km)

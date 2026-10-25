@@ -116,7 +116,7 @@ def main():
             if req not in text:
                 sys.exit(f"{src['id']}: saved page lacks {req!r}")
         if "image" in src:
-            # Hours printed in an image: the transcription sits in hours_sources.json, tied to the image bytes.
+            # Hours printed in an image: the transcription is in hours_sources.json, tied to the image bytes.
             if hashlib.md5((ROOT / src["image"]).read_bytes()).hexdigest() != src["image_md5"]:
                 sys.exit(f"{src['id']}: saved image differs from the transcribed one")
         hit_any = False

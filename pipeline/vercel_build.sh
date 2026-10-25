@@ -13,7 +13,7 @@
 # - Files outside the root directory are in the build while the project setting "Include source files outside
 #   of the Root Directory in the Build Step" is on, the default since 2020-08-27.
 #   https://vercel.com/docs/monorepos/monorepo-faq
-# - The build cache keeps node_modules/** (1.5 GB cap on Standard machines), so the venv lives there.
+# - The build cache keeps node_modules/** (1.5 GB cap on Standard machines), so the venv goes there.
 #   https://vercel.com/docs/deployments/troubleshoot-a-build#what-is-cached
 # - A build may run 45 minutes on 4 CPUs and 8 GB. https://vercel.com/docs/limits
 #
@@ -72,8 +72,8 @@ if [ ! -f "$DATA/areas.json" ]; then
 fi
 # Weather and the advisory need only the standard library.
 export PY="$PYTHON"
-# The map tiles, each area's graph, places and hours, the search index and the area inputs live in the data
-# release that pipeline/data-release.json names, not in git (2026-10-23). fetch skips files that already match,
+# The map tiles, each area's graph, places and hours, the search index and the area inputs are in the data
+# release that pipeline/data-release.json names, and no longer in git (2026-10-23). fetch skips files that already match,
 # replaces files that differ and checks every download's sha256.
 "$PY" -I pipeline/data_release.py fetch --tiles --app
 IDS="$("$PY" -I -c 'import json, sys; print(" ".join(a["id"] for a in json.load(open(sys.argv[1]))["areas"]))' "$DATA/areas.json")"
@@ -98,7 +98,7 @@ if [ "$SOURCE" = "release" ]; then
     echo "vercel_build: no shade release from $START or the six days before it, so every area is shaded here" >&2
   else
     tar -xzf "$ROOT/shade-release.tar.gz" -C "$DATA/areas"
-    # A release cast from a branch can hold areas this commit does not list. They must not ship.
+    # A release built from a branch can hold areas this commit does not list. They must not ship.
     for d in "$DATA/areas"/*/; do
       d="${d%/}"
       [[ " $IDS " == *" ${d##*/} "* ]] || { echo "dropping ${d##*/}: in the release, not in areas.json"; rm -rf "$d"; }

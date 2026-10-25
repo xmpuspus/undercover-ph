@@ -58,7 +58,7 @@ function crossingAt(data: Data, x: number): Switch {
  * So the side and the direction walked give the hand the walker has the sidewalk on. Between pieces on
  * two different arms of x, the same sidewalk stays on the same hand, at any turn angle. A U-turn onto
  * the other edge between the same two nodes reverses the walker, so there the same hand means the
- * other sidewalk. The offset vectors (sideX, sideY) cannot decide this: on a curved piece the bend
+ * other sidewalk. The offset vectors (sideX, sideY) do not work for this test. On a curved piece the bend
  * moves the mean of the line more than the sidewalk offset does.
  */
 export function sideSwitch(data: Data, a: number, b: number, x: number): Switch {

@@ -6,7 +6,7 @@ its v3 outlines at Google's 80%-precision cutoff (pipeline/raw/districts/<id>/go
 whose centre lies in the area's graph boxes count.
 
 Coverage: the share of the Google 2023 raster's building area (presence >= 0.5, height >= 2.5 m, read at 2 m, each
-district's own box) that each set covers. The raster is Google's too, so it may favour v3. An imagery sample is the check.
+district's own box) that each set covers. The raster is Google's too, so it can be biased toward v3. An imagery sample is the check.
 Detail, from overlaps between the two sets:
 - same: one OSM and one v3 outline with intersection over union 0.5 or more.
 - osm_coarser: one OSM outline holds 2 or more v3 outlines, each at least half inside it.

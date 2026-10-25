@@ -3,7 +3,7 @@
 # This job reads every area's live manifest after the rebuild window and opens an issue when
 # an area's shade dates do not cover today (Manila) with 4 or more days left, or its shade marker
 # is gone. GitHub starts scheduled runs late (2 to 3 hours on 2026-10-23), so a first date of
-# yesterday is normal before the morning run lands; 4 days left still gives time to fix a failure.
+# yesterday is normal before the morning run finishes; 4 days left still gives time to fix a failure.
 
 name: live-check
 

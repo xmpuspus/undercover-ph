@@ -2,7 +2,7 @@ import type { Mode, Result, Route, SegKind } from "../types";
 import { COLORS } from "../config";
 
 // One drawn route. Two router labels can share one geometry, for example
-// when the recommended route is also the shortest; they merge into one card and one bubble.
+// when the recommended route is the shortest route; they merge into one card and one bubble.
 export interface DisplayRoute {
   key: string;
   route: Route;

@@ -135,7 +135,7 @@ export default function SunChip({
           {!low && <p className="mt-1.5 text-slate-500">The arrow points from the sun toward the shadows on the map.</p>}
           {day && (
             <p className="mt-1.5 text-slate-500">
-              The arc is this day&apos;s sun, from sunrise at {fmtMinute(day.sunrise)} to sunset at {fmtMinute(day.sunset)}.
+              The arc shows the sun&apos;s path on this day, from sunrise at {fmtMinute(day.sunrise)} to sunset at {fmtMinute(day.sunset)}.
             </p>
           )}
           {shadows && (

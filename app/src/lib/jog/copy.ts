@@ -19,7 +19,7 @@ export function loopFacts(loop: Loop, { litShare, grade }: { litShare: number | 
   }
   const c = loop.crossings;
   lines.push(`Crossings: ${c.signals} with signals, ${c.marked} marked, ${c.unmarked} without a marked crossing.`);
-  if (c.unmarkedBig) lines.push(`${c.unmarkedBig} unmarked across a secondary road or larger.`);
+  if (c.unmarkedBig) lines.push(`Unmarked crossings of a secondary road or larger: ${c.unmarkedBig}.`);
   const sights = loop.sights.filter(Boolean);
   if (sights.length) lines.push(`Sights: ${sights.join(", ")}`);
   if (litShare !== null && grade === "thin") lines.push(JOG_COPY.fewSights);

@@ -37,7 +37,7 @@ worker.onmessage = ({ data: m }) => {
       const { data, jog } = state;
       worker.postMessage({ id: m.id, result: findLoops(data, jog, m.query), litShare: jog?.litShare ?? null, grade: jog ? sightGrade(jog, data) : "thin" });
     } catch {
-      worker.postMessage({ id: m.id, error: "Could not find loops from this start. Try another place or distance." });
+      worker.postMessage({ id: m.id, error: "The app could not search for loops from this start. Try another place or distance." });
     }
-  }).catch(() => worker.postMessage({ id: m.id, error: "The walking map could not load for runs. Try again." }));
+  }).catch(() => worker.postMessage({ id: m.id, error: "The app could not load the walking map for Run a loop. Try again." }));
 };

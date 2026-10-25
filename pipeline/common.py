@@ -14,7 +14,7 @@ PBF = RESEARCH / "raw/shared/ncr.osm.pbf"
 OUT = ROOT / "app/public/data"
 WORK = ROOT / "pipeline/work"
 RAW = ROOT / "pipeline/raw"
-# Full building set: a pipeline input for the graph and shade steps, not served by the app.
+# Full building set: a pipeline input for the graph and shade steps. The app does not serve it.
 BUILDINGS = ROOT / "pipeline/inputs/buildings.geojson"
 
 # The research access policy and the corrected classifier are imported, never copied.

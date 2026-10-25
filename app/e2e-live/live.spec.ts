@@ -56,7 +56,7 @@ for (const [area, from, to] of TRIPS) {
   test(`${area}: ${from} to ${to}`, async ({ page }) => {
     expect(to, `${area} has no route-check pair with names unique across areas`).not.toBe("");
     const errors: string[] = [];
-    // A bare "Error" text says nothing, so keep each Error's message and stack top.
+    // A bare "Error" text gives no cause, so keep each Error's message and stack top.
     page.on("console", async (m) => {
       if (m.type() !== "error") return;
       const args = await Promise.all(m.args().map((x) => x.evaluate((v) => (v instanceof Error ? `${v.name}: ${v.message} ${String(v.stack).split("\n")[1] ?? ""}` : String(v))).catch(() => m.text())));

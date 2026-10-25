@@ -3,7 +3,7 @@
 The shade engine needs buildings out to 800 m past the walk area. The map only needs the ones a
 walker can see, so this keeps features that touch the graph area plus 150 m, keeps the two height
 fields and the source, rounds coordinates to 6 decimals (about 0.1 m), and drops null heights,
-which the shade model also leaves out.
+which the shade model leaves out.
 """
 
 import json

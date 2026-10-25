@@ -76,7 +76,7 @@ function openDB(): Promise<IDBDatabase> {
     const request = indexedDB.open("ucph-jog", 1);
     request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains("runs")) request.result.createObjectStore("runs", { keyPath: "id" }); };
     request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(new Error("Saved runs could not open on this phone."));
+    request.onerror = () => reject(new Error("Saved history could not be opened on this phone."));
     request.onblocked = () => reject(new Error("Close other tabs of this site to open saved runs."));
   });
 }

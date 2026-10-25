@@ -31,7 +31,7 @@ export function ModeSwitch({ mode, onChange, running = false, onRun }: { mode: M
   );
 }
 
-// One message for every search with no match: the list cannot tell a missing place from a place outside the areas.
+// One message for every search with no match: the list cannot distinguish a missing place from a place outside the areas.
 const NO_MATCH = "No place by that name in the areas this app covers. Try another name, or tap the map.";
 
 // Map tags as a walker would say them. "residential" alone is an adjective, and the tags use British spelling.
@@ -113,7 +113,7 @@ export function PlaceList({ id, places, onPick, testid, active, where }: { id: s
           <PinIcon size={16} className="mt-0.5 shrink-0 text-brand" />
           <span className="min-w-0">
             <span className="block truncate text-[15px] text-ink">{pl.name}</span>
-            {/* detail tells apart places that share a name, for example "Muji, in Greenbelt 3". */}
+            {/* detail distinguishes places that share a name, for example "Muji, in Greenbelt 3". */}
             <span className="block truncate text-[12px] text-slate-600">
               {[`${categoryLabel(pl.category)}${pl.detail ? `, ${pl.detail}` : ""}`, where?.(pl)].filter(Boolean).join(" · ")}
             </span>
@@ -272,7 +272,7 @@ export function TripFields(p: TripProps) {
             data-testid="use-location"
           >
             <LocateIcon size={16} />
-            {p.locating ? "Finding you..." : "Use my location"}
+            {p.locating ? "Finding your location..." : "Use my location"}
           </button>
         )}
         {p.notice && (

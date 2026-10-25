@@ -45,7 +45,7 @@ SAMPLE_STEP_M = 1.0
 FOOTPRINT_MARGIN_M = 0.05
 # Decision 7: an unsheltered edge with over half its length inside a footprint gets bit 10.
 INSIDE_SHARE = 0.5
-# Safety rule: node_flags tell the router where a walker can cross between side edges.
+# Safety rule: node_flags mark where a walker can cross between side edges.
 NODE_BIT = {"crossing": 1, "signals": 2, "junction": 4, "grade_separated": 8}
 CROSSING_STREETS = ["Ayala Avenue", "Paseo de Roxas", "Makati Avenue", "Senator Gil J. Puyat Avenue"]
 
@@ -59,7 +59,7 @@ def crossing_node_tags():
             continue
         hw, cr, rw = n.tags.get("highway"), n.tags.get("crossing"), n.tags.get("railway")
         if cr == "no":
-            crossing_no.add(n.id)  # OSM says no crossing here, so the node gets neither bit
+            crossing_no.add(n.id)  # crossing=no in OSM, so the node gets neither bit
             continue
         if hw == "crossing" or cr is not None or rw == "crossing":
             crossing.add(n.id)

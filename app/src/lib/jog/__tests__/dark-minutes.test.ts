@@ -6,7 +6,7 @@ import type { JogQuery } from "../types";
 import { grid, rawJog } from "./fixtures";
 
 // Acceptance for SPEC J-N4 (app/src/lib/jog/SPEC.md). Shade slots start at 06:00, but from April to September 06:00
-// is 17 to 32 minutes after sunrise in Manila, so a slot's sun can be up while a 05:00 runner is in the dark. A loop
+// is 9 to 34 minutes after sunrise in Manila (pvlib SPA, 2026), so a slot's sun can be up while a 05:00 runner is in the dark. A loop
 // is dark at every minute before sunrise or from sunset on, read from manifest.sunrise_sunset, whatever the slot.
 // The helper manifest has sunrise 05:51, sunset 17:33, and slots 10:00 (sun 60), 15:00 (40), 18:00 (0), 18:30 (-5).
 

@@ -180,7 +180,7 @@ def advisory():
         issued = re.search(r"Issued at:?\s*([0-9]{1,2}:[0-9]{2}\s*[AP]M,?\s*[0-9]{1,2}\s+\w+\s+[0-9]{4})", block)
         # An advisory can name the whole region ("Metro Manila", "NCR") instead of its cities. That covers Makati too.
         region = re.search(r"\bMetro Manila\b|\bNCR\b|National Capital Region", block.replace("#NCR_PRSD", ""))
-        # Whole words only, and "Manila" never inside "Metro Manila", which names the region, not the city.
+        # Whole words only, and "Manila" never inside "Metro Manila", which names the region.
         named = {c for c in NCR_CITIES if re.search(("(?<!Metro )" if c == "Manila" else "") + r"\b" + re.escape(c) + r"\b", block)}
         cities = sorted(named | ({"Metro Manila"} if region else set()))
         return {
@@ -203,7 +203,7 @@ def shared_advisory():
     if REGION and shared.get("source_url") != ADVISORY_URL:  # another region's page
         return advisory()
     if REGION and shared.get("status") == "ok" and shared.get("text"):
-        # A region near Metro Manila shares its page. Its cities are its own, not the Metro Manila list.
+        # A region near Metro Manila shares its page. It matches its own cities instead of the Metro Manila list.
         provinces = REGION.get("advisory_provinces") or []
         return {**shared, "cities": region_places(shared["text"], area_cities(), provinces, REGION.get("name", ""))}
     return shared

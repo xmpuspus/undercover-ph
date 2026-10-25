@@ -5,7 +5,7 @@ MIN_HEIGHT_M = 2.5
 
 
 def verdict(conf, threshold, osm_overlap_share, raster_median_m):
-    """"added", or the first rule the outline fails. raster_median_m is None when the raster sees too few building pixels."""
+    """"added", or the first rule the outline fails. raster_median_m is None when the raster has too few building pixels."""
     if conf < threshold:
         return "below_80pct_precision"
     if osm_overlap_share >= MAX_OSM_OVERLAP:

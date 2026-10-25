@@ -1,7 +1,7 @@
 """Region settings for walking areas outside Metro Manila. Standard library only.
 
 A region gives the OSM extract, the UTM zone and the PAGASA page for its districts.
-Districts and areas outside Metro Manila live in pipeline/regions/districts.json and areas.json,
+Districts and areas outside Metro Manila are in pipeline/regions/districts.json and areas.json,
 with the same shape as pipeline/districts.json and pipeline/areas.json plus a "region" key.
 A district without a region key belongs to ncr. ncr keeps the paths and text in pipeline/common.py,
 so nothing here changes a Metro Manila build.

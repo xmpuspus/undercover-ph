@@ -67,7 +67,7 @@ export interface Step {
  *   roof_m counts sheltered edges. sun_m is open sky (no roof, building, or tree cover).
  *   At night or without shade data, building_m and tree_m are 0 and sun_m holds all unroofed metres.
  * covered_pct: shade mode by day counts roof, building, and tree. Rain mode and night count roof only.
- *   It rounds down, so it never claims more cover than measured.
+ *   It rounds down, so it is never more than the measured cover.
  * sun_minutes: minutes exposed under the active mode, at 1.1 m/s, rounded up to 0.1.
  *   Shade mode: minutes in sun. Rain mode: minutes without a roof. Night: 0.
  * lowconf_pct: share of building-shaded metres cast by buildings with a default height.

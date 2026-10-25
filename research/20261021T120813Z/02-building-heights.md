@@ -1,23 +1,25 @@
 # OSM plus Google 2.5D gives a height to 96% of Makati CBD footprints, and OSM alone gives 27%
 
-Correction, 2026-10-21: the headline measures heuristic height assignment, with no field shade-accuracy result. The Google median lacks a building-presence mask, and 0.5 m output pixels have about 4 m effective resolution. Revisit the eight-pixel threshold before calling a height usable. See [the height and geometry corrections](../../docs/research-corrections.md).
+A correction on 2026-10-21 limits the headline. The headline counts heights that a rule assigns. No field check measured shade accuracy.
 
-Labels: [VERIFIED] means I read the source or ran the code. [UNVERIFIED] means not computed, not read, or recall.
+The Google median lacks a building-presence mask. Its 0.5 m output pixels have about 4 m effective resolution. Revisit the eight-pixel threshold before you call a height usable. See [the height and geometry corrections](../../docs/research-corrections.md).
+
+[VERIFIED] means I read the source or ran the code. [UNVERIFIED] means a value I did not compute, a source I did not read, or my recall.
 
 All numbers come from `raw/02/final_union/` and `raw/02/derived_osm_google_v2/`. Scripts are in `scripts/02/`.
 
-## Requested use and denominator
+## Makati CBD has 1,598 OSM building outlines, and Overture has exactly 1,598 OSM-sourced rows in the same box
 
-- Decision: ship building shade routing in v1 for a Makati CBD pilot, or wait for v2.
-- Unit: one building footprint polygon with one height in metres above ground.
-- Box: Makati CBD, lat 14.548 to 14.562, lon 121.012 to 121.032.
-- Denominator: 1,598 OSM outlines (`building` not `no`) with the centroid in the box. 778 are over 500 m2. [VERIFIED]
-- Cross-check: Overture holds exactly 1,598 OSM-sourced footprints in the same box. [VERIFIED]
-- Rights: the router publishes derived shade data, so each source needs an open licence that permits derived works.
+- The decision is to ship building shade routing in v1 for a Makati CBD pilot, or to wait for v2.
+- The unit is one building footprint polygon with one height in metres above ground.
+- The Makati CBD box is lat 14.548 to 14.562, lon 121.012 to 121.032.
+- The base count is 1,598 OSM outlines (`building` not `no`) with the centroid in the box. Of these, 778 are over 500 m2. [VERIFIED]
+- As a cross-check, Overture holds exactly 1,598 OSM-sourced footprints in the same box. [VERIFIED]
+- The router publishes derived shade data, so each source needs an open licence that permits derived works.
 
-## Headline: 96.2% of Makati footprints get a height, and 98.0% of footprint area
+## Makati footprints get a height for 96.2% by count and 98.0% by area
 
-Rule: OSM `height`, else OSM `building:levels` x 3.74 m, else the Google 2.5D 2023 zonal median.
+The rule takes OSM `height` first, then OSM `building:levels` x 3.74 m, then the Google 2.5D 2023 zonal median.
 
 | Measure | OSM rule only | Google 2.5D only | Union, OSM wins |
 |---|---|---|---|
@@ -28,16 +30,16 @@ Rule: OSM `height`, else OSM `building:levels` x 3.74 m, else the Google 2.5D 20
 
 All values are [VERIFIED] from `raw/02/final_union/makati.json`.
 
-- 81 of the 432 OSM rule heights are podium heights. A `building:part` is more than 5 m taller. [VERIFIED]
+- 81 of the 432 OSM rule heights are podium heights, the height of the low base under a tower. In each, a `building:part` is more than 5 m taller. [VERIFIED]
 - These 81 outlines hold 25.9% of the area over 500 m2. Their median gap to the tallest part is 93.5 m. [VERIFIED]
-- Cast each building part on its own geometry. Applying its tallest height to the entire podium can overstate shade, while ignoring the part can understate it.
-- Google statistic: zonal median (p50) of `building_height` inside each footprint at 0.5 m pixels.
-- Google counts as usable when a footprint has at least 8 pixels and a median of 2.5 m or more.
+- Cast each building part on its own geometry. If you apply the tallest height to the entire podium, the shade can come out too large. If you ignore the part, it can come out too small.
+- The Google value is the median (p50) of `building_height` over the 0.5 m pixels inside each footprint.
+- If a footprint has at least 8 pixels and a median of 2.5 m or more, its Google value counts as usable.
 - The levels factor 3.74 m is the median of `height` / `building:levels` on 278 Makati outlines. The ratio limits are 2 m to 6 m.
-- Google fills 1,105 footprints. That is 43.3% of the footprint area, and it is modelled, not mapped.
+- Google fills 1,105 footprints, which hold 43.3% of the footprint area. These heights are not mapped but modelled.
 - 61 footprints get no height. They hold 2.0% of the area, and 1.6% of the area over 500 m2.
 
-## BGC and Ortigas give the same pattern
+## BGC and Ortigas show the same pattern, with the union covering over 97% of footprint area
 
 | Box | Footprints | OSM rule, count / area | Union, count / area | Union over 500 m2, count / area |
 |---|---|---|---|---|
@@ -47,9 +49,9 @@ All values are [VERIFIED] from `raw/02/final_union/makati.json`.
 
 All values are [VERIFIED] from `raw/02/final_union/{bgc,ortigas}.json`. The levels factor is 3.82 m in BGC and 3.87 m in Ortigas.
 
-## Each source gives a different part of the answer
+## Only OSM and Google 2.5D give usable Makati heights, and no other source tested adds one, with Microsoft read as a 20,000-row sample
 
-| Source | Reach | Height in the Makati box | Licence | Vintage | Label |
+| Source | Access | Height in the Makati box | Licence | Vintage | Label |
 |---|---|---|---|---|---|
 | OSM `height` | Local PBF, MD5 checked | 263 of 1,598 (16.5%) | ODbL | 2026-10-20 | [VERIFIED] |
 | OSM `building:levels` | Same | 433 (27.1%), including part levels | ODbL | 2026-10-20 | [VERIFIED] |
@@ -63,9 +65,9 @@ All values are [VERIFIED] from `raw/02/final_union/{bgc,ortigas}.json`. The leve
 | Google Photorealistic 3D Tiles | not tested | terms not read | Google Maps Platform terms | live | [UNVERIFIED] |
 | NAMRIA or Makati 3D model | not tested | none found | unknown | unknown | [UNVERIFIED] |
 
-Source notes:
+These notes give the source details.
 
-- Overture holds 2,058 footprints in the box: 1,598 OSM, 395 Google Open Buildings, and 65 Microsoft. [VERIFIED]
+- Overture holds 2,058 footprints in the box. Of these, 1,598 come from OSM, 395 from Google Open Buildings, and 65 from Microsoft. [VERIFIED]
 - Overture carries heights only on OSM rows. The 460 non-OSM footprints have no height. [VERIFIED]
 - The 460 non-OSM footprints cover 33,335 m2, or 2.4% of Overture footprint area in the box. [VERIFIED]
 - Microsoft rows carry `"height": -1.0` in all 20,000 sampled rows of quadkey `132303122`. [VERIFIED]
@@ -75,27 +77,27 @@ Source notes:
 - Google states the CC BY 4.0 or ODbL choice. [VERIFIED] https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_Research_open-buildings-temporal_v1
 - I read Google with anonymous HTTP range requests. I did not use Earth Engine or the personal key. [VERIFIED]
 
-## The Google 2.5D cap cuts every Makati tower above 100 m, but OSM covers all except one
+## Google 2.5D reads 99 of 100 Makati towers above 100 m lower than OSM, and OSM has a height for 122 of 123
 
-- The Google 2.5D raster tops out at 99.5 m inside any Makati footprint. Only 9 of 15.5 million pixels reach 100.0 m. [VERIFIED]
+- The highest Google 2.5D value inside any Makati footprint is 99.5 m. Only 9 of 15.5 million pixels reach 100.0 m. [VERIFIED]
 - 46 Makati outlines have an OSM rule height above 100 m. Google reads all 46 lower. [VERIFIED]
 - 100 outlines have an OSM tag or part height above 100 m. Google reads 99 of them lower. [VERIFIED]
 - For those 100 outlines, the OSM median is 136.2 m and the Google p90 median is 95.5 m. [VERIFIED]
 - 79 Makati footprints read at the cap, which I define as a Google p90 of 95 m or more. [VERIFIED]
 - 123 footprints show a height above 100 m from the OSM rule, an OSM part, or the Google cap. [VERIFIED]
 - 6 of the 123 have no OSM rule height. 5 of them carry an OSM `building:part` height of 104.7 m to 192 m. [VERIFIED]
-- 1 tower has no OSM height at all: Citadines Benavidez Makati, Google median 93.5 m. [VERIFIED]
+- 1 tower, Citadines Benavidez Makati, has no OSM height at all. Its Google median is 93.5 m. [VERIFIED]
 - BGC has 2 such towers and Ortigas has 9. [VERIFIED]
 - Those 100 outlines hold 26.8% of the Makati footprint area over 500 m2. [VERIFIED]
-- Impact: at 45 degrees of sun altitude, a 200 m tower casts a 200 m shadow. With the Google value, it casts under 100 m.
+- At 45 degrees of sun altitude, a 200 m tower casts a 200 m shadow. With the Google value, the shadow is under 100 m.
 
-## OSM outline tags often hold the podium height, so use building:part heights for towers
+## OSM outline tags often hold the podium height, so use `building:part` heights for towers
 
 - In 81 Makati outlines, a `building:part` is more than 5 m taller than the rule height. [VERIFIED]
 - PBCom Tower reads 36 m on its outline and 258 m on its part. [VERIFIED]
 - Discovery Primea reads 14 m on its outline and 250 m on its part. [VERIFIED]
-- The rule "height, else levels" gives these towers their podium height. Their shadows come out too short.
-- Fix: cast shadows from the parts, or use the tallest part height for the outline.
+- The rule "height, else levels" gives these towers their podium height. So their shadows are too short.
+- Cast shadows from the parts, or use the tallest part height for the outline.
 
 ## Google and OSM agree within 8.6 m median on Makati buildings up to 100 m
 
@@ -114,13 +116,13 @@ All values are [VERIFIED]. BGC gives 7.7 m on 50 pairs, and Ortigas gives 8.6 m 
 - Google states that its output "is not guaranteed to be orthorectified, especially for tall buildings." [VERIFIED] project page
 - A leaning tower roof falls partly outside its footprint. So the footprint median can read low on tall buildings. [UNVERIFIED] inference
 - OSM `height` and `building:levels` agree within 0.1 m median. Mappers probably derive one from the other. [UNVERIFIED] inference
-- OSM is not ground truth. No survey or LiDAR height exists for this box to settle the 8.6 m gap. [VERIFIED] for LiPAD
+- OSM is not a measured reference. No survey or LiDAR height exists for this box to settle the 8.6 m gap. [VERIFIED] for LiPAD
 
-## The fallback rule leaves 2% of Makati footprint area to guesswork
+## The last fallback, an area-class default for 2% of Makati footprint area, missed by 45.0 m on average in a leave-one-out test
 
-- First fallback: the Google median. It agrees with OSM within 8.6 m median on buildings up to 100 m. [VERIFIED]
-- Second fallback, for the 61 footprints with no height: a default by footprint area class.
-- Area-class medians from OSM heights: 25.5 m for 100 to 500 m2, 71.0 m for 500 to 2,000 m2, 96.8 m above. [VERIFIED]
+- The first fallback is the Google median. It agrees with OSM within 8.6 m median on buildings up to 100 m. [VERIFIED]
+- The second fallback gives the 61 footprints with no height a default by footprint area class.
+- The area-class medians from OSM heights are 25.5 m for 100 to 500 m2 and 71.0 m for 500 to 2,000 m2. Above that, the median is 96.8 m. [VERIFIED]
 - The area rule misses by 45.0 m on average in a leave-one-out test. That error is too large for towers. [VERIFIED]
 - So use the area rule only for the 61 leftovers. They hold 2.0% of the area, and 1.6% over 500 m2. [VERIFIED]
 - Flag each Google-filled height as "modelled 2023" in the data. Google fills 43.3% of the area. [VERIFIED]
@@ -144,23 +146,25 @@ All values are [VERIFIED]. BGC gives 7.7 m on 50 pairs, and Ortigas gives 8.6 m 
 - The terms page returned HTTP 404. The licence stays [UNVERIFIED].
 - The WFS endpoint returned HTTP 502. The WMS GetFeatureInfo endpoint returned HTTP 200. [VERIFIED]
 
-## Verdict: yes, building shade routing can ship in a Makati v1 pilot, with three conditions
+## Building shade routing can ship in a Makati v1 pilot on three conditions
 
-- Verdict: CONDITIONAL yes for Makati CBD v1. The union gives 98.4% of the area over 500 m2 a height.
-- Condition 1: use OSM first, with the tallest `building:part` height for towers.
-- Condition 2: fill the rest with the Google 2.5D 2023 median. Label those heights as modelled.
-- Condition 3: give the 61 leftovers an area-class default, and show that shade as low confidence.
+The verdict is a CONDITIONAL yes for Makati CBD v1. The union gives a height to 98.4% of the area over 500 m2. The three conditions are these.
+
+1. Use OSM first, with the tallest `building:part` height for towers.
+2. Fill the rest with the Google 2.5D 2023 median. Label those heights as modelled.
+3. Give the 61 leftovers an area-class default, and show that shade as low confidence.
+
 - The single action that raises coverage most is the Google 2.5D join. It lifts Makati from 27.0% to 96.2% by count.
-- Google 2.5D is BLOCKED as a stand-alone source for towers. It cuts every tower above 100 m.
+- Google 2.5D gets a BLOCKED verdict as a stand-alone source for towers. It reads 99 of 100 Makati towers above 100 m lower than OSM.
 - The same verdict holds for BGC and Ortigas on the area over 500 m2. Ortigas has 9 tall footprints with no OSM height.
 
-## Smallest next evidence needed
+## Three checks are still open, starting with 10 Google-filled heights against field photos
 
 - Check 10 Google-filled heights against field photos or street imagery shadows in Makati.
 - Add an OSM `height` to Citadines Benavidez Makati after a survey, through normal OSM editing.
-- Open item: I did not read the Google Photorealistic 3D Tiles terms. Extraction rights stay [UNVERIFIED].
+- I did not read the Google Photorealistic 3D Tiles terms, so extraction rights stay [UNVERIFIED].
 
-## Sample evidence
+## All source reads worked except the DuckDB extension install, the LiPAD WFS, and the LiPAD terms page
 
 | Item | Value |
 |---|---|

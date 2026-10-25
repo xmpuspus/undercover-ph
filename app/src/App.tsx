@@ -47,7 +47,7 @@ type Field = "from" | "to";
 type Screen = "landing" | "dest" | "trip" | "results" | "steps" | "navigate" | "run";
 const RUN_DARK_MINUTES = [240, 270, 300, 330, 1140, 1170, 1200, 1230, 1260];
 
-// What each browser history entry remembers, so Back and Forward put the screen back as it was.
+// What each browser history entry stores, so Back and Forward put the screen back as it was.
 interface Snapshot {
   screen: Screen;
   stage: Stage;
@@ -58,7 +58,7 @@ interface Snapshot {
   jogStart?: Endpoint | null;
   // The trip settings of this entry, so Back and Forward restore its time and profile, not the latest ones.
   settings?: { dateIdx: number; bucketIdx: number; mode: Mode; stepFree: boolean; nowAt: { minute: number; dateIdx: number; bucketIdx: number } | null; jogMinute?: number | null };
-  // Position in the app's own history, 0 for the first entry. In-app Back uses it to know when to go back a step.
+  // Position in the app's own history, 0 for the first entry. In-app Back checks it before it goes back a step.
   i: number;
 }
 const historyIndex = () => (window.history.state as Snapshot | null)?.i ?? 0;
@@ -223,7 +223,7 @@ export default function App() {
   }, [prsd]);
   // Matched again whenever the area changes, not only when the page does.
   const advisory = useMemo(() => areaAdvisory(pageAdvisory, advArea), [pageAdvisory, advArea]);
-  // Weather belongs to the area.
+  // Each area has its own weather file. Load it again when the area changes.
   useEffect(() => {
     if (!areaId) return;
     let live = true;
@@ -412,7 +412,7 @@ export default function App() {
       if (!day) continue;
       setDateIdx(d.idx);
       setBucketIdx(day.idx);
-      setNowNote({ text: `${lead} The route uses ${dateLabel(d.date, clock.date)} ${fmtMinute(day.min, true)}, the next time with shade data.`, dateIdx: d.idx, bucketIdx: day.idx });
+      setNowNote({ text: `${lead} The app plans the route for ${dateLabel(d.date, clock.date)} ${fmtMinute(day.min, true)}, the next time with shade data.`, dateIdx: d.idx, bucketIdx: day.idx });
       return;
     }
     const first = dateOpts[0];
@@ -423,7 +423,7 @@ export default function App() {
   const isNow = !!nowAt && nowAt.dateIdx === dateIdx && nowAt.bucketIdx === bucketIdx;
   const shownNote = nowNote && nowNote.dateIdx === dateIdx && nowNote.bucketIdx === bucketIdx ? nowNote.text : null;
 
-  // A time the user picks by hand is never Now, even if it lands on Now's slot again.
+  // A time the user picks by hand is never Now, even if it falls on Now's slot again.
   const pickBucket = (i: number, pickedMinute: number) => {
     setPlaying(false);
     setNowAt(null);
@@ -496,8 +496,8 @@ export default function App() {
 
   // Routing runs in the browser. The router scores each edge at the slot when the walker reaches it.
   // The search runs on a deferred copy of its inputs, so a tap on a place or an hour paints at once and the
-  // routes follow; meanwhile the card says it is updating. The bundle rides along, so the ends and the graph
-  // they belong to always change together.
+  // routes follow; meanwhile the card says it is updating. The deferred copy holds the bundle too, so the ends
+  // and the graph they belong to always change together.
   const [timeSet, setTimeSet] = useState(false);
   const routeInput = useMemo(
     () => ({ data, area: areaId, from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute: departMin, stage, ready: timeSet && shadeReady && !running, shadeVer }),
@@ -527,7 +527,7 @@ export default function App() {
       return { result, error: null };
     } catch (e) {
       console.error(e);
-      return { result: null, error: "Could not plan this route. Change the start or end, or reload the page." };
+      return { result: null, error: "The app could not plan this route. Change the start or end, or reload the page." };
     }
   }, [deferred]);
   // A stale result from before the start moved to another area never shows beside the one-area message.
@@ -545,7 +545,7 @@ export default function App() {
     : sun
       ? { altitude: sun[0], azimuth: sun[1], compass: compass16(sun[1]), shadySide: null }
       : null;
-  // The routes on screen belong to the deferred inputs, so they use that mode until the new search lands.
+  // The routes on screen come from the deferred inputs, so they use that mode until the new search finishes.
   const routeMode = deferred.mode;
   const display = useMemo(() => (result && (result.state === "ok" || result.state === "night") ? toDisplay(result, routeMode) : []), [result, routeMode]);
 
@@ -610,7 +610,8 @@ export default function App() {
     if (field === "from") setFrom(ep);
     else setTo(ep);
     setActive(other ? null : field === "from" ? "to" : "from");
-    // Keyboard and screen reader users land on the next thing to do, not on the page body.
+    // Focus goes to the other field, or to the panel once both ends are set, so keyboard and screen reader
+    // users start from the next thing to do instead of the page body.
     refocus(other ? "panel" : `${field === "from" ? "to" : "from"}-input`);
   };
 
@@ -684,7 +685,7 @@ export default function App() {
     const a = areaAt(areas, lon, lat, areaId);
     if (!a) {
       // With areas in many regions the full list is too long for a notice. About lists them by region.
-      const list = areas && areas.length > 20 ? ". About lists them all." : `: ${areaList(areas)}.`;
+      const list = areas && areas.length > 20 ? ". Open About to see the full list." : `. The areas are ${areaList(areas)}.`;
       setNotice(`${label === MY_LOCATION ? "You are" : "That point is"} outside the areas this app covers${list}`);
       return;
     }
@@ -727,7 +728,7 @@ export default function App() {
       },
       (err) => {
         setLocating(false);
-        setNotice(err.code === err.PERMISSION_DENIED ? "Location permission was denied. Pick a place instead." : "Could not get your location. Pick a place instead.");
+        setNotice(err.code === err.PERMISSION_DENIED ? "Location permission was denied. Pick a place instead." : "The app could not get your location. Pick a place instead.");
       },
     );
   };
@@ -933,12 +934,12 @@ export default function App() {
     setFocus({ at: s.at, bearing: next ? bearing(s.at, next) : null, zoom: 18 });
   }, [stage, navIdx, current]);
 
-  // Read out new route results to screen readers, once each search lands.
+  // Read out new route results to screen readers, once each search finishes.
   // A start and end in different areas: no route, and the card names both areas.
   const crossText = blocked && from && to ? `${from.label} is in ${areaLabel(from.area, areas)}. ${to.label} is in ${areaLabel(to.area, areas)}.` : "";
   const announce = useMemo(() => {
     if (stage !== "plan" || editing || !from || !to) return "";
-    if (crossText) return `Routes stay inside one area. ${crossText}`;
+    if (crossText) return `A route must start and end in the same area. ${crossText}`;
     if (routing) return "";
     if (routed.error) return routed.error;
     if (!result) return "";
@@ -947,7 +948,7 @@ export default function App() {
     if (!current) return "";
     const n = display.length;
     const sunLine = result.state === "night" ? ((result.sun?.altitude ?? 0) > 0 ? "The sun is too low for shade." : "Shade does not apply after dark.") : `${fmtDuration(current.route.sun_minutes)} ${routeMode === "shade" ? "in sun" : "without a roof"}.`;
-    return `${n} ${n === 1 ? "route" : "routes"} found. ${current.title}: ${current.pct}% ${current.pctWord}, ${current.route.minutes} min walk. ${sunLine}`;
+    return `${n} ${n === 1 ? "route" : "routes"} found. ${current.title}, ${current.pct}% ${current.pctWord}, ${current.route.minutes} min walk. ${sunLine}`;
   }, [stage, editing, from, to, crossText, routing, routed.error, result, current, display.length, routeMode]);
 
   const vp = useViewport();
@@ -1287,7 +1288,7 @@ export default function App() {
                     {crossArea && !blocked && <Pending text={`Loading the walking map for ${areaLabel(shared!, areas)}...`} />}
                     {blocked && (
                       <div className="rounded-card bg-white p-4 text-[14px] text-ink shadow-card" role="status" data-testid="cross-area">
-                        <p className="text-[16px] font-medium">Routes stay inside one area.</p>
+                        <p className="text-[16px] font-medium">A route must start and end in the same area.</p>
                         <p className="mt-1 text-slate-700">{crossText} Pick a start in the same area as your end.</p>
                         <button type="button" onClick={() => editField("from")} className="mt-3 block h-11 rounded-card bg-brand px-4 text-white" data-testid="cross-area-edit">
                           Change the start

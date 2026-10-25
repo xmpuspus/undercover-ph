@@ -1,7 +1,7 @@
 import type { Rollup } from "vite";
 
 /** Only the landing shell and the map needed to reopen a trip belong in the install download.
- * Other views and font subsets enter the asset cache when they are actually requested. */
+ * Other views and font subsets enter the asset cache when they are requested. */
 export function shellAssets(bundle: Rollup.OutputBundle): string[] {
   const keep = new Set<string>();
   const visit = (name: string) => {

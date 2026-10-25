@@ -1,7 +1,7 @@
 """Acceptance for PLAN.md items 6, 29 and 33 (2026-10-23). Plain asserts, no pytest.
 
 Run: pipeline/.venv/bin/python -I pipeline/districts/check_walk_data.py [--stage AREA]
-Exits 0 when every rule holds. With --stage AREA it also checks that area's built graph in pipeline/stage/AREA/.
+Exits 0 when every rule holds. With --stage AREA it adds a check of that area's built graph in pipeline/stage/AREA/.
 The build must call these functions, so the graph follows the same rules:
 - build_graph.passage_tags(tags): the tags the access rules read. A road that runs through a building
   (tunnel=building_passage) and has a tagged sidewalk is a street, not a vehicle tunnel, so its sidewalks stay
@@ -12,7 +12,7 @@ The build must call these functions, so the graph follows the same rules:
   one gets bit 0 (covered) and bit 4096 (under a deck). Item 29.
 - build_graph.side_offset_m(tags, class_lanes): how far an assumed sidewalk sits from the road's centre line.
   With no width or lanes tag, the class minimum lanes apply (trunk 6, primary 4, secondary 4, tertiary 2), so
-  a wide road's sidewalk no longer lands inside the carriageway. Item 33.
+  a wide road's sidewalk no longer sits inside the carriageway. Item 33.
 - build_graph.assumed_side_fits(d_used, width_m): an assumed side (no sidewalk tag) whose line had to move
   closer than 0.5 m outside the carriageway, because buildings stand there, is dropped. Item 33.
 """

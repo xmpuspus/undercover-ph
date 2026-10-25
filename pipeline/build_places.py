@@ -29,7 +29,7 @@ PRIORITY = ["station", "bus_station", "mall", "store", "hotel", "hospital", "sch
 ALIAS_KEYS = ("alt_name", "short_name", "official_name", "old_name", "loc_name", "name:en", "alt_name:en")
 
 
-# Plain part names such as "Tower 1" say nothing to a walker. Only the named towers are searchable.
+# Plain part names such as "Tower 1" mean nothing to a walker. Only the named towers are searchable.
 GENERIC_PART = re.compile(r"^(the )?(tower|block|wing|building)( [0-9a-z]+)?$", re.I)
 PART_KINDS = ("yes", "apartments", "office", "commercial", "residential", "hotel")
 COMMERCIAL_MIN_M2 = 1000.0
@@ -120,7 +120,7 @@ def make_place(r):
     if not in_bbox(p.x, p.y, GRAPH_BBOX):
         return None
     utm = shapely.transform(g, lambda a: np.column_stack(TO_UTM.transform(a[:, 0], a[:, 1])))
-    # Small commercial lots and tiny office areas are single tenants, not places to walk to.
+    # Small commercial lots and tiny office areas are single tenants, so they are left out.
     if t.get("landuse") == "commercial" and "building" not in t and not t.get("wikidata") \
             and utm.area < COMMERCIAL_MIN_M2:
         return None

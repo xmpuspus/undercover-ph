@@ -174,7 +174,7 @@ describe("side switches", () => {
 
   it("names the sidewalk on a curved piece from the way direction, not the bend", () => {
     // B to C bulges 150 m north, so the mean point of its south sidewalk line lies north of the chord.
-    // The step must still say south side, the side the router walks.
+    // The step must still say south side, the side that the route uses.
     const data = makeData({
       nodes: AVENUE,
       edges: [south(0, 1, 0, 200), { ...south(1, 2, 200, 400), geom: [[200, -5], [300, 145], [400, -5]] }],

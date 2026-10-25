@@ -96,7 +96,7 @@ interface Props {
 }
 
 export function StepsList({ steps, lengthM, minutes, night, onBack, onFocus, current }: Props) {
-  // Escape goes back to the route. It marks the event handled so navigation does not also close.
+  // Escape goes back to the route. It marks the event handled, so the same Escape does not end navigation.
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || e.defaultPrevented) return;

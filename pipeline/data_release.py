@@ -20,8 +20,8 @@ An area or an older release without jog.json still packs and fetches.
 
 fetch keeps local work. pipeline/.data-fetched.json (ignored by git) records the sha256 of each file or area as
 fetch last left it. A local file that matches the release is left alone. One that still matches that record is
-stale, and fetch replaces it. One that matches neither came from a local rebuild, and fetch keeps it and says
-so, unless --replace is given. So a local deploy build never overwrites maps that are not yet published.
+stale, and fetch replaces it. One that matches neither came from a local rebuild, and fetch keeps it and prints
+a note, unless --replace is given. So a local deploy build never overwrites maps that are not yet published.
 Git history still holds the copies committed before 2026-10-23; clone with --depth 1 to skip them.
 Environment: UCPH_DATA_REPO (owner/name, default xmpuspus/undercover-ph), UCPH_DATA_BASE (another download base,
 for tests).

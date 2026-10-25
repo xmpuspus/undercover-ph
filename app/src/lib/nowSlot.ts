@@ -10,7 +10,8 @@ export interface NowSlot {
 // The shade slot a "Now" trip uses: the first slot at or after the clock. After the day's last slot there is
 // no slot ahead, so use the last one when it is night (the router returns state "night" for it).
 // At sunset the next slot can be night while the sun is still up now (5:01 PM, slot 5:30 PM at 0.2 degrees).
-// The sun height now, read between the two slots, decides: above the night line, keep the earlier daylight slot.
+// The choice uses the sun height now, read between the two slots: above the night line, keep the earlier
+// daylight slot.
 // Null means today has no slot that fits, and the caller must say so.
 export function nowSlot(bucketsMin: number[], sunAlt: (number | undefined)[] | undefined, clockMin: number, nightAlt: number): NowSlot | null {
   const alt = (i: number) => sunAlt?.[i] ?? 90;

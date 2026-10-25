@@ -11,7 +11,7 @@ so the script reads only the blocks under the area's canopy window over HTTP: 1.
 in pipeline/raw/regions/canopy_meta/v2_<quadkey>.json.
 
 CHMv2 uses the same Maxar Vivid2 imagery as v1 (Brandt et al. 2026, section 2.2). In the Philippines the
-per-tile acquisition windows run from 2010 to 2019-11-18, so the switch brings a better model, not newer trees.
+per-tile acquisition windows run from 2010 to 2019-11-18, so the switch brings a better model but no newer trees.
 
 The output keeps the grid of the Metro Manila raster from leaves-ph (canopy_height_ncr.tif):
 - CHMv2 tiles (s3://dataforgood-fb-data/forests/v2/global/dinov3_global_chm_v2_ml3/chm/), uint8 metres;
@@ -23,7 +23,7 @@ shade.py then reads pipeline/inputs/areas/<id>/canopy.tif as it does for every a
 
 --check compares this method with the leaves-ph raster on one Metro Manila window (default makati-cbd),
 reading the remote v1 tile through /vsicurl/ so nothing large is downloaded. It still tests v1, because
-leaves-ph holds v1; it proves the mosaic and resampling that build() applies to CHMv2. It also checks that the
+leaves-ph holds v1; it proves the mosaic and resampling that build() applies to CHMv2. The same run checks that the
 area window equals the grid of that area's existing canopy.tif. Results go to
 pipeline/raw/regions/canopy_meta/check_<area>.json.
 """

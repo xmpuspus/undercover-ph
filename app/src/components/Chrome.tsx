@@ -11,7 +11,7 @@ export function TopBanner({ onClose, onAbout }: { onClose: () => void; onAbout: 
       <button type="button" onClick={onAbout} className="min-h-11 min-w-0 flex-1 py-1.5 text-left underline-offset-2 hover:underline md:hidden">
         Not a government service. Routes can be wrong.
       </button>
-      <p className="hidden min-w-0 flex-1 py-1.5 md:block">Prototype. Routes and data can be wrong. Independent project, not affiliated with any government agency.</p>
+      <p className="hidden min-w-0 flex-1 py-1.5 md:block">This is an independent prototype. Routes and data can be wrong. It is not affiliated with any government agency.</p>
       <button type="button" onClick={onAbout} className="hidden h-11 shrink-0 rounded px-2 underline underline-offset-2 hover:bg-white/10 md:block">
         About
       </button>
@@ -75,7 +75,7 @@ export function AdvisoryBar({
 // Phones get one 32 px row (above the 24 px WCAG minimum) so the attribution does not take two rows of the map.
 const link = "inline-flex min-h-8 items-center hover:underline md:min-h-11";
 
-// Basemap attribution stays visible at every size and in every stage. Data credits live in About.
+// Basemap attribution stays visible at every size and in every stage. Data credits are in About.
 export function Footer({ onAbout }: { onAbout: () => void }) {
   return (
     <footer

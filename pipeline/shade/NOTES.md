@@ -10,9 +10,9 @@ cd pipeline/shade
 .venv/bin/python shade.py            # needs app/public/data/READY.graph
 ```
 
-The venv uses Python 3.13 from Homebrew. Packages: numpy 2.5.4, numba 0.68.0, rasterio 1.5.2, pyproj 3.8.0, shapely 2.2.0, pvlib 0.16.1, pillow 13.0.0. `requirements.txt` pins them with every transitive package.
+The venv uses Python 3.13 from Homebrew, with numpy 2.5.4, numba 0.68.0, rasterio 1.5.2, pyproj 3.8.0, shapely 2.2.0, pvlib 0.16.1 and pillow 13.0.0. `requirements.txt` pins them with every transitive package.
 
-Inputs and settings:
+### Input files and environment variables
 
 - Buildings come from `pipeline/inputs/buildings.geojson`. Tree heights come from `pipeline/inputs/canopy_height_makati.tif`.
 - That canopy file is a 1.24 MB clip of the leaves-ph NCR raster, made by `clip_canopy.py`. It holds the source pixels unchanged.
@@ -32,14 +32,14 @@ Inputs and settings:
 4. The grid covers the graph area plus 800 m on each side, at 1 m cells.
 5. Each building part burns its own geometry. Overlaps keep the highest top and the lowest base.
 6. The default-height flag comes from the part that owns the highest top in each cell.
-7. The canopy raster is resampled to the grid by nearest neighbour. Nodata and building cells become 0.
+7. Nearest-neighbour resampling puts the canopy raster on the grid. Nodata and building cells become 0.
 8. Samples run every 5 m along each edge `geom`, with both ends included. Each sample carries half the gap to each neighbour as its weight.
 9. Ground samples sit at 1.5 m. Footbridge samples (flag 8) sit at 7.5 m, a 6 m deck plus 1.5 m.
 10. Each ray steps toward the sun azimuth in 1 m horizontal steps. Above 45 degrees, steps shrink so that each rise stays at 1 m or less.
-11. A building blocks the ray when its base is at or below the ray height and its top is at or above it.
+11. A building blocks the ray if two conditions are true. Its base is at or below the ray height, and its top is at or above it.
 12. A crown blocks the ray between 25% of the canopy height and the full height. That lower zone is the UMEP trunk default.
 13. The march stops when the ray rises above the tallest top or crown, or leaves the grid.
-14. A building hit ends the ray. A crown hit only marks it, so a building further along still wins.
+14. A building hit ends the ray. A crown hit only marks it, so a building further along still counts as the blocker.
 15. The ray skips buildings in its own start cell. Otherwise a sidewalk sample that rasterises into a facade cell reads as shaded at every hour.
 16. Sheltered edges (`flags & 7`) get computed values like every other edge.
 17. Per edge, `building` is the rounded percent of weighted length in building shadow.
@@ -47,7 +47,7 @@ Inputs and settings:
 19. `lowconf` pools all daytime buckets. It is the weighted percent of building-shaded samples whose blocking cell has a default height.
 20. When the apparent elevation is at or below 0, both arrays hold 255 for that bucket.
 
-## Checks before the real graph arrived
+## Unit tests and the canopy resample passed before the real graph arrived
 
 - 11 unit tests pass in `test_shade.py`, on hand-built grids only. The 11th checks the overlay frame.
 - A 30 m wall at 30 degrees shades a 1.5 m sample to 49.4 m and the ground to 52.0 m. The test checks both within 2 m.
@@ -55,16 +55,16 @@ Inputs and settings:
 - A ray passes under a deck with a 5 m base. The same deck on the ground blocks it.
 - A sample on a 100 m roof stays sunny. A street sample west of the tower falls in its shadow.
 - A north-south street between 50 m blocks stays sunny at the real solar noon of 22 October.
-- Solar noon falls near 11:40 local time, so the 12:00 azimuth is 191 degrees, not 180.
-- The resampled canopy over the pilot box matches the source. 18.4% of cells read above 0 m, 6.9% read 5 m or more, and the maximum is 26 m.
+- Solar noon falls near 11:40 local time, so the 12:00 azimuth is not 180 degrees but 191.
+- The resampled canopy over the pilot box matches the source. 18.4% of cells read above 0 m and 6.9% read 5 m or more. The tallest cell reads 26 m.
 - At 200 random source pixels of 8 m or more, 99% match exactly and all match within 2 m.
 
-## Check on every shade run
+## The shade workflow and refresh_dates.sh fail a run when noon shade is not below 16:00 shade
 
 - `check_sun_order.py` fails a run when an area's noon shade is not below its 16:00 shade, length-weighted over open walkways.
-- A sun cast for the wrong hour, time zone or direction breaks that order. Roofed edges are left out.
-- The shade workflow runs it before publishing, and `refresh_dates.sh` runs it after each local shade run.
-- On 2026-10-23 it held in all 67 areas on every date. Swapping the real 12:00 and 16:00 planes makes it fail.
+- A sun cast for the wrong hour, time zone or direction breaks that order. The check leaves out roofed edges.
+- The shade workflow runs it before publishing, and `refresh_dates.sh` runs it after each local shade run. A direct `shade.py` run does not call it.
+- On 2026-10-23 the order held in all 67 areas on every date. Swapping the real 12:00 and 16:00 planes makes it fail.
 - 08:00 against 12:00 is not checked. A low east sun runs along east-west streets, so 08:00 can be less shady than noon.
 
 ## Sun table
@@ -72,13 +72,13 @@ Inputs and settings:
 - Sunrise runs from 05:48 to 05:50 and sunset from 17:33 to 17:30 across 21 to 27 October.
 - The 18:00 and 18:30 buckets are below the horizon on every date, so they hold 255.
 - The 17:30 bucket sits at 0.2 to 0.3 degrees. The model still computes it, and nearly every ray at that height hits something.
-- On 22 October at 08:00 the sun stands at 29.7 degrees and azimuth 112.0. Shadows should point toward 292 degrees, west-northwest.
-- On 22 October at 15:00 the sun stands at 34.3 degrees and azimuth 245.3. Shadows should point toward 65 degrees, east-northeast.
+- On 22 October at 08:00 the sun stands at 29.7 degrees and azimuth 112.0. The expected shadow bearing is 292 degrees, west-northwest.
+- On 22 October at 15:00 the sun stands at 34.3 degrees and azimuth 245.3. The expected shadow bearing is 65 degrees, east-northeast.
 - From 25 to 27 October the 17:30 bucket drops to or below 0 degrees. Those dates have 3 night buckets instead of 2.
 
-## Real run on 22 October 2026
+## The 01:06 run on 22 October 2026 shaded the 01:04 graph
 
-The current outputs come from the run at 01:06. It used the graph with READY.graph at 01:04:15.
+That run used the graph with READY.graph at 01:04:15.
 
 - `graph.json` md5 is `5522d54adb938effb78ff13e90c0c8a9`. `shade.bin` md5 is `97cf750271de2f35de31c7bff159c7a5`.
 - The 01:03 graph write added node flags only. `shade.bin` came out byte-identical to the 00:58 run, so edge geometry did not change.
@@ -99,7 +99,7 @@ The current outputs come from the run at 01:06. It used the graph with READY.gra
 - The graph build rewrote the manifest at 00:34:47 and dropped the shade limits once. Its script now keeps lines it does not own.
 - `shade.py` now records its own limit lines in `owned_limits.json`. Each run replaces only those lines, so old counts do not pile up.
 
-### Inputs
+### Graph, buildings, canopy and grid of the 01:06 run
 
 - `graph.json` holds 6,274 edges and 3,714 nodes, 255.3 km in total. Edge ids equal their positions.
 - 158 edges are sheltered (`flags & 7`). 80 edges are footbridges. No edge carries a deck height, so all 80 use 6 m.
@@ -112,13 +112,13 @@ The current outputs come from the run at 01:06. It used the graph with READY.gra
 
 - `app/public/data/shade.bin` holds 2,290,010 bytes. That equals 6,274 edges times 365 bytes.
 - `manifest.json` holds `sun`, `sunrise_sunset`, `shade` and `shadow_overlay`, with `n_edges` 6,274.
-- It also holds 14 shade limits and 2 shade sources. The 14th limit covers the overlay height.
+- `manifest.json` holds 14 shade limits and 2 shade sources. The 14th limit covers the overlay height.
 - The manifest has 53 limits with no duplicates. Every key and limit line from the graph build stayed unchanged.
 - Copies of the manifest before each write sit in `debug/manifest.before-shade*.json`.
 - `READY.shade` holds the write time, the edge count and the runtime.
 - `run_log.json` holds the time for each bucket, the share for each bucket and the added limits.
 
-### Shade shares on 22 October, by edge length
+### On 22 October in the Makati pilot graph, buildings shade 23.7% of edge length at 12:00 and 62.7% at 16:00
 
 | Time | Sun altitude | Building shade | Tree shade |
 | --- | --- | --- | --- |
@@ -137,7 +137,7 @@ The current outputs come from the run at 01:06. It used the graph with READY.gra
 - The 165 daytime buckets take 2.25 s in total. Each takes 0.002 s to 0.12 s, with a mean of 0.014 s.
 - The shade step takes 4.85 s to 7.66 s on this Mac, depending on load. That excludes the debug images and overlays.
 
-### Debug images
+### In the debug images, shadows point away from the sun at 08:00 and 15:00
 
 - `debug/shadow-2026-10-22-0800.png` and `debug/shadow-2026-10-22-1500.png` show ground shadow over the pilot box.
 - Enlarged crops from the first run sit beside them as `debug/crop-*.png`.
@@ -146,16 +146,20 @@ The current outputs come from the run at 01:06. It used the graph with READY.gra
 - In both images the shadows point away from the sun, which matches the expected bearings above.
 - Each rerun redrew both images. Directions stay the same. Default-height houses cast shorter shadows since the 00:41 rebuild.
 
-### Findings for the graph build and the router
+### 100 unsheltered edges in the Makati pilot graph run mostly inside buildings and read as building shade at most hours
 
-- 1,272 samples (2%) sit inside a solid building part at their own height. The start-cell skip stops a facade sample from shading itself.
-- 100 unsheltered edges (2.4 km) run mostly inside a building part at walking height. 62 of them carry flag 1024.
-- Nobody has checked why the other 38 lack the flag. The graph build notes expect most are vehicle ways with a cover tag, which its rule excludes.
-- Sampling also differs. This step samples every 5 m on a 1 m grid. The graph build tests 1 m samples against polygons.
-- These edges read as building shade at most hours. A field check must show whether a real roof covers them.
+- 100 unsheltered edges (2.4 km) run mostly inside a building part at walking height. These edges read as building shade at most hours.
+- A field check must show whether a real roof covers them.
+- 62 of them carry flag 1024. Nobody checked yet why the other 38 lack the flag. The graph build notes expect most are vehicle ways with a cover tag, which its rule excludes.
+- The two steps sample in different ways. This step samples every 5 m on a 1 m grid. The graph build tests 1 m samples against polygons.
 - Before the final rebuild, this count was 193 edges (8.0 km). The graph build notes trace most of those to road side edges pushed into footprints.
+- 1,272 samples (2%) sit inside a solid building part at their own height. The start-cell skip stops a facade sample from shading itself.
+
+### In the Makati pilot graph, a straight-line A* heuristic must scale the distance by 0.86 or less
+
 - `len_m` equals the haversine length along `geom`. 2,772 edges are shorter than the chord between their own nodes, by up to 2.93 m.
-- The side offsets cause that shortfall, and the graph build intends it. A straight-line A* heuristic needs a factor of 0.86 or less.
+- The side offsets cause that shortfall, and the graph build intends it.
+- The lowest ratio of `len_m` to the distance between its two nodes is 0.8609. A straight-line A* heuristic needs a factor of 0.86 or less.
 
 ## Shadow overlays for the map
 
@@ -163,21 +167,22 @@ The app shows ground shadow as a MapLibre image source per date and bucket. `sha
 
 - The overlays use the same height grids and ray march as `shade.bin`. Each pixel casts its ray from 0.5 m.
 - Each PNG covers `manifest.graph_bbox` at 2 m per pixel, 1,573 by 1,272 pixels, with row 0 at the north edge.
-- MapLibre stretches an image linearly in Web Mercator. So rows step evenly in Mercator y, not in latitude.
+- MapLibre stretches an image linearly in Web Mercator. So rows step evenly not in latitude but in Mercator y.
 - Building shadow is rgba(15, 23, 42, 0.55) and tree shadow is rgba(22, 101, 52, 0.50). Sun and roof pixels are transparent.
 - Each file is a 3-colour palette PNG with a transparency chunk. Alpha values are 140 and 128 out of 255.
 - A QA pass in the tilted 3D view found the first colours too faint. The 01:27 rerun uses the stronger colours above. File sizes did not change.
 - Buckets with the sun above 3 degrees get a file. That is 06:30 to 17:00, 22 buckets on each of 7 dates.
 
-### Overlay results
+### The 154 overlay files fit the 250 KB budget
 
-- 154 files in `app/public/data/shadows/{date}/{HHMM}.png` hold 26,314,259 bytes in total.
+- In the 09:59 run that READY.shadows records, 154 files in `app/public/data/shadows/{date}/{HHMM}.png` hold 26,314,527 bytes in total.
+- An earlier run, logged in the first version of these notes, gave 26,314,259 bytes.
 - Files range from 140 KB to 178 KB, under the 250 KB budget.
 - `manifest.shadow_overlay` holds the bbox, the four corners, `px_m` 2, the path pattern and the bucket list per date.
 - Rendering takes 48 s to 62 s for all 154 files, depending on machine load. Each file takes 0.3 s on average and 1.4 s at most.
 - READY.shadows holds the write time, the file count, the total bytes and the runtime.
 
-### Overlay read-back checks
+### Two overlays read back from disk, 08:00 and 16:00 on 22 October, line up with the building outlines
 
 - `debug/overlay-check-2026-10-22-0800.png` and `-1600.png` composite the overlay files from disk on building outlines.
 - The outlines come from `pipeline/inputs/buildings.geojson` coordinates through the same Mercator mapping. Misplaced rows would split roofs from outlines.
@@ -198,11 +203,11 @@ cd pipeline/shade
 UCPH_START_DATE=2026-10-22 .venv/bin/python shade.py --area metro-core
 ```
 
-- `--area` or `UCPH_AREA` selects the area before the settings load. `UCPH_DATA`, `UCPH_INPUTS` and the other overrides still win.
+- `--area` or `UCPH_AREA` chooses the area before the settings load. `UCPH_DATA`, `UCPH_INPUTS` and the other overrides still win.
 - Data defaults to `pipeline/stage/<id>/`. Inputs default to `pipeline/inputs/areas/<id>/`.
 - The run reads `graph.json`, `buildings.geojson` or `buildings.geojson.gz`, and `manifest_template.json`. It looks in the data folder, then the inputs folder.
 - The canopy comes from `INPUTS/canopy.tif`, else the first `INPUTS/canopy_height*.tif`. When neither exists, the run clips `canopy.tif` from the leaves-ph NCR raster.
-- The clip matches `clip_canopy.py`: the `load_canopy()` window plus 16 pixels, tiled 256, deflate, predictor 2.
+- The clip matches `clip_canopy.py`. It uses the `load_canopy()` window plus 16 pixels, tiled 256, deflate, predictor 2.
 - Without the NCR raster, as on a build server, a missing clip stops the run with a clear error.
 - Dates come from `UCPH_START_DATE`, else the area's `manifest.json`, else its template. These runs used 2026-10-22, the root manifest's first date.
 - The run starts `manifest.json` from the template when it is missing or holds other dates, as `set_dates.py` does for the root.
@@ -221,20 +226,20 @@ UCPH_START_DATE=2026-10-22 .venv/bin/python shade.py --area metro-core
 
 1. The run takes the 1 m canopy grid, with building cells already set to 0.
 2. It keeps cells of 3 m or more, within 200 m of the graph envelope. A 27 m crown at 8 degrees of sun casts about 190 m.
-3. A 3 by 3 mean smooths the grid, so whole-metre plateaus stop tying.
+3. A 3 by 3 mean smooths the grid, so cells on a flat whole-metre patch no longer tie as local maxima.
 4. Local height maxima seed the crowns. The search window is 5 m below 10 m height, 7 m to 20 m, and 9 m above.
 5. Touching maxima merge into one marker. A watershed then assigns each canopy cell to a marker.
 6. Flat canopy patches can still end up with one marker each. So a segment wider than 8 m in radius splits into 10 m squares.
 7. Each segment becomes a disc of equal area at its centroid. Its top is the 90th percentile height, and its base sits at a quarter of that.
 
-Checks on the crowns:
+Four checks cover the crowns.
 
 - The disc areas add up exactly to the canopy area of 3 m or more in every area.
 - Before the split, Makati had 520 discs wider than 12 m and one 86.8 m disc. After it, the widest disc is 8.0 m.
 - `debug/<area>/trees-check.png` draws the discs over the canopy for the densest 300 m square. In Makati and metro-core, the discs sit on the canopy with no offset.
 - In Makati, crowns under 4 m2 hold 0.79% of the canopy area. The run keeps them.
 
-### Area checks
+### The Makati area run reproduces the root `shade.bin` byte for byte
 
 - A `--no-write` root run gives the same 164 bucket shares and limit lines as before the area code.
 - A copy of the Makati inputs, run through `--area`, reproduces the root `shade.bin` byte for byte for every date and for lowconf.
@@ -243,7 +248,7 @@ Checks on the crowns:
 - `test_shade.py` holds 14 tests. Three cover the per-date files, and all 14 pass.
 - Every area's file sizes fit the layout, `n_edges` matches its graph, and its dates match the root manifest.
 
-### Results for each area on 22 October
+### Shade for all seven areas matched their rebuilt graphs from 10:43:59 on 22 October
 
 The graph build rebuilt bundles several times between 10:00 and 10:43. A watcher reran any area whose inputs were newer than its `READY.shade` and quiet for 60 s. Every area was current from 10:43:59.
 
@@ -278,14 +283,14 @@ The graph build rebuilt bundles several times between 10:00 and 10:43. A watcher
 
 - One sun position at the area centre serves every edge. Across 10 km the sun direction shifts by about 0.1 degrees.
 - The grid covers the envelope of the member districts. Buildings outside their building boxes are not loaded, so some low-sun shadows can be missing.
-- Edge samples more than 800 m past the graph area fall outside the grid and count as sun. metro-core has 74 and alabang 52.
+- Edge samples more than 800 m past the graph area fall outside the grid. They count as sun. metro-core has 74 and alabang 52.
 - The canopy raster ends about 420 m inside Alabang's southern building margin, so that strip has no trees.
 - metro-core's `trees.json` holds 247,610 crowns, 8.2 MB raw and 1.7 MB gzipped. A phone loads it once per area.
 
 ## Limits
 
 - One sun position at the pilot centre serves each bucket and the whole walk.
-- Crowns block all light. The UMEP default transmissivity is 3%, so tree shade is slightly overstated.
+- Crowns block all light. The UMEP default transmissivity is 3%, so the model overstates tree shade slightly.
 - The canopy map dates from about 2018 to 2020. It misses newer trees and keeps removed ones.
 - Overlapping parts merge into one block from the lowest base to the highest top. This fills any gap between stacked parts.
 - The low-confidence flag follows the part that owns the highest top in a cell.
@@ -295,4 +300,4 @@ The graph build rebuilt bundles several times between 10:00 and 10:43. A watcher
 - A ray that leaves the grid counts as sun.
 - Footbridge decks use 6 m because the graph carries no heights.
 - The 1 m grid does not add detail. Google heights have an effective resolution of about 4 m.
-- Nobody has checked the shade against field photos.
+- Nobody checked the shade against field photos yet.

@@ -4,7 +4,7 @@ Usage: pipeline/.venv/bin/python -I pipeline/regions/pick_routes.py OUT_JSON ARE
 Then add OUT_JSON with pipeline/regions/registry_add.py routes OUT_JSON, and run build.py --checks.
 A pair joins two places with unique names, 300 m to 3 km apart, ranked by category
 (malls, hospitals, terminals, city halls, universities, cathedrals). No place is in two pairs.
-The graph is not read, so a pair can fail the route check. That is the point of the check.
+The graph is not read on purpose, so a pair can fail the route check.
 UCPH_PICK_EXCLUDE (names joined by "|") drops places that a run note says sit behind a closed gate.
 """
 

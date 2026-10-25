@@ -49,7 +49,7 @@ it.each([404, 410])("uses preload recovery for a confirmed missing file (%i)", a
 it("rejects into the app boundary when the one-reload handler declines recovery", async () => {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 404 })));
   const importer = vi.fn().mockResolvedValue("cached module");
-  await expect(lazyChunk(url, importer)()).rejects.toThrow("removed by a deploy");
+  await expect(lazyChunk(url, importer)()).rejects.toThrow("removed this file");
   expect(importer).toHaveBeenCalledTimes(1);
 });
 

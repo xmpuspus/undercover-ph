@@ -2,13 +2,13 @@
 
 The correction is dated 2026-10-21. The original research outputs stay in place as historical evidence. The corrected static profile is `public-through-static-v1`. New results are in [raw/access-correction-20261021](../research/20261021T120813Z/raw/access-correction-20261021/).
 
-The three original extractors admitted `access=private`, `access=no` and `foot=private`. An audit of the actual NCR extract found 51,979 accepted ways with an explicit private or no-access rule and no positive pedestrian override. Those counts supported the original network ranking and routing benchmarks. They cannot show public through-access.
+The three original extractors admitted `access=private`, `access=no` and `foot=private`. An audit of the NCR (Metro Manila) extract found 51,979 accepted ways with an explicit private or no-access rule and no positive pedestrian override. Those counts supported the original network ranking and routing benchmarks. They cannot show public through-access.
 
-The corrected extractors share one policy. A specific `foot=yes`, `foot=designated` or `foot=permissive` can override general access restrictions. Customer-only, destination-only, permit-only and unknown access values are excluded from the public-through candidate profile. Ways touching explicitly blocked nodes are omitted in full. This conservative barrier treatment removes approach segments that a more detailed graph could keep.
+The corrected extractors share one policy. A specific `foot=yes`, `foot=designated` or `foot=permissive` can override general access restrictions. The public-through candidate profile excludes customer-only, destination-only, permit-only and unknown access values. The extractors omit every way that touches an explicitly blocked node. This barrier rule is conservative. It removes approach segments that a more detailed graph could keep.
 
 A review found vehicle cover in the shelter flags as well. The profile now excludes busways and vehicle tunnels without explicit pedestrian permission. Only pedestrian-class ways receive shelter flags. A roof over a driveway does not show that an adjacent sidewalk has a roof. The revised tests reproduce this error before the fix and check pedestrian tunnels and roof tags after it.
 
-[OSM access documentation](https://wiki.openstreetmap.org/wiki/Key:access) explains the access hierarchy. This profile still needs local defaults and field checks. Missing tags leave legal status unverified, even when a way qualifies as a structural candidate.
+[OSM access documentation](https://wiki.openstreetmap.org/wiki/Key:access) explains the access hierarchy. This profile still needs local defaults and field checks. Missing tags leave the legal status unchecked, even when a way qualifies as a structural candidate.
 
 ## Corrected structural metrics replace the access-blind totals
 
@@ -30,35 +30,35 @@ The routing extractor assigns whole ways by their mean node position. Its [05/gr
 | Makati CBD | 1,732 | 2,265 | 2,903 | 5,806 | 90.7 | 809 |
 | NCR polygon | 96,071 | 139,237 | 176,122 | 352,244 | 9,134.0 | 18,834 |
 
-Directed arc totals describe storage duplication before direction rules are applied. A figure stated only as 500,000 edges cannot support the original claim that the graph was 44% smaller. The original latency, payload and route-choice results describe the old graph and synthetic shade on a desktop M5. They have not been reproduced on the corrected graph or a phone.
+The directed-arc column counts each edge twice, once per direction. It measures storage size. It does not show a larger network. A figure stated only as 500,000 edges cannot support the original claim that the graph was 44% smaller. The original latency, payload and route-choice results describe the old graph and synthetic shade on a desktop M5. Nobody reproduced them on the corrected graph or on a phone.
 
-## Access rules survive extraction and still need routing code
+## Extraction keeps the access rules, and routing code must still apply them
 
 The pilot cache now keeps access values, conditional text, opening hours and node barriers. Graph archives include original way and node identifiers. Each graph has a `graph_<region>_rules.json` sidecar and a per-edge `requires_access_evaluation` array. Indoor hallways and building passages need evaluation even when hours are missing. The map export uses the same static filter and marks unresolved rules.
 
-The corrected graph metadata and pilot cache declare `routing_ready: false`. No schedule parser or live closure evaluator exists. A production importer must apply restrictions and arrival-time availability before comfort scoring. It must exclude unsupported controlled passages and keep separate levels, entrances, crossings and directional foot rules. Missing hours on a controlled passage need confirmation. Lowering its shade score cannot make it admissible.
+The corrected graph metadata and pilot cache declare `routing_ready: false`. No schedule parser or live closure evaluator exists. A production importer must apply restrictions and arrival-time availability before comfort scoring. It must exclude unsupported controlled passages and keep separate levels, entrances, crossings and directional foot rules. Missing hours on a controlled passage need a check. Lowering its shade score cannot make it admissible.
 
-The shelter report's cover-tag totals inventory mapped structures, including restricted ones. They do not measure usable public shelter. The updated shelter extraction and reach analysis are under the same correction directory, separate from the historical outputs.
+The shelter report's cover-tag totals count mapped structures, including restricted ones. They do not measure usable public shelter. The updated shelter extraction and reach analysis are under the same correction directory, separate from the historical outputs.
 
 ## Height coverage does not measure shadow accuracy
 
-The 96.2% headline is 1,537 of 1,598 OSM outlines receiving a height under the report's heuristic. Google fills 1,105 outlines. Its height median currently uses non-nodata pixels without a building-presence mask. Eight pixels in a 0.5 m output are not eight independent observations. The product has an effective resolution of about 4 m. [Google's temporal dataset documentation](https://sites.research.google/gr/open-buildings/temporal/) describes the resolution, confidence and 100 m height cap.
+The 96.2% figure is 1,537 of 1,598 OSM outlines that get a height under the report's heuristic. Google fills 1,105 outlines. Its height median uses all non-nodata pixels, with no building-presence mask. The report accepts a Google height from 8 or more 0.5 m pixels. The product has an effective resolution of about 4 m, so all 8 pixels can come from one source cell. [Google's temporal dataset documentation](https://sites.research.google/gr/open-buildings/temporal/) describes the resolution, confidence and 100 m height cap.
 
-Keep this figure as heuristic assignment coverage. Check presence masking, source age and height uncertainty before using it as a shade-quality gate. Cast each `building:part` on its own geometry. Applying a tower's tallest height to its whole podium can overstate shade. Treat the remaining 61 outlines as unknown heights until a documented estimate is available.
+Report this figure as the share of outlines that the heuristic gives a height. Check presence masking, source age and height uncertainty before using it as a shade-quality gate. Cast each `building:part` on its own geometry. Applying a tower's tallest height to its whole podium can overstate shade. Treat the remaining 61 outlines as unknown heights until a documented estimate is available.
 
-The 111-day noon result describes a 30 m obstacle shading a point 4 m from its facade. It cannot show that Makati's building shade vanishes at lunch. At 82.4 degrees elevation a 200 m tower still casts about 26.7 m. Street orientation, actual parts, footprints and sidewalks set route shade.
+The 111-day noon result describes a 30 m obstacle shading a point 4 m from its facade. It cannot show that Makati's building shade disappears at noon. At 82.4 degrees elevation a 200 m tower still casts a shadow of about 26.7 m. Route shade depends on street direction, the building parts, the footprints and the sidewalk positions.
 
-Shadow extraction needs a height- and sun-dependent margin as well. The margin is `maximum relevant height / tan(minimum supported sun elevation)`. A 200 m obstacle can cast 746.410 m at 15 degrees. A fixed 150 m margin can omit an obstacle that shades a route. These are geometric calculations, without a measured Philippine error rate.
+Shadow extraction needs a height- and sun-dependent margin as well. The margin is `maximum relevant height / tan(minimum supported sun elevation)`. A 200 m obstacle can cast a shadow of 746.410 m at 15 degrees. A fixed 150 m margin can omit an obstacle that shades a route. These are geometric calculations, without a measured Philippine error rate.
 
 ## Public recommendations need exposure, access and field evidence
 
-Rank only admissible routes. Show travel time, minutes in sun, detour and unknown coverage separately. A 10-minute walk at 50% shade has 5 minutes in sun. A 30-minute walk at 80% shade has 6. Shade percentage alone cannot rank the second route as a better exposure outcome. The 20% detour and 15% sun-reduction cutoffs are proposed product choices that need user tests.
+Rank only admissible routes. Show travel time, minutes in sun, detour and unknown coverage separately. A 10-minute walk at 50% shade has 5 minutes in sun. A 30-minute walk at 80% shade has 6. So a higher shade percentage alone does not make the second route better for sun exposure. The 20% detour and 15% sun-reduction cutoffs are proposed product choices that need user tests.
 
 Build the [14 acceptance cases](acceptance-cases.md) before public navigation. Check access, hours, levels, stairs, crossings and side direction. Then check exposure arithmetic, unknown cover, distant shadows, time buckets, stale sources and historical flood flags. Compare frozen-bucket searches with a reference shortest-path solver. Arrival-time scoring needs a checked state model that keeps the timing alternatives needed for correctness.
 
-Ten sun points can guide model development. They cannot show launch accuracy. Use routes not used in development, multiple departure times, clear and overcast conditions, different street directions, low sun and noon. Record access continuity, crossings, closed passages and stairs separately from sun classification. Report 09 models field hours and mapping speed. Measure both during a timed survey.
+Ten sun points can guide model development. They cannot show launch accuracy. Use routes not used in development, multiple departure times, clear and overcast conditions, different street directions, low sun and noon. Record access continuity, crossings, closed passages and stairs separately from sun classification. [Report 09](../research/20261021T120813Z/09-ground-truth-collection.md) models field hours and mapping speed. Measure both during a timed survey.
 
-## Free hosting and client routing leave terms and privacy work open
+## Demand is unproven, and nobody checked licence terms or runtime privacy
 
 The prior-art search found no comparable Philippine product in the sources searched. Demand and competitor absence are unproven. The partner search found no ready-to-use public walkway layer. Historical MaCEA stock totals have different dates, boundaries and possible overlap, so they cannot show the size of the current mapping gap.
 

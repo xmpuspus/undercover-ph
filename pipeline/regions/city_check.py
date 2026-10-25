@@ -2,7 +2,7 @@
 
 Usage: pipeline/.venv/bin/python -I pipeline/regions/city_check.py
 publish.py ships a regional area only when this file gives it PASS. On 2026-10-22 the Lapu-Lapu boxes sat
-mostly on Mandaue, and half the Mandaue boxes on Cebu City. Route checks and reach did not see that.
+mostly on Mandaue, and half the Mandaue boxes on Cebu City. Route checks and reach did not catch that.
 
 Boundaries are the admin_level=6 cities and municipalities of the source extract (region.SOURCE_PBF), cut
 once with osmium into pipeline/raw/regions/bounds/admin6.geojsonseq. Share = land in the boxes inside the

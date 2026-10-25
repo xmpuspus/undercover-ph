@@ -111,10 +111,10 @@ describe("route card text", () => {
     const r = findRoutes(fan([{ y: 0, building: 100 }, { y: 80 }]).data, query());
     expect(r.notes).toEqual(expect.arrayContaining(["No meaningfully shadier route.", "The most covered route is the shortest route."]));
     const text = cardText(r);
-    // A note no other line says stays.
+    // A note that no other line repeats stays on the card.
     expect(text).toContain("Crossing data is missing");
     expect(text).toContain("The shortest walk is the most shaded");
-    expect(text).toContain("The recommended walk is at most 20% longer than the shortest and has at least 15% less time in sun. If no walk meets both, the shortest is recommended.");
+    expect(text).toContain("The recommended walk is at most 20% longer than the shortest and has at least 15% less time in sun. If no walk meets both rules, the app recommends the shortest.");
     expect(text).not.toContain("No meaningfully");
     expect(text).not.toContain("The most covered route is the shortest route.");
     expect(text).toContain("0 min in sun");
@@ -163,7 +163,7 @@ describe("no-route text", () => {
     const r = findRoutes(fan([{ y: 0, routable: false }]).data, query());
     expect(noRouteText(notesOf(r), "Glorietta", "Dasmariñas Village", ["Dasmariñas Village"])).toEqual({
       title: "No walking route from Glorietta to Dasmariñas Village.",
-      fix: "Dasmariñas Village sits behind a gate or inside a gated village. Include paths that may be gated or private, or pick a nearby street.",
+      fix: "Dasmariñas Village is behind a gate or inside a gated village. Include paths that may be gated or private, or pick a nearby street.",
     });
     expect(noRouteText(notesOf(r), "A", "B", []).fix).toBe("A route exists on paths that may be gated or private. Include those paths to see it.");
   });
@@ -176,7 +176,7 @@ describe("no-route text", () => {
     const apart = makeData({ nodes: [[0, 0], [100, 0], [300, 0], [400, 0]], edges: [{ u: 0, v: 1 }, { u: 2, v: 3 }] });
     const none = findRoutes(apart, query({ from: 0, to: 3 }));
     expect(noRouteText(notesOf(none), "A", "B", []).fix).toBe("No walking route connects them at any hour. Pick a nearby start or end.");
-    expect(noRouteText(notesOf(none), "A", "B", ["B"]).fix).toBe("B sits behind a gate or inside a gated village. Pick a nearby street.");
+    expect(noRouteText(notesOf(none), "A", "B", ["B"]).fix).toBe("B is behind a gate or inside a gated village. Pick a nearby street.");
   });
 
   it("tells a step-free walker to turn it off when every route has steps", () => {

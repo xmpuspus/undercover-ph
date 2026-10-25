@@ -103,7 +103,7 @@ async function planTrip(page: Page, now = NOW) {
 
 test("Back steps to the previous stage and a reload keeps the trip", async ({ page }) => {
   await planTrip(page);
-  // The trip rides in the fragment, which the browser never sends to the server. ?now= stays in the query.
+  // The trip is in the fragment, which the browser never sends to the server. ?now= stays in the query.
   const url = new URL(page.url());
   const trip = tripOf(page.url());
   expect(trip.get("area")).toBe("metro-core");
@@ -203,7 +203,7 @@ test("Now after the last slot is a night walk today, not tomorrow morning", asyn
 
 test("plan a walk in BGC, tomorrow at 3 PM", async ({ page }) => {
   await page.goto(`/?now=${NOW}`);
-  await expect(page.getByTestId("landing-areas")).toContainText(/\d+ walking areas: 14 in Metro Manila and \d+ in other cities/);
+  await expect(page.getByTestId("landing-areas")).toContainText(/\d+ walking areas, 14 in Metro Manila and \d+ in other cities/);
   await expect(page.getByTestId("pick-shade")).toBeEnabled({ timeout: 60_000 });
   await page.getByTestId("pick-shade").click();
   await pickPlace(page, "destination-input", "Market! Market!");
@@ -235,7 +235,7 @@ test("a start in another area says routes stay inside one area and offers to cha
   await pickPlace(page, "from-input", "SM Mall of Asia");
   const msg = page.getByTestId("cross-area");
   await expect(msg).toBeVisible();
-  await expect(msg).toContainText("Routes stay inside one area.");
+  await expect(msg).toContainText("A route must start and end in the same area.");
   await expect(msg).toContainText("SM Mall of Asia is in Bay Area and MOA.");
   await expect(msg).toContainText("Greenbelt is in Makati CBD, Rockwell, BGC, Shaw, Ortigas, Pasig and Greenhills.");
   await expect(page.getByTestId("route-card")).toHaveCount(0);
@@ -248,7 +248,7 @@ test("a start in another area says routes stay inside one area and offers to cha
   await expect(page.getByTestId("cross-area")).toHaveCount(0);
 });
 
-// A tab opened before a deploy asks for code files that the deploy removed. The 404 must not blank the page.
+// A tab opened before a deploy requests code files that the deploy removed. The 404 must not blank the page.
 test("a Navigate file removed by a deploy reloads the page once and the trip comes back", async ({ page }) => {
   await planTrip(page);
   await page.route("**/assets/Navigate-*.js", (r) => r.fulfill({ status: 404, body: "" }));

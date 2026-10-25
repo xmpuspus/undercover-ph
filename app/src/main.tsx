@@ -15,7 +15,7 @@ void searchReady.catch(() => {});
 registerOffline(searchReady);
 
 // Each deploy renames the code files, and the daily rebuild deploys every morning. A tab opened before a deploy
-// asks for the old Navigate, Steps or About file, gets a 404, and React drops the page. Reload once to get the
+// requests the old Navigate, Steps or About file, gets a 404, and React drops the page. Reload once to get the
 // new build. The trip is in the URL fragment, so the reload keeps it. A second failure within a minute is a real
 // outage, so the error card below shows instead of a reload loop.
 const RELOAD_KEY = "ucph-reload-at";

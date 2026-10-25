@@ -15,7 +15,7 @@
 # that main keeps.
 
 # Area inputs (canopy, buildings, manifest template) and the walk graph come from the data release that
-# pipeline/data-release.json names, not from git (2026-10-23).
+# pipeline/data-release.json names, and no longer from git (2026-10-23).
 
 name: shade
 

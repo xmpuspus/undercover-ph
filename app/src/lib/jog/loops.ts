@@ -219,7 +219,7 @@ export function findLoops(data: Data, jog: JogAttrs | null, q: JogQuery): JogRes
   }
   if (!Number.isFinite(q.targetM) || q.targetM < 500 || q.targetM > 42_000 || !Number.isFinite(q.paceMinPerKm) || q.paceMinPerKm < 2 || q.paceMinPerKm > 20 ||
     !Number.isInteger(q.dateIdx) || q.dateIdx < 0 || q.dateIdx >= data.manifest.dates.length || !Number.isInteger(q.bucketIdx) || q.bucketIdx < 0 || q.bucketIdx >= data.manifest.buckets_min.length || !Number.isFinite(q.departMin) || q.departMin < 0 || q.departMin >= 1440) {
-    notes.push("Choose 0.5 to 42 km, a pace of 2 to 20 min/km, and an available time."); return result("no_loop");
+    notes.push("Choose 0.5 to 42 km, a pace of 2 to 20 min/km, and a date and time that the app offers."); return result("no_loop");
   }
   const budget = Number.isFinite(q.budgetMs) ? Math.max(1, Math.min(5000, q.budgetMs!)) : 1500;
   const expired = () => { if (now() - started >= budget) budgetHit = true; return budgetHit; };
@@ -265,7 +265,7 @@ export function findLoops(data: Data, jog: JogAttrs | null, q: JogQuery): JogRes
     }
     return best;
   };
-  // Only a degree-one start earns a repeated stem. Count neighbours, not parallel sidewalks.
+  // Only a degree-one start can have a repeated stem. Parallel sidewalks to one neighbour count as one neighbour.
   let stemM = 0, prev = -1, node = q.start;
   const stemNodes = new Set<number>();
   while (!stemNodes.has(node)) {
@@ -342,8 +342,8 @@ export function findLoops(data: Data, jog: JogAttrs | null, q: JogQuery): JogRes
     if (best.length === 3 && candidates.length >= 12) break;
     if (best.length && searches - lastProgress >= 90) break;
   }
-  if (!best.length) notes.push(`No loop near this distance was found. The closest was ${(closest / 1000).toFixed(1)} km. Try a shorter distance or another start.`);
-  else if (best.length < 3) notes.push(`Only ${best.length} ${best.length === 1 ? "loop fits" : "loops fit"} this distance without sharing too many streets. Try another start for more choices.`);
+  if (!best.length) notes.push(`The search found no loop near this distance. The closest loop was ${(closest / 1000).toFixed(1)} km. Try a shorter distance or another start.`);
+  else if (best.length < 3) notes.push(`Only ${best.length} ${best.length === 1 ? "loop fits" : "loops fit"} this distance without sharing more than 30% of their streets. Try another start for more choices.`);
   if (budgetHit) notes.push("The search reached its time limit. These are the loops found so far.");
   return result(best.length ? "ok" : "no_loop", best.map((c) => c.loop));
 }
