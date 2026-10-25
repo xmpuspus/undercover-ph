@@ -104,6 +104,9 @@ it. [The methodology](../../../../docs/methodology.md), section 8, explains the 
   pace) with an Edit button, and the run panel takes at most 45% of the screen height, so the chosen loop spans at
   least half of the map above the panel. Edit opens the form again and keeps the loops until a new search.
   Test: `app/e2e/jog-phone.spec.ts`.
+- J-U8. In Run a loop the hour picker also offers 4:00 to 5:30 AM and 7:00 to 9:00 PM, every 30 minutes, after the
+  shade slots' own rule for past times today. A picked dark time sets the loop's departure minute. Walking keeps only
+  the shade slots. Test: `app/e2e/jog-times.spec.ts`.
 - J-U7. A sight name with several OSM values separated by ";" shows its first non-empty value, trimmed.
   Test: `sight-names.test.ts`.
 - J-U5. The jog UI lives in its own components (`JogPanel.tsx`, `JogCards.tsx`, `JogLayer` in the map), so the
@@ -131,6 +134,9 @@ it. [The methodology](../../../../docs/methodology.md), section 8, explains the 
   sunset." Test: `card.test.ts::dark`.
 - J-N2. In the dark, the card shows mapped-lit metres. Where the area maps little lighting, it says: "Street lights
   are not mapped on most streets here." Test: `card.test.ts::light_unknown`.
+- J-N4. A loop is dark at every minute before sunrise or from sunset on, read from the manifest's sunrise and sunset
+  for the date, whatever the shade slot. From April to September 06:00 is 17 to 32 minutes after sunrise in Manila.
+  Test: `dark-minutes.test.ts`.
 - J-N3. A loop that reaches a park while it is closed warns with the park's name, for example "Track 30th may be
   closed when you reach it." Test: `park-hours.test.ts`.
 - J-C1. Wherever the app says safe, it says traffic safety only: "Safety here means traffic: crossings and road

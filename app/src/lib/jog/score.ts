@@ -33,8 +33,21 @@ export function bucketAt(data: Data, first: number, minute: number): number {
   return b;
 }
 
-export function darkAt(data: Data, date: number, bucket: number, _minute: number): boolean {
-  return isNight(data, date, bucket);
+function clockMinute(value: unknown): number | null {
+  if (typeof value !== "string" || value.length !== 5 || !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value)) return null;
+  return Number(value.slice(0, 2)) * 60 + Number(value.slice(3));
+}
+
+export function darkAt(data: Data, date: number, bucket: number, minute: number): boolean {
+  const day = data.manifest.dates[date];
+  const row = data.manifest.sunrise_sunset?.[day];
+  const times = Array.isArray(row) && row.length === 2 ? row : null;
+  const sunrise = clockMinute(times?.[0]), sunset = clockMinute(times?.[1]);
+  const validTimes = sunrise !== null && sunset !== null && sunrise < sunset;
+  // The walking slot rule remains in force. Its hours fallback needs a valid row when slot sun is absent.
+  const slotSun = data.manifest.sun?.[day]?.[bucket]?.[0];
+  const slotNight = typeof slotSun === "number" || validTimes ? isNight(data, date, bucket) : false;
+  return slotNight || (validTimes && (minute < sunrise || minute >= sunset));
 }
 
 export function shadedShare(data: Data, date: number, bucket: number, e: number): number {

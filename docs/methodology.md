@@ -83,7 +83,9 @@ The search runs in the browser, so no server of this project sees a start or end
 The [numbered run specification](../app/src/lib/jog/SPEC.md) records the agreed requirements and defaults.
 
 The runner selects a start, a distance and a departure time. Defaults are 5 km and 7 min/km; these are
-product defaults. Two waypoints in different directions form a candidate. Three A* legs connect the start,
+product defaults. Runs can start from 4 AM to 9 PM, in half-hour steps. Times before 6 AM and after 6:30 PM
+use the nearest shade slot while keeping the selected departure minute. Walking keeps only the shade slots.
+Two waypoints in different directions form a candidate. Three A* legs connect the start,
 the waypoints and the start again. Each leg carries the incoming sidewalk state, so a waypoint cannot
 create a mid-block crossing. A penalty on corridors used by earlier legs discourages retracing a street.
 A smaller penalty on corridors in the current choices directs later searches toward other streets.
@@ -112,6 +114,9 @@ Loops avoid parks while they are closed, using the park's cited hours matched by
 A start with every way out inside a closed park gives no loop and names the park and its next opening time
 when the hours provide one. Measuring a path that reaches a closed park gives a warning with the park's name.
 
+Darkness follows the date's sunrise and sunset at each arrival minute: before sunrise and from sunset on,
+the run is dark regardless of its shade slot. A slot with the sun at 3 degrees or lower still counts as dark.
+Missing or malformed sunrise and sunset times leave the slot rule in force.
 Any dark part of a run removes the shade percentage and shows
 "Shade does not apply before sunrise or after sunset." Light affects cost only where at least 30% of
 walkable metres have a light tag. There, `lit=no` adds three times the cost of unknown light, while mapped

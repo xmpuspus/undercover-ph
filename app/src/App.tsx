@@ -45,6 +45,7 @@ const RainLayer = lazy(lazyChunk(chunkUrls.RainLayer, () => import("./components
 type Stage = "landing" | "plan" | "navigate";
 type Field = "from" | "to";
 type Screen = "landing" | "dest" | "trip" | "results" | "steps" | "navigate" | "run";
+const RUN_DARK_MINUTES = [240, 270, 300, 330, 1140, 1170, 1200, 1230, 1260];
 
 // What each browser history entry remembers, so Back and Forward put the screen back as it was.
 interface Snapshot {
@@ -56,7 +57,7 @@ interface Snapshot {
   to: Endpoint | null;
   jogStart?: Endpoint | null;
   // The trip settings of this entry, so Back and Forward restore its time and profile, not the latest ones.
-  settings?: { dateIdx: number; bucketIdx: number; mode: Mode; stepFree: boolean; nowAt: { minute: number; dateIdx: number; bucketIdx: number } | null };
+  settings?: { dateIdx: number; bucketIdx: number; mode: Mode; stepFree: boolean; nowAt: { minute: number; dateIdx: number; bucketIdx: number } | null; jogMinute?: number | null };
   // Position in the app's own history, 0 for the first entry. In-app Back uses it to know when to go back a step.
   i: number;
 }
@@ -165,6 +166,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [dateIdx, setDateIdx] = useState(0);
   const [bucketIdx, setBucketIdx] = useState(0);
+  const [jogMinute, setJogMinute] = useState<number | null>(null);
   const [stepFree, setStepFree] = useState(initialTrip?.stepFree ?? false);
   const [includeUnchecked, setIncludeUnchecked] = useState(false);
   const [pickedLabel, setPickedLabel] = useState<Route["label"] | null>(null);
@@ -324,11 +326,11 @@ export default function App() {
   // Dates and times on offer: only manifest dates, and only times still ahead today.
   const futureDates = useMemo(() => {
     if (!manifest) return [];
-    const last = manifest.buckets_min[manifest.buckets_min.length - 1] ?? 0;
+    const last = Math.max(manifest.buckets_min[manifest.buckets_min.length - 1] ?? 0, running ? 1260 : 0);
     return manifest.dates
       .map((date, idx) => ({ date, idx }))
       .filter((d) => d.date > clock.date || (d.date === clock.date && last >= clock.minute));
-  }, [manifest, clock]);
+  }, [manifest, clock, running]);
   const datesPassed = !!manifest && futureDates.length === 0;
   const dateOpts = useMemo(
     () => (datesPassed && manifest ? manifest.dates.map((date, idx) => ({ date, idx })) : futureDates),
@@ -345,7 +347,16 @@ export default function App() {
     },
     [manifest, clock],
   );
-  const bucketOpts = useMemo(() => bucketsFor(date), [bucketsFor, date]);
+  const hoursFor = useCallback((d: string) => {
+    const slots = bucketsFor(d);
+    if (!running || !manifest?.buckets_min.length) return slots;
+    const first = manifest.buckets_min[0], lastIdx = manifest.buckets_min.length - 1;
+    const extra = RUN_DARK_MINUTES
+      .filter((min) => (min < first || min > manifest.buckets_min[lastIdx]) && (d !== clock.date || min >= clock.minute))
+      .map((min) => ({ min, idx: min < first ? 0 : lastIdx, night: true }));
+    return [...slots, ...extra].sort((a, b) => a.min - b.min);
+  }, [bucketsFor, running, manifest, clock]);
+  const bucketOpts = useMemo(() => hoursFor(date), [hoursFor, date]);
 
   // Hour scrubber: step through the day's daylight slots every 700 ms. Any tap outside the button stops it.
   const bucketRef = useRef(bucketIdx);
@@ -374,6 +385,7 @@ export default function App() {
     const i = daySlots.findIndex((b) => b.idx === bucketIdx);
     if (i < 0 || i >= daySlots.length - 1) setBucketIdx(daySlots[0].idx);
     setNowAt(null);
+    setJogMinute(null);
     setPlaying(true);
   };
 
@@ -383,6 +395,7 @@ export default function App() {
   const applyNow = useCallback(() => {
     if (!manifest || !dateOpts.length) return;
     setPlaying(false);
+    setJogMinute(null);
     const todayIdx = manifest.dates.indexOf(clock.date);
     const slot = todayIdx >= 0 ? nowSlot(manifest.buckets_min, manifest.sun?.[clock.date]?.map((r) => r?.[0]), clock.minute, NIGHT_ALT_DEG) : null;
     if (slot) {
@@ -411,21 +424,28 @@ export default function App() {
   const shownNote = nowNote && nowNote.dateIdx === dateIdx && nowNote.bucketIdx === bucketIdx ? nowNote.text : null;
 
   // A time the user picks by hand is never Now, even if it lands on Now's slot again.
-  const pickBucket = (i: number) => {
+  const pickBucket = (i: number, pickedMinute: number) => {
     setPlaying(false);
     setNowAt(null);
+    setJogMinute(running && pickedMinute !== manifest?.buckets_min[i] ? pickedMinute : null);
     setBucketIdx(i);
   };
   const pickDate = (idx: number) => {
     setNowAt(null);
     setDateIdx(idx);
-    const opts = bucketsFor(manifest?.dates[idx] ?? "");
-    if (!opts.some((b) => b.idx === bucketIdx)) setBucketIdx((opts.find((b) => !b.night) ?? opts[0])?.idx ?? 0);
+    const opts = hoursFor(manifest?.dates[idx] ?? "");
+    const selectedMinute = running && jogMinute !== null ? jogMinute : manifest?.buckets_min[bucketIdx];
+    const selected = opts.find((b) => b.min === selectedMinute);
+    if (selected) setBucketIdx(selected.idx);
+    else {
+      setJogMinute(null);
+      setBucketIdx((opts.find((b) => !b.night) ?? opts[0])?.idx ?? 0);
+    }
   };
 
   const minute = manifest?.buckets_min[bucketIdx] ?? 0;
   // Opening hours and walking time use the real departure minute; shade uses the slot.
-  const departMin = isNow && nowAt ? nowAt.minute : minute;
+  const departMin = running && jogMinute !== null ? jogMinute : isNow && nowAt ? nowAt.minute : minute;
   const sun = (manifest?.sun?.[date]?.[bucketIdx] ?? null) as [number, number] | null;
   // The router's night: at 3 degrees or lower, shade does not apply. Shadows and UV hide.
   const dark = sun ? sun[0] <= NIGHT_ALT_DEG : false;
@@ -782,7 +802,7 @@ export default function App() {
     const { pathname, search } = window.location;
     const url = `${pathname}${search}${tripHash}`;
     const prior = window.history.state as Snapshot | null;
-    const snap: Snapshot = { screen, stage, active, showSteps, from, to, jogStart: running ? jogStart : undefined, settings: { dateIdx, bucketIdx, mode, stepFree, nowAt }, i: prior?.i ?? 0 };
+    const snap: Snapshot = { screen, stage, active, showSteps, from, to, jogStart: running ? jogStart : undefined, settings: { dateIdx, bucketIdx, mode, stepFree, nowAt, ...(running ? { jogMinute } : {}) }, i: prior?.i ?? 0 };
     if (lastScreen.current === null) {
       lastScreen.current = screen;
       if (prior || screen === "landing") return window.history.replaceState(snap, "", url);
@@ -796,7 +816,7 @@ export default function App() {
     } else {
       window.history.replaceState(snap, "", url);
     }
-  }, [restoring, screen, stage, active, showSteps, from, to, tripHash, dateIdx, bucketIdx, mode, stepFree, nowAt, running, jogStart]);
+  }, [restoring, screen, stage, active, showSteps, from, to, tripHash, dateIdx, bucketIdx, mode, stepFree, nowAt, running, jogStart, jogMinute]);
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
       const s = e.state as Snapshot | null;
@@ -810,6 +830,7 @@ export default function App() {
       setFocus(null);
       setStage(s.stage);
       setRunning(s.screen === "run");
+      setJogMinute(s.screen === "run" ? s.settings?.jogMinute ?? null : null);
       if (s.screen === "run") setJogStart(s.jogStart ?? null);
       setActive(s.active);
       setShowSteps(s.showSteps);
@@ -983,7 +1004,7 @@ export default function App() {
     if (!running) setJogFormOpen(true);
     setRunning(true); setPlaying(false); setFocus(null); setQuery(""); setNotice(null);
   };
-  const walkMode = (m: Mode) => { if (running) setQuery(""); setRunning(false); setJogLoop(null); setMode(m); };
+  const walkMode = (m: Mode) => { if (running) setQuery(""); setRunning(false); setJogMinute(null); setJogLoop(null); setMode(m); };
 
   const when =
     isNow && nowAt
@@ -1087,6 +1108,7 @@ export default function App() {
                         dateIdx={dateIdx}
                         buckets={bucketOpts}
                         bucketIdx={bucketIdx}
+                        pickedMinute={running ? jogMinute ?? undefined : undefined}
                         allDates={manifest.dates}
                         bucketsMin={manifest.buckets_min}
                         onDate={pickDate}
@@ -1143,6 +1165,7 @@ export default function App() {
                       dateIdx={dateIdx}
                       buckets={bucketOpts}
                       bucketIdx={bucketIdx}
+                      pickedMinute={running ? jogMinute ?? undefined : undefined}
                       allDates={manifest.dates}
                       bucketsMin={manifest.buckets_min}
                       onDate={pickDate}

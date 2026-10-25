@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
-import { makeData, DAY, THURSDAY } from "../router/__tests__/helpers";
+import { makeData, DAY, NIGHT, THURSDAY } from "../router/__tests__/helpers";
 import { findRoutes } from "../router/route";
 import { loadJog, parseJog } from "./attrs";
 import { JogClient } from "./client";
@@ -119,14 +119,27 @@ it("does not describe failed light data as zero mapped lights or sparse mapping"
   expect(text.join(" ")).not.toMatch(/mapped as lit|Few sights/);
 });
 
-describe("walking and running use one night rule", () => {
-  for (const missingSun of [false, true]) it(`matches walking when sun data ${missingSun ? "is absent" : "takes priority over sunset times"}`, () => {
+// SPEC J-N4: a run is dark whenever walking's slot rule says night, and also at any minute before sunrise or from
+// sunset on. Walking keeps its slot rule (tmp/latent-bugs records the pre-6 AM walking case).
+describe("running darkness covers walking's night rule and adds sunrise and sunset", () => {
+  const walk = (data: ReturnType<typeof makeData>, bucketIdx: number, departMin: number) =>
+    findRoutes(data, { from: 0, to: 1, dateIdx: THURSDAY, bucketIdx, departMin, mode: "shade", stepFree: false, includeUnchecked: false });
+  it("matches walking when sun data and sunrise times are absent", () => {
     const data = makeData({ nodes: [[0, 0], [100, 0]], edges: [{ u: 0, v: 1 }] });
-    if (missingSun) { data.manifest.sun = {}; delete data.manifest.sunrise_sunset; }
-    else data.manifest.sunrise_sunset = { [data.manifest.dates[THURSDAY]]: ["06:00", "17:00"] };
-    const departMin = missingSun ? 300 : 1200;
-    const walking = findRoutes(data, { from: 0, to: 1, dateIdx: THURSDAY, bucketIdx: DAY, departMin, mode: "shade", stepFree: false, includeUnchecked: false });
-    expect(darkAt(data, THURSDAY, DAY, departMin)).toBe(walking.state === "night");
+    data.manifest.sun = {}; delete data.manifest.sunrise_sunset;
+    expect(darkAt(data, THURSDAY, DAY, 300)).toBe(walk(data, DAY, 300).state === "night");
+  });
+  it("is dark at 20:00 after a 17:00 sunset even in a daylight slot", () => {
+    const data = makeData({ nodes: [[0, 0], [100, 0]], edges: [{ u: 0, v: 1 }] });
+    data.manifest.sunrise_sunset = { [data.manifest.dates[THURSDAY]]: ["06:00", "17:00"] };
+    expect(walk(data, DAY, 1200).state).not.toBe("night");
+    expect(darkAt(data, THURSDAY, DAY, 1200)).toBe(true);
+    expect(darkAt(data, THURSDAY, DAY, 12 * 60)).toBe(false);
+  });
+  it("is dark whenever walking's slot is night", () => {
+    const data = makeData({ nodes: [[0, 0], [100, 0]], edges: [{ u: 0, v: 1 }] });
+    expect(walk(data, NIGHT, 1110).state).toBe("night");
+    expect(darkAt(data, THURSDAY, NIGHT, 1110)).toBe(true);
   });
 });
 

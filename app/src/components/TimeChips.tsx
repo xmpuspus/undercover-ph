@@ -16,10 +16,12 @@ interface Props {
   dateIdx: number;
   buckets: { min: number; idx: number; night: boolean }[];
   bucketIdx: number;
+  // Runs outside the shade window keep their actual departure minute beside the nearest shade slot.
+  pickedMinute?: number;
   allDates: string[];
   bucketsMin: number[];
   onDate: (idx: number) => void;
-  onBucket: (idx: number) => void;
+  onBucket: (idx: number, minute: number) => void;
   // Phones get one "when" chip that opens Now, the dates, the hours, and Play in one panel.
   compact?: boolean;
   play?: { playing: boolean; onToggle: () => void } | null;
@@ -56,11 +58,11 @@ function HourGrid({ p, onPicked }: { p: Props; onPicked: () => void }) {
           key={b.min}
           type="button"
           onClick={() => {
-            p.onBucket(b.idx);
+            p.onBucket(b.idx, b.min);
             onPicked();
           }}
           className={`flex min-h-11 items-center justify-center gap-1 rounded-full border px-1 text-[13px] ${
-            b.idx === p.bucketIdx ? "border-brand bg-blue-50 font-medium text-brand" : "border-slate-200 text-ink hover:border-slate-300"
+            b.min === (p.pickedMinute ?? p.bucketsMin[p.bucketIdx]) ? "border-brand bg-blue-50 font-medium text-brand" : "border-slate-200 text-ink hover:border-slate-300"
           }`}
           data-testid={`hour-option-${b.min}`}
           aria-label={b.night ? `${fmtMinute(b.min)}, sun too low for shade` : undefined}
@@ -98,7 +100,7 @@ function WhenChip(p: Props) {
   };
   const ref = useOutside(open, close);
   const date = p.allDates[p.dateIdx];
-  const minute = p.bucketsMin[p.bucketIdx];
+  const minute = p.pickedMinute ?? p.bucketsMin[p.bucketIdx];
   const label = p.now.active ? `Now ${fmtMinute(p.now.minute)}` : `${date ? dateLabel(date, p.today) : "Date"} ${minute != null ? fmtMinute(minute, true) : "time"}`;
   return (
     <div ref={ref} className="pointer-events-auto relative">
@@ -193,7 +195,7 @@ function TimeChipRow(p: Props) {
   };
   const ref = useOutside(menu !== null, close);
   const date = p.allDates[p.dateIdx];
-  const minute = p.bucketsMin[p.bucketIdx];
+  const minute = p.pickedMinute ?? p.bucketsMin[p.bucketIdx];
   return (
     <div ref={ref} className="pointer-events-auto relative">
       <div className="flex flex-wrap gap-2">
