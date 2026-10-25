@@ -228,7 +228,7 @@ export function findLoops(data: Data, jog: JogAttrs | null, q: JogQuery): JogRes
   if (closed.length) { notes.push(...closed); return result("no_loop"); }
   const searchData = withParkHours(data, jog);
   if (!top.cycles[top.component[q.start]]) {
-    notes.push("This start is on an isolated path with no loop. Choose a nearby street. The closest loop found was 0.0 km.");
+    notes.push("This start is on an isolated path with no loop. Choose a nearby street.");
     return result("no_loop");
   }
   const scoreSights = !!jog && sightGrade(jog, data) !== "thin";
