@@ -1,7 +1,7 @@
 """Build offline jogging attributes without rewriting the walk graph.
 
 Usage: pipeline/.venv/bin/python -I pipeline/districts/build_jog.py --area qc-north
-Or pass --graph, --pbf, --wikidata and --out explicitly. With only UC_AREA set,
+Or pass --graph, --pbf, --wikidata, --hours and --out explicitly. With only UC_AREA set,
 read graph.json and write jog.json in pipeline/stage/<area>/, as build.py does.
 OSM area assembly uses two passes over the extract, including multipolygon holes.
 """
@@ -103,6 +103,7 @@ class Features(osmium.SimpleHandler):
         super().__init__()
         self.way_ids, self.bbox = way_ids, bbox
         self.tags, self.parks, self.waters, self.sights = {}, [], [], {}
+        self.park_urls = []
         self.sight_qids = {}
         self.wkb = osmium.geom.WKBFactory()
         lon, lat = ((bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2) if bbox else (121, 14)
@@ -168,6 +169,7 @@ class Features(osmium.SimpleHandler):
                 return
             if is_park:
                 self.parks.append(metric)
+                self.park_urls.append(f"https://www.openstreetmap.org/{'way' if area.from_way() else 'relation'}/{area.orig_id()}")
             if is_water:
                 self.waters.append(metric.boundary if area.tags.get("natural") == "coastline" else metric)
             src = f"osm:{'w' if area.from_way() else 'r'}{area.orig_id()}"
@@ -215,7 +217,28 @@ def read_wikidata(path, bbox):
     return list(sights.values())
 
 
-def attributes(graph, graph_bytes, features, wikidata):
+def read_hours(path):
+    """Keep original row indexes; the first row for an exact source URL wins."""
+    try:
+        if not path.exists():
+            return {}
+        rows = json.loads(path.read_text())
+        if not isinstance(rows, list):
+            raise ValueError("expected a list of hours rows")
+    except FileNotFoundError:
+        return {}
+    except (OSError, ValueError, RecursionError) as ex:
+        print(f"Park hours unavailable: {ex}", file=sys.stderr)
+        return {}
+    by_url = {}
+    for i, row in enumerate(rows):
+        url = row.get("source_url") if isinstance(row, dict) else None
+        if isinstance(url, str):
+            by_url.setdefault(url, i)
+    return by_url
+
+
+def attributes(graph, graph_bytes, features, wikidata, hours=None):
     sights, seen_sources, seen_qids = [], set(), set()
     # OSM sorts first and supplies the mapped point when both sources identify the same place.
     for sight in sorted([*features.sights.values(), *wikidata], key=lambda s: s["src"]):
@@ -228,21 +251,25 @@ def attributes(graph, graph_bytes, features, wikidata):
         seen_qids.update(qids)
     points = [transform(features.to_m, shapely.Point(s["lon"], s["lat"])) for s in sights]
     park_tree, water_tree, sight_tree = STRtree(features.parks), STRtree(features.waters), STRtree(points)
-    rows = {k: [] for k in ("road", "lit", "surface", "park", "water", "sight")}
+    park_hours = [(hours or {}).get(url, -1) for url in features.park_urls]
+    rows = {k: [] for k in ("road", "lit", "surface", "park", "water", "sight", "hours")}
     walk_m = lit_tagged_m = 0.0
     for edge in graph["edges"]:
         road, lit, surface = features.tags.get(edge.get("way_id"), (0, 0, 0))
         in_park = near_water = 0
-        sight = -1
+        sight = hours_idx = -1
         coords = edge_coords(edge)
         if coords:
             mid = transform(features.to_m, shapely.LineString(coords)).interpolate(0.5, normalized=True)
-            in_park = int(len(park_tree.query(mid, predicate="covered_by")) > 0)
+            parks = park_tree.query(mid, predicate="covered_by")
+            in_park = int(len(parks) > 0)
+            # Overlapping parks use the lowest matching hours row, independent of tree order.
+            hours_idx = min((park_hours[p] for p in parks if park_hours[p] >= 0), default=-1)
             near_water = int(len(water_tree.query(mid, predicate="dwithin", distance=50)) > 0)
             candidates = sight_tree.query(mid, predicate="dwithin", distance=40)
             if len(candidates):
                 sight = int(min(candidates, key=lambda k: (mid.distance(points[k]), int(k))))
-        for key, value in zip(rows, (road, lit, surface, in_park, near_water, sight)):
+        for key, value in zip(rows, (road, lit, surface, in_park, near_water, sight, hours_idx)):
             rows[key].append(value)
         length = edge.get("len_m", 0)
         if not isinstance(length, (int, float)) or isinstance(length, bool):
@@ -257,14 +284,15 @@ def attributes(graph, graph_bytes, features, wikidata):
                 lit_tagged_m += length
     return {"version": 1, "graph_sha256": hashlib.sha256(graph_bytes).hexdigest(), "edges": rows, "sights": sights,
             "counts": {"edges": len(graph["edges"]), "walk_m": walk_m, "lit_tagged_m": lit_tagged_m,
-                       "lit_share": lit_tagged_m / walk_m if walk_m else 0.0, "sights": len(sights)}, "sources": SOURCES}
+                       "lit_share": lit_tagged_m / walk_m if walk_m else 0.0, "sights": len(sights),
+                       "park_hours_edges": sum(h >= 0 for h in rows["hours"])}, "sources": SOURCES}
 
 
 def paths(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("area_id", nargs="?", help="area id (alias for --area)")
     parser.add_argument("--area")
-    for key in ("graph", "pbf", "wikidata", "out"):
+    for key in ("graph", "pbf", "wikidata", "hours", "out"):
         parser.add_argument(f"--{key}", type=Path)
     args = parser.parse_args(argv)
     if args.area and args.area_id and args.area != args.area_id:
@@ -287,9 +315,11 @@ def paths(argv=None):
         args.out = args.out or base / "jog.json"
         bbox = ctx.GRAPH_BBOX
     args.wikidata = args.wikidata or HERE / "wikidata_heritage.json"
-    if args.out.resolve() in {args.graph.resolve(), args.pbf.resolve(), args.wikidata.resolve()}:
+    args.hours = args.hours or args.graph.with_name("hours.json")
+    inputs = (args.graph, args.pbf, args.wikidata, args.hours)
+    if args.out.resolve() in {p.resolve() for p in inputs}:
         parser.error("--out must differ from every input path")
-    if args.out.exists() and any(args.out.samefile(p) for p in (args.graph, args.pbf, args.wikidata) if p.exists()):
+    if args.out.exists() and any(args.out.samefile(p) for p in inputs if p.exists()):
         parser.error("--out must not be a hard link to an input")
     return args, bbox
 
@@ -301,7 +331,7 @@ def main(argv=None):
     bbox = bbox or graph_bbox(graph)
     features = Features({e.get("way_id") for e in graph["edges"]}, bbox)
     features.apply_file(str(args.pbf), locations=True, idx="flex_mem")
-    jog = attributes(graph, graph_bytes, features, read_wikidata(args.wikidata, bbox))
+    jog = attributes(graph, graph_bytes, features, read_wikidata(args.wikidata, bbox), read_hours(args.hours))
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(jog, ensure_ascii=False, separators=(",", ":"), allow_nan=False))
     print(json.dumps(jog["counts"]))

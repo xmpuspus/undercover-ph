@@ -128,6 +128,19 @@ for id in $IDS; do
     echo "area $id weather in $((SECONDS - t0)) s"
   fi
 done
+# The app checks each area's jog.json against graph.sha256. An area shaded here keeps the release's old hash, so
+# write every area's hash from the graph.json this deploy ships.
+"$PY" -I - "$DATA/areas" $IDS <<'PY'
+import hashlib
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+for area in sys.argv[2:]:
+    graph = root / area / "graph.json"
+    if graph.exists():
+        (root / area / "graph.sha256").write_text(hashlib.sha256(graph.read_bytes()).hexdigest() + "\n")
+PY
 echo "data step done in $((SECONDS - t_all)) s"
 
 cd "$APP"

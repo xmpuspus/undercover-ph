@@ -1,9 +1,8 @@
-"""Real-area check for build_jog.py on qc-north (tmp/jog-loops-20261024/SPEC.md, J-D1 to J-D8).
+"""Real-area check for build_jog.py on qc-north (app/src/lib/jog/SPEC.md, J-D1 to J-D8).
 
 Usage: pipeline/shade/.venv/bin/python pipeline/districts/check_jog_real.py
 Runs `build_jog.py --area qc-north --out <temp file>` on the published graph and the NCR extract, then checks
-the file against facts the lead measured on 2026-10-24 (tmp/jog-loops-20261024/research/05-osm-tags and
-08-anchors). It fails when the area data is missing, so it never passes on nothing.
+the file against counts measured from the 2026-10-20 OSM extract on 2026-10-24. It fails when the area data is missing, so it never passes on nothing.
 """
 import hashlib
 import json
@@ -59,7 +58,7 @@ def main():
     lens = [e["len_m"] for e in edges]
     total = sum(lens)
     lit_yes = sum(m for m, x in zip(lens, jog["edges"]["lit"]) if x == 1) / total
-    # The lead's own count on 2026-10-24, joining each graph edge to its OSM way in the NCR extract: 294,364 of
+    # A separate count on 2026-10-24, joining each graph edge to its OSM way in the NCR extract: 294,364 of
     # 525,148 graph metres carry a lit tag (0.5605), all of them lit=yes. Sidewalk edges repeat their road's tag,
     # so this share is higher than the 34.7% of OSM way length in the box.
     if abs(jog["counts"]["lit_share"] - 0.5605) > 0.01 or abs(lit_yes - 0.5605) > 0.01:

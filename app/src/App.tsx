@@ -26,6 +26,10 @@ import { useReducedMotion } from "./lib/motion";
 import { PauseIcon, PlayIcon } from "./components/Icons";
 import { nowLabel, nowSlot } from "./lib/nowSlot";
 import { decodeEndpoint, encodeEndpoint, hashFor, hhmmToMinute, minuteToHHMM, MY_LOCATION, tripFromHash, type TripParams } from "./lib/tripUrl";
+import JogPanel from "./components/JogPanel";
+import type { Loop } from "./lib/jog/types";
+import { networkOf, snapJogStart } from "./lib/jog/network";
+import { locate } from "./lib/jog/location";
 
 // The first screen needs only the landing card. The map, steps, navigation, About and rain load as separate chunks.
 const loadMapView = lazyChunk(chunkUrls.MapView, () => import("./components/MapView"));
@@ -40,7 +44,7 @@ const RainLayer = lazy(lazyChunk(chunkUrls.RainLayer, () => import("./components
 
 type Stage = "landing" | "plan" | "navigate";
 type Field = "from" | "to";
-type Screen = "landing" | "dest" | "trip" | "results" | "steps" | "navigate";
+type Screen = "landing" | "dest" | "trip" | "results" | "steps" | "navigate" | "run";
 
 // What each browser history entry remembers, so Back and Forward put the screen back as it was.
 interface Snapshot {
@@ -50,6 +54,7 @@ interface Snapshot {
   showSteps: boolean;
   from: Endpoint | null;
   to: Endpoint | null;
+  jogStart?: Endpoint | null;
   // The trip settings of this entry, so Back and Forward restore its time and profile, not the latest ones.
   settings?: { dateIdx: number; bucketIdx: number; mode: Mode; stepFree: boolean; nowAt: { minute: number; dateIdx: number; bucketIdx: number } | null };
   // Position in the app's own history, 0 for the first entry. In-app Back uses it to know when to go back a step.
@@ -137,12 +142,16 @@ export default function App() {
   const [restoring, setRestoring] = useState(!!initialTrip);
   const [stage, setStage] = useState<Stage>(initialTrip ? "plan" : "landing");
   const [mode, setMode] = useState<Mode>(initialTrip?.mode ?? "shade");
+  const [running, setRunning] = useState(false);
+  const [jogStart, setJogStart] = useState<Endpoint | null>(null);
+  const [jogLoop, setJogLoop] = useState<Loop | null>(null);
+  const [jogFormOpen, setJogFormOpen] = useState(true);
   const [from, setFrom] = useState<Endpoint | null>(null);
   const [to, setTo] = useState<Endpoint | null>(null);
   // The trip's area is the end's, else the start's. A start in another area gets the one-area message.
   // lastArea holds the area while no end is set, such as during a restore or after Back clears the fields.
   const [lastArea, setLastArea] = useState<string | null>(initialTrip ? (initialTrip.area ?? DEFAULT_AREA) : null);
-  const areaId = to?.area ?? from?.area ?? lastArea;
+  const areaId = running ? jogStart?.area ?? lastArea : to?.area ?? from?.area ?? lastArea;
   const data = areaId ? (bundles[areaId] ?? null) : null;
   const crossArea = !!from && !!to && from.area !== to.area;
   // Ends in two areas still route when one area's graph holds both. Only a trip no graph holds gets the message.
@@ -288,7 +297,7 @@ export default function App() {
       const res = await fetching(url);
       if (res.ok && !res.headers.get("content-type")?.includes("text/html") && !files.includes(url)) files.push(url);
       return res;
-    }, { date: wantDate.current, graphFile: "graph.cols.json" })
+    }, { date: wantDate.current, graphFile: "graph.cols.json", captureGraphHash: true })
       .then((d) => {
         setBundles((prev) => {
           const cur = areaRef.current;
@@ -471,8 +480,8 @@ export default function App() {
   // they belong to always change together.
   const [timeSet, setTimeSet] = useState(false);
   const routeInput = useMemo(
-    () => ({ data, area: areaId, from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute: departMin, stage, ready: timeSet && shadeReady, shadeVer }),
-    [data, areaId, from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, departMin, stage, timeSet, shadeReady, shadeVer],
+    () => ({ data, area: areaId, from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, minute: departMin, stage, ready: timeSet && shadeReady && !running, shadeVer }),
+    [data, areaId, from, to, dateIdx, bucketIdx, mode, stepFree, includeUnchecked, departMin, stage, timeSet, shadeReady, shadeVer, running],
   );
   const deferred = useDeferredValue(routeInput);
   const routing = deferred !== routeInput;
@@ -506,32 +515,7 @@ export default function App() {
 
   // Label each node with its piece of the routable network. A start or end outside the largest piece
   // usually sits behind a gate or inside a gated village.
-  const mainNet = useMemo(() => {
-    if (!data) return null;
-    const comp = new Int32Array(data.nodeCount).fill(-1);
-    const sizes: number[] = [];
-    const stack: number[] = [];
-    for (let start = 0; start < data.nodeCount; start++) {
-      if (comp[start] >= 0 || !data.routableNode[start]) continue;
-      const c = sizes.length;
-      let size = 0;
-      comp[start] = c;
-      stack.push(start);
-      while (stack.length) {
-        const u = stack.pop()!;
-        size++;
-        for (let k = data.adjOff[u]; k < data.adjOff[u + 1]; k++) {
-          const v = data.adjNode[k];
-          if (data.edgeRoutable[data.adjEdge[k]] && comp[v] < 0) {
-            comp[v] = c;
-            stack.push(v);
-          }
-        }
-      }
-      sizes.push(size);
-    }
-    return { comp, main: sizes.indexOf(Math.max(...sizes)) };
-  }, [data]);
+  const mainNet = useMemo(() => data ? networkOf(data) : null, [data]);
   const gatedEnds =
     mainNet && from && to && !crossArea && to.area === areaId ? [from, to].filter((x) => mainNet.comp[x.node] !== mainNet.main).map((x) => x.label) : [];
   const night = result?.state === "night";
@@ -555,17 +539,17 @@ export default function App() {
   const current = display[selected] ?? null;
   const view: "dest" | "trip" | "results" | "steps" =
     !to && active !== "from" ? "dest" : active || !from || !to ? "trip" : showSteps ? "steps" : "results";
-  const screen: Screen = stage === "landing" ? "landing" : stage === "navigate" ? "navigate" : view;
+  const screen: Screen = stage === "landing" ? "landing" : running ? "run" : stage === "navigate" ? "navigate" : view;
   // While a start or end is being edited the old route is hidden; the kept end stays as a marker.
   const editing = stage === "plan" && (view === "dest" || view === "trip");
   const mapRoutes = useMemo(
-    () => (stage === "landing" || editing ? [] : stage === "navigate" && current ? [current] : display),
-    [stage, editing, current, display],
+    () => (running || stage === "landing" || editing ? [] : stage === "navigate" && current ? [current] : display),
+    [running, stage, editing, current, display],
   );
 
   // Search covers every area. Within a tier, places in the other end's area come first.
-  const editingField: Field = view === "dest" ? "to" : (active ?? (!from ? "from" : "to"));
-  const otherArea = (editingField === "from" ? to : from)?.area ?? null;
+  const editingField: Field = running ? "from" : view === "dest" ? "to" : (active ?? (!from ? "from" : "to"));
+  const otherArea = running ? jogStart?.area ?? null : (editingField === "from" ? to : from)?.area ?? null;
   const results = useMemo(
     () => (index && query.trim() ? searchPlaces(index, query, 8, otherArea ? (p) => p.area === otherArea : undefined) : []),
     [index, query, otherArea],
@@ -597,6 +581,11 @@ export default function App() {
     setFocus(null);
     setPendingPoint(null);
     setLastArea(ep.area);
+    if (running) {
+      setJogStart(ep);
+      setJogLoop(null);
+      return;
+    }
     const other = field === "from" ? to : from;
     if (field === "from") setFrom(ep);
     else setTo(ep);
@@ -621,12 +610,13 @@ export default function App() {
     };
     setFrom(fix);
     setTo(fix);
+    setJogStart(fix);
   }, [bundles]);
 
   // Move the end that sits in another area onto the shared area's graph: the same place by name within 150 m,
   // else the nearest path node there.
   useEffect(() => {
-    if (!shared || !from || !to) return;
+    if (running || !shared || !from || !to) return;
     const d = bundles[shared];
     if (!d) return ensureArea(shared);
     const near = (p: { lon: number; lat: number }, q: { lon: number; lat: number }) =>
@@ -646,11 +636,11 @@ export default function App() {
       setFrom(f);
       setTo(t2);
     }
-  }, [shared, bundles, from, to]);
+  }, [shared, bundles, from, to, running]);
 
   // A point farther than the router's snap limit is off the mapped paths; say so instead of dropping a pin.
   const pointEndpoint = (d: Data, area: string, lon: number, lat: number, label: string): Endpoint | string => {
-    const s = snapToNode(d, lon, lat);
+    const s = running && label === MY_LOCATION ? snapJogStart(d, lon, lat) : snapToNode(d, lon, lat);
     if (!s) return "The walking map is not loaded.";
     if (s.dist_m > MAX_SNAP_M) {
       return `${label === MY_LOCATION ? "You are" : "That point is"} ${fmtDist(s.dist_m)} from the nearest mapped path. Pick a point on a street or path.`;
@@ -699,7 +689,7 @@ export default function App() {
   const onPick = (pl: Place) => assign(editingField, placeEndpoint(pl));
 
   const onMapClick = (lon: number, lat: number) => {
-    if (stage !== "plan" || view === "results" || view === "steps") return;
+    if (stage !== "plan" || (running ? !!jogLoop : view === "results" || view === "steps")) return;
     pickPoint(editingField, lon, lat, "Point on map");
   };
 
@@ -710,7 +700,7 @@ export default function App() {
     }
     setLocating(true);
     setNotice(null);
-    navigator.geolocation.getCurrentPosition(
+    locate(navigator.geolocation,
       (pos) => {
         setLocating(false);
         pickPoint("from", pos.coords.longitude, pos.coords.latitude, MY_LOCATION);
@@ -719,7 +709,6 @@ export default function App() {
         setLocating(false);
         setNotice(err.code === err.PERMISSION_DENIED ? "Location permission was denied. Pick a place instead." : "Could not get your location. Pick a place instead.");
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
     );
   };
 
@@ -771,7 +760,7 @@ export default function App() {
 
   // Every screen is a browser history entry, and the trip is kept in the fragment with replaceState.
   const tripParams = useMemo<TripParams | null>(() => {
-    if (stage === "landing") return null;
+    if (stage === "landing" || running) return null;
     // A name gets a node suffix only when it repeats inside its own area.
     const placesOf = (area: string) => bundles[area]?.places ?? index?.places.filter((p) => p.area === area) ?? [];
     const timed = !!manifest && !!(from || to);
@@ -785,7 +774,7 @@ export default function App() {
       mode,
       stepFree,
     };
-  }, [stage, bundles, index, manifest, from, to, isNow, nowAt, dateIdx, minute, mode, stepFree]);
+  }, [stage, bundles, index, manifest, from, to, isNow, nowAt, dateIdx, minute, mode, stepFree, running]);
   const tripHash = hashFor(tripParams);
   const lastScreen = useRef<Screen | null>(null);
   useEffect(() => {
@@ -793,7 +782,7 @@ export default function App() {
     const { pathname, search } = window.location;
     const url = `${pathname}${search}${tripHash}`;
     const prior = window.history.state as Snapshot | null;
-    const snap: Snapshot = { screen, stage, active, showSteps, from, to, settings: { dateIdx, bucketIdx, mode, stepFree, nowAt }, i: prior?.i ?? 0 };
+    const snap: Snapshot = { screen, stage, active, showSteps, from, to, jogStart: running ? jogStart : undefined, settings: { dateIdx, bucketIdx, mode, stepFree, nowAt }, i: prior?.i ?? 0 };
     if (lastScreen.current === null) {
       lastScreen.current = screen;
       if (prior || screen === "landing") return window.history.replaceState(snap, "", url);
@@ -807,11 +796,12 @@ export default function App() {
     } else {
       window.history.replaceState(snap, "", url);
     }
-  }, [restoring, screen, stage, active, showSteps, from, to, tripHash, dateIdx, bucketIdx, mode, stepFree, nowAt]);
+  }, [restoring, screen, stage, active, showSteps, from, to, tripHash, dateIdx, bucketIdx, mode, stepFree, nowAt, running, jogStart]);
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
       const s = e.state as Snapshot | null;
       if (!s?.screen || restoring) return;
+      if (s.screen === "run" && lastScreen.current !== "run") setJogFormOpen(true);
       lastScreen.current = s.screen;
       setPlaying(false);
       setPicking(null);
@@ -819,6 +809,8 @@ export default function App() {
       setQuery("");
       setFocus(null);
       setStage(s.stage);
+      setRunning(s.screen === "run");
+      if (s.screen === "run") setJogStart(s.jogStart ?? null);
       setActive(s.active);
       setShowSteps(s.showSteps);
       if (s.settings) {
@@ -865,11 +857,12 @@ export default function App() {
   // Each screen gets its own title, so tabs, history, and screen readers say where the user is (WCAG 2.4.2).
   useEffect(() => {
     const base = "undercover.ph";
-    if (stage === "navigate" && to) document.title = `Walking to ${to.label} | ${base}`;
+    if (running && stage === "plan") document.title = `Run a loop | ${base}`;
+    else if (stage === "navigate" && to) document.title = `Walking to ${to.label} | ${base}`;
     else if (stage === "plan" && from && to) document.title = `${from.label} to ${to.label} | ${base}`;
     else if (stage === "plan") document.title = `Plan a walk | ${base}`;
     else document.title = `${base} | Shaded and sheltered walks in Philippine cities`;
-  }, [stage, from, to]);
+  }, [stage, from, to, running]);
 
   const refocus = (testid: string) => {
     focusNext.current = testid;
@@ -985,6 +978,13 @@ export default function App() {
     setShowSteps(false);
   };
 
+  const runMode = () => {
+    ensureData();
+    if (!running) setJogFormOpen(true);
+    setRunning(true); setPlaying(false); setFocus(null); setQuery(""); setNotice(null);
+  };
+  const walkMode = (m: Mode) => { if (running) setQuery(""); setRunning(false); setJogLoop(null); setMode(m); };
+
   const when =
     isNow && nowAt
       ? nowLabel(nowAt.minute, { bucketIdx, min: minute, night: dark }, mode, sun?.[0])
@@ -1009,7 +1009,7 @@ export default function App() {
       />
       <main className="relative min-h-0 flex-1 overflow-hidden">
         {mapOn && buildingsLoading && (
-          <p className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1 text-[12px] text-slate-600 shadow-sm" role="status">
+          <p className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1 text-[12px] text-slate-600 shadow-sm" style={running && !desktop ? { top: topH + 20 } : undefined} role="status">
             Loading 3D buildings...
           </p>
         )}
@@ -1017,6 +1017,7 @@ export default function App() {
           <MapBoundary key={mapTry} onRetry={() => setMapTry((n) => n + 1)}>
         <Suspense fallback={null}>
           <MapView
+            jogLoop={running && stage === "plan" ? jogLoop : null}
             theme={theme}
             onBuildings={() => setBuildingsLoading(false)}
             onLoaded={() => setMapLoaded(true)}
@@ -1027,12 +1028,12 @@ export default function App() {
             selected={stage === "navigate" ? 0 : selected}
             mode={routeMode}
             nightState={night}
-            from={stage === "landing" ? null : from}
-            to={stage === "landing" ? null : to}
+            from={stage === "landing" ? null : running ? jogStart : from}
+            to={stage === "landing" || running ? null : to}
             insets={insets}
             stage={stage}
             focus={focus}
-            showCallouts={stage === "plan" && (view === "results" || (view === "steps" && desktop))}
+            showCallouts={!running && stage === "plan" && (view === "results" || (view === "steps" && desktop))}
             fitKey={fitKey}
             onMapClick={onMapClick}
             onBearing={setMapBearing}
@@ -1053,7 +1054,7 @@ export default function App() {
           {announce}
         </p>
 
-        {mode === "rain" && stage !== "landing" && (
+        {!running && mode === "rain" && stage !== "landing" && (
           <Suspense fallback={null}>
             <RainLayer />
           </Suspense>
@@ -1074,7 +1075,7 @@ export default function App() {
 
         {stage === "plan" && (
           <>
-            {view !== "dest" && manifest && (
+            {(running || view !== "dest") && manifest && (
               <div ref={setTopEl} className="pointer-events-none absolute left-3 right-3 top-3 z-30 flex flex-col items-start gap-2 md:left-4 md:top-4 md:short:left-[396px]">
                 {desktop ? (
                   <>
@@ -1165,7 +1166,7 @@ export default function App() {
               tabIndex={-1}
               aria-label="Trip"
               className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-2 p-3 outline-none md:bottom-4 md:left-4 md:right-auto md:w-[368px] md:p-0"
-              style={{ maxHeight: short ? "calc(100% - 32px)" : desktop ? `calc(100% - ${(view === "dest" ? 0 : topH) + 40}px)` : `min(${view === "steps" ? 72 : 70}%, calc(100% - ${topH + 20}px))` }}
+              style={{ maxHeight: short ? "calc(100% - 32px)" : desktop ? `calc(100% - ${(view === "dest" && !running ? 0 : topH) + 40}px)` : running && !jogFormOpen ? `min(45dvh, calc(100% - ${topH + 20}px))` : `min(${view === "steps" ? 72 : 70}%, calc(100% - ${topH + 20}px))` }}
               data-testid="panel"
             >
               {datesPassed && (
@@ -1184,9 +1185,17 @@ export default function App() {
                   Loading {areaLabel(areaId, areas)} · {progressLabel(areaProgress[areaId])}
                 </p>
               )}
-              {view === "dest" && !restoring && (
+              {running && <>
+                <ModeSwitch mode={mode} onChange={walkMode} running onRun={runMode} />
+                <JogPanel start={jogStart} data={data} ready={timeSet && shadeReady} dateIdx={dateIdx} bucketIdx={bucketIdx} departMin={departMin}
+                  desktop={desktop} formOpen={jogFormOpen} onFormOpen={setJogFormOpen}
+                  query={query} onQuery={setQuery} results={results} suggested={suggested} onPick={onPick} onLocate={onLocate} locating={locating}
+                  notice={notice} placesState={{ status, onRetry: ensureData }} where={where} onLoop={setJogLoop}
+                  areaError={areaError} onRetryArea={() => areaId && ensureArea(areaId)} />
+              </>}
+              {!running && view === "dest" && !restoring && (
                 <>
-                  <ModeSwitch mode={mode} onChange={setMode} />
+                  <ModeSwitch mode={mode} onChange={walkMode} onRun={runMode} />
                   <div className="min-h-0 overflow-y-auto rounded-card">
                     <DestinationSearch
                       data={{ status, onRetry: ensureData }}
@@ -1207,9 +1216,9 @@ export default function App() {
                   </div>
                 </>
               )}
-              {view === "trip" && (
+              {!running && view === "trip" && (
                 <>
-                  <ModeSwitch mode={mode} onChange={setMode} />
+                  <ModeSwitch mode={mode} onChange={walkMode} onRun={runMode} />
                   <div className="min-h-0 overflow-y-auto rounded-card">
                     <TripFields
                       data={{ status, onRetry: ensureData }}
@@ -1231,7 +1240,7 @@ export default function App() {
                   </div>
                 </>
               )}
-              {(view === "results" || view === "steps") && from && to && (
+              {!running && (view === "results" || view === "steps") && from && to && (
                 <>
                   {!desktop && sheetFull && view === "results" && current && (
                     <button
@@ -1361,7 +1370,7 @@ export default function App() {
         )}
 
         {/* Phones: Play as a round map button above the sheet, as map apps place their map controls. */}
-        {stage === "plan" && !desktop && view === "results" && !sheetFull && current && daySlots.length > 1 && (
+        {!running && stage === "plan" && !desktop && view === "results" && !sheetFull && current && daySlots.length > 1 && (
           <button
             type="button"
             data-scrubber

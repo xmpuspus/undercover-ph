@@ -73,8 +73,15 @@ function dayFile(m: Manifest, dateIdx: number): string {
  * another date when the walker picks it. An older manifest without per_date loads the single shade.bin.
  * A missing or mismatched shade file does not throw. data.shade is then null and data.loadNotes says why.
  */
-export async function loadData(base = "data", fetchImpl?: FetchLike, opts: { dateIdx?: number; date?: string; graphFile?: "graph.cols.json" } = {}): Promise<Data> {
+export async function loadData(base = "data", fetchImpl?: FetchLike, opts: { dateIdx?: number; date?: string; graphFile?: "graph.cols.json"; captureGraphHash?: boolean } = {}): Promise<Data> {
   const f: FetchLike = fetchImpl ?? ((url: string) => fetch(url, { cache: "no-cache" }));
+  // Capture identity alongside the graph, so a later supplement cannot silently describe another
+  // daily build with the same edge count. Optional metadata must not hold up walking routes.
+  let graphHash: string | null = null;
+  const hashRequest = opts.captureGraphHash ? getBytes(f, base, "graph.sha256").then((bytes) => {
+    const hash = bytes && bytes.byteLength <= 1024 ? new TextDecoder().decode(bytes).trim() : "";
+    return graphHash = /^[a-f0-9]{64}$/.test(hash) ? hash : null;
+  }).catch(() => null) : null;
   const [manifest, graph, places, hours] = await Promise.all([
     getJson(f, base, "manifest.json"),
     getJson(f, base, opts.graphFile ?? "graph.json"),
@@ -97,6 +104,12 @@ export async function loadData(base = "data", fetchImpl?: FetchLike, opts: { dat
     shade = await getShade(f, base, 2 * h.n_dates * h.n_buckets * h.n_edges + h.n_edges);
   }
   const data = buildData({ manifest: m, graph: opts.graphFile ? decodeGraph(graph, { routing: true }) : graph as RawGraph, places: places as Place[], hours: hours as HoursRow[], shade, lowconf, days });
+  if (hashRequest) {
+    data.graphHash = graphHash;
+    // Walking never waits for optional jog metadata. A later jog request can use a late capture,
+    // or loadJog can try the digest again if the worker received an unavailable capture.
+    void hashRequest.then((hash) => { data.graphHash = hash; });
+  }
   data.source = { base, fetchImpl: f };
   return data;
 }

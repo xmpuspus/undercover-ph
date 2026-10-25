@@ -77,3 +77,55 @@ The search runs in the browser, so no server of this project sees a start or end
 - Where OpenStreetMap has no sidewalk data, the pipeline assumes a sidewalk on both sides of larger roads. A step such as "walk on the south side" can point to a sidewalk that does not exist.
 - Awnings and arcades that OpenStreetMap does not map add shade that the model cannot see.
 - The data covers 7 days. A scheduled job moves the window each day.
+
+## 8. Run a loop searches nearby waypoints and keeps distinct closed paths
+
+The [numbered run specification](../app/src/lib/jog/SPEC.md) records the agreed requirements and defaults.
+
+The runner selects a start, a distance and a departure time. Defaults are 5 km and 7 min/km; these are
+product defaults. Two waypoints in different directions form a candidate. Three A* legs connect the start,
+the waypoints and the start again. Each leg carries the incoming sidewalk state, so a waypoint cannot
+create a mid-block crossing. A penalty on corridors used by earlier legs discourages retracing a street.
+A smaller penalty on corridors in the current choices directs later searches toward other streets.
+These search penalties do not change the measured facts or reported score of a returned loop.
+A corridor is the unordered pair of end nodes, shared by both sidewalks of a block.
+An edge is excluded if even the shortest trip from the start, along that edge and back exceeds the
+distance tolerance. Each leg gets weighted distance bounds from its destination, including used-street
+penalties. This calculation stops upon reaching the leg's start and clips farther distances at that cost.
+These bounds reduce A* expansion without changing its cost or optimum. Hours and sidewalk legality
+remain part of each leg's search.
+
+The search adjusts waypoint distance when a candidate misses the requested length. Returned loops stay
+within 10% of that length. Any two loops share at most 30% of their corridor metres. Each loop repeats at
+most 10%, excluding a required stem from a dead-end start. A disconnected path with no circuit gives a
+message instead of an invented connection. The search returns up to three choices and reports fewer when
+the network or time budget cannot supply three. A search stops early after 90 further leg searches add no
+choice or score improvement. Other loops changes the seed and uses the current history. A location start
+snaps to the nearest node in the largest walkable component, within the existing 150 m snap limit.
+
+Lower cost favours shade, smaller roads, marked crossings, mapped parks and water, mapped sights where
+enough exist, and streets the runner has not saved before. Turns add a small cost. Discounts cannot reduce
+an edge's cost below its length. Weights live in `app/src/lib/jog/score.ts`; they are routing preferences,
+not measured probabilities of injury. Each leg searches with its arrival slot. Card shade and step minutes
+use the runner's arrival time at each edge and the chosen pace. Opening hours must hold at entry and exit.
+Loops avoid parks while they are closed, using the park's cited hours matched by its OSM way or relation URL.
+A start with every way out inside a closed park gives no loop and names the park and its next opening time
+when the hours provide one. Measuring a path that reaches a closed park gives a warning with the park's name.
+
+Any dark part of a run removes the shade percentage and shows
+"Shade does not apply before sunrise or after sunset." Light affects cost only where at least 30% of
+walkable metres have a light tag. There, `lit=no` adds three times the cost of unknown light, while mapped
+lit metres add none. Familiar streets cost half as much extra in the dark as by day. Every dark card reports
+mapped-lit metres when the street data loaded; poorly mapped areas say "Street lights are not mapped on most streets here."
+If street data failed to load, the card reports that failure and omits claims about mapped-light coverage.
+Light tags cover few areas and do not confirm that lamps work or that a street feels safe.
+
+The sight grade uses mapped sights per square kilometre of the graph box times 0.5 square kilometres.
+Three or more gives rich, one or more gives some, and less than one gives thin. Thin areas omit sight
+discounts from loop selection and say "Few sights are mapped here." Named sights actually passed still
+appear on the card. The path measurement helper can score a known linked sight separately; loop selection
+applies the area grade.
+
+Safety here means traffic: crossings and road size. We have no crime data. The score does not measure
+crime, harassment, pavement condition, live traffic, working lights or a runner's personal security.
+Street mapping and modelled shade need checks on the ground. A stored run records the planned path only.

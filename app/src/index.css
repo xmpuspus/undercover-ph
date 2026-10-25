@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@media (max-width: 767px) {
+  .jog-panel-folded {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .jog-panel-folded .jog-panel-results {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+}
+
 /* Local fonts sized to Jost's width and line metrics, so text keeps its line breaks when Jost swaps in.
    Values from the real font files (fontTools): size-adjust is Jost's average advance over the fallback's,
    the overrides are Jost's hhea ascent 1070, descent 375 and line gap 0 (per 1000) over size-adjust.

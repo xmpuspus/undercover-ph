@@ -234,6 +234,10 @@ export interface Shade {
 
 /** Everything the router needs, in typed arrays where speed matters. */
 export interface Data {
+  /** Graph digest captured with the area's initial load; null when requested but unavailable. */
+  graphHash?: string | null;
+  /** Optional component labels prepared by the page and reused by the jog worker. */
+  network?: { comp: Int32Array; main: number; cycles: boolean[] };
   manifest: Manifest;
   places: Place[];
   hours: HoursRow[];

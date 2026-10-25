@@ -225,7 +225,8 @@ Sheltered means `flags & 7`. Only pedestrian-class ways get bits 0 to 2. Busways
 ### `jog.json` adds jogging attributes in graph edge order
 
 One per area, beside `graph.json`. `pipeline/districts/build_jog.py` reads the graph, the area's OSM extract,
-and the committed `pipeline/districts/wikidata_heritage.json` snapshot. It never reads the network or changes
+the area's `hours.json` beside the graph (or `--hours PATH`), and the committed
+`pipeline/districts/wikidata_heritage.json` snapshot. It never reads the network or changes
 the graph. The snapshot records its query and fetch date. A missing or malformed snapshot produces a warning
 and leaves the OSM sights available. Invalid snapshot rows are skipped.
 
@@ -235,14 +236,14 @@ The top-level fields are:
 | --- | --- |
 | `version` | Integer `1` |
 | `graph_sha256` | Lowercase SHA-256 of the exact `graph.json` bytes read |
-| `edges` | Six integer arrays, each with one entry per graph edge, in the graph's array order |
+| `edges` | Seven integer arrays, each with one entry per graph edge, in the graph's array order. Older files may omit `hours`. |
 | `sights` | Sight points, each with `name`, `kind`, `lon`, `lat` and `src` |
-| `counts` | `edges`, `walk_m`, `lit_tagged_m`, `lit_share` and `sights` |
+| `counts` | `edges`, `walk_m`, `lit_tagged_m`, `lit_share`, `sights` and `park_hours_edges` (edges whose `hours` index is at least 0) |
 | `sources` | Objects with `name`, `licence` and `url`: OpenStreetMap under ODbL and Wikidata under CC0 |
 
 Consumers must check `graph_sha256` before using the arrays. Sidewalk edges inherit the tags of their
 `way_id`, including the road class. Link roads use their parent class. A missing OSM way keeps the default
-tag codes. An empty or invalid edge geometry keeps its tag codes and has park 0, water 0 and sight -1.
+tag codes. An empty or invalid edge geometry keeps its tag codes and has park 0, water 0, sight -1 and hours -1.
 
 | Array | Codes |
 | --- | --- |
@@ -252,6 +253,15 @@ tag codes. An empty or invalid edge geometry keeps its tag codes and has park 0,
 | `edges.park` | 1 when the edge midpoint lies in or on the boundary of a park area, else 0 |
 | `edges.water` | 1 when the midpoint lies within 50 m of water geometry, else 0 |
 | `edges.sight` | Index of the nearest sight point within 40 m of the midpoint, or -1. Equal distances use the lower index. |
+| `edges.hours` | Index of the area's `hours.json` row for the park containing the edge midpoint, or -1. The park's exact OSM way or relation URL must equal the row's `source_url`. |
+
+`edges.hours` uses the same polygons, boundaries and holes as `edges.park`. Duplicate URLs and overlapping
+parks use the lowest matching row index. A missing or malformed hours file gives -1 everywhere; rows
+without a string `source_url` are skipped without changing other row indexes. An older jog file without
+the column loads as -1 everywhere. A present column must contain one integer of -1 or more per edge;
+otherwise the app rejects the supplement. An index absent from the area's hours rows counts as no hours.
+Jog searches check both park and graph hours at entry and exit, at the runner's pace on each leg.
+Walking routes continue to use graph hours alone.
 
 Paved surfaces are `paved`, `asphalt`, `concrete`, `concrete:lanes`, `concrete:plates`, `paving_stones`, `sett`,
 `cobblestone`, `unhewn_cobblestone`, `metal`, `wood`, `rubber` and `bricks`. Unpaved surfaces are `unpaved`,
@@ -284,6 +294,44 @@ The sight list sorts by `src`, so indexes are deterministic.
 edges whose access needs a check. `counts.lit_tagged_m` sums the lengths with light code 1 or 2.
 `counts.lit_share` divides those tagged metres by `walk_m`, or is 0 when the graph has no length.
 Unknown light does not mean unlit. `counts.sights` is the length of `sights`.
+
+The browser loads this supplement only for Run a loop, inside `jogWorker.ts`. It checks `graph_sha256`
+against the area's published 65-byte `graph.sha256` and checks the column lengths against the loaded
+graph. Digest capture starts with the initial graph load and never delays walking. A known captured
+digest rejects a later digest from another build. If capture was unavailable, the worker can retry it.
+Each deploy writes the digest from the exact graph it ships, after any local re-shading.
+This also covers deploys that do not download a shade release.
+It does not download `graph.json` again. `parseJog` rejects invalid versions, sizes, codes,
+sight coordinates and light shares. An absent, invalid, mismatched or slow supplement leaves the loop
+finder working with shade and crossings. The card area says
+"Street data for sights, light and road size did not load."
+
+The page sends its in-memory routing data once per area to the dedicated worker. Queries send only run
+settings and local history through `postMessage`. A newly loaded shade date sends that date's shade arrays.
+The worker keeps at most two areas. Other loops retries street data when the previous load failed.
+Optional street-data requests stop after three seconds; loop searches
+have their own 1,500 ms default budget. A worker startup error gives a retry state on the page.
+
+### Run history stays in IndexedDB on the phone
+
+Database `ucph-jog`, version 1, contains object store `runs` with key path `id`. Each planned run is
+`{id, area, date, length_m, streets}`. Each street sample is `[way_id, side, lonE5, latE5]`, with side 0
+for centre, 1 for left and 2 for right. Coordinates are integer degrees times 100,000. Geometry is sampled
+with at most 23 m between samples before rounding, leaving room for rounding error within the 25 m limit.
+
+An edge matches past runs only when its way id and side match and its geometry midpoint is within 30 m
+of a saved sample. An edge without a way id never matches. Corrupt records are skipped with a notice.
+Scoring inspects at most 10,000 records and 1,000,000 samples, counting rejected records toward both limits.
+Validation stops before a record exceeds the remaining sample allowance. Larger histories show a notice and retain their
+records. Reading and exporting use a separate history worker, so cloning a large legacy record cannot
+block the page. A history-worker error or ten-second timeout gives a message and releases the loop controls.
+The count includes every saved record. Export reads the full store as `{runs: [...]}` and refuses
+a file over 50 MB with a message instead of downloading a partial history. Clear history clears the store.
+Saving first requests persistent browser storage. Safari outside a Home Screen app shows the retention
+notice. The feature saves the planned loop and does not track a run with GPS.
+
+History never enters a request URL, header or body. Export creates a local Blob download. Run starts and
+settings do not enter trip links; a start from the phone's location is never written as coordinates in a link.
 
 Run `pipeline/.venv/bin/python -I pipeline/districts/build_jog.py --area qc-north` to add the file to an
 already published area. A positional area id is accepted too. `--graph`, `--pbf`, `--wikidata` and `--out`
@@ -414,6 +462,16 @@ openAt(data: Data, hoursIdx: number, dateIdx: number, minute: number): boolean
 ```
 
 - The walking speed is 1.1 m/s. Report minutes rounded up.
+- `aStar(data, spec, start, end, k, options?)` accepts optional `{extra, entry, junctionExtra, mPerMin}`.
+  `extra[e]` adds non-negative cost per metre. `entry: {edge, context?}` carries the previous leg's sidewalk
+  state. `junctionExtra[e]` adds metres at an unmarked side change into edge `e`. `mPerMin` changes opening-hours
+  arrival times. Omitting these options preserves walking routes. `buildSteps` accepts an optional fourth
+  argument for metres per minute; walking still defaults to 66.
+  Jog legs can also pass `potential`, a Float64Array of consistent weighted distance bounds. The jog engine
+  computes these from each leg's destination on permitted streets, including repeat penalties but ignoring
+  hours and side changes. It stops at the leg's start and clips farther distances at that cost. The absolute
+  distance difference strengthens A*'s lower bound. It never adds routing cost, and nonfinite entries use
+  the original geometric bound.
 - The search ranks routes with the shade of the departure bucket. The route card reports the shade of the bucket in force when the walker reaches each edge (`coverAt` in `route.ts`).
 - `state: "night"` when the sun altitude at the bucket is at or below 3 degrees (see the 2026-10-22 amendment). Then return the shortest and the most sheltered routes, and add a note.
 - For the recommended route, start at k = 2 and lower k until the detour is 20% or less. Keep it only if it cuts sun minutes by at least 15%. If it does not, the most covered route takes its place when it meets both limits. Otherwise set `recommendedIsShortest`.

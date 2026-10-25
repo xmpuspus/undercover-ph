@@ -35,7 +35,7 @@ function sunAltitude(data: Data, dateIdx: number, bucketIdx: number): number | n
   return row && typeof row[0] === "number" ? row[0] : null;
 }
 
-function isNight(data: Data, dateIdx: number, bucketIdx: number): boolean {
+export function isNight(data: Data, dateIdx: number, bucketIdx: number): boolean {
   const alt = sunAltitude(data, dateIdx, bucketIdx);
   if (alt !== null) return alt <= NIGHT_MAX_ALT;
   const date = data.manifest.dates[dateIdx];

@@ -66,7 +66,8 @@ test("the first suggestions come from top.json alone, and places_index.json is n
 test("the area graph loads only after a place is picked, in the smaller column file", async ({ page }) => {
   const graphs: Request[] = [];
   page.on("request", (r) => {
-    if (/\/data\/areas\/[^/]+\/graph[^/]*$/.test(new URL(r.url()).pathname)) graphs.push(r);
+    // graph.sha256 is a 65-byte digest that Run a loop checks its street data against, not a graph file.
+    if (/\/data\/areas\/[^/]+\/graph(\.cols)?\.json$/.test(new URL(r.url()).pathname)) graphs.push(r);
   });
   await start(page);
   await page.getByTestId("destination-input").fill("Greenbelt");

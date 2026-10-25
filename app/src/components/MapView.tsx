@@ -13,6 +13,8 @@ import { addPmtilesProtocol } from "../lib/pmtiles";
 import { BUILDINGS_SOURCE, GroundShadows, TREES_SOURCE } from "../lib/groundShadows";
 import { rectsOutline, type Rect as AreaRect } from "../lib/areaOutline";
 import { MoonIcon, SunIcon, UmbrellaIcon } from "./Icons";
+import type { Loop } from "../lib/jog/types";
+import JogLayer from "./JogLayer";
 
 export interface Insets {
   top: number;
@@ -28,6 +30,7 @@ export interface Focus {
 }
 
 interface Props {
+  jogLoop?: Loop | null;
   // Sky, light and building colours for the chosen hour. theme.dark picks the night basemap.
   theme: SkyTheme;
   // Replaced by buildingTiles. Kept so older callers compile; a GeoJSON URL here is ignored.
@@ -177,6 +180,7 @@ export default function MapView(p: Props) {
   const groundShadows = useRef<GroundShadows | null>(null);
   const [tick, setTick] = useState(0);
   const [styleTick, setStyleTick] = useState(0);
+  const [jogCounts, setJogCounts] = useState({ marks: 0, arrows: 0 });
 
   const routeData = useMemo(() => {
     const alt: GeoJSON.Feature[] = [];
@@ -652,7 +656,8 @@ export default function MapView(p: Props) {
 
   return (
     <div className="absolute inset-0">
-      <div ref={box} className="h-full w-full" data-testid="map" />
+      <div ref={box} className="h-full w-full" data-testid="map" data-jog-km-marks={jogCounts.marks} data-jog-arrows={jogCounts.arrows} />
+      <JogLayer map={mapRef.current} loop={p.jogLoop ?? null} styleTick={styleTick} styleReady={ready.current} insets={p.insets} onDrawn={setJogCounts} />
       <div ref={toneRef} className="pointer-events-none absolute inset-0 mix-blend-multiply" aria-hidden="true" data-testid="map-tone" />
       <div ref={washRef} className="pointer-events-none absolute inset-0" aria-hidden="true" />
       {failed && (

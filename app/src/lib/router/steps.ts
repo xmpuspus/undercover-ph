@@ -478,7 +478,7 @@ function bestLandmark(leg: Leg): string | null {
  * 2. Fold steps under 25 m into a neighbour. Stairs, crossings, and bridges fold forward and keep their phrase.
  * 3. Word the turn from the bearing change, then add the landmark, cover words, and closing time.
  */
-export function buildSteps(data: Data, trips: EdgeTrip[], dateIdx: number): Step[] {
+export function buildSteps(data: Data, trips: EdgeTrip[], dateIdx: number, mPerMin = WALK_M_PER_MIN): Step[] {
   if (trips.length === 0) return [];
   const legs: Leg[] = [];
   let prevTrip: EdgeTrip | null = null;
@@ -626,7 +626,7 @@ export function buildSteps(data: Data, trips: EdgeTrip[], dateIdx: number): Step
       text: en,
       textTl: tl,
       distance_m: Math.round(leg.dist),
-      minutes: leg.dist > 0 ? Math.max(1, Math.ceil(leg.dist / WALK_M_PER_MIN - 1e-9)) : 0,
+      minutes: leg.dist > 0 ? Math.max(1, Math.ceil(leg.dist / mPerMin - 1e-9)) : 0,
       cover: cover(leg),
       landmark: lm,
       flags: [...leg.flags],

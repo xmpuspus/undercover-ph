@@ -1,4 +1,4 @@
-"""Acceptance for build_jog.py, the per-area jog file (tmp/jog-loops-20261024/SPEC.md, J-D1 to J-D11).
+"""Acceptance for build_jog.py, the per-area jog file (app/src/lib/jog/SPEC.md, J-D1 to J-D11).
 
 Run: pipeline/shade/.venv/bin/python -m pytest pipeline/districts/test_build_jog.py -q
 The script runs under pipeline/.venv, which has osmium. The test writes a small graph, an OSM XML file and a

@@ -2,9 +2,9 @@ import { useEffect, useState, type KeyboardEvent } from "react";
 import type { Endpoint, Mode, Place } from "../types";
 import { BackIcon, CloseIcon, LocateIcon, PinIcon, RainIcon, SunIcon, TargetIcon } from "./Icons";
 
-export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void }) {
+export function ModeSwitch({ mode, onChange, running = false, onRun }: { mode: Mode; onChange: (m: Mode) => void; running?: boolean; onRun?: () => void }) {
   const item = (m: Mode, label: string) => {
-    const on = mode === m;
+    const on = !running && mode === m;
     return (
       <button
         type="button"
@@ -25,6 +25,8 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (m: Mode)
     <div role="radiogroup" aria-label="Route type" className="flex gap-1 rounded-card bg-slate-200/80 p-1">
       {item("shade", "Shaded")}
       {item("rain", "Sheltered")}
+      {onRun && <button type="button" role="radio" aria-checked={running} onClick={onRun} data-testid="mode-run"
+        className={`min-h-11 flex-1 rounded-xl px-2 py-2 text-[14px] ${running ? "bg-white font-medium text-brand shadow-sm" : "text-slate-600 hover:text-ink"}`}>Run a loop</button>}
     </div>
   );
 }
@@ -49,7 +51,7 @@ function categoryLabel(c: string): string {
 
 // Search box and place list as a combobox: focus stays in the box, arrow keys move through the places,
 // Enter picks the highlighted one (or the first), Escape clears the box.
-function useCombobox(id: string, places: Place[], onPick: (p: Place) => void, query: string, onQuery: (q: string) => void) {
+export function useCombobox(id: string, places: Place[], onPick: (p: Place) => void, query: string, onQuery: (q: string) => void) {
   const [active, setActive] = useState(-1);
   const key = places.map((pl) => pl.node_id).join(",");
   useEffect(() => setActive(-1), [key]);

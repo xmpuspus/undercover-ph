@@ -119,6 +119,20 @@ export interface Path {
   exposed: number;
 }
 
+export interface SearchOptions {
+  /** Additional non-negative cost per metre, indexed by edge. */
+  extra?: Float32Array;
+  /** Incoming edge and centre-side context from the preceding leg. */
+  entry?: { edge: number; context?: number };
+  /** Metres added to an unmarked side change into each edge. */
+  junctionExtra?: Float32Array;
+  /** Opening-hours travel speed. Defaults to the walking speed. */
+  mPerMin?: number;
+  /** Distances from one landmark under costs no greater than this search's. Differences
+   * strengthen the lower bound without changing the optimum. Nonfinite entries are ignored. */
+  potential?: Float64Array;
+}
+
 interface Buffers {
   centreOffset: Int32Array;
   directed: Int32Array;
@@ -223,7 +237,7 @@ function buffers(data: Data): Buffers {
  * Every edge costs at least its length, and data.hScale keeps straight-line distance under every
  * edge length, so the heuristic is consistent. States reopen when their cost drops.
  */
-export function aStar(data: Data, spec: SearchSpec, s: number, t: number, k: number): Path | null {
+export function aStar(data: Data, spec: SearchSpec, s: number, t: number, k: number, opts?: SearchOptions): Path | null {
   const b = buffers(data);
   const run = ++b.run;
   const { nodeX, nodeY, adjOff, adjNode, adjEdge, edgeLen, edgeHours, edgeU, edgeV } = data;
@@ -234,11 +248,16 @@ export function aStar(data: Data, spec: SearchSpec, s: number, t: number, k: num
   const h = (v: number) => {
     if (b.hStamp[v] !== run) {
       b.hStamp[v] = run;
-      b.h[v] = hs * Math.hypot(nodeX[v] - tx, nodeY[v] - ty);
+      let lower = hs * Math.hypot(nodeX[v] - tx, nodeY[v] - ty);
+      const p = opts?.potential;
+      if (p && Number.isFinite(p[v]) && Number.isFinite(p[t])) lower = Math.max(lower, Math.abs(p[v] - p[t]));
+      b.h[v] = lower;
     }
     return b.h[v];
   };
   const penalty = JUNCTION_PENALTY_M * (1 + k);
+  const speed = opts?.mPerMin && Number.isFinite(opts.mPerMin) && opts.mPerMin > 0 ? opts.mPerMin : WALK_M_PER_MIN;
+  const nonnegative = (v: number | undefined) => v !== undefined && Number.isFinite(v) && v > 0 ? v : 0;
 
   let size = 0;
   const push = (key: number, v: number) => {
@@ -275,21 +294,22 @@ export function aStar(data: Data, spec: SearchSpec, s: number, t: number, k: num
     if (hi >= 0 && !ignoreHours) {
       // A passage with hours must be open when the walker enters and leaves it.
       // The search orders by cost, not time, so with k > 0 this arrival time is approximate.
-      const arrive = departMin + wx / WALK_M_PER_MIN;
-      if (!(openAt(data, hi, dateIdx, arrive) && openAt(data, hi, dateIdx, arrive + len / WALK_M_PER_MIN))) return;
+      const arrive = departMin + wx / speed;
+      if (!(openAt(data, hi, dateIdx, arrive) && openAt(data, hi, dateIdx, arrive + len / speed))) return;
     }
     let c = gx + len * (1 + k * exposure[e]);
+    if (opts?.extra) c += len * nonnegative(opts.extra[e]);
     let d: number;
     if (from >= 0 && b.turnState && b.turnJunction) {
       const slot = b.turnOff[from] + j - adjOff[x];
       d = b.turnState[slot];
       if (d < 0) return;
-      if (b.turnJunction[slot]) c += penalty;
+      if (b.turnJunction[slot]) c += penalty + nonnegative(opts?.junctionExtra?.[e]);
     } else {
-      const move = advanceSideCode(data, from < 0 ? -1 : b.directed[from] >> 1, e, x, from < 0 ? 0 : b.context[from]);
+      const move = advanceSideCode(data, from < 0 ? (opts?.entry?.edge ?? -1) : b.directed[from] >> 1, e, x, from < 0 ? (opts?.entry?.context ?? 0) : b.context[from]);
       const sw = move & 3;
       if (sw === Switch.Forbidden) return;
-      if (sw === Switch.Junction) c += penalty;
+      if (sw === Switch.Junction) c += penalty + nonnegative(opts?.junctionExtra?.[e]);
       const carry = move >> 2;
       const context = carry === 1 || carry === 4 ? 0 : carry;
       const dir = edgeU[e] === x ? 0 : 1;
